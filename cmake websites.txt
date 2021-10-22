@@ -1,0 +1,3 @@
+https://cmake.org/cmake/help/latest/guide/tutorial/Selecting%20Static%20or%20Shared%20Libraries.html
+
+http://derekmolloy.ie/hello-world-introductions-to-cmake/
