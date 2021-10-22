@@ -1,0 +1,2 @@
+﻿  EngineCore.cpp
+D:\C++\SecondEngineProject\Engine\Source\Core\Private\EngineCore.cpp(1,10): fatal error C1083: Cannot open include file: 'Public/EngineCore.h': No such file or directory

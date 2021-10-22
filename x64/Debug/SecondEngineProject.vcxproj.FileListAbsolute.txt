@@ -1,0 +1,2 @@
+D:\C++\SecondEngineProject\x64\Debug\SecondEngineProject.exe
+D:\C++\SecondEngineProject\x64\Debug\SecondEngineProject.pdb
