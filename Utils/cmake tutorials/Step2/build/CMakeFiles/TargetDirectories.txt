@@ -1,0 +1,4 @@
+C:/Users/cryst/Desktop/tutorial/Step2/build/CMakeFiles/Tutorial.dir
+C:/Users/cryst/Desktop/tutorial/Step2/build/CMakeFiles/ALL_BUILD.dir
+C:/Users/cryst/Desktop/tutorial/Step2/build/CMakeFiles/ZERO_CHECK.dir
+C:/Users/cryst/Desktop/tutorial/Step2/build/MathFunctions/CMakeFiles/MathFunctions.dir
