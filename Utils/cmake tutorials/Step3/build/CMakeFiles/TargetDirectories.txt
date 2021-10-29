@@ -1,4 +1,42 @@
-C:/Users/cryst/Desktop/tutorial/Step3/build/CMakeFiles/Tutorial.dir
-C:/Users/cryst/Desktop/tutorial/Step3/build/CMakeFiles/ALL_BUILD.dir
-C:/Users/cryst/Desktop/tutorial/Step3/build/CMakeFiles/ZERO_CHECK.dir
-C:/Users/cryst/Desktop/tutorial/Step3/build/MathFunctions/CMakeFiles/MathFunctions.dir
+D:/C++/SecondEngineProject/Utils/cmake tutorials/Step3/build/CMakeFiles/Tutorial.dir
+D:/C++/SecondEngineProject/Utils/cmake tutorials/Step3/build/CMakeFiles/INSTALL.dir
+D:/C++/SecondEngineProject/Utils/cmake tutorials/Step3/build/CMakeFiles/ALL_BUILD.dir
+D:/C++/SecondEngineProject/Utils/cmake tutorials/Step3/build/CMakeFiles/ZERO_CHECK.dir
+D:/C++/SecondEngineProject/Utils/cmake tutorials/Step3/build/MathFunctions/CMakeFiles/MathFunctions.dir
+D:/C++/SecondEngineProject/Utils/cmake tutorials/Step3/build/MathFunctions/CMakeFiles/INSTALL.dir
+D:/C++/SecondEngineProject/Utils/cmake tutorials/Step3/build/glfw-3.3.4/CMakeFiles/uninstall.dir
+D:/C++/SecondEngineProject/Utils/cmake tutorials/Step3/build/glfw-3.3.4/CMakeFiles/INSTALL.dir
+D:/C++/SecondEngineProject/Utils/cmake tutorials/Step3/build/glfw-3.3.4/CMakeFiles/ALL_BUILD.dir
+D:/C++/SecondEngineProject/Utils/cmake tutorials/Step3/build/glfw-3.3.4/src/CMakeFiles/glfw.dir
+D:/C++/SecondEngineProject/Utils/cmake tutorials/Step3/build/glfw-3.3.4/src/CMakeFiles/INSTALL.dir
+D:/C++/SecondEngineProject/Utils/cmake tutorials/Step3/build/glfw-3.3.4/examples/CMakeFiles/boing.dir
+D:/C++/SecondEngineProject/Utils/cmake tutorials/Step3/build/glfw-3.3.4/examples/CMakeFiles/gears.dir
+D:/C++/SecondEngineProject/Utils/cmake tutorials/Step3/build/glfw-3.3.4/examples/CMakeFiles/heightmap.dir
+D:/C++/SecondEngineProject/Utils/cmake tutorials/Step3/build/glfw-3.3.4/examples/CMakeFiles/offscreen.dir
+D:/C++/SecondEngineProject/Utils/cmake tutorials/Step3/build/glfw-3.3.4/examples/CMakeFiles/particles.dir
+D:/C++/SecondEngineProject/Utils/cmake tutorials/Step3/build/glfw-3.3.4/examples/CMakeFiles/sharing.dir
+D:/C++/SecondEngineProject/Utils/cmake tutorials/Step3/build/glfw-3.3.4/examples/CMakeFiles/simple.dir
+D:/C++/SecondEngineProject/Utils/cmake tutorials/Step3/build/glfw-3.3.4/examples/CMakeFiles/splitview.dir
+D:/C++/SecondEngineProject/Utils/cmake tutorials/Step3/build/glfw-3.3.4/examples/CMakeFiles/wave.dir
+D:/C++/SecondEngineProject/Utils/cmake tutorials/Step3/build/glfw-3.3.4/examples/CMakeFiles/INSTALL.dir
+D:/C++/SecondEngineProject/Utils/cmake tutorials/Step3/build/glfw-3.3.4/tests/CMakeFiles/clipboard.dir
+D:/C++/SecondEngineProject/Utils/cmake tutorials/Step3/build/glfw-3.3.4/tests/CMakeFiles/events.dir
+D:/C++/SecondEngineProject/Utils/cmake tutorials/Step3/build/glfw-3.3.4/tests/CMakeFiles/msaa.dir
+D:/C++/SecondEngineProject/Utils/cmake tutorials/Step3/build/glfw-3.3.4/tests/CMakeFiles/glfwinfo.dir
+D:/C++/SecondEngineProject/Utils/cmake tutorials/Step3/build/glfw-3.3.4/tests/CMakeFiles/iconify.dir
+D:/C++/SecondEngineProject/Utils/cmake tutorials/Step3/build/glfw-3.3.4/tests/CMakeFiles/monitors.dir
+D:/C++/SecondEngineProject/Utils/cmake tutorials/Step3/build/glfw-3.3.4/tests/CMakeFiles/reopen.dir
+D:/C++/SecondEngineProject/Utils/cmake tutorials/Step3/build/glfw-3.3.4/tests/CMakeFiles/cursor.dir
+D:/C++/SecondEngineProject/Utils/cmake tutorials/Step3/build/glfw-3.3.4/tests/CMakeFiles/empty.dir
+D:/C++/SecondEngineProject/Utils/cmake tutorials/Step3/build/glfw-3.3.4/tests/CMakeFiles/gamma.dir
+D:/C++/SecondEngineProject/Utils/cmake tutorials/Step3/build/glfw-3.3.4/tests/CMakeFiles/icon.dir
+D:/C++/SecondEngineProject/Utils/cmake tutorials/Step3/build/glfw-3.3.4/tests/CMakeFiles/inputlag.dir
+D:/C++/SecondEngineProject/Utils/cmake tutorials/Step3/build/glfw-3.3.4/tests/CMakeFiles/joysticks.dir
+D:/C++/SecondEngineProject/Utils/cmake tutorials/Step3/build/glfw-3.3.4/tests/CMakeFiles/opacity.dir
+D:/C++/SecondEngineProject/Utils/cmake tutorials/Step3/build/glfw-3.3.4/tests/CMakeFiles/tearing.dir
+D:/C++/SecondEngineProject/Utils/cmake tutorials/Step3/build/glfw-3.3.4/tests/CMakeFiles/threads.dir
+D:/C++/SecondEngineProject/Utils/cmake tutorials/Step3/build/glfw-3.3.4/tests/CMakeFiles/timeout.dir
+D:/C++/SecondEngineProject/Utils/cmake tutorials/Step3/build/glfw-3.3.4/tests/CMakeFiles/title.dir
+D:/C++/SecondEngineProject/Utils/cmake tutorials/Step3/build/glfw-3.3.4/tests/CMakeFiles/triangle-vulkan.dir
+D:/C++/SecondEngineProject/Utils/cmake tutorials/Step3/build/glfw-3.3.4/tests/CMakeFiles/windows.dir
+D:/C++/SecondEngineProject/Utils/cmake tutorials/Step3/build/glfw-3.3.4/tests/CMakeFiles/INSTALL.dir

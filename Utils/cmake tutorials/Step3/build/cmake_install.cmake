@@ -1,4 +1,4 @@
-# Install script for directory: C:/Users/cryst/Desktop/tutorial/Step3
+# Install script for directory: D:/C++/SecondEngineProject/Utils/cmake tutorials/Step3
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -34,7 +34,8 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
-  include("C:/Users/cryst/Desktop/tutorial/Step3/build/MathFunctions/cmake_install.cmake")
+  include("D:/C++/SecondEngineProject/Utils/cmake tutorials/Step3/build/MathFunctions/cmake_install.cmake")
+  include("D:/C++/SecondEngineProject/Utils/cmake tutorials/Step3/build/glfw-3.3.4/cmake_install.cmake")
 
 endif()
 
@@ -46,5 +47,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "C:/Users/cryst/Desktop/tutorial/Step3/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "D:/C++/SecondEngineProject/Utils/cmake tutorials/Step3/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

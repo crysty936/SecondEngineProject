@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="D:\C++\SecondEngineProject\Utils\cmake tutorials\Step3\glfw-3.3.4\tests\reopen.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\C++\SecondEngineProject\Utils\cmake tutorials\Step3\glfw-3.3.4\deps\glad_gl.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="D:\C++\SecondEngineProject\Utils\cmake tutorials\Step3\glfw-3.3.4\deps\glad\gl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="D:\C++\SecondEngineProject\Utils\cmake tutorials\Step3\glfw-3.3.4\tests\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{91107102-2ADB-3E72-9A0B-EDAA78487E91}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{5F54886F-7CD6-300E-8E6B-56CD3236F3E0}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

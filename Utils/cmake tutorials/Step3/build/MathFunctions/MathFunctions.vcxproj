@@ -22,7 +22,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{562E6396-5C6D-35F8-8E6C-2D792CD287C0}</ProjectGuid>
+    <ProjectGuid>{471576B9-5070-3FB2-9C3A-F88568307798}</ProjectGuid>
     <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
     <Keyword>Win32Proj</Keyword>
     <Platform>x64</Platform>
@@ -59,19 +59,19 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\cryst\Desktop\tutorial\Step3\build\MathFunctions\Debug\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\C++\SecondEngineProject\Utils\cmake tutorials\Step3\build\MathFunctions\Debug\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MathFunctions.dir\Debug\</IntDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MathFunctions</TargetName>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.lib</TargetExt>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\cryst\Desktop\tutorial\Step3\build\MathFunctions\Release\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\C++\SecondEngineProject\Utils\cmake tutorials\Step3\build\MathFunctions\Release\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MathFunctions.dir\Release\</IntDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MathFunctions</TargetName>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.lib</TargetExt>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\cryst\Desktop\tutorial\Step3\build\MathFunctions\MinSizeRel\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:\C++\SecondEngineProject\Utils\cmake tutorials\Step3\build\MathFunctions\MinSizeRel\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">MathFunctions.dir\MinSizeRel\</IntDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">MathFunctions</TargetName>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">.lib</TargetExt>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\cryst\Desktop\tutorial\Step3\build\MathFunctions\RelWithDebInfo\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:\C++\SecondEngineProject\Utils\cmake tutorials\Step3\build\MathFunctions\RelWithDebInfo\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">MathFunctions.dir\RelWithDebInfo\</IntDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">MathFunctions</TargetName>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">.lib</TargetExt>
@@ -200,11 +200,11 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <CustomBuild Include="C:\Users\cryst\Desktop\tutorial\Step3\MathFunctions\CMakeLists.txt">
+    <CustomBuild Include="D:\C++\SecondEngineProject\Utils\cmake tutorials\Step3\MathFunctions\CMakeLists.txt">
       <StdOutEncoding>UTF-8</StdOutEncoding>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule C:/Users/cryst/Desktop/tutorial/Step3/MathFunctions/CMakeLists.txt</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule D:/C++/SecondEngineProject/Utils/cmake tutorials/Step3/MathFunctions/CMakeLists.txt</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/cryst/Desktop/tutorial/Step3 -BC:/Users/cryst/Desktop/tutorial/Step3/build --check-stamp-file C:/Users/cryst/Desktop/tutorial/Step3/build/MathFunctions/CMakeFiles/generate.stamp
+"C:\Program Files\CMake\bin\cmake.exe" "-SD:/C++/SecondEngineProject/Utils/cmake tutorials/Step3" "-BD:/C++/SecondEngineProject/Utils/cmake tutorials/Step3/build" --check-stamp-file "D:/C++/SecondEngineProject/Utils/cmake tutorials/Step3/build/MathFunctions/CMakeFiles/generate.stamp"
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -212,12 +212,12 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\cryst\Desktop\tutorial\Step3\build\MathFunctions\CMakeFiles\generate.stamp</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\C++\SecondEngineProject\Utils\cmake tutorials\Step3\build\CMakeFiles\cmake.verify_globs;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\C++\SecondEngineProject\Utils\cmake tutorials\Step3\build\MathFunctions\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule C:/Users/cryst/Desktop/tutorial/Step3/MathFunctions/CMakeLists.txt</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule D:/C++/SecondEngineProject/Utils/cmake tutorials/Step3/MathFunctions/CMakeLists.txt</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/cryst/Desktop/tutorial/Step3 -BC:/Users/cryst/Desktop/tutorial/Step3/build --check-stamp-file C:/Users/cryst/Desktop/tutorial/Step3/build/MathFunctions/CMakeFiles/generate.stamp
+"C:\Program Files\CMake\bin\cmake.exe" "-SD:/C++/SecondEngineProject/Utils/cmake tutorials/Step3" "-BD:/C++/SecondEngineProject/Utils/cmake tutorials/Step3/build" --check-stamp-file "D:/C++/SecondEngineProject/Utils/cmake tutorials/Step3/build/MathFunctions/CMakeFiles/generate.stamp"
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -225,12 +225,12 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\cryst\Desktop\tutorial\Step3\build\MathFunctions\CMakeFiles\generate.stamp</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\C++\SecondEngineProject\Utils\cmake tutorials\Step3\build\CMakeFiles\cmake.verify_globs;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\C++\SecondEngineProject\Utils\cmake tutorials\Step3\build\MathFunctions\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
-      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule C:/Users/cryst/Desktop/tutorial/Step3/MathFunctions/CMakeLists.txt</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule D:/C++/SecondEngineProject/Utils/cmake tutorials/Step3/MathFunctions/CMakeLists.txt</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/cryst/Desktop/tutorial/Step3 -BC:/Users/cryst/Desktop/tutorial/Step3/build --check-stamp-file C:/Users/cryst/Desktop/tutorial/Step3/build/MathFunctions/CMakeFiles/generate.stamp
+"C:\Program Files\CMake\bin\cmake.exe" "-SD:/C++/SecondEngineProject/Utils/cmake tutorials/Step3" "-BD:/C++/SecondEngineProject/Utils/cmake tutorials/Step3/build" --check-stamp-file "D:/C++/SecondEngineProject/Utils/cmake tutorials/Step3/build/MathFunctions/CMakeFiles/generate.stamp"
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -238,12 +238,12 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\cryst\Desktop\tutorial\Step3\build\MathFunctions\CMakeFiles\generate.stamp</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:\C++\SecondEngineProject\Utils\cmake tutorials\Step3\build\CMakeFiles\cmake.verify_globs;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:\C++\SecondEngineProject\Utils\cmake tutorials\Step3\build\MathFunctions\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
-      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule C:/Users/cryst/Desktop/tutorial/Step3/MathFunctions/CMakeLists.txt</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule D:/C++/SecondEngineProject/Utils/cmake tutorials/Step3/MathFunctions/CMakeLists.txt</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/cryst/Desktop/tutorial/Step3 -BC:/Users/cryst/Desktop/tutorial/Step3/build --check-stamp-file C:/Users/cryst/Desktop/tutorial/Step3/build/MathFunctions/CMakeFiles/generate.stamp
+"C:\Program Files\CMake\bin\cmake.exe" "-SD:/C++/SecondEngineProject/Utils/cmake tutorials/Step3" "-BD:/C++/SecondEngineProject/Utils/cmake tutorials/Step3/build" --check-stamp-file "D:/C++/SecondEngineProject/Utils/cmake tutorials/Step3/build/MathFunctions/CMakeFiles/generate.stamp"
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -251,17 +251,17 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\cryst\Desktop\tutorial\Step3\build\MathFunctions\CMakeFiles\generate.stamp</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:\C++\SecondEngineProject\Utils\cmake tutorials\Step3\build\CMakeFiles\cmake.verify_globs;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:\C++\SecondEngineProject\Utils\cmake tutorials\Step3\build\MathFunctions\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="C:\Users\cryst\Desktop\tutorial\Step3\MathFunctions\mysqrt.cxx" />
+    <ClCompile Include="D:\C++\SecondEngineProject\Utils\cmake tutorials\Step3\MathFunctions\mysqrt.cxx" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="C:\Users\cryst\Desktop\tutorial\Step3\build\ZERO_CHECK.vcxproj">
-      <Project>{F6D26CF1-7939-3D55-90E8-D04B44719FDB}</Project>
+    <ProjectReference Include="D:\C++\SecondEngineProject\Utils\cmake tutorials\Step3\build\ZERO_CHECK.vcxproj">
+      <Project>{12C51697-9CFE-3D28-A874-4A94E159FC7A}</Project>
       <Name>ZERO_CHECK</Name>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>

@@ -1,4 +1,4 @@
-# Install script for directory: C:/Users/cryst/Desktop/tutorial/Step3/MathFunctions
+# Install script for directory: D:/C++/SecondEngineProject/Utils/cmake tutorials/Step3/MathFunctions
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
