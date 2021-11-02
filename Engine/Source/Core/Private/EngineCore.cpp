@@ -26,30 +26,39 @@ void EngineCore::Init()
 
 }
 
+// Windows platform code for getting time spent
+static __forceinline double seconds()
+{
+	constexpr double secondsPerCycle = 1.0f / 1000000.0f;
+	LARGE_INTEGER cycles;
+	::QueryPerformanceCounter(&cycles);
+
+    return cycles.QuadPart * secondsPerCycle + 16777216.0;
+}
+
 void EngineCore::Run()
 {
 	double deltaTime = 0.0;
-	double lastTime = glfwGetTime();
+	double lastTime = seconds();
 	const float idealFrameTime = 1.0f / IdealFrameRate;
 
  	while (true)
  	{
- 		double currentTime = glfwGetTime();
+ 		double currentTime = seconds();
  		double timeSpent = (currentTime - lastTime);
  		// sleep for x amount to reach the ideal frame time
  		double sleepTime = idealFrameTime - timeSpent;
- 		if (sleepTime)
+ 		if (sleepTime > 0)
  		{
             uint32_t milliseconds = (uint32_t)(sleepTime * 1000.0);
             ::Sleep(milliseconds);
  		}
  
- 		currentTime = glfwGetTime();
+ 		currentTime = seconds();
  		deltaTime = currentTime - lastTime;
  		lastTime = currentTime;
  
- 		std::cout << "Frame time: " << deltaTime << std::endl;
- 			
+        std::cout << "Frame time: " << deltaTime << std::endl << std::flush;
  	}
 }
 
