@@ -1,16 +1,22 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Core\Private\EngineCore.cpp">
-      <Filter>Engine\Source\Core\Private</Filter>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Core\EngineCore.cpp">
+      <Filter>Engine\Source\Core</Filter>
     </ClCompile>
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\EntryPoint\EntryPoint.cpp">
       <Filter>Engine\Source\EntryPoint</Filter>
     </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Logger\Logger.cpp">
+      <Filter>Engine\Source\Logger</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\Public\EngineCore.h">
-      <Filter>Engine\Source\Core\Public</Filter>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\EngineCore.h">
+      <Filter>Engine\Source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Logger\Logger.h">
+      <Filter>Engine\Source\Logger</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -23,14 +29,11 @@
     <Filter Include="Engine\Source\Core">
       <UniqueIdentifier>{F33D7D25-A1C9-3DB2-8BCB-77735BD726B9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\Source\Core\Private">
-      <UniqueIdentifier>{6845A836-5ACA-3E83-A653-610428F4BCDB}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Engine\Source\Core\Public">
-      <UniqueIdentifier>{C7A1F859-D2F4-3B6C-8ACE-7846133665A0}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Engine\Source\EntryPoint">
       <UniqueIdentifier>{B549495F-A607-3E5C-9827-830FBEB19F55}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\Logger">
+      <UniqueIdentifier>{8CA88269-8D94-3FA4-84BA-37BA657F37D5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

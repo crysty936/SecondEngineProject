@@ -260,13 +260,16 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Core\Private\EngineCore.cpp" />
-    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\Public\EngineCore.h" />
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Core\EngineCore.cpp" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\EngineCore.h" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\EntryPoint\EntryPoint.cpp" />
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Logger\Logger.cpp" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Logger\Logger.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="Plugins\glfw-3.3.4\src\glfw.vcxproj">
-      <Project>{5b7798d0-6291-3af4-9a26-c4aec09e203e}</Project>
+    <ProjectReference Include="D:\Projects\SecondEngineProject\build\Plugins\glfw-3.3.4\src\glfw.vcxproj">
+      <Project>{5B7798D0-6291-3AF4-9A26-C4AEC09E203E}</Project>
+      <Name>glfw</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
