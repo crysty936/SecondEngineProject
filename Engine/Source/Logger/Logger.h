@@ -10,7 +10,7 @@ private:
 public:
 
 	inline static Logger& GetLogger() { return Instance; }
-	void Log(const char* inFormat, const Args&... inArgs);
+	void Log(const char* inFormat, ...);
 
 
 

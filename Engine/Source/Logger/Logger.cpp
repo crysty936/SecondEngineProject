@@ -20,16 +20,13 @@ Logger::Logger()
 
 Logger::~Logger() = default;
 
-void Logger::Log(const char* inFormat, const Args&... inArgs)
+void Logger::Log(const char* inFormat, ...)
 {
 	// Try to use a stack allocated buffer
 
  	constexpr int32_t bufferSize = 512;
   	char stackArray[bufferSize];
  
-     std::string value = Arg(2).GetValue();
- 
-  
   	va_list argumentList;
   
   	va_start(argumentList, inFormat);
