@@ -62,22 +62,31 @@ void EngineCore::Run()
  	while (true)
  	{
  		double currentTime = seconds();
+		//Logger::GetLogger().Log("Current time before sleep: %lf", currentTime);
+
  		double timeSpent = (currentTime - lastTime);
+		//Logger::GetLogger().Log("Time spent: %lf", timeSpent);
+
  		// sleep for x amount to reach the ideal frame time
  		double sleepTime = idealFrameTime - timeSpent;
+		//Logger::GetLogger().Log("Sleep Time: %lf", sleepTime);
+
  		if (sleepTime > 0)
  		{
             uint32_t milliseconds = static_cast<uint32_t>(sleepTime * 1000.0);
+			Logger::GetLogger().Log("Sleep time in milliseconds: %i", milliseconds);
+
             ::Sleep(milliseconds);
  		}
  
  		currentTime = seconds();
- 		deltaTime = currentTime - lastTime;
- 		lastTime = currentTime;
- 
-        Logger::GetLogger().Log("Frame time %lf", deltaTime);
+		//Logger::GetLogger().Log("Current time after sleep: %lf", currentTime);
 
-        //std::cout << "Frame time: " << deltaTime << std::endl << std::flush;
+ 		deltaTime = currentTime - lastTime;
+		//Logger::GetLogger().Log("Last time: %lf", lastTime);
+		Logger::GetLogger().Log("Delta time: %lf", deltaTime);
+
+ 		lastTime = currentTime;
  	}
 }
 

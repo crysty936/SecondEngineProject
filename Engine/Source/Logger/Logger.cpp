@@ -7,6 +7,7 @@
 #include <type_traits>
 #include "Logger/Logger.h"
 
+// Fmt logger is a good source for this
 
 
 Logger::Logger()
@@ -16,14 +17,22 @@ Logger::Logger()
 	assert(!bLoggerExisting);
 
 	bLoggerExisting = true;
+
+//     Typed format test
+//     int32_t t1 = 1;
+//     const char* t2 = "test param";
+//     TypedArgsFormatTest("test arguments {0} {1}", t1, t2);
 }
 
 Logger::~Logger() = default;
 
 void Logger::Log(const char* inFormat, ...)
 {
-	// Try to use a stack allocated buffer
+ #ifdef NDEBUG
+     return;
+ #endif
 
+	// Try to use a stack allocated buffer
  	constexpr int32_t bufferSize = 512;
   	char stackArray[bufferSize];
  
@@ -35,6 +44,7 @@ void Logger::Log(const char* inFormat, ...)
   
   	va_end(argumentList);
   
+    // Means our allocated buffer is not enough, the log to be printed is too big
   	assert(result != -1);
   
   

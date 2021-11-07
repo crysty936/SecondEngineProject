@@ -1,4 +1,4 @@
-#include "Core/Public/EngineCore.h"
+#include "Core/EngineCore.h"
 
 
 int main(int inArgCount, char* inArgs)
