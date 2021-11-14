@@ -3,11 +3,11 @@
 
 enum FormatValueType : char
 {
-	intType = 1,
-	uintType = 2,
-	floatType = 4,
-	doubleType = 8,
-	stringType = 16
+	intType,
+	uintType,
+	floatType,
+	doubleType,
+	stringType
 };
 
 union allFormatValues
@@ -71,7 +71,7 @@ private:
 
 		ArgsContainer& arg1 = args[0];
 
-		if (arg1.Type & FormatValueType::intType)
+		if (arg1.Type == FormatValueType::intType)
 		{
 			int32_t value = arg1.value.int_value;
 
@@ -80,7 +80,7 @@ private:
 
  		ArgsContainer& arg2 = args[1];
  
- 		if (arg2.Type & FormatValueType::stringType)
+ 		if (arg2.Type == FormatValueType::stringType)
  		{
  			const char* value = arg2.value.string_value;
  
@@ -88,10 +88,7 @@ private:
  		}
  	}
 
-
 private:
-
-
 	static Logger Instance;
 
 
