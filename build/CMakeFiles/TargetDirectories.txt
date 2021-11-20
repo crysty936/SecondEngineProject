@@ -37,3 +37,5 @@ D:/Projects/SecondEngineProject/build/Plugins/glfw-3.3.4/tests/CMakeFiles/title.
 D:/Projects/SecondEngineProject/build/Plugins/glfw-3.3.4/tests/CMakeFiles/triangle-vulkan.dir
 D:/Projects/SecondEngineProject/build/Plugins/glfw-3.3.4/tests/CMakeFiles/windows.dir
 D:/Projects/SecondEngineProject/build/Plugins/glfw-3.3.4/tests/CMakeFiles/INSTALL.dir
+D:/Projects/SecondEngineProject/build/Plugins/glad/CMakeFiles/glad.dir
+D:/Projects/SecondEngineProject/build/Plugins/glad/CMakeFiles/INSTALL.dir

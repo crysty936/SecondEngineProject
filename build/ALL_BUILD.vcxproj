@@ -139,6 +139,10 @@
       <Project>{41AB895B-9855-385D-B7EB-B5ED62E2110E}</Project>
       <Name>gears</Name>
     </ProjectReference>
+    <ProjectReference Include="D:\Projects\SecondEngineProject\build\Plugins\glad\glad.vcxproj">
+      <Project>{8F12F85D-3395-31B8-A332-E45D31D8A428}</Project>
+      <Name>glad</Name>
+    </ProjectReference>
     <ProjectReference Include="D:\Projects\SecondEngineProject\build\Plugins\glfw-3.3.4\src\glfw.vcxproj">
       <Project>{5B7798D0-6291-3AF4-9A26-C4AEC09E203E}</Project>
       <Name>glfw</Name>

@@ -1,4 +1,5 @@
 #pragma once
+#include <memory>
 
 class EngineCore
 {
@@ -9,6 +10,10 @@ public:
 public:
 	void Init();
 	void Run();
+
+private:
+	std::shared_ptr<class Window> MainWindow;
+
 
 };
 

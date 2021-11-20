@@ -35,6 +35,7 @@ endif()
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
   include("D:/Projects/SecondEngineProject/build/Plugins/glfw-3.3.4/cmake_install.cmake")
+  include("D:/Projects/SecondEngineProject/build/Plugins/glad/cmake_install.cmake")
 
 endif()
 

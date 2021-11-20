@@ -26,7 +26,7 @@ Logger::Logger()
 
 Logger::~Logger() = default;
 
-void Logger::Log(const char* inFormat, ...)
+void Logger::Print(const char* inFormat, ...)
 {
  #ifdef NDEBUG
      return;

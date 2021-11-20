@@ -58,8 +58,8 @@ private:
 
 public:
 
-	inline static Logger& GetLogger() { return Instance; }
-	void Log(const char* inFormat, ...);
+	inline static Logger& Get() { return Instance; }
+	void Print(const char* inFormat, ...);
 
 private:
 	// To be developed

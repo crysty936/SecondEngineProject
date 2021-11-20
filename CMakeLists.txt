@@ -13,6 +13,10 @@ add_subdirectory(Plugins/glfw-3.3.4)
 # add the glfw lib to the linking process so that the includes are added.
 list(APPEND EXTRA_LIBS glfw)
 
+# add Glad
+add_subdirectory(Plugins/glad)
+list(APPEND EXTRA_LIBS glad)
+
 # used to add all cpp files under source
 file(GLOB_RECURSE source_files CONFIGURE_DEPENDS "${CMAKE_CURRENT_LIST_DIR}/Engine/*.cpp" "${CMAKE_CURRENT_LIST_DIR}/Engine/*.h")
 

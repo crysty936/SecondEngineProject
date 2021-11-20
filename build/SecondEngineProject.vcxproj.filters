@@ -4,19 +4,58 @@
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Core\EngineCore.cpp">
       <Filter>Engine\Source\Core</Filter>
     </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Core\WindowsPlatformDependent.cpp">
+      <Filter>Engine\Source\Core</Filter>
+    </ClCompile>
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\EntryPoint\EntryPoint.cpp">
       <Filter>Engine\Source\EntryPoint</Filter>
     </ClCompile>
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Logger\Logger.cpp">
       <Filter>Engine\Source\Logger</Filter>
     </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\Renderer.cpp">
+      <Filter>Engine\Source\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\RendererContext.cpp">
+      <Filter>Engine\Source\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Window\Window.cpp">
+      <Filter>Engine\Source\Window</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Window\WindowContext.cpp">
+      <Filter>Engine\Source\Window</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\Source\Renderer\GLUtils.cpp">
+      <Filter>Engine\Source\Renderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\EngineCore.h">
       <Filter>Engine\Source\Core</Filter>
     </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\WindowsPlatformDependent.h">
+      <Filter>Engine\Source\Core</Filter>
+    </ClInclude>
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Logger\Logger.h">
       <Filter>Engine\Source\Logger</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\Renderer.h">
+      <Filter>Engine\Source\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\RendererContext.h">
+      <Filter>Engine\Source\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Window\Window.h">
+      <Filter>Engine\Source\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Window\WindowContext.h">
+      <Filter>Engine\Source\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\Source\Renderer\GLUtils.h">
+      <Filter>Engine\Source\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\Source\Core\EngineUtils.h">
+      <Filter>Engine\Source\Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -34,6 +73,12 @@
     </Filter>
     <Filter Include="Engine\Source\Logger">
       <UniqueIdentifier>{8CA88269-8D94-3FA4-84BA-37BA657F37D5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\Renderer">
+      <UniqueIdentifier>{257D7CF0-8FA7-32C5-A267-5CB51E8AEFA1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\Window">
+      <UniqueIdentifier>{29E68D5E-4245-3A87-86BE-77379684E2DF}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
