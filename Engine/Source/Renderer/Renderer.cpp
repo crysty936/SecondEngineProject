@@ -3,6 +3,7 @@
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 #include "GLUtils.h"
+#include "Core/EngineUtils.h"
 
 Renderer RHI;
 
@@ -12,47 +13,56 @@ Renderer::Renderer()
 Renderer::~Renderer()
 = default;
 
-void Renderer::Init()
+eastl::shared_ptr<Window> Renderer::Init(const WindowProperties& inDefaultWindowProperties)
 {
 	const bool glfwSuccess = glfwInit() == GLFW_TRUE;
 
-	assert(glfwSuccess);
+	ASSERT(glfwSuccess);
 
 	glfwSetErrorCallback(GLUtils::GLFWErrorCallback);
-	
-	// Test to see if gladLoadGLLoader can be used without setting the current glfw context
 
+	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
 
+	eastl::shared_ptr<Window> defaultWindow = CreateWindow(inDefaultWindowProperties);
+
+	GLFWwindow* defaultWindowHandle = defaultWindow->GetHandle();
+
+	glfwMakeContextCurrent(defaultWindowHandle);
 
 	const bool gladSuccess = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress) == GLFW_TRUE;
 
+
+	glViewport(0, 0, inDefaultWindowProperties.Width, inDefaultWindowProperties.Height);
+
+
+	return defaultWindow;
 }
 
 void Renderer::Draw(const Window& inWindowToUse)
 {
+	glfwPollEvents();
 
-	GLFWwindow* windowHandle = inWindowToUse.GetHandle<GLFWwindow>();
-
-	glfwMakeContextCurrent(windowHandle);
-
-
-
-
-
+	glfwSwapBuffers(inWindowToUse.GetHandle());
 }
 
-void* Renderer::CreateWindow(const int32_t inWidth, const int32_t inHeight, const char* inWindowTitle)
+eastl::shared_ptr<Window> Renderer::CreateWindow(const WindowProperties& inWindowProperties) const
 {
-	GLFWwindow* newWindow = glfwCreateWindow(inWidth, inHeight, inWindowTitle, nullptr, nullptr);
-
+	GLFWwindow* newHandle = CreateNewWinowHandle(inWindowProperties);
+	eastl::shared_ptr<Window> newWindow = eastl::make_shared<Window>(newHandle);
 
 	return newWindow;
 }
 
-void Renderer::DestroyWindow(void* inWindowHandle) const
-{
-	GLFWwindow* window = reinterpret_cast<GLFWwindow*>(inWindowHandle);
 
-	glfwDestroyWindow(window);
+void Renderer::DestroyWindow(GLFWwindow* inWindowHandle) const
+{
+	glfwDestroyWindow(inWindowHandle);
+}
+
+GLFWwindow* Renderer::CreateNewWinowHandle(const WindowProperties& inWindowProperties) const
+{
+	GLFWwindow* newWindowHandle = glfwCreateWindow(inWindowProperties.Width, inWindowProperties.Height, inWindowProperties.Title.data(), nullptr, nullptr);
+
+	return newWindowHandle;
 }
 

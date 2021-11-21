@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include "EASTL/shared_ptr.h"
 
 class EngineCore
 {
@@ -12,8 +13,7 @@ public:
 	void Run();
 
 private:
-	std::shared_ptr<class Window> MainWindow;
-
+	eastl::shared_ptr<class Window> MainWindow;
 
 };
 

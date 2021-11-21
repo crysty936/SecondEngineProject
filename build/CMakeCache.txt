@@ -251,6 +251,33 @@ CMAKE_VERBOSE_MAKEFILE:BOOL=FALSE
 //Doxygen documentation generation tool (http://www.doxygen.org)
 DOXYGEN_EXECUTABLE:FILEPATH=DOXYGEN_EXECUTABLE-NOTFOUND
 
+//Enable generation of build files for tests
+EABASE_BUILD_TESTS:BOOL=OFF
+
+//Value Computed by CMake
+EABase_BINARY_DIR:STATIC=D:/Projects/SecondEngineProject/build/Plugins/EASTL/test/packages/EABase
+
+//Value Computed by CMake
+EABase_IS_TOP_LEVEL:STATIC=OFF
+
+//Value Computed by CMake
+EABase_SOURCE_DIR:STATIC=D:/Projects/SecondEngineProject/Plugins/EASTL/test/packages/EABase
+
+//Value Computed by CMake
+EASTL_BINARY_DIR:STATIC=D:/Projects/SecondEngineProject/build/Plugins/EASTL
+
+//Enable generation of build files for benchmark
+EASTL_BUILD_BENCHMARK:BOOL=OFF
+
+//Enable generation of build files for tests
+EASTL_BUILD_TESTS:BOOL=OFF
+
+//Value Computed by CMake
+EASTL_IS_TOP_LEVEL:STATIC=OFF
+
+//Value Computed by CMake
+EASTL_SOURCE_DIR:STATIC=D:/Projects/SecondEngineProject/Plugins/EASTL
+
 //Value Computed by CMake
 GLFW_BINARY_DIR:STATIC=D:/Projects/SecondEngineProject/build/Plugins/glfw-3.3.4
 
@@ -409,7 +436,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_MT
 CMAKE_MT-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=6
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=8
 //Platform information initialized
 CMAKE_PLATFORM_INFO_INITIALIZED:INTERNAL=1
 //noop for ranlib
@@ -457,6 +484,10 @@ CMAKE_STATIC_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 CMAKE_VERBOSE_MAKEFILE-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: DOXYGEN_EXECUTABLE
 DOXYGEN_EXECUTABLE-ADVANCED:INTERNAL=1
+//Test EASTL_HAS_FCHAR8T_FLAG
+EASTL_HAS_FCHAR8T_FLAG:INTERNAL=
+//Test EASTL_HAS_ZCCHAR8T_FLAG
+EASTL_HAS_ZCCHAR8T_FLAG:INTERNAL=1
 //Details about finding Threads
 FIND_PACKAGE_MESSAGE_DETAILS_Threads:INTERNAL=[TRUE][v()]
 //CMAKE_INSTALL_PREFIX during last run

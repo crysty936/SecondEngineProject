@@ -13,6 +13,9 @@
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Logger\Logger.cpp">
       <Filter>Engine\Source\Logger</Filter>
     </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\GLUtils.cpp">
+      <Filter>Engine\Source\Renderer</Filter>
+    </ClCompile>
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\Renderer.cpp">
       <Filter>Engine\Source\Renderer</Filter>
     </ClCompile>
@@ -25,12 +28,15 @@
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Window\WindowContext.cpp">
       <Filter>Engine\Source\Window</Filter>
     </ClCompile>
-    <ClCompile Include="..\Engine\Source\Renderer\GLUtils.cpp">
-      <Filter>Engine\Source\Renderer</Filter>
+    <ClCompile Include="..\Engine\Source\Core\EASTLNew.cpp">
+      <Filter>Engine\Source\Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\EngineCore.h">
+      <Filter>Engine\Source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\EngineUtils.h">
       <Filter>Engine\Source\Core</Filter>
     </ClInclude>
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\WindowsPlatformDependent.h">
@@ -38,6 +44,9 @@
     </ClInclude>
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Logger\Logger.h">
       <Filter>Engine\Source\Logger</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\GLUtils.h">
+      <Filter>Engine\Source\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\Renderer.h">
       <Filter>Engine\Source\Renderer</Filter>
@@ -51,11 +60,8 @@
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Window\WindowContext.h">
       <Filter>Engine\Source\Window</Filter>
     </ClInclude>
-    <ClInclude Include="..\Engine\Source\Renderer\GLUtils.h">
-      <Filter>Engine\Source\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\Source\Core\EngineUtils.h">
-      <Filter>Engine\Source\Core</Filter>
+    <ClInclude Include="..\Engine\Source\Window\WindowProperties.h">
+      <Filter>Engine\Source\Window</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -24,16 +24,11 @@ EngineCore::~EngineCore() = default;
 
 void EngineCore::Init()
 {
-    RHI.Init();
+    MainWindow = RHI.Init({});
 
-    MainWindow = std::make_shared<Window>();
 
 
     
-
-
-
-
 
 
 

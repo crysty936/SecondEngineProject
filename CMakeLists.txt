@@ -17,7 +17,24 @@ list(APPEND EXTRA_LIBS glfw)
 add_subdirectory(Plugins/glad)
 list(APPEND EXTRA_LIBS glad)
 
-# used to add all cpp files under source
+#add EASTL
+set(EASTL_ROOT_DIR Plugins/EASTL)
+# include_directories (${EASTL_ROOT_DIR}/include)
+# include_directories (${EASTL_ROOT_DIR}/test/packages/EAAssert/include)
+# include_directories (${EASTL_ROOT_DIR}/test/packages/EABase/include/Common)
+# include_directories (${EASTL_ROOT_DIR}/test/packages/EAMain/include)
+# include_directories (${EASTL_ROOT_DIR}/test/packages/EAStdC/include)
+# include_directories (${EASTL_ROOT_DIR}/test/packages/EATest/include)
+# include_directories (${EASTL_ROOT_DIR}/test/packages/EAThread/include)
+# set(EASTL_LIBRARY debug ${EASTL_ROOT_DIR}/build/Debug/EASTL.lib optimized ${EASTL_ROOT_DIR}/build/Release/EASTL.lib)
+# add_custom_target(NatVis SOURCES ${EASTL_ROOT_DIR}/doc/EASTL.natvis)
+
+# list(APPEND EXTRA_LIBS ${EASTL_LIBRARY})
+
+add_subdirectory(Plugins/EASTL)
+list(APPEND EXTRA_LIBS EASTL)
+
+# used to add all .cpp and .h files under source
 file(GLOB_RECURSE source_files CONFIGURE_DEPENDS "${CMAKE_CURRENT_LIST_DIR}/Engine/*.cpp" "${CMAKE_CURRENT_LIST_DIR}/Engine/*.h")
 
 # used to create filters for all files one to one with their folder structure

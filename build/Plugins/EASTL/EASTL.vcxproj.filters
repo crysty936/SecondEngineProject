@@ -1,0 +1,849 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Plugins\EASTL\source\allocator_eastl.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Plugins\EASTL\source\assert.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Plugins\EASTL\source\atomic.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Plugins\EASTL\source\fixed_pool.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Plugins\EASTL\source\hashtable.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Plugins\EASTL\source\intrusive_list.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Plugins\EASTL\source\numeric_limits.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Plugins\EASTL\source\red_black_tree.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Plugins\EASTL\source\string.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Plugins\EASTL\source\thread_support.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\algorithm.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\allocator.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\allocator_malloc.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\any.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\array.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\atomic.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\bit.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\bitset.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\bitvector.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\bonus\adaptors.h">
+      <Filter>include\EASTL\bonus</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\bonus\call_traits.h">
+      <Filter>include\EASTL\bonus</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\bonus\compressed_pair.h">
+      <Filter>include\EASTL\bonus</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\bonus\fixed_ring_buffer.h">
+      <Filter>include\EASTL\bonus</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\bonus\fixed_tuple_vector.h">
+      <Filter>include\EASTL\bonus</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\bonus\intrusive_sdlist.h">
+      <Filter>include\EASTL\bonus</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\bonus\intrusive_slist.h">
+      <Filter>include\EASTL\bonus</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\bonus\list_map.h">
+      <Filter>include\EASTL\bonus</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\bonus\lru_cache.h">
+      <Filter>include\EASTL\bonus</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\bonus\ring_buffer.h">
+      <Filter>include\EASTL\bonus</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\bonus\sort_extra.h">
+      <Filter>include\EASTL\bonus</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\bonus\tuple_vector.h">
+      <Filter>include\EASTL\bonus</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\chrono.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\core_allocator.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\core_allocator_adapter.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\deque.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\finally.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\fixed_allocator.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\fixed_function.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\fixed_hash_map.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\fixed_hash_set.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\fixed_list.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\fixed_map.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\fixed_set.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\fixed_slist.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\fixed_string.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\fixed_substring.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\fixed_vector.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\functional.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\hash_map.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\hash_set.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\heap.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\initializer_list.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\arch.h">
+      <Filter>include\EASTL\internal\atomic\arch</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\arch_add_fetch.h">
+      <Filter>include\EASTL\internal\atomic\arch</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\arch_and_fetch.h">
+      <Filter>include\EASTL\internal\atomic\arch</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\arch_cmpxchg_strong.h">
+      <Filter>include\EASTL\internal\atomic\arch</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\arch_cmpxchg_weak.h">
+      <Filter>include\EASTL\internal\atomic\arch</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\arch_compiler_barrier.h">
+      <Filter>include\EASTL\internal\atomic\arch</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\arch_cpu_pause.h">
+      <Filter>include\EASTL\internal\atomic\arch</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\arch_exchange.h">
+      <Filter>include\EASTL\internal\atomic\arch</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\arch_fetch_add.h">
+      <Filter>include\EASTL\internal\atomic\arch</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\arch_fetch_and.h">
+      <Filter>include\EASTL\internal\atomic\arch</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\arch_fetch_or.h">
+      <Filter>include\EASTL\internal\atomic\arch</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\arch_fetch_sub.h">
+      <Filter>include\EASTL\internal\atomic\arch</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\arch_fetch_xor.h">
+      <Filter>include\EASTL\internal\atomic\arch</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\arch_load.h">
+      <Filter>include\EASTL\internal\atomic\arch</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\arch_memory_barrier.h">
+      <Filter>include\EASTL\internal\atomic\arch</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\arch_or_fetch.h">
+      <Filter>include\EASTL\internal\atomic\arch</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\arch_signal_fence.h">
+      <Filter>include\EASTL\internal\atomic\arch</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\arch_store.h">
+      <Filter>include\EASTL\internal\atomic\arch</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\arch_sub_fetch.h">
+      <Filter>include\EASTL\internal\atomic\arch</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\arch_thread_fence.h">
+      <Filter>include\EASTL\internal\atomic\arch</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\arch_xor_fetch.h">
+      <Filter>include\EASTL\internal\atomic\arch</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\arm\arch_arm.h">
+      <Filter>include\EASTL\internal\atomic\arch\arm</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\arm\arch_arm_load.h">
+      <Filter>include\EASTL\internal\atomic\arch\arm</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\arm\arch_arm_memory_barrier.h">
+      <Filter>include\EASTL\internal\atomic\arch\arm</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\arm\arch_arm_store.h">
+      <Filter>include\EASTL\internal\atomic\arch\arm</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\arm\arch_arm_thread_fence.h">
+      <Filter>include\EASTL\internal\atomic\arch\arm</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\x86\arch_x86.h">
+      <Filter>include\EASTL\internal\atomic\arch\x86</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\x86\arch_x86_add_fetch.h">
+      <Filter>include\EASTL\internal\atomic\arch\x86</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\x86\arch_x86_and_fetch.h">
+      <Filter>include\EASTL\internal\atomic\arch\x86</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\x86\arch_x86_cmpxchg_strong.h">
+      <Filter>include\EASTL\internal\atomic\arch\x86</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\x86\arch_x86_cmpxchg_weak.h">
+      <Filter>include\EASTL\internal\atomic\arch\x86</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\x86\arch_x86_exchange.h">
+      <Filter>include\EASTL\internal\atomic\arch\x86</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\x86\arch_x86_fetch_add.h">
+      <Filter>include\EASTL\internal\atomic\arch\x86</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\x86\arch_x86_fetch_and.h">
+      <Filter>include\EASTL\internal\atomic\arch\x86</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\x86\arch_x86_fetch_or.h">
+      <Filter>include\EASTL\internal\atomic\arch\x86</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\x86\arch_x86_fetch_sub.h">
+      <Filter>include\EASTL\internal\atomic\arch\x86</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\x86\arch_x86_fetch_xor.h">
+      <Filter>include\EASTL\internal\atomic\arch\x86</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\x86\arch_x86_load.h">
+      <Filter>include\EASTL\internal\atomic\arch\x86</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\x86\arch_x86_memory_barrier.h">
+      <Filter>include\EASTL\internal\atomic\arch\x86</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\x86\arch_x86_or_fetch.h">
+      <Filter>include\EASTL\internal\atomic\arch\x86</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\x86\arch_x86_store.h">
+      <Filter>include\EASTL\internal\atomic\arch\x86</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\x86\arch_x86_sub_fetch.h">
+      <Filter>include\EASTL\internal\atomic\arch\x86</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\x86\arch_x86_thread_fence.h">
+      <Filter>include\EASTL\internal\atomic\arch\x86</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\x86\arch_x86_xor_fetch.h">
+      <Filter>include\EASTL\internal\atomic\arch\x86</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic.h">
+      <Filter>include\EASTL\internal\atomic</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_asserts.h">
+      <Filter>include\EASTL\internal\atomic</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_base_width.h">
+      <Filter>include\EASTL\internal\atomic</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_casts.h">
+      <Filter>include\EASTL\internal\atomic</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_flag.h">
+      <Filter>include\EASTL\internal\atomic</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_flag_standalone.h">
+      <Filter>include\EASTL\internal\atomic</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_integral.h">
+      <Filter>include\EASTL\internal\atomic</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_macros.h">
+      <Filter>include\EASTL\internal\atomic</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_macros\atomic_macros.h">
+      <Filter>include\EASTL\internal\atomic\atomic_macros</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_macros\atomic_macros_add_fetch.h">
+      <Filter>include\EASTL\internal\atomic\atomic_macros</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_macros\atomic_macros_and_fetch.h">
+      <Filter>include\EASTL\internal\atomic\atomic_macros</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_macros\atomic_macros_base.h">
+      <Filter>include\EASTL\internal\atomic\atomic_macros</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_macros\atomic_macros_cmpxchg_strong.h">
+      <Filter>include\EASTL\internal\atomic\atomic_macros</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_macros\atomic_macros_cmpxchg_weak.h">
+      <Filter>include\EASTL\internal\atomic\atomic_macros</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_macros\atomic_macros_compiler_barrier.h">
+      <Filter>include\EASTL\internal\atomic\atomic_macros</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_macros\atomic_macros_cpu_pause.h">
+      <Filter>include\EASTL\internal\atomic\atomic_macros</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_macros\atomic_macros_exchange.h">
+      <Filter>include\EASTL\internal\atomic\atomic_macros</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_macros\atomic_macros_fetch_add.h">
+      <Filter>include\EASTL\internal\atomic\atomic_macros</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_macros\atomic_macros_fetch_and.h">
+      <Filter>include\EASTL\internal\atomic\atomic_macros</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_macros\atomic_macros_fetch_or.h">
+      <Filter>include\EASTL\internal\atomic\atomic_macros</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_macros\atomic_macros_fetch_sub.h">
+      <Filter>include\EASTL\internal\atomic\atomic_macros</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_macros\atomic_macros_fetch_xor.h">
+      <Filter>include\EASTL\internal\atomic\atomic_macros</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_macros\atomic_macros_load.h">
+      <Filter>include\EASTL\internal\atomic\atomic_macros</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_macros\atomic_macros_memory_barrier.h">
+      <Filter>include\EASTL\internal\atomic\atomic_macros</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_macros\atomic_macros_or_fetch.h">
+      <Filter>include\EASTL\internal\atomic\atomic_macros</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_macros\atomic_macros_signal_fence.h">
+      <Filter>include\EASTL\internal\atomic\atomic_macros</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_macros\atomic_macros_store.h">
+      <Filter>include\EASTL\internal\atomic\atomic_macros</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_macros\atomic_macros_sub_fetch.h">
+      <Filter>include\EASTL\internal\atomic\atomic_macros</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_macros\atomic_macros_thread_fence.h">
+      <Filter>include\EASTL\internal\atomic\atomic_macros</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_macros\atomic_macros_xor_fetch.h">
+      <Filter>include\EASTL\internal\atomic\atomic_macros</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_memory_order.h">
+      <Filter>include\EASTL\internal\atomic</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_pointer.h">
+      <Filter>include\EASTL\internal\atomic</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_pop_compiler_options.h">
+      <Filter>include\EASTL\internal\atomic</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_push_compiler_options.h">
+      <Filter>include\EASTL\internal\atomic</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_size_aligned.h">
+      <Filter>include\EASTL\internal\atomic</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_standalone.h">
+      <Filter>include\EASTL\internal\atomic</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\compiler.h">
+      <Filter>include\EASTL\internal\atomic\compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\compiler_add_fetch.h">
+      <Filter>include\EASTL\internal\atomic\compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\compiler_and_fetch.h">
+      <Filter>include\EASTL\internal\atomic\compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\compiler_barrier.h">
+      <Filter>include\EASTL\internal\atomic\compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\compiler_cmpxchg_strong.h">
+      <Filter>include\EASTL\internal\atomic\compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\compiler_cmpxchg_weak.h">
+      <Filter>include\EASTL\internal\atomic\compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\compiler_cpu_pause.h">
+      <Filter>include\EASTL\internal\atomic\compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\compiler_exchange.h">
+      <Filter>include\EASTL\internal\atomic\compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\compiler_fetch_add.h">
+      <Filter>include\EASTL\internal\atomic\compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\compiler_fetch_and.h">
+      <Filter>include\EASTL\internal\atomic\compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\compiler_fetch_or.h">
+      <Filter>include\EASTL\internal\atomic\compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\compiler_fetch_sub.h">
+      <Filter>include\EASTL\internal\atomic\compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\compiler_fetch_xor.h">
+      <Filter>include\EASTL\internal\atomic\compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\compiler_load.h">
+      <Filter>include\EASTL\internal\atomic\compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\compiler_memory_barrier.h">
+      <Filter>include\EASTL\internal\atomic\compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\compiler_or_fetch.h">
+      <Filter>include\EASTL\internal\atomic\compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\compiler_signal_fence.h">
+      <Filter>include\EASTL\internal\atomic\compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\compiler_store.h">
+      <Filter>include\EASTL\internal\atomic\compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\compiler_sub_fetch.h">
+      <Filter>include\EASTL\internal\atomic\compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\compiler_thread_fence.h">
+      <Filter>include\EASTL\internal\atomic\compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\compiler_xor_fetch.h">
+      <Filter>include\EASTL\internal\atomic\compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\gcc\compiler_gcc.h">
+      <Filter>include\EASTL\internal\atomic\compiler\gcc</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\gcc\compiler_gcc_add_fetch.h">
+      <Filter>include\EASTL\internal\atomic\compiler\gcc</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\gcc\compiler_gcc_and_fetch.h">
+      <Filter>include\EASTL\internal\atomic\compiler\gcc</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\gcc\compiler_gcc_barrier.h">
+      <Filter>include\EASTL\internal\atomic\compiler\gcc</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\gcc\compiler_gcc_cmpxchg_strong.h">
+      <Filter>include\EASTL\internal\atomic\compiler\gcc</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\gcc\compiler_gcc_cmpxchg_weak.h">
+      <Filter>include\EASTL\internal\atomic\compiler\gcc</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\gcc\compiler_gcc_cpu_pause.h">
+      <Filter>include\EASTL\internal\atomic\compiler\gcc</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\gcc\compiler_gcc_exchange.h">
+      <Filter>include\EASTL\internal\atomic\compiler\gcc</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\gcc\compiler_gcc_fetch_add.h">
+      <Filter>include\EASTL\internal\atomic\compiler\gcc</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\gcc\compiler_gcc_fetch_and.h">
+      <Filter>include\EASTL\internal\atomic\compiler\gcc</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\gcc\compiler_gcc_fetch_or.h">
+      <Filter>include\EASTL\internal\atomic\compiler\gcc</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\gcc\compiler_gcc_fetch_sub.h">
+      <Filter>include\EASTL\internal\atomic\compiler\gcc</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\gcc\compiler_gcc_fetch_xor.h">
+      <Filter>include\EASTL\internal\atomic\compiler\gcc</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\gcc\compiler_gcc_load.h">
+      <Filter>include\EASTL\internal\atomic\compiler\gcc</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\gcc\compiler_gcc_or_fetch.h">
+      <Filter>include\EASTL\internal\atomic\compiler\gcc</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\gcc\compiler_gcc_signal_fence.h">
+      <Filter>include\EASTL\internal\atomic\compiler\gcc</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\gcc\compiler_gcc_store.h">
+      <Filter>include\EASTL\internal\atomic\compiler\gcc</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\gcc\compiler_gcc_sub_fetch.h">
+      <Filter>include\EASTL\internal\atomic\compiler\gcc</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\gcc\compiler_gcc_thread_fence.h">
+      <Filter>include\EASTL\internal\atomic\compiler\gcc</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\gcc\compiler_gcc_xor_fetch.h">
+      <Filter>include\EASTL\internal\atomic\compiler\gcc</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\msvc\compiler_msvc.h">
+      <Filter>include\EASTL\internal\atomic\compiler\msvc</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\msvc\compiler_msvc_add_fetch.h">
+      <Filter>include\EASTL\internal\atomic\compiler\msvc</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\msvc\compiler_msvc_and_fetch.h">
+      <Filter>include\EASTL\internal\atomic\compiler\msvc</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\msvc\compiler_msvc_barrier.h">
+      <Filter>include\EASTL\internal\atomic\compiler\msvc</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\msvc\compiler_msvc_cmpxchg_strong.h">
+      <Filter>include\EASTL\internal\atomic\compiler\msvc</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\msvc\compiler_msvc_cmpxchg_weak.h">
+      <Filter>include\EASTL\internal\atomic\compiler\msvc</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\msvc\compiler_msvc_cpu_pause.h">
+      <Filter>include\EASTL\internal\atomic\compiler\msvc</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\msvc\compiler_msvc_exchange.h">
+      <Filter>include\EASTL\internal\atomic\compiler\msvc</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\msvc\compiler_msvc_fetch_add.h">
+      <Filter>include\EASTL\internal\atomic\compiler\msvc</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\msvc\compiler_msvc_fetch_and.h">
+      <Filter>include\EASTL\internal\atomic\compiler\msvc</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\msvc\compiler_msvc_fetch_or.h">
+      <Filter>include\EASTL\internal\atomic\compiler\msvc</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\msvc\compiler_msvc_fetch_sub.h">
+      <Filter>include\EASTL\internal\atomic\compiler\msvc</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\msvc\compiler_msvc_fetch_xor.h">
+      <Filter>include\EASTL\internal\atomic\compiler\msvc</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\msvc\compiler_msvc_or_fetch.h">
+      <Filter>include\EASTL\internal\atomic\compiler\msvc</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\msvc\compiler_msvc_signal_fence.h">
+      <Filter>include\EASTL\internal\atomic\compiler\msvc</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\msvc\compiler_msvc_sub_fetch.h">
+      <Filter>include\EASTL\internal\atomic\compiler\msvc</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\msvc\compiler_msvc_xor_fetch.h">
+      <Filter>include\EASTL\internal\atomic\compiler\msvc</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\char_traits.h">
+      <Filter>include\EASTL\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\config.h">
+      <Filter>include\EASTL\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\copy_help.h">
+      <Filter>include\EASTL\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\enable_shared.h">
+      <Filter>include\EASTL\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\fill_help.h">
+      <Filter>include\EASTL\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\fixed_pool.h">
+      <Filter>include\EASTL\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\function.h">
+      <Filter>include\EASTL\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\function_detail.h">
+      <Filter>include\EASTL\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\function_help.h">
+      <Filter>include\EASTL\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\functional_base.h">
+      <Filter>include\EASTL\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\generic_iterator.h">
+      <Filter>include\EASTL\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\hashtable.h">
+      <Filter>include\EASTL\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\in_place_t.h">
+      <Filter>include\EASTL\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\integer_sequence.h">
+      <Filter>include\EASTL\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\intrusive_hashtable.h">
+      <Filter>include\EASTL\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\mem_fn.h">
+      <Filter>include\EASTL\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\memory_base.h">
+      <Filter>include\EASTL\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\move_help.h">
+      <Filter>include\EASTL\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\pair_fwd_decls.h">
+      <Filter>include\EASTL\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\piecewise_construct_t.h">
+      <Filter>include\EASTL\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\red_black_tree.h">
+      <Filter>include\EASTL\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\smart_ptr.h">
+      <Filter>include\EASTL\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\thread_support.h">
+      <Filter>include\EASTL\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\tuple_fwd_decls.h">
+      <Filter>include\EASTL\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\type_compound.h">
+      <Filter>include\EASTL\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\type_fundamental.h">
+      <Filter>include\EASTL\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\type_pod.h">
+      <Filter>include\EASTL\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\type_properties.h">
+      <Filter>include\EASTL\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\type_transformations.h">
+      <Filter>include\EASTL\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\intrusive_hash_map.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\intrusive_hash_set.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\intrusive_list.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\intrusive_ptr.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\iterator.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\linked_array.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\linked_ptr.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\list.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\map.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\memory.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\meta.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\numeric.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\numeric_limits.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\optional.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\priority_queue.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\queue.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\random.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\ratio.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\safe_ptr.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\scoped_array.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\scoped_ptr.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\segmented_vector.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\set.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\shared_array.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\shared_ptr.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\slist.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\sort.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\span.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\stack.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\string.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\string_hash_map.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\string_map.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\string_view.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\tuple.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\type_traits.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\unique_ptr.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\unordered_map.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\unordered_set.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\utility.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\variant.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\vector.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\vector_map.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\vector_multimap.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\vector_multiset.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\vector_set.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\version.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\weak_ptr.h">
+      <Filter>include\EASTL</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="D:\Projects\SecondEngineProject\Plugins\EASTL\doc\EASTL.natvis" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="include">
+      <UniqueIdentifier>{5E558E84-ECCC-3949-A0C8-E9D002FE5055}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\EASTL">
+      <UniqueIdentifier>{00DA076F-A1CC-3289-AB57-C2435B5AEC31}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\EASTL\bonus">
+      <UniqueIdentifier>{273B8687-7149-3293-8114-3D6E4F9AC7C3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\EASTL\internal">
+      <UniqueIdentifier>{E7B862CC-F2EE-3934-AD27-80E98429AE7D}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\EASTL\internal\atomic">
+      <UniqueIdentifier>{55FEA678-F1BC-313E-BE60-1379200075B2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\EASTL\internal\atomic\arch">
+      <UniqueIdentifier>{D5B5D0AA-B846-3F0F-A873-CA832E2EF29F}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\EASTL\internal\atomic\arch\arm">
+      <UniqueIdentifier>{703A8B9B-316A-30F4-A3F8-6063FA158B44}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\EASTL\internal\atomic\arch\x86">
+      <UniqueIdentifier>{563C587C-D221-38FF-8619-E0C493ADCD4D}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\EASTL\internal\atomic\atomic_macros">
+      <UniqueIdentifier>{F96AEC1B-8379-3769-B5B8-67FE5F44399E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\EASTL\internal\atomic\compiler">
+      <UniqueIdentifier>{A42F3A7B-E6B2-3D9B-9E1F-55F909E06694}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\EASTL\internal\atomic\compiler\gcc">
+      <UniqueIdentifier>{76F14299-1124-3D75-B2DA-30B614EF63FF}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\EASTL\internal\atomic\compiler\msvc">
+      <UniqueIdentifier>{5257C319-4AC3-3D2B-8C08-E128F978FD26}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source">
+      <UniqueIdentifier>{F510BA89-264D-3FC4-BC62-F0C4DC4580F1}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

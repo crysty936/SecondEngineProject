@@ -1,5 +1,6 @@
 #pragma once
 #include "Window/Window.h"
+#include "EASTL/shared_ptr.h"
 
 /**
  * To make the renderer Generic, a base RHI class should be made, this should be renamed to OpenGLRHI,
@@ -13,11 +14,15 @@ public:
 	virtual ~Renderer();
 
 public:
-	virtual void Init();
+	// Will create the base window and return the context for it
+	virtual eastl::shared_ptr<Window> Init(const WindowProperties& inDefaultWindowProperties);
 	void Draw(const class Window& inWindowToUse);
 
-	void* CreateWindow(const int32_t inWidth, const int32_t inHeight, const char* inWindowTitle);
-	void DestroyWindow(void* inWindowHandle) const;
+	eastl::shared_ptr<Window> CreateWindow(const WindowProperties& inWindowProperties) const;
+	void DestroyWindow(GLFWwindow* inWindowHandle) const;
+
+private:
+	struct GLFWwindow* CreateNewWinowHandle(const WindowProperties& inWindowProperties) const;
 
 };
 

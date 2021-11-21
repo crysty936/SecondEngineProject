@@ -1,4 +1,3 @@
-#include <assert.h>
 #include <stdint.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -6,6 +5,7 @@
 #include <string>
 #include <type_traits>
 #include "Logger/Logger.h"
+#include "Core/EngineUtils.h"
 
 // Fmt logger is a good source for this
 
@@ -14,7 +14,8 @@ Logger::Logger()
 {
 	static bool bLoggerExisting = false;
 
-	assert(!bLoggerExisting);
+
+    ASSERT(!bLoggerExisting);
 
 	bLoggerExisting = true;
 
@@ -45,7 +46,7 @@ void Logger::Print(const char* inFormat, ...)
   	va_end(argumentList);
   
     // Means our allocated buffer is not enough, the log to be printed is too big
-  	assert(result != -1);
+    ASSERT(result != -1);
   
   
      std::cout << stackArray << std::endl;

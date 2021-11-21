@@ -107,6 +107,10 @@
   <ItemGroup>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="D:\Projects\SecondEngineProject\build\Plugins\EASTL\EASTL.vcxproj">
+      <Project>{52F12E02-7F29-32F6-8B16-160274005C2C}</Project>
+      <Name>EASTL</Name>
+    </ProjectReference>
     <ProjectReference Include="D:\Projects\SecondEngineProject\build\SecondEngineProject.vcxproj">
       <Project>{B639FC97-BA39-333C-AAB8-8696CD8339AD}</Project>
       <Name>SecondEngineProject</Name>

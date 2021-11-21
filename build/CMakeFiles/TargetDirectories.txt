@@ -39,3 +39,8 @@ D:/Projects/SecondEngineProject/build/Plugins/glfw-3.3.4/tests/CMakeFiles/window
 D:/Projects/SecondEngineProject/build/Plugins/glfw-3.3.4/tests/CMakeFiles/INSTALL.dir
 D:/Projects/SecondEngineProject/build/Plugins/glad/CMakeFiles/glad.dir
 D:/Projects/SecondEngineProject/build/Plugins/glad/CMakeFiles/INSTALL.dir
+D:/Projects/SecondEngineProject/build/Plugins/EASTL/CMakeFiles/EASTL.dir
+D:/Projects/SecondEngineProject/build/Plugins/EASTL/CMakeFiles/INSTALL.dir
+D:/Projects/SecondEngineProject/build/Plugins/EASTL/CMakeFiles/ALL_BUILD.dir
+D:/Projects/SecondEngineProject/build/Plugins/EASTL/test/packages/EABase/CMakeFiles/INSTALL.dir
+D:/Projects/SecondEngineProject/build/Plugins/EASTL/test/packages/EABase/CMakeFiles/ALL_BUILD.dir

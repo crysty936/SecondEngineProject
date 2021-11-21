@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <assert.h>
 #include "Logger/Logger.h"
+#include "Core/EngineUtils.h"
 
 namespace GLUtils
 {
@@ -8,10 +9,7 @@ namespace GLUtils
 	{
 		Logger::Get().Print(inErrorDesc);
 
-		assert(0);
-
-
-
+		ASSERT(0, "OpenGl Error.");
 	}
 }
 
