@@ -1,7 +1,7 @@
-#include "Window/Window.h"
+#include "Window/OpenGLWindow.h"
 #include <assert.h>
 #include "Logger/Logger.h"
-#include "Renderer/Renderer.h"
+#include "Renderer/OpenGLRenderer.h"
 #include "GLFW/glfw3.h"
 
 // Renderer should have the draw function adn get the window, while the window should contain it's context and other window related
@@ -13,17 +13,19 @@
 
 // Window should be just the data holder and renderer should do all logic
 
-Window::Window(GLFWwindow* inWindowHandle, const WindowProperties& inProperties /*= {}*/)
+OpenGLWindow::OpenGLWindow(GLFWwindow* inWindowHandle, const WindowProperties& inProperties /*= {}*/)
 	: WindowHandle{inWindowHandle}, Properties{ inProperties }
-{}
+{
+	
+}
 
-Window::~Window()
+OpenGLWindow::~OpenGLWindow()
 {
 	RHI.DestroyWindow(WindowHandle);
 }
 
 
-void Window::Open()
+void OpenGLWindow::Open()
 {
 	Logger::Get().Print("Creating Window %s (%d, %d).", Properties.Title, Properties.Width, Properties.Height);
 
@@ -32,5 +34,11 @@ void Window::Open()
 
 
 
+}
+
+void OpenGLWindow::SetVSyncEnabled(const bool inEnabled)
+{
+	Properties.VSyncEnabled = inEnabled;
+	RHI.SetVSyncEnabled(inEnabled);
 }
 

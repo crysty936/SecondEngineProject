@@ -13,7 +13,7 @@ public:
 	void Run();
 
 private:
-	eastl::shared_ptr<class Window> MainWindow;
+	eastl::shared_ptr<class OpenGLWindow> MainWindow;
 
 };
 

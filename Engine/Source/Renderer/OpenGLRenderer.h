@@ -1,5 +1,5 @@
 #pragma once
-#include "Window/Window.h"
+#include "Window/OpenGLWindow.h"
 #include "EASTL/shared_ptr.h"
 
 /**
@@ -7,19 +7,20 @@
  * A base class should be made for the WindowContext, present one renamed to OpenGL Context, same for Window then the new implementation defined.
  */
 
-class Renderer
+class OpenGLRenderer
 {
 public:
-	Renderer();
-	virtual ~Renderer();
+	OpenGLRenderer();
+	virtual ~OpenGLRenderer();
 
 public:
 	// Will create the base window and return the context for it
-	virtual eastl::shared_ptr<Window> Init(const WindowProperties& inDefaultWindowProperties);
-	void Draw(const class Window& inWindowToUse);
+	virtual eastl::shared_ptr<OpenGLWindow> Init(const WindowProperties& inDefaultWindowProperties);
+	void Draw(const class OpenGLWindow& inWindowToUse);
 
-	eastl::shared_ptr<Window> CreateWindow(const WindowProperties& inWindowProperties) const;
+	eastl::shared_ptr<OpenGLWindow> CreateWindow(const WindowProperties& inWindowProperties) const;
 	void DestroyWindow(GLFWwindow* inWindowHandle) const;
+	void SetVSyncEnabled(const bool inEnabled);
 
 private:
 	struct GLFWwindow* CreateNewWinowHandle(const WindowProperties& inWindowProperties) const;
@@ -27,4 +28,4 @@ private:
 };
 
 // Convert to pointer for generic RHI implementation
-extern Renderer RHI;
+extern OpenGLRenderer RHI;

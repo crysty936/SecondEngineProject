@@ -1,18 +1,18 @@
 #pragma once
 #include "WindowProperties.h"
 
-class Window
+class OpenGLWindow
 {
 public:
-	Window(struct GLFWwindow* inWindowHandle, const WindowProperties& inProperties = {});
-	~Window();
+	OpenGLWindow(struct GLFWwindow* inWindowHandle, const WindowProperties& inProperties = {});
+	~OpenGLWindow();
 	void Open();
 
 	inline struct GLFWwindow* GetHandle() const { return WindowHandle; }
 
+	void SetVSyncEnabled(const bool inEnabled);
 
 private:
-	// Handle for what type the RHI requires
 	struct GLFWwindow* WindowHandle;
 	WindowProperties Properties;
 };

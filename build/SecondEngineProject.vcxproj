@@ -261,8 +261,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\Engine\Source\Core\EASTLNew.cpp" />
+    <ClCompile Include="..\Engine\Source\EventSystem\EventSystem.cpp" />
+    <ClCompile Include="..\Engine\Source\InputSystem\OpenGLInputSystem.cpp" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Core\EngineCore.cpp" />
-    <ClInclude Include="..\Engine\Source\Window\WindowProperties.h" />
+    <ClInclude Include="..\Engine\Source\EventSystem\EventSystem.h" />
+    <ClInclude Include="..\Engine\Source\InputSystem\OpenGLInputSystem.h" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\EngineCore.h" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\EngineUtils.h" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Core\WindowsPlatformDependent.cpp" />
@@ -270,16 +273,12 @@
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\EntryPoint\EntryPoint.cpp" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Logger\Logger.cpp" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Logger\Logger.h" />
-    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\GLUtils.cpp" />
-    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\GLUtils.h" />
-    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\Renderer.cpp" />
-    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\Renderer.h" />
-    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\RendererContext.cpp" />
-    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\RendererContext.h" />
-    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Window\Window.cpp" />
-    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Window\Window.h" />
-    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Window\WindowContext.cpp" />
-    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Window\WindowContext.h" />
+    <ClCompile Include="..\Engine\Source\Renderer\OpenGLUtils.cpp" />
+    <ClInclude Include="..\Engine\Source\Renderer\OpenGLUtils.h" />
+    <ClCompile Include="..\Engine\Source\Renderer\OpenGLRenderer.cpp" />
+    <ClInclude Include="..\Engine\Source\Renderer\OpenGLRenderer.h" />
+    <ClCompile Include="..\Engine\Source\Window\OpenGLWindow.cpp" />
+    <ClInclude Include="..\Engine\Source\Window\OpenGLWindow.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="D:\Projects\SecondEngineProject\build\Plugins\EASTL\EASTL.vcxproj">

@@ -5,8 +5,9 @@
 #include "Core/WindowsPlatformDependent.h"
 #include "GLFW/glfw3.h"
 #include "Logger/Logger.h"
-#include "Renderer/Renderer.h"
-#include "Window/Window.h"
+#include "Renderer/OpenGLRenderer.h"
+#include "Window/OpenGLWindow.h"
+#include "InputSystem/OpenGlInputSystem.h"
 
 const float IdealFrameRate = 60.f;
 
@@ -22,18 +23,12 @@ EngineCore::EngineCore()
 
 EngineCore::~EngineCore() = default;
 
+
 void EngineCore::Init()
 {
     MainWindow = RHI.Init({});
-
-
-
+    OpenGLInputSystem::Init(*MainWindow);
     
-
-
-
-
-
 }
 
 void EngineCore::Run()
