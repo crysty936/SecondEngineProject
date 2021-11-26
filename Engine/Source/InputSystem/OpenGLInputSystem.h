@@ -3,7 +3,7 @@
 #include "GLFW/glfw3.h"
 #include "Core/EngineUtils.h"
 
-using KeyDelegate = TemplatedMulticastDelegate<int, int, int, int>;
+using KeyDelegate = MulticastDelegate<int, int, int, int>;
 
 class OpenGLInputSystem
 {

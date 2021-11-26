@@ -22,9 +22,9 @@ void OpenGLInputSystem::Init(const OpenGLWindow & inWindow)
 {
 	Instance = new OpenGLInputSystem{};
 
-	Instance->OnKeysPressed.BindRaw(Instance, &OpenGLInputSystem::OnKeyPressedTest);
-
-	glfwSetKeyCallback(inWindow.GetHandle(), &KeyCallback);
+// 	Instance->OnKeysPressed.BindRaw(Instance, &OpenGLInputSystem::OnKeyPressedTest);
+// 
+// 	glfwSetKeyCallback(inWindow.GetHandle(), &KeyCallback);
 
 }
 

@@ -26,6 +26,10 @@ EngineCore::~EngineCore() = default;
 
 void EngineCore::Init()
 {
+    EventSystemTest test;
+
+    test.Test(1);
+
     MainWindow = RHI.Init({});
     OpenGLInputSystem::Init(*MainWindow);
     

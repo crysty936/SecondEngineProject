@@ -31,6 +31,12 @@
     <ClCompile Include="..\Engine\Source\EventSystem\EventSystem.cpp">
       <Filter>Engine\Source\EventSystem</Filter>
     </ClCompile>
+    <ClCompile Include="..\Engine\Source\EventSystem\DelegateBase.cpp">
+      <Filter>Engine\Source\EventSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\Source\Utils\InlineAllocator.cpp">
+      <Filter>Engine\Source\Utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\EngineCore.h">
@@ -58,6 +64,15 @@
       <Filter>Engine\Source\InputSystem</Filter>
     </ClInclude>
     <ClInclude Include="..\Engine\Source\EventSystem\EventSystem.h">
+      <Filter>Engine\Source\EventSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\Source\EventSystem\DelegateBase.h">
+      <Filter>Engine\Source\EventSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\Source\Utils\InlineAllocator.h">
+      <Filter>Engine\Source\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\Source\EvenSystem\IFunctionContainerBase.h">
       <Filter>Engine\Source\EventSystem</Filter>
     </ClInclude>
   </ItemGroup>
@@ -88,6 +103,9 @@
     </Filter>
     <Filter Include="Engine\Source\EventSystem">
       <UniqueIdentifier>{39d81988-87bf-4a93-adc6-83d3a6eb0267}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\Utils">
+      <UniqueIdentifier>{4d7f65cb-82dd-4630-a208-4eab262f859d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

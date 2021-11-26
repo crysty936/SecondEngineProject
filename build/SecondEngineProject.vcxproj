@@ -261,11 +261,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\Engine\Source\Core\EASTLNew.cpp" />
+    <ClCompile Include="..\Engine\Source\EventSystem\DelegateBase.cpp" />
     <ClCompile Include="..\Engine\Source\EventSystem\EventSystem.cpp" />
     <ClCompile Include="..\Engine\Source\InputSystem\OpenGLInputSystem.cpp" />
+    <ClCompile Include="..\Engine\Source\Utils\InlineAllocator.cpp" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Core\EngineCore.cpp" />
+    <ClInclude Include="..\Engine\Source\EvenSystem\IFunctionContainerBase.h" />
+    <ClInclude Include="..\Engine\Source\EventSystem\DelegateBase.h" />
     <ClInclude Include="..\Engine\Source\EventSystem\EventSystem.h" />
     <ClInclude Include="..\Engine\Source\InputSystem\OpenGLInputSystem.h" />
+    <ClInclude Include="..\Engine\Source\Utils\InlineAllocator.h" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\EngineCore.h" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\EngineUtils.h" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Core\WindowsPlatformDependent.cpp" />

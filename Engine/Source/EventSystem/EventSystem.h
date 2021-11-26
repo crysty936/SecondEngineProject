@@ -1,20 +1,28 @@
 #pragma once
 #include <type_traits>
 #include "EASTL/vector.h"
+#include "DelegateBase.h"
+#include "EvenSystem/IFunctionContainerBase.h"
 
 template<typename inRetType, typename... inParamTypes>
-struct IDelegateInstance
+class IFunctionContainer : IFunctionContainerBase
 {
+public:
 	virtual inRetType Execute(inParamTypes&&...) const = 0;
-	virtual ~IDelegateInstance() = default;
+	virtual ~IFunctionContainer() = default;
 };
 
 template<typename inRetType, typename... inParamTypes>
-class TemplatedFreeDelegate : public IDelegateInstance<inRetType, inParamTypes...>
+class FreeFunctionContainer : public IFunctionContainer<inRetType, inParamTypes...>
 {
 	using FreeFunctionType = inRetType(*)(inParamTypes...);
 
 public:
+	FreeFunctionContainer(FreeFunctionType* inFunc) noexcept
+		: Func{ inFunc }
+	{
+
+	}
 
 	inRetType Execute(inParamTypes&&... inParams) const
 	{
@@ -25,24 +33,24 @@ public:
 };
 
 template <typename inObjType, typename inRetType, typename... inParamTypes>
-struct TMemFunPtrType
+struct MemberFuncPtrType
 {
 	using Type = inRetType(inObjType::*)(inParamTypes...);
 };
 
 template<typename inObjType, typename inRetType, typename... inParamTypes>
-class TemplatedMemberDelegate : public IDelegateInstance<inRetType, inParamTypes...>
+class MemberFuncContainer : public IFunctionContainer<inRetType, inParamTypes...>
 {
-	using MemberFunctionType = typename TMemFunPtrType<inObjType, inRetType, inParamTypes...>::Type;
+	using MemberFunctionType = typename MemberFuncPtrType<inObjType, inRetType, inParamTypes...>::Type;
 
 public:
-	TemplatedMemberDelegate(inObjType* inObj, MemberFunctionType inMemberFunction)
+	MemberFuncContainer(inObjType* inObj, MemberFunctionType inMemberFunction) noexcept
 		:Obj(inObj), MemberFunctionPtr(inMemberFunction)
 	{
 
 	}
 
-	virtual ~TemplatedMemberDelegate()
+	virtual ~MemberFuncContainer()
 		= default;
 
 	inRetType Execute(inParamTypes&&... inParams) const
@@ -57,25 +65,29 @@ private:
 
 
 template<typename inRetType, typename... inParamTypes>
-class TemplatedDelegate
+class Delegate : DelegateBase
 {
-	//static_assert(std::is_integral<inParamTypes...>::value);
-
 	template<typename T>
-	using MemberFunc = typename TMemFunPtrType<T, inRetType, inParamTypes...>::Type;
+	using MemberFunc = typename MemberFuncPtrType<T, inRetType, inParamTypes...>::Type;
+
+	using FuncContainerType = IFunctionContainer<inRetType, inParamTypes...>;
 
 public:
-	TemplatedDelegate() = default;
-	~TemplatedDelegate()
+	Delegate() = default;
+	~Delegate()
 	{
 		delete DelegateInstance;
 	}
 
 
 	template<typename inObjType>
-	static IDelegateInstance<inRetType, inParamTypes...>* CreateRaw(inObjType* inObj, MemberFunc<inObjType> inMemberFunction)
+	static Delegate CreateRaw(inObjType* inObj, MemberFunc<inObjType> inMemberFunction)
 	{
-		return new TemplatedMemberDelegate<inObjType, inRetType, inParamTypes...>(inObj, inMemberFunction);
+		Delegate del;
+
+		new (del) MemberFuncContainer<inObjType, inRetType, inParamTypes...>(inObj, inMemberFunction);
+
+		return del;
 	}
 
 
@@ -87,45 +99,58 @@ public:
 
 	inRetType Execute(inParamTypes... inParams) const
 	{
-		return DelegateInstance->Execute(std::forward<inParamTypes>(inParams)...);
+		FuncContainerType* funcContainer = GetFuncContainer();
+
+		return funcContainer->Execute(std::forward<inParamTypes>(inParams)...);
 	}
 
+
+
 private:
-	IDelegateInstance<inRetType, inParamTypes...>* DelegateInstance = nullptr;
+	FuncContainerType* GetFuncContainer() const
+	{
+		IFunctionContainerBase* funcContainerBase = GetDelegateInstance();
+		FuncContainerType* funcContainer = static_cast<FuncContainerType*>(funcContainerBase);
+
+		return funcContainer;
+	}
+
+
+	IFunctionContainer<inRetType, inParamTypes...>* DelegateInstance = nullptr;
 };
 
 template<typename... inParamTypes>
-class TemplatedMulticastDelegate
+class MulticastDelegate
 {
 	using RetType = void;
-	using delegateType = TemplatedDelegate<RetType, inParamTypes...>;
+	using delegateType = Delegate<RetType, inParamTypes...>;
 
 public:
-	TemplatedMulticastDelegate() = default;
+	MulticastDelegate() = default;
 
-	~TemplatedMulticastDelegate()
+	~MulticastDelegate()
 	{
 		delete[] Delegates.data();
 	}
 
 	template<typename inObjType>
-	void BindRaw(inObjType* inObj, typename TMemFunPtrType<inObjType, RetType, inParamTypes...>::Type inMemberFunction)
+	void BindRaw(inObjType* inObj, typename MemberFuncPtrType<inObjType, RetType, inParamTypes...>::Type inMemberFunction)
 	{
-		IDelegateInstance<void, inParamTypes...>* del = delegateType::CreateRaw(inObj, inMemberFunction);
+		IFunctionContainer<void, inParamTypes...>* del = delegateType::CreateRaw(inObj, inMemberFunction);
 
 		Delegates.push_back(del);
 	}
 
 	void Invoke(inParamTypes... inParams)
 	{
-		for (const IDelegateInstance<void, inParamTypes...>* del : Delegates)
+		for (const IFunctionContainer<void, inParamTypes...>* del : Delegates)
 		{
 			del->Execute(std::forward<inParamTypes>(inParams)...);
 		}
 	}
 
 private:
-	eastl::vector<IDelegateInstance<void, inParamTypes...>*> Delegates{};
+	eastl::vector<IFunctionContainer<void, inParamTypes...>*> Delegates{};
 };
 
 
@@ -133,7 +158,8 @@ class EventSystemTest
 {
 
 public:
-	void Test();
+	void Test(int delimiter);
 	void Function(int intA);
-
+	void Function2();
 };
+
