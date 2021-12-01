@@ -19,6 +19,8 @@ namespace DelegatesTests
  		testDelegate del = testDelegate::CreateRaw(&test, &DelegatesTestClass::SimpleMemberFunction);
 
 		EXPECT_EQ(del.GetAllocatedSize(), 24);
+
+		//test
 	}
 
 	TEST(MemberDelegate, EmptyMemberDelegateSize)
