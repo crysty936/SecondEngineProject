@@ -64,11 +64,8 @@ include(GoogleTest)
 list(APPEND source_files UnitTests/test.cpp)
 
 get_filename_component(full_path_test_cpp ${CMAKE_CURRENT_SOURCE_DIR}/Engine/Source/EntryPoint/EntryPoint.cpp ABSOLUTE)
-message("${full_path_test_cpp}")
 
 list(REMOVE_ITEM source_files "${full_path_test_cpp}")
-message("${source_files}")
-
 add_executable(EngineTests ${source_files})
 
 target_include_directories(EngineTests PUBLIC
