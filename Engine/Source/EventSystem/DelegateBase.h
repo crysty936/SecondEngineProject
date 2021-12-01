@@ -1,11 +1,14 @@
  #pragma once
 #include "Utils/InlineAllocator.h"
-#include "EvenSystem/IFunctionContainerBase.h"
+#include "EventSystem/IFunctionContainerBase.h"
  
 class InlineAllocator;
 
  class DelegateBase
  {
+
+ public:
+ 	 inline size_t GetAllocatedSize() const { return Allocator.GetAllocatedSize(); }
 
  protected:
 	DelegateBase();
@@ -20,7 +23,7 @@ class InlineAllocator;
  protected:
 	 void Unbind();
 
-	 inline IFunctionContainerBase* GetDelegateInstance() const { return reinterpret_cast<IFunctionContainerBase*>(Allocator.GetAllocation()); }
+	 inline const IFunctionContainerBase* GetDelegateInstance() const { return reinterpret_cast<const IFunctionContainerBase*>(Allocator.GetAllocation()); }
 
 	 void* Allocate(size_t inSize);
 

@@ -10,23 +10,23 @@ InlineAllocator::~InlineAllocator()
 	Free();
 }
 
-InlineAllocator::InlineAllocator(const InlineAllocator& inOther)
-{
-	if (!inOther.HasAllocation()) { return; }
-
-	memcpy(Allocate(inOther.AllocatedSize), inOther.GetAllocation(), inOther.AllocatedSize);
-	AllocatedSize = inOther.AllocatedSize;
-}
-
-InlineAllocator& InlineAllocator::operator=(const InlineAllocator& inOther)
-{
-	if (!inOther.HasAllocation()) { return *this; }
-
-	memcpy(Allocate(inOther.AllocatedSize), inOther.GetAllocation(), inOther.AllocatedSize);
-	AllocatedSize = inOther.AllocatedSize;
-
-	return *this;
-}
+ InlineAllocator::InlineAllocator(const InlineAllocator& inOther)
+ {
+ 	if (!inOther.HasAllocation()) { return; }
+ 
+ 	memcpy(Allocate(inOther.AllocatedSize), inOther.GetAllocation(), inOther.AllocatedSize);
+ 	AllocatedSize = inOther.AllocatedSize;
+ }
+ 
+ InlineAllocator& InlineAllocator::operator=(const InlineAllocator& inOther)
+ {
+ 	if (!inOther.HasAllocation()) { return *this; }
+ 
+ 	memcpy(Allocate(inOther.AllocatedSize), inOther.GetAllocation(), inOther.AllocatedSize);
+ 	AllocatedSize = inOther.AllocatedSize;
+ 
+ 	return *this;
+ }
 
 InlineAllocator::InlineAllocator(InlineAllocator&& inOther)
 	:AllocatedSize{inOther.AllocatedSize}
@@ -102,7 +102,7 @@ void* InlineAllocator::Allocate(const size_t inSize)
 	}
 }
 
-void* InlineAllocator::GetAllocation() const
+const void* InlineAllocator::GetAllocation() const
 {
 	const bool hasAllocation = HasAllocation();
 
@@ -115,7 +115,7 @@ void* InlineAllocator::GetAllocation() const
 		return HeapPtr;
 	}
 
-	return  reinterpret_cast<void*>(StackPtr[0]);
+	return  static_cast<const void*>(StackPtr);
 }
 
 void InlineAllocator::Free()

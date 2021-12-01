@@ -185,7 +185,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="D:\Projects\SecondEngineProject\build\ALL_BUILD.vcxproj">
+    <ProjectReference Include="D:\Projects\SecondEngineProject\build\Plugins\googletest-main\googletest\ALL_BUILD.vcxproj">
       <Project>{57DB1603-F816-3D29-A6B1-90EDC7D4EAAC}</Project>
       <Name>ALL_BUILD</Name>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>

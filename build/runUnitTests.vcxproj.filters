@@ -1,0 +1,117 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Core\EASTLNew.cpp">
+      <Filter>Engine\Source\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Core\EngineCore.cpp">
+      <Filter>Engine\Source\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Core\WindowsPlatformDependent.cpp">
+      <Filter>Engine\Source\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\EventSystem\DelegateBase.cpp">
+      <Filter>Engine\Source\EventSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\EventSystem\EventSystem.cpp">
+      <Filter>Engine\Source\EventSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\InputSystem\OpenGLInputSystem.cpp">
+      <Filter>Engine\Source\InputSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Logger\Logger.cpp">
+      <Filter>Engine\Source\Logger</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGLRenderer.cpp">
+      <Filter>Engine\Source\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGLUtils.cpp">
+      <Filter>Engine\Source\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Utils\InlineAllocator.cpp">
+      <Filter>Engine\Source\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Window\OpenGLWindow.cpp">
+      <Filter>Engine\Source\Window</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\UnitTests\test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\EngineCore.h">
+      <Filter>Engine\Source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\EngineUtils.h">
+      <Filter>Engine\Source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\WindowsPlatformDependent.h">
+      <Filter>Engine\Source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\EventSystem\DelegateBase.h">
+      <Filter>Engine\Source\EventSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\EventSystem\EventSystem.h">
+      <Filter>Engine\Source\EventSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\EventSystem\IFunctionContainerBase.h">
+      <Filter>Engine\Source\EventSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\InputSystem\OpenGLInputSystem.h">
+      <Filter>Engine\Source\InputSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Logger\Logger.h">
+      <Filter>Engine\Source\Logger</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGLRenderer.h">
+      <Filter>Engine\Source\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGLUtils.h">
+      <Filter>Engine\Source\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Utils\InlineAllocator.h">
+      <Filter>Engine\Source\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Window\OpenGLWindow.h">
+      <Filter>Engine\Source\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Window\WindowProperties.h">
+      <Filter>Engine\Source\Window</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Engine">
+      <UniqueIdentifier>{F865CFEF-2D3B-3D8E-BB80-9952931C80B3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source">
+      <UniqueIdentifier>{301F8C73-A95D-3FEF-8A8D-9EB9B443CCD9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\Core">
+      <UniqueIdentifier>{F33D7D25-A1C9-3DB2-8BCB-77735BD726B9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\EntryPoint">
+      <UniqueIdentifier>{B549495F-A607-3E5C-9827-830FBEB19F55}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\EventSystem">
+      <UniqueIdentifier>{9684A5FC-B188-34BE-9150-080F51D7B3BC}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\InputSystem">
+      <UniqueIdentifier>{D2C490B8-B828-3411-936E-8265824BB9B8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\Logger">
+      <UniqueIdentifier>{8CA88269-8D94-3FA4-84BA-37BA657F37D5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\Renderer">
+      <UniqueIdentifier>{257D7CF0-8FA7-32C5-A267-5CB51E8AEFA1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\Utils">
+      <UniqueIdentifier>{75B3C83B-1FEA-39A9-BDF9-D9EDBA99A05A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\Window">
+      <UniqueIdentifier>{29E68D5E-4245-3A87-86BE-77379684E2DF}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{CFD6D7F1-B2BB-3A9D-B5AC-D71921A8CFBB}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

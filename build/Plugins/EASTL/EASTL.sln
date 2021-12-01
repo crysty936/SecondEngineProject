@@ -17,6 +17,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "INSTALL", "INSTALL.vcxproj"
 		{57DB1603-F816-3D29-A6B1-90EDC7D4EAAC} = {57DB1603-F816-3D29-A6B1-90EDC7D4EAAC}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RUN_TESTS", "RUN_TESTS.vcxproj", "{F0D8FBE0-7DF7-3DDB-98E4-8EF748857319}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -45,10 +49,15 @@ Global
 		{86A3AD23-DF08-3490-88AA-0C85559458DF}.Release|x64.ActiveCfg = Release|x64
 		{86A3AD23-DF08-3490-88AA-0C85559458DF}.MinSizeRel|x64.ActiveCfg = MinSizeRel|x64
 		{86A3AD23-DF08-3490-88AA-0C85559458DF}.RelWithDebInfo|x64.ActiveCfg = RelWithDebInfo|x64
+		{F0D8FBE0-7DF7-3DDB-98E4-8EF748857319}.Debug|x64.ActiveCfg = Debug|x64
+		{F0D8FBE0-7DF7-3DDB-98E4-8EF748857319}.Release|x64.ActiveCfg = Release|x64
+		{F0D8FBE0-7DF7-3DDB-98E4-8EF748857319}.MinSizeRel|x64.ActiveCfg = MinSizeRel|x64
+		{F0D8FBE0-7DF7-3DDB-98E4-8EF748857319}.RelWithDebInfo|x64.ActiveCfg = RelWithDebInfo|x64
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{57DB1603-F816-3D29-A6B1-90EDC7D4EAAC} = {6ED9D403-5BCA-3C00-AFBB-D7A98968D6F8}
 		{86A3AD23-DF08-3490-88AA-0C85559458DF} = {6ED9D403-5BCA-3C00-AFBB-D7A98968D6F8}
+		{F0D8FBE0-7DF7-3DDB-98E4-8EF748857319} = {6ED9D403-5BCA-3C00-AFBB-D7A98968D6F8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B6368885-46FC-34D9-9413-FABFD76B075A}

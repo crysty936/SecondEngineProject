@@ -2,7 +2,7 @@
 #include <type_traits>
 #include "EASTL/vector.h"
 #include "DelegateBase.h"
-#include "EvenSystem/IFunctionContainerBase.h"
+#include "EventSystem/IFunctionContainerBase.h"
 
 template<typename inRetType, typename... inParamTypes>
 class IFunctionContainer : IFunctionContainerBase
@@ -65,58 +65,52 @@ private:
 
 
 template<typename inRetType, typename... inParamTypes>
-class Delegate : DelegateBase
+class Delegate : public DelegateBase
 {
 	template<typename T>
 	using MemberFunc = typename MemberFuncPtrType<T, inRetType, inParamTypes...>::Type;
+
+	template<class inObjType>
+	using MemberFuncContainerType = MemberFuncContainer<inObjType, inRetType, inParamTypes...>;
 
 	using FuncContainerType = IFunctionContainer<inRetType, inParamTypes...>;
 
 public:
 	Delegate() = default;
-	~Delegate()
-	{
-		delete DelegateInstance;
-	}
-
+	~Delegate() = default;
 
 	template<typename inObjType>
 	static Delegate CreateRaw(inObjType* inObj, MemberFunc<inObjType> inMemberFunction)
 	{
 		Delegate del;
 
-		new (del) MemberFuncContainer<inObjType, inRetType, inParamTypes...>(inObj, inMemberFunction);
+		new(del) MemberFuncContainerType<inObjType>(inObj, inMemberFunction);
 
-		return del;
+		return std::move(del);
 	}
 
 
 	template<typename inObjType>
 	void BindRaw(inObjType* inObj, MemberFunc<inObjType> inMemberFunction)
 	{
-		DelegateInstance = CreateRaw(inObj, inMemberFunction);
+		new(this) MemberFuncContainerType<inObjType>(inObj, inMemberFunction);
 	}
 
 	inRetType Execute(inParamTypes... inParams) const
 	{
-		FuncContainerType* funcContainer = GetFuncContainer();
+		const FuncContainerType* funcContainer = GetFuncContainer();
 
 		return funcContainer->Execute(std::forward<inParamTypes>(inParams)...);
 	}
 
-
-
 private:
-	FuncContainerType* GetFuncContainer() const
+	const FuncContainerType* GetFuncContainer() const
 	{
-		IFunctionContainerBase* funcContainerBase = GetDelegateInstance();
-		FuncContainerType* funcContainer = static_cast<FuncContainerType*>(funcContainerBase);
+		const IFunctionContainerBase* funcContainerBase = GetDelegateInstance();
+		const FuncContainerType* funcContainer = static_cast<const FuncContainerType*>(funcContainerBase);
 
 		return funcContainer;
 	}
-
-
-	IFunctionContainer<inRetType, inParamTypes...>* DelegateInstance = nullptr;
 };
 
 template<typename... inParamTypes>

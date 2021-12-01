@@ -86,7 +86,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\build;D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\build;D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -104,10 +104,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\build;D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\build;D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\build;D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\build;D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -130,7 +130,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\build;D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\build;D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <ExceptionHandling>Sync</ExceptionHandling>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
@@ -148,10 +148,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\build;D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\build;D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\build;D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\build;D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -174,7 +174,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\build;D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\build;D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <ExceptionHandling>Sync</ExceptionHandling>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
@@ -192,10 +192,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR=\"MinSizeRel\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\build;D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\build;D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\build;D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\build;D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -218,7 +218,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\build;D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\build;D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -235,10 +235,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR=\"RelWithDebInfo\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\build;D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\build;D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\build;D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\build;D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -260,30 +260,31 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\Engine\Source\Core\EASTLNew.cpp" />
-    <ClCompile Include="..\Engine\Source\EventSystem\DelegateBase.cpp" />
-    <ClCompile Include="..\Engine\Source\EventSystem\EventSystem.cpp" />
-    <ClCompile Include="..\Engine\Source\InputSystem\OpenGLInputSystem.cpp" />
-    <ClCompile Include="..\Engine\Source\Utils\InlineAllocator.cpp" />
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Core\EASTLNew.cpp" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Core\EngineCore.cpp" />
-    <ClInclude Include="..\Engine\Source\EvenSystem\IFunctionContainerBase.h" />
-    <ClInclude Include="..\Engine\Source\EventSystem\DelegateBase.h" />
-    <ClInclude Include="..\Engine\Source\EventSystem\EventSystem.h" />
-    <ClInclude Include="..\Engine\Source\InputSystem\OpenGLInputSystem.h" />
-    <ClInclude Include="..\Engine\Source\Utils\InlineAllocator.h" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\EngineCore.h" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\EngineUtils.h" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Core\WindowsPlatformDependent.cpp" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\WindowsPlatformDependent.h" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\EntryPoint\EntryPoint.cpp" />
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\EventSystem\DelegateBase.cpp" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\EventSystem\DelegateBase.h" />
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\EventSystem\EventSystem.cpp" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\EventSystem\EventSystem.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\EventSystem\IFunctionContainerBase.h" />
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\InputSystem\OpenGLInputSystem.cpp" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\InputSystem\OpenGLInputSystem.h" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Logger\Logger.cpp" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Logger\Logger.h" />
-    <ClCompile Include="..\Engine\Source\Renderer\OpenGLUtils.cpp" />
-    <ClInclude Include="..\Engine\Source\Renderer\OpenGLUtils.h" />
-    <ClCompile Include="..\Engine\Source\Renderer\OpenGLRenderer.cpp" />
-    <ClInclude Include="..\Engine\Source\Renderer\OpenGLRenderer.h" />
-    <ClCompile Include="..\Engine\Source\Window\OpenGLWindow.cpp" />
-    <ClInclude Include="..\Engine\Source\Window\OpenGLWindow.h" />
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGLRenderer.cpp" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGLRenderer.h" />
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGLUtils.cpp" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGLUtils.h" />
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Utils\InlineAllocator.cpp" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Utils\InlineAllocator.h" />
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Window\OpenGLWindow.cpp" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Window\OpenGLWindow.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Window\WindowProperties.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="D:\Projects\SecondEngineProject\build\Plugins\EASTL\EASTL.vcxproj">

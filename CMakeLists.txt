@@ -17,20 +17,6 @@ list(APPEND EXTRA_LIBS glfw)
 add_subdirectory(Plugins/glad)
 list(APPEND EXTRA_LIBS glad)
 
-#add EASTL
-set(EASTL_ROOT_DIR Plugins/EASTL)
-# include_directories (${EASTL_ROOT_DIR}/include)
-# include_directories (${EASTL_ROOT_DIR}/test/packages/EAAssert/include)
-# include_directories (${EASTL_ROOT_DIR}/test/packages/EABase/include/Common)
-# include_directories (${EASTL_ROOT_DIR}/test/packages/EAMain/include)
-# include_directories (${EASTL_ROOT_DIR}/test/packages/EAStdC/include)
-# include_directories (${EASTL_ROOT_DIR}/test/packages/EATest/include)
-# include_directories (${EASTL_ROOT_DIR}/test/packages/EAThread/include)
-# set(EASTL_LIBRARY debug ${EASTL_ROOT_DIR}/build/Debug/EASTL.lib optimized ${EASTL_ROOT_DIR}/build/Release/EASTL.lib)
-# add_custom_target(NatVis SOURCES ${EASTL_ROOT_DIR}/doc/EASTL.natvis)
-
-# list(APPEND EXTRA_LIBS ${EASTL_LIBRARY})
-
 add_subdirectory(Plugins/EASTL)
 list(APPEND EXTRA_LIBS EASTL)
 
@@ -52,4 +38,46 @@ target_include_directories(SecondEngineProject PUBLIC
 include_directories(${CMAKE_CURRENT_LIST_DIR}/Engine/Source)
 						   
 
+# Stop it from creating unnecessary Project
 set(CMAKE_SUPPRESS_REGENERATION true)
+
+
+
+
+
+# GTest done so that it can be used with lib and .exe by creating a copy of the original project, without the main
+
+# Build with MDd
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+
+# Do not create GMock project
+option(BUILD_GMOCK OFF)
+
+ADD_SUBDIRECTORY(Plugins/googletest-main)
+
+enable_testing()
+
+include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
+
+include(GoogleTest)
+
+list(APPEND source_files UnitTests/test.cpp)
+
+get_filename_component(full_path_test_cpp ${CMAKE_CURRENT_SOURCE_DIR}/Engine/Source/EntryPoint/EntryPoint.cpp ABSOLUTE)
+message("${full_path_test_cpp}")
+
+list(REMOVE_ITEM source_files "${full_path_test_cpp}")
+message("${source_files}")
+
+add_executable(EngineTests ${source_files})
+
+target_include_directories(EngineTests PUBLIC
+                           "${PROJECT_BINARY_DIR}"
+                           ${EXTRA_INCLUDES}
+                           )
+
+
+
+target_link_libraries(EngineTests PUBLIC gtest gtest_main ${EXTRA_LIBS})
+
+gtest_discover_tests(EngineTests)

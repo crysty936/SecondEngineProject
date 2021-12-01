@@ -1,8 +1,6 @@
 #include "EventSystem/DelegateBase.h"
 
 DelegateBase::DelegateBase() = default;
-
-
 DelegateBase::~DelegateBase() = default;
 
 DelegateBase& DelegateBase::operator=(const DelegateBase& inOther) = default;
@@ -13,7 +11,7 @@ DelegateBase& DelegateBase::operator=(DelegateBase&& inOther) = default;
 
 void DelegateBase::Unbind()
 {
-	if (IFunctionContainerBase* currentInstance = GetDelegateInstance())
+	if (const IFunctionContainerBase* currentInstance = GetDelegateInstance())
 	{
 		currentInstance->~IFunctionContainerBase();
 
@@ -23,7 +21,7 @@ void DelegateBase::Unbind()
 
 void* DelegateBase::Allocate(size_t inSize)
 {
-	if (IFunctionContainerBase* currentInstance = GetDelegateInstance())
+	if (const IFunctionContainerBase* currentInstance = GetDelegateInstance())
 	{
 		currentInstance->~IFunctionContainerBase();
 	}

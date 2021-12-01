@@ -11,6 +11,7 @@ C:/Program Files/CMake/share/cmake-3.22/Modules/CMakeSystemSpecificInitialize.cm
 C:/Program Files/CMake/share/cmake-3.22/Modules/Compiler/CMakeCommonCompilerMacros.cmake
 C:/Program Files/CMake/share/cmake-3.22/Modules/Compiler/MSVC-C.cmake
 C:/Program Files/CMake/share/cmake-3.22/Modules/Compiler/MSVC-CXX.cmake
+C:/Program Files/CMake/share/cmake-3.22/Modules/GoogleTest.cmake
 C:/Program Files/CMake/share/cmake-3.22/Modules/Platform/Windows-MSVC-C.cmake
 C:/Program Files/CMake/share/cmake-3.22/Modules/Platform/Windows-MSVC-CXX.cmake
 C:/Program Files/CMake/share/cmake-3.22/Modules/Platform/Windows-MSVC.cmake

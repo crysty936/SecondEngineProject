@@ -14,6 +14,9 @@
 # EXTERNAL cache entries
 ########################
 
+//Builds the googlemock subproject
+BUILD_GMOCK:BOOL=OFF
+
 //Build shared libraries
 BUILD_SHARED_LIBS:BOOL=OFF
 
@@ -305,6 +308,10 @@ GLFW_USE_HYBRID_HPG:BOOL=OFF
 //Assume the Vulkan loader is linked with the application
 GLFW_VULKAN_STATIC:BOOL=OFF
 
+//Enable installation of googletest. (Projects embedding googletest
+// may want to turn this OFF.)
+INSTALL_GTEST:BOOL=ON
+
 //Value Computed by CMake
 SecondEngineProject_BINARY_DIR:STATIC=D:/Projects/SecondEngineProject/build
 
@@ -316,6 +323,43 @@ SecondEngineProject_SOURCE_DIR:STATIC=D:/Projects/SecondEngineProject
 
 //Use MSVC runtime library DLL
 USE_MSVC_RUNTIME_LIBRARY_DLL:BOOL=ON
+
+//Value Computed by CMake
+googletest-distribution_BINARY_DIR:STATIC=D:/Projects/SecondEngineProject/build/Plugins/googletest-main
+
+//Value Computed by CMake
+googletest-distribution_IS_TOP_LEVEL:STATIC=OFF
+
+//Value Computed by CMake
+googletest-distribution_SOURCE_DIR:STATIC=D:/Projects/SecondEngineProject/Plugins/googletest-main
+
+//Value Computed by CMake
+gtest_BINARY_DIR:STATIC=D:/Projects/SecondEngineProject/build/Plugins/googletest-main/googletest
+
+//Value Computed by CMake
+gtest_IS_TOP_LEVEL:STATIC=OFF
+
+//Value Computed by CMake
+gtest_SOURCE_DIR:STATIC=D:/Projects/SecondEngineProject/Plugins/googletest-main/googletest
+
+//Build gtest's sample programs.
+gtest_build_samples:BOOL=OFF
+
+//Build all of gtest's own tests.
+gtest_build_tests:BOOL=OFF
+
+//Disable uses of pthreads in gtest.
+gtest_disable_pthreads:BOOL=OFF
+
+//Use shared (DLL) run-time lib even when Google Test is built
+// as static lib.
+gtest_force_shared_crt:BOOL=ON
+
+//Build gtest with internal symbols hidden in shared libraries.
+gtest_hide_internal_symbols:BOOL=OFF
+
+//Dependencies for the target
+gtest_main_LIB_DEPENDS:STATIC=general;gtest;
 
 
 ########################
@@ -436,7 +480,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_MT
 CMAKE_MT-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=8
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=10
 //Platform information initialized
 CMAKE_PLATFORM_INFO_INITIALIZED:INTERNAL=1
 //noop for ranlib
@@ -488,8 +532,28 @@ DOXYGEN_EXECUTABLE-ADVANCED:INTERNAL=1
 EASTL_HAS_FCHAR8T_FLAG:INTERNAL=
 //Test EASTL_HAS_ZCCHAR8T_FLAG
 EASTL_HAS_ZCCHAR8T_FLAG:INTERNAL=1
+//Details about finding Python
+FIND_PACKAGE_MESSAGE_DETAILS_Python:INTERNAL=[C:/Users/cryst/AppData/Local/Programs/Python/Python39/python.exe][cfound components: Interpreter ][v3.9.0()]
 //Details about finding Threads
 FIND_PACKAGE_MESSAGE_DETAILS_Threads:INTERNAL=[TRUE][v()]
 //CMAKE_INSTALL_PREFIX during last run
 _GNUInstallDirs_LAST_CMAKE_INSTALL_PREFIX:INTERNAL=C:/Program Files (x86)/SecondEngineProject
+//Path to a program.
+_Python_EXECUTABLE:INTERNAL=C:/Users/cryst/AppData/Local/Programs/Python/Python39/python.exe
+//Python Properties
+_Python_INTERPRETER_PROPERTIES:INTERNAL=Python;3;9;0;64;;cp39-win_amd64;C:\Users\cryst\AppData\Local\Programs\Python\Python39\Lib;C:\Users\cryst\AppData\Local\Programs\Python\Python39\Lib;C:\Users\cryst\AppData\Local\Programs\Python\Python39\Lib\site-packages;C:\Users\cryst\AppData\Local\Programs\Python\Python39\Lib\site-packages
+_Python_INTERPRETER_SIGNATURE:INTERNAL=e1ffd0054dae62508a27153917514852
+cmake_package_name:INTERNAL=GTest
+generated_dir:INTERNAL=D:/Projects/SecondEngineProject/build/Plugins/googletest-main/googletest/generated
+//ADVANCED property for variable: gtest_build_samples
+gtest_build_samples-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: gtest_build_tests
+gtest_build_tests-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: gtest_disable_pthreads
+gtest_disable_pthreads-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: gtest_force_shared_crt
+gtest_force_shared_crt-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: gtest_hide_internal_symbols
+gtest_hide_internal_symbols-ADVANCED:INTERNAL=1
+targets_export_name:INTERNAL=GTestTargets
 

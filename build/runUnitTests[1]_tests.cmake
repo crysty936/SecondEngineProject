@@ -1,0 +1,5 @@
+add_test( MemberDelegate.MemberDelegateSize D:/Projects/SecondEngineProject/build/Debug/runUnitTests.exe [==[--gtest_filter=MemberDelegate.MemberDelegateSize]==] --gtest_also_run_disabled_tests)
+set_tests_properties( MemberDelegate.MemberDelegateSize PROPERTIES WORKING_DIRECTORY D:/Projects/SecondEngineProject/build SKIP_REGULAR_EXPRESSION [==[\[  SKIPPED \]]==])
+add_test( MemberDelegate.EmptyMemberDelegateSize D:/Projects/SecondEngineProject/build/Debug/runUnitTests.exe [==[--gtest_filter=MemberDelegate.EmptyMemberDelegateSize]==] --gtest_also_run_disabled_tests)
+set_tests_properties( MemberDelegate.EmptyMemberDelegateSize PROPERTIES WORKING_DIRECTORY D:/Projects/SecondEngineProject/build SKIP_REGULAR_EXPRESSION [==[\[  SKIPPED \]]==])
+set( runUnitTests_TESTS MemberDelegate.MemberDelegateSize MemberDelegate.EmptyMemberDelegateSize)

@@ -37,6 +37,7 @@ if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   include("D:/Projects/SecondEngineProject/build/Plugins/glfw-3.3.4/cmake_install.cmake")
   include("D:/Projects/SecondEngineProject/build/Plugins/glad/cmake_install.cmake")
   include("D:/Projects/SecondEngineProject/build/Plugins/EASTL/cmake_install.cmake")
+  include("D:/Projects/SecondEngineProject/build/Plugins/googletest-main/cmake_install.cmake")
 
 endif()
 

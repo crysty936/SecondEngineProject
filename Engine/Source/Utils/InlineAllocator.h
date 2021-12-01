@@ -21,13 +21,15 @@ public:
 
 	void* Allocate(const size_t inSize);
 
-	void* GetAllocation() const;
+	const void* GetAllocation() const;
 
 	void Free();
 
 	bool HasAllocation () const { return AllocatedSize > 0; }
 
 	bool HasHeapAllocation () const { return AllocatedSize > StackSize; }
+
+	inline size_t GetAllocatedSize() const { return AllocatedSize; }
 
 private:
 	size_t AllocatedSize = 0;

@@ -66,7 +66,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Midl>
-      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Engine\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -76,7 +76,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Midl>
-      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Engine\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -86,7 +86,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
     <Midl>
-      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Engine\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -96,7 +96,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
     <Midl>
-      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Engine\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -110,6 +110,10 @@
     <ProjectReference Include="D:\Projects\SecondEngineProject\build\Plugins\EASTL\EASTL.vcxproj">
       <Project>{52F12E02-7F29-32F6-8B16-160274005C2C}</Project>
       <Name>EASTL</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Projects\SecondEngineProject\build\EngineTests.vcxproj">
+      <Project>{F8E44271-CDAB-35E6-899B-A75A22668E5F}</Project>
+      <Name>EngineTests</Name>
     </ProjectReference>
     <ProjectReference Include="D:\Projects\SecondEngineProject\build\SecondEngineProject.vcxproj">
       <Project>{B639FC97-BA39-333C-AAB8-8696CD8339AD}</Project>
@@ -154,6 +158,14 @@
     <ProjectReference Include="D:\Projects\SecondEngineProject\build\Plugins\glfw-3.3.4\tests\glfwinfo.vcxproj">
       <Project>{3230BC2D-C4C8-3D36-8215-1343A92F9DF1}</Project>
       <Name>glfwinfo</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Projects\SecondEngineProject\build\Plugins\googletest-main\googletest\gtest.vcxproj">
+      <Project>{E1B42B62-B18E-3E65-9E0A-7822F99001A7}</Project>
+      <Name>gtest</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Projects\SecondEngineProject\build\Plugins\googletest-main\googletest\gtest_main.vcxproj">
+      <Project>{0597D13D-5B40-3645-8FE2-E239D3970B79}</Project>
+      <Name>gtest_main</Name>
     </ProjectReference>
     <ProjectReference Include="D:\Projects\SecondEngineProject\build\Plugins\glfw-3.3.4\examples\heightmap.vcxproj">
       <Project>{C6CD8B0C-DC6B-3350-92D4-DF52E458B9C9}</Project>
