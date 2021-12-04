@@ -18,11 +18,9 @@ class FreeFunctionContainer : public IFunctionContainer<inRetType, inParamTypes.
 	using FreeFunctionType = inRetType(*)(inParamTypes...);
 
 public:
-	FreeFunctionContainer(FreeFunctionType* inFunc) noexcept
-		: Func{ inFunc }
-	{
-
-	}
+	FreeFunctionContainer(FreeFunctionType inFunc) noexcept
+		: Func{ inFunc } 
+	{}
 
 	inRetType Execute(inParamTypes&&... inParams) const
 	{
@@ -32,23 +30,30 @@ public:
 	FreeFunctionType Func;
 };
 
+template<bool isConst, typename inObjType, typename inRetType, typename... inParamTypes>
+struct MemberFuncPtrType;
+
 template <typename inObjType, typename inRetType, typename... inParamTypes>
-struct MemberFuncPtrType
+struct MemberFuncPtrType<false, inObjType, inRetType, inParamTypes...>
 {
 	using Type = inRetType(inObjType::*)(inParamTypes...);
 };
 
-template<typename inObjType, typename inRetType, typename... inParamTypes>
+template <typename inObjType, typename inRetType, typename... inParamTypes>
+struct MemberFuncPtrType<true, inObjType, inRetType, inParamTypes...>
+{
+	using Type = inRetType(inObjType::*)(inParamTypes...) const;
+};
+
+template<bool isConst, typename inObjType, typename inRetType, typename... inParamTypes>
 class MemberFuncContainer : public IFunctionContainer<inRetType, inParamTypes...>
 {
-	using MemberFunctionType = typename MemberFuncPtrType<inObjType, inRetType, inParamTypes...>::Type;
+	using MemberFunctionType = typename MemberFuncPtrType<isConst, inObjType, inRetType, inParamTypes...>::Type;
 
 public:
 	MemberFuncContainer(inObjType* inObj, MemberFunctionType inMemberFunction) noexcept
 		:Obj(inObj), MemberFunctionPtr(inMemberFunction)
-	{
-
-	}
+	{}
 
 	virtual ~MemberFuncContainer()
 		= default;
@@ -67,34 +72,71 @@ private:
 template<typename inRetType, typename... inParamTypes>
 class Delegate : public DelegateBase
 {
-	template<typename T>
-	using MemberFunc = typename MemberFuncPtrType<T, inRetType, inParamTypes...>::Type;
+	template<bool isConst, typename inObjType>
+	using MemberFunc = typename MemberFuncPtrType<isConst, inObjType, inRetType, inParamTypes...>::Type;
 
-	template<class inObjType>
-	using MemberFuncContainerType = MemberFuncContainer<inObjType, inRetType, inParamTypes...>;
+	template<bool isConst, typename inObjType>
+	using MemberFuncContainerType = MemberFuncContainer<isConst, inObjType, inRetType, inParamTypes...>;
 
+	using FreeFuncContainerType = FreeFunctionContainer<inRetType, inParamTypes...>;
+	using FreeFunctionType = inRetType(*)(inParamTypes...);
 	using FuncContainerType = IFunctionContainer<inRetType, inParamTypes...>;
 
 public:
 	Delegate() = default;
 	~Delegate() = default;
+	Delegate(const Delegate& inOther) = default;
+	Delegate& operator=(const Delegate& inOther) = default;
+	Delegate(Delegate&& inOther) = default;
+	Delegate& operator=(Delegate&& inOther) = default;
 
-	template<typename inObjType>
-	static Delegate CreateRaw(inObjType* inObj, MemberFunc<inObjType> inMemberFunction)
+	static Delegate CreateStatic(FreeFunctionType inFunc)
 	{
 		Delegate del;
 
-		new(del) MemberFuncContainerType<inObjType>(inObj, inMemberFunction);
+		new(del) FreeFuncContainerType(inFunc);
 
-		return std::move(del);
+		return del;
 	}
 
+	void BindStatic(FreeFunctionType inFunc)
+	{
+		*this = CreateStatic(inFunc);
+	}
 
 	template<typename inObjType>
-	void BindRaw(inObjType* inObj, MemberFunc<inObjType> inMemberFunction)
+	static Delegate CreateRaw(inObjType* inObj, MemberFunc<false, inObjType> inMemberFunction)
 	{
-		new(this) MemberFuncContainerType<inObjType>(inObj, inMemberFunction);
+		Delegate del;
+
+		new(del) MemberFuncContainerType<false, inObjType>(inObj, inMemberFunction);
+
+		return del;
 	}
+
+	template<typename inObjType>
+	static Delegate CreateRaw(const inObjType* inObj, MemberFunc<true, inObjType> inMemberFunction)
+	{
+		Delegate del;
+
+		new(del) MemberFuncContainerType<true, const inObjType>(inObj, inMemberFunction);
+
+		return del;
+	}
+
+	template<typename inObjType>
+	void BindRaw(inObjType* inObj, MemberFunc<false, inObjType> inMemberFunction)
+ 	{
+		static_assert(!std::is_const<inObjType>::value, "Attempting to bind a const object with a non const member Function.");
+
+		*this = CreateRaw(inObj, inMemberFunction);
+	}
+
+ 	template<typename inObjType>
+ 	void BindRaw(const inObjType* inObj, MemberFunc<true, inObjType> inMemberFunction)
+ 	{
+		*this = CreateRaw(inObj, inMemberFunction);
+ 	}
 
 	inRetType Execute(inParamTypes... inParams) const
 	{
@@ -113,47 +155,79 @@ private:
 	}
 };
 
-template<typename... inParamTypes>
-class MulticastDelegate
-{
-	using RetType = void;
-	using delegateType = Delegate<RetType, inParamTypes...>;
+ template<typename... inParamTypes>
+ class MulticastDelegate
+ {
+ 	using RetType = void;
+ 	using delegateType = Delegate<RetType, inParamTypes...>;
 
-public:
-	MulticastDelegate() = default;
+	template<bool isConst, typename inObjType>
+	using MemberFunc = typename MemberFuncPtrType<isConst, inObjType, RetType, inParamTypes...>::Type;
 
-	~MulticastDelegate()
+	template<bool isConst, typename inObjType>
+	using MemberFuncContainerType = MemberFuncContainer<isConst, inObjType, RetType, inParamTypes...>;
+
+	using FreeFuncContainerType = FreeFunctionContainer<RetType, inParamTypes...>;
+	using FreeFunctionType = RetType(*)(inParamTypes...);
+
+	using BaseFuncContainerType = IFunctionContainer<RetType, inParamTypes...>;  
+
+ public:
+ 	MulticastDelegate() = default;
+	~MulticastDelegate() = default;
+	MulticastDelegate(const MulticastDelegate& inOther) = default;
+	MulticastDelegate& operator=(const MulticastDelegate& inOther) = default;
+	MulticastDelegate(MulticastDelegate&& inOther) = default;
+	MulticastDelegate& operator=(MulticastDelegate&& inOther) = default;
+
+	void BindStatic(FreeFunctionType inFunc)
 	{
-		delete[] Delegates.data();
-	}
+		delegateType del;
 
-	template<typename inObjType>
-	void BindRaw(inObjType* inObj, typename MemberFuncPtrType<inObjType, RetType, inParamTypes...>::Type inMemberFunction)
-	{
-		IFunctionContainer<void, inParamTypes...>* del = delegateType::CreateRaw(inObj, inMemberFunction);
+		new(del) FreeFuncContainerType(inFunc);
 
 		Delegates.push_back(del);
 	}
 
-	void Invoke(inParamTypes... inParams)
+	template<typename inObjType>
+	void BindRaw(inObjType* inObj, MemberFunc<false, inObjType> inMemberFunction)
 	{
-		for (const IFunctionContainer<void, inParamTypes...>* del : Delegates)
-		{
-			del->Execute(std::forward<inParamTypes>(inParams)...);
-		}
+		delegateType del;
+
+		new(del) MemberFuncContainerType<false, inObjType>(inObj, inMemberFunction);
+
+		Delegates.push_back(del);
 	}
 
-private:
-	eastl::vector<IFunctionContainer<void, inParamTypes...>*> Delegates{};
-};
+ 	template<typename inObjType>
+ 	void BindRaw(const inObjType* inObj, MemberFunc<true, inObjType> inMemberFunction)
+ 	{
+ 		delegateType del;
+ 
+ 		new(del) MemberFuncContainerType<true, inObjType>(inObj, inMemberFunction);
+ 
+ 		Delegates.push_back(del);
+ 	}
 
+ 	void Invoke(inParamTypes... inParams)
+ 	{
+  		for (const delegateType& del : Delegates)
+  		{
+  			del.Execute(std::forward<inParamTypes>(inParams)...);
+  		}
+ 	}
+ 
+	size_t GetAllocationsSize()
+	{
+		size_t sum = 0;
+		for (int32_t i = 0; i < Delegates.size(); i++)
+		{
+			sum += Delegates[i].GetAllocatedSize();
+		}
 
-class EventSystemTest
-{
+		return sum;
+	}
 
-public:
-	void Test(int delimiter);
-	void Function(int intA);
-	void Function2();
-};
-
+ private:
+ 	eastl::vector<delegateType> Delegates{};
+ };

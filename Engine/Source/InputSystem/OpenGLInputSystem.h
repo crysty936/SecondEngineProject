@@ -3,7 +3,7 @@
 #include "GLFW/glfw3.h"
 #include "Core/EngineUtils.h"
 
-using KeyDelegate = MulticastDelegate<int, int, int, int>;
+using KeyDelegate = MulticastDelegate<int32_t, int32_t, int32_t, int32_t>;
 
 class OpenGLInputSystem
 {
@@ -20,7 +20,7 @@ public:
 	KeyDelegate OnKeysPressed;
 
 private:
-	void OnKeyPressedTest(int keycode, int scanCode, int action, int mods);
+	void OnKeyPressedTest(int32_t keycode, int32_t scanCode, int32_t action, int32_t mods);
 
 private:
 	static OpenGLInputSystem* Instance;
