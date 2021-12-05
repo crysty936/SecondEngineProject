@@ -7,7 +7,7 @@
 #include "Logger/Logger.h"
 #include "Renderer/OpenGLRenderer.h"
 #include "Window/OpenGLWindow.h"
-#include "InputSystem/OpenGlInputSystem.h"
+#include "InputSystem/InputSystem.h"
 
 const float IdealFrameRate = 60.f;
 
@@ -29,7 +29,7 @@ void EngineCore::Init()
     WindowProperties defaultWindowProperties = {};
     MainWindow = RHI.Init(defaultWindowProperties);
 
-    OpenGLInputSystem::Init(*MainWindow);
+    InputSystem::Init(*MainWindow);
     
 }
 
@@ -57,10 +57,12 @@ void EngineCore::Run()
 			timeLeft = idealFrameTime - timeSpent;
  		}
 
-        RHI.Draw(*MainWindow);
-
  		deltaTime = currentTime - lastTime;
 		//Logger::GetLogger().Log("Delta time: %lf", deltaTime);
+
+        //Call tickableObjects
+
+        RHI.Draw(*MainWindow);
 
  		lastTime = currentTime;
  	}

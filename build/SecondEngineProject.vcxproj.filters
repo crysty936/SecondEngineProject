@@ -19,9 +19,6 @@
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\EventSystem\EventSystem.cpp">
       <Filter>Engine\Source\EventSystem</Filter>
     </ClCompile>
-    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\InputSystem\OpenGLInputSystem.cpp">
-      <Filter>Engine\Source\InputSystem</Filter>
-    </ClCompile>
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Logger\Logger.cpp">
       <Filter>Engine\Source\Logger</Filter>
     </ClCompile>
@@ -36,6 +33,15 @@
     </ClCompile>
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Window\OpenGLWindow.cpp">
       <Filter>Engine\Source\Window</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\Source\InputSystem\InputEventType.cpp">
+      <Filter>Engine\Source\InputSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\Source\Camera\Camera.cpp">
+      <Filter>Engine\Source\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\Source\InputSystem\InputSystem.cpp">
+      <Filter>Engine\Source\InputSystem</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -57,9 +63,6 @@
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\EventSystem\IFunctionContainerBase.h">
       <Filter>Engine\Source\EventSystem</Filter>
     </ClInclude>
-    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\InputSystem\OpenGLInputSystem.h">
-      <Filter>Engine\Source\InputSystem</Filter>
-    </ClInclude>
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Logger\Logger.h">
       <Filter>Engine\Source\Logger</Filter>
     </ClInclude>
@@ -77,6 +80,21 @@
     </ClInclude>
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Window\WindowProperties.h">
       <Filter>Engine\Source\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\Source\InputSystem\WindowsInputKeys.h">
+      <Filter>Engine\Source\InputSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\Source\InputSystem\InputEventType.h">
+      <Filter>Engine\Source\InputSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\Source\Camera\Camera.h">
+      <Filter>Engine\Source\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\Source\InputSystem\InputSystem.h">
+      <Filter>Engine\Source\InputSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\Source\Core\ITickableObject.h">
+      <Filter>Engine\Source\Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -109,6 +127,9 @@
     </Filter>
     <Filter Include="Engine\Source\Window">
       <UniqueIdentifier>{29E68D5E-4245-3A87-86BE-77379684E2DF}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\Camera">
+      <UniqueIdentifier>{14e8607c-e0a7-4a1f-afe7-4fb14c394d6d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

@@ -260,8 +260,14 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\Engine\Source\Camera\Camera.cpp" />
+    <ClCompile Include="..\Engine\Source\InputSystem\InputEventType.cpp" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Core\EASTLNew.cpp" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Core\EngineCore.cpp" />
+    <ClInclude Include="..\Engine\Source\Camera\Camera.h" />
+    <ClInclude Include="..\Engine\Source\Core\ITickableObject.h" />
+    <ClInclude Include="..\Engine\Source\InputSystem\InputEventType.h" />
+    <ClInclude Include="..\Engine\Source\InputSystem\WindowsInputKeys.h" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\EngineCore.h" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\EngineUtils.h" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Core\WindowsPlatformDependent.cpp" />
@@ -272,8 +278,8 @@
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\EventSystem\EventSystem.cpp" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\EventSystem\EventSystem.h" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\EventSystem\IFunctionContainerBase.h" />
-    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\InputSystem\OpenGLInputSystem.cpp" />
-    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\InputSystem\OpenGLInputSystem.h" />
+    <ClCompile Include="..\Engine\Source\InputSystem\InputSystem.cpp" />
+    <ClInclude Include="..\Engine\Source\InputSystem\InputSystem.h" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Logger\Logger.cpp" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Logger\Logger.h" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGLRenderer.cpp" />

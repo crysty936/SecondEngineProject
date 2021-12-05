@@ -323,8 +323,8 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\EventSystem\EventSystem.cpp" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\EventSystem\EventSystem.h" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\EventSystem\IFunctionContainerBase.h" />
-    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\InputSystem\OpenGLInputSystem.cpp" />
-    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\InputSystem\OpenGLInputSystem.h" />
+    <ClCompile Include="..\Engine\Source\InputSystem\InputSystem.cpp" />
+    <ClInclude Include="..\Engine\Source\InputSystem\InputSystem.h" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Logger\Logger.cpp" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Logger\Logger.h" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGLRenderer.cpp" />
