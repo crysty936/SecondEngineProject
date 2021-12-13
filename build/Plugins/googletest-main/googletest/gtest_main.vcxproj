@@ -78,7 +78,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>%(AdditionalOptions) -J -utf-8</AdditionalOptions>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -102,10 +102,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;_UNICODE;UNICODE;_WIN32;STRICT;WIN32_LEAN_AND_MEAN;GTEST_HAS_PTHREAD=0;_HAS_EXCEPTIONS=1;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -118,7 +118,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>%(AdditionalOptions) -J -utf-8</AdditionalOptions>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BufferSecurityCheck>true</BufferSecurityCheck>
@@ -142,10 +142,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;_UNICODE;UNICODE;_WIN32;STRICT;WIN32_LEAN_AND_MEAN;GTEST_HAS_PTHREAD=0;_HAS_EXCEPTIONS=1;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -158,7 +158,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>%(AdditionalOptions) -J -utf-8</AdditionalOptions>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BufferSecurityCheck>true</BufferSecurityCheck>
@@ -182,10 +182,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;_UNICODE;UNICODE;_WIN32;STRICT;WIN32_LEAN_AND_MEAN;GTEST_HAS_PTHREAD=0;_HAS_EXCEPTIONS=1;CMAKE_INTDIR=\"MinSizeRel\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -198,7 +198,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>%(AdditionalOptions) -J -utf-8</AdditionalOptions>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BufferSecurityCheck>true</BufferSecurityCheck>
@@ -221,10 +221,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;_UNICODE;UNICODE;_WIN32;STRICT;WIN32_LEAN_AND_MEAN;GTEST_HAS_PTHREAD=0;_HAS_EXCEPTIONS=1;CMAKE_INTDIR=\"RelWithDebInfo\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>

@@ -43,7 +43,5 @@ void InputSystem::Init(const OpenGLWindow & inWindow)
 
 void InputSystem::OnKeyPressedLog(KeyCode inKeyCode, InputEventType inEventType)
 {
-    
-
-	Logger::Get().Print("Key input received for key %d with action: %s", static_cast<int32_t>(inKeyCode), ToString(inEventType));
+	LOG("Key input received for key %d with action: %s", static_cast<int32_t>(inKeyCode), ToString(inEventType));
 }

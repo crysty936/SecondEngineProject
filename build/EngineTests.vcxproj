@@ -86,7 +86,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\build;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\build;D:\Projects\SecondEngineProject\Plugins\glm;D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -104,10 +104,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\build;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\build;D:\Projects\SecondEngineProject\Plugins\glm;D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\build;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\build;D:\Projects\SecondEngineProject\Plugins\glm;D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -115,8 +115,7 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <PostBuildEvent>
-      <Message>
-      </Message>
+      <Message></Message>
       <Command>setlocal
 "C:\Program Files\CMake\bin\cmake.exe" -D TEST_TARGET=EngineTests -D TEST_EXECUTABLE=D:/Projects/SecondEngineProject/build/Debug/EngineTests.exe -D TEST_EXECUTOR= -D TEST_WORKING_DIR=D:/Projects/SecondEngineProject/build -D TEST_EXTRA_ARGS= -D TEST_PROPERTIES= -D TEST_PREFIX= -D TEST_SUFFIX= -D TEST_FILTER= -D NO_PRETTY_TYPES=FALSE -D NO_PRETTY_VALUES=FALSE -D TEST_LIST=EngineTests_TESTS -D CTEST_FILE=D:/Projects/SecondEngineProject/build/EngineTests[1]_tests.cmake -D TEST_DISCOVERY_TIMEOUT=5 -D TEST_XML_OUTPUT_DIR= -P "C:/Program Files/CMake/share/cmake-3.22/Modules/GoogleTestAddTests.cmake"
 if %errorlevel% neq 0 goto :cmEnd
@@ -143,7 +142,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\build;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\build;D:\Projects\SecondEngineProject\Plugins\glm;D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <ExceptionHandling>Sync</ExceptionHandling>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
@@ -161,10 +160,10 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\build;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\build;D:\Projects\SecondEngineProject\Plugins\glm;D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\build;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\build;D:\Projects\SecondEngineProject\Plugins\glm;D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -172,8 +171,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <PostBuildEvent>
-      <Message>
-      </Message>
+      <Message></Message>
       <Command>setlocal
 "C:\Program Files\CMake\bin\cmake.exe" -D TEST_TARGET=EngineTests -D TEST_EXECUTABLE=D:/Projects/SecondEngineProject/build/Release/EngineTests.exe -D TEST_EXECUTOR= -D TEST_WORKING_DIR=D:/Projects/SecondEngineProject/build -D TEST_EXTRA_ARGS= -D TEST_PROPERTIES= -D TEST_PREFIX= -D TEST_SUFFIX= -D TEST_FILTER= -D NO_PRETTY_TYPES=FALSE -D NO_PRETTY_VALUES=FALSE -D TEST_LIST=EngineTests_TESTS -D CTEST_FILE=D:/Projects/SecondEngineProject/build/EngineTests[1]_tests.cmake -D TEST_DISCOVERY_TIMEOUT=5 -D TEST_XML_OUTPUT_DIR= -P "C:/Program Files/CMake/share/cmake-3.22/Modules/GoogleTestAddTests.cmake"
 if %errorlevel% neq 0 goto :cmEnd
@@ -200,7 +198,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\build;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\build;D:\Projects\SecondEngineProject\Plugins\glm;D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <ExceptionHandling>Sync</ExceptionHandling>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
@@ -218,10 +216,10 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR=\"MinSizeRel\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\build;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\build;D:\Projects\SecondEngineProject\Plugins\glm;D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\build;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\build;D:\Projects\SecondEngineProject\Plugins\glm;D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -229,8 +227,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <PostBuildEvent>
-      <Message>
-      </Message>
+      <Message></Message>
       <Command>setlocal
 "C:\Program Files\CMake\bin\cmake.exe" -D TEST_TARGET=EngineTests -D TEST_EXECUTABLE=D:/Projects/SecondEngineProject/build/MinSizeRel/EngineTests.exe -D TEST_EXECUTOR= -D TEST_WORKING_DIR=D:/Projects/SecondEngineProject/build -D TEST_EXTRA_ARGS= -D TEST_PROPERTIES= -D TEST_PREFIX= -D TEST_SUFFIX= -D TEST_FILTER= -D NO_PRETTY_TYPES=FALSE -D NO_PRETTY_VALUES=FALSE -D TEST_LIST=EngineTests_TESTS -D CTEST_FILE=D:/Projects/SecondEngineProject/build/EngineTests[1]_tests.cmake -D TEST_DISCOVERY_TIMEOUT=5 -D TEST_XML_OUTPUT_DIR= -P "C:/Program Files/CMake/share/cmake-3.22/Modules/GoogleTestAddTests.cmake"
 if %errorlevel% neq 0 goto :cmEnd
@@ -257,7 +254,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\build;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\build;D:\Projects\SecondEngineProject\Plugins\glm;D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -274,10 +271,10 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR=\"RelWithDebInfo\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\build;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\build;D:\Projects\SecondEngineProject\Plugins\glm;D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\build;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\build;D:\Projects\SecondEngineProject\Plugins\glm;D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -285,8 +282,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <PostBuildEvent>
-      <Message>
-      </Message>
+      <Message></Message>
       <Command>setlocal
 "C:\Program Files\CMake\bin\cmake.exe" -D TEST_TARGET=EngineTests -D TEST_EXECUTABLE=D:/Projects/SecondEngineProject/build/RelWithDebInfo/EngineTests.exe -D TEST_EXECUTOR= -D TEST_WORKING_DIR=D:/Projects/SecondEngineProject/build -D TEST_EXTRA_ARGS= -D TEST_PROPERTIES= -D TEST_PREFIX= -D TEST_SUFFIX= -D TEST_FILTER= -D NO_PRETTY_TYPES=FALSE -D NO_PRETTY_VALUES=FALSE -D TEST_LIST=EngineTests_TESTS -D CTEST_FILE=D:/Projects/SecondEngineProject/build/EngineTests[1]_tests.cmake -D TEST_DISCOVERY_TIMEOUT=5 -D TEST_XML_OUTPUT_DIR= -P "C:/Program Files/CMake/share/cmake-3.22/Modules/GoogleTestAddTests.cmake"
 if %errorlevel% neq 0 goto :cmEnd
@@ -312,10 +308,13 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Camera\Camera.cpp" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Camera\Camera.h" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Core\EASTLNew.cpp" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Core\EngineCore.cpp" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\EngineCore.h" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\EngineUtils.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\ITickableObject.h" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Core\WindowsPlatformDependent.cpp" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\WindowsPlatformDependent.h" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\EventSystem\DelegateBase.cpp" />
@@ -323,12 +322,17 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\EventSystem\EventSystem.cpp" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\EventSystem\EventSystem.h" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\EventSystem\IFunctionContainerBase.h" />
-    <ClCompile Include="..\Engine\Source\InputSystem\InputSystem.cpp" />
-    <ClInclude Include="..\Engine\Source\InputSystem\InputSystem.h" />
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\InputSystem\InputEventType.cpp" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\InputSystem\InputEventType.h" />
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\InputSystem\InputSystem.cpp" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\InputSystem\InputSystem.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\InputSystem\WindowsInputKeys.h" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Logger\Logger.cpp" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Logger\Logger.h" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGLRenderer.cpp" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGLRenderer.h" />
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGLShader.cpp" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGLShader.h" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGLUtils.cpp" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGLUtils.h" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Utils\InlineAllocator.cpp" />

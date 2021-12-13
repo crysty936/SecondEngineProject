@@ -753,6 +753,7 @@ namespace eastl
 		bool validate() const EA_NOEXCEPT;
 		int  validate_iterator(const_iterator i) const EA_NOEXCEPT;
 
+		void InitialiseToSize(size_type n, value_type c);
 
 	protected:
 		// Helper functions for initialization/insertion operations.
@@ -3240,7 +3241,6 @@ namespace eastl
 		*internalLayout().EndPtr() = 0;
 	}
 
-
 	template <typename T, typename Allocator>
 	void basic_string<T, Allocator>::RangeInitialize(const value_type* pBegin, const value_type* pEnd)
 	{
@@ -3752,6 +3752,16 @@ namespace eastl
 		return isf_none;
 	}
 
+
+	template <typename T, typename Allocator>
+	void basic_string<T, Allocator>::InitialiseToSize(size_type n, value_type c)
+	{
+		DeallocateSelf();
+		AllocateSelf(n);
+
+		CharStringUninitializedFillN(internalLayout().BeginPtr(), n, c);
+		*internalLayout().EndPtr() = 0;
+	}
 
 	///////////////////////////////////////////////////////////////////////
 	// global operators

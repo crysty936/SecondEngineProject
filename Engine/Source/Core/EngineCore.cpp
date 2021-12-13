@@ -26,11 +26,15 @@ EngineCore::~EngineCore() = default;
 
 void EngineCore::Init()
 {
-    WindowProperties defaultWindowProperties = {};
+
+    WindowProperties defaultWindowProperties{};
     MainWindow = RHI.Init(defaultWindowProperties);
 
     InputSystem::Init(*MainWindow);
     
+
+
+
 }
 
 void EngineCore::Run()
@@ -47,6 +51,7 @@ void EngineCore::Run()
 
  		double timeLeft = idealFrameTime - timeSpent;
 
+        // Sleep 0 until time is out
  		while (timeLeft > 0)
  		{
             WindowsPlatformDependent::Sleep(0);

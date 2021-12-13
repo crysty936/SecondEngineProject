@@ -5,15 +5,18 @@ cmake_policy(SET CMP0009 NEW)
 # source_files at CMakeLists.txt:24 (file)
 file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "D:/Projects/SecondEngineProject/Engine/*.cpp")
 set(OLD_GLOB
+  "D:/Projects/SecondEngineProject/Engine/Source/Camera/Camera.cpp"
   "D:/Projects/SecondEngineProject/Engine/Source/Core/EASTLNew.cpp"
   "D:/Projects/SecondEngineProject/Engine/Source/Core/EngineCore.cpp"
   "D:/Projects/SecondEngineProject/Engine/Source/Core/WindowsPlatformDependent.cpp"
   "D:/Projects/SecondEngineProject/Engine/Source/EntryPoint/EntryPoint.cpp"
   "D:/Projects/SecondEngineProject/Engine/Source/EventSystem/DelegateBase.cpp"
   "D:/Projects/SecondEngineProject/Engine/Source/EventSystem/EventSystem.cpp"
-  "D:/Projects/SecondEngineProject/Engine/Source/InputSystem/OpenGLInputSystem.cpp"
+  "D:/Projects/SecondEngineProject/Engine/Source/InputSystem/InputEventType.cpp"
+  "D:/Projects/SecondEngineProject/Engine/Source/InputSystem/InputSystem.cpp"
   "D:/Projects/SecondEngineProject/Engine/Source/Logger/Logger.cpp"
   "D:/Projects/SecondEngineProject/Engine/Source/Renderer/OpenGLRenderer.cpp"
+  "D:/Projects/SecondEngineProject/Engine/Source/Renderer/OpenGLShader.cpp"
   "D:/Projects/SecondEngineProject/Engine/Source/Renderer/OpenGLUtils.cpp"
   "D:/Projects/SecondEngineProject/Engine/Source/Utils/InlineAllocator.cpp"
   "D:/Projects/SecondEngineProject/Engine/Source/Window/OpenGLWindow.cpp"
@@ -26,15 +29,20 @@ endif()
 # source_files at CMakeLists.txt:24 (file)
 file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "D:/Projects/SecondEngineProject/Engine/*.h")
 set(OLD_GLOB
+  "D:/Projects/SecondEngineProject/Engine/Source/Camera/Camera.h"
   "D:/Projects/SecondEngineProject/Engine/Source/Core/EngineCore.h"
   "D:/Projects/SecondEngineProject/Engine/Source/Core/EngineUtils.h"
+  "D:/Projects/SecondEngineProject/Engine/Source/Core/ITickableObject.h"
   "D:/Projects/SecondEngineProject/Engine/Source/Core/WindowsPlatformDependent.h"
   "D:/Projects/SecondEngineProject/Engine/Source/EventSystem/DelegateBase.h"
   "D:/Projects/SecondEngineProject/Engine/Source/EventSystem/EventSystem.h"
   "D:/Projects/SecondEngineProject/Engine/Source/EventSystem/IFunctionContainerBase.h"
-  "D:/Projects/SecondEngineProject/Engine/Source/InputSystem/OpenGLInputSystem.h"
+  "D:/Projects/SecondEngineProject/Engine/Source/InputSystem/InputEventType.h"
+  "D:/Projects/SecondEngineProject/Engine/Source/InputSystem/InputSystem.h"
+  "D:/Projects/SecondEngineProject/Engine/Source/InputSystem/WindowsInputKeys.h"
   "D:/Projects/SecondEngineProject/Engine/Source/Logger/Logger.h"
   "D:/Projects/SecondEngineProject/Engine/Source/Renderer/OpenGLRenderer.h"
+  "D:/Projects/SecondEngineProject/Engine/Source/Renderer/OpenGLShader.h"
   "D:/Projects/SecondEngineProject/Engine/Source/Renderer/OpenGLUtils.h"
   "D:/Projects/SecondEngineProject/Engine/Source/Utils/InlineAllocator.h"
   "D:/Projects/SecondEngineProject/Engine/Source/Window/OpenGLWindow.h"

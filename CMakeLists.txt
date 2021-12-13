@@ -11,31 +11,36 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 add_subdirectory(Plugins/glfw-3.3.4)
 # add the glfw lib to the linking process so that the includes are added.
-list(APPEND EXTRA_LIBS glfw)
+list(APPEND extra_libs glfw)
 
 # add Glad
 add_subdirectory(Plugins/glad)
-list(APPEND EXTRA_LIBS glad)
+list(APPEND extra_libs glad)
 
 add_subdirectory(Plugins/EASTL)
-list(APPEND EXTRA_LIBS EASTL)
+list(APPEND extra_libs EASTL)
 
 # used to add all .cpp and .h files under source
 file(GLOB_RECURSE source_files CONFIGURE_DEPENDS "${CMAKE_CURRENT_LIST_DIR}/Engine/*.cpp" "${CMAKE_CURRENT_LIST_DIR}/Engine/*.h")
+
+# Add GLM
+list(APPEND EXTRA_INCLUDES "${CMAKE_CURRENT_LIST_DIR}/Plugins/glm/")
 
 # used to create filters for all files one to one with their folder structure
 source_group(TREE ${CMAKE_CURRENT_LIST_DIR} FILES ${source_files})
 
 add_executable(SecondEngineProject ${source_files})
 
-target_link_libraries(SecondEngineProject PUBLIC ${EXTRA_LIBS})
+target_link_libraries(SecondEngineProject PUBLIC ${extra_libs})
+
+list(APPEND EXTRA_INCLUDES ${CMAKE_CURRENT_LIST_DIR}/Engine/Source)	
 
 target_include_directories(SecondEngineProject PUBLIC
                            "${PROJECT_BINARY_DIR}"
                            ${EXTRA_INCLUDES}
                            )
 						   
-include_directories(${CMAKE_CURRENT_LIST_DIR}/Engine/Source)
+
 						   
 
 # Stop it from creating unnecessary Project
@@ -75,6 +80,6 @@ target_include_directories(EngineTests PUBLIC
 
 
 
-target_link_libraries(EngineTests PUBLIC gtest gtest_main ${EXTRA_LIBS})
+target_link_libraries(EngineTests PUBLIC gtest gtest_main ${extra_libs})
 
 gtest_discover_tests(EngineTests)

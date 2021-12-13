@@ -11,9 +11,9 @@ const char* ToString(InputEventType inEvent)
 		return "InputRelease";
 		break;
 	case InputEventType::InputRepeat:
-		return "InputRepeat";	
-		break;
+		return "InputRepeat";
+		break;         
 	default:
-		return "Missing Input String";
+		return "Missing Input Type String";
 	}
 }

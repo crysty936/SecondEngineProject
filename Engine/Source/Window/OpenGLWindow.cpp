@@ -27,8 +27,7 @@ OpenGLWindow::~OpenGLWindow()
 
 void OpenGLWindow::Open()
 {
-	Logger::Get().Print("Creating Window %s (%d, %d).", Properties.Title, Properties.Width, Properties.Height);
-
+	LOG("Creating Window %s (%d, %d).", Properties.Title, Properties.Width, Properties.Height);
 
 
 

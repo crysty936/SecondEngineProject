@@ -1,6 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Camera\Camera.cpp">
+      <Filter>Engine\Source\Camera</Filter>
+    </ClCompile>
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Core\EASTLNew.cpp">
       <Filter>Engine\Source\Core</Filter>
     </ClCompile>
@@ -16,10 +19,19 @@
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\EventSystem\EventSystem.cpp">
       <Filter>Engine\Source\EventSystem</Filter>
     </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\InputSystem\InputEventType.cpp">
+      <Filter>Engine\Source\InputSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\InputSystem\InputSystem.cpp">
+      <Filter>Engine\Source\InputSystem</Filter>
+    </ClCompile>
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Logger\Logger.cpp">
       <Filter>Engine\Source\Logger</Filter>
     </ClCompile>
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGLRenderer.cpp">
+      <Filter>Engine\Source\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGLShader.cpp">
       <Filter>Engine\Source\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGLUtils.cpp">
@@ -34,15 +46,18 @@
     <ClCompile Include="D:\Projects\SecondEngineProject\UnitTests\test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Engine\Source\InputSystem\InputSystem.cpp">
-      <Filter>Engine\Source\InputSystem</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Camera\Camera.h">
+      <Filter>Engine\Source\Camera</Filter>
+    </ClInclude>
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\EngineCore.h">
       <Filter>Engine\Source\Core</Filter>
     </ClInclude>
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\EngineUtils.h">
+      <Filter>Engine\Source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\ITickableObject.h">
       <Filter>Engine\Source\Core</Filter>
     </ClInclude>
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\WindowsPlatformDependent.h">
@@ -57,10 +72,22 @@
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\EventSystem\IFunctionContainerBase.h">
       <Filter>Engine\Source\EventSystem</Filter>
     </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\InputSystem\InputEventType.h">
+      <Filter>Engine\Source\InputSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\InputSystem\InputSystem.h">
+      <Filter>Engine\Source\InputSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\InputSystem\WindowsInputKeys.h">
+      <Filter>Engine\Source\InputSystem</Filter>
+    </ClInclude>
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Logger\Logger.h">
       <Filter>Engine\Source\Logger</Filter>
     </ClInclude>
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGLRenderer.h">
+      <Filter>Engine\Source\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGLShader.h">
       <Filter>Engine\Source\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGLUtils.h">
@@ -75,9 +102,6 @@
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Window\WindowProperties.h">
       <Filter>Engine\Source\Window</Filter>
     </ClInclude>
-    <ClInclude Include="..\Engine\Source\InputSystem\InputSystem.h">
-      <Filter>Engine\Source\InputSystem</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -85,6 +109,9 @@
     </Filter>
     <Filter Include="Engine\Source">
       <UniqueIdentifier>{301F8C73-A95D-3FEF-8A8D-9EB9B443CCD9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\Camera">
+      <UniqueIdentifier>{DD20D998-8F81-3138-B957-E49ADF34648C}</UniqueIdentifier>
     </Filter>
     <Filter Include="Engine\Source\Core">
       <UniqueIdentifier>{F33D7D25-A1C9-3DB2-8BCB-77735BD726B9}</UniqueIdentifier>

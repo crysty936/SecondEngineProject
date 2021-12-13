@@ -9,7 +9,7 @@ namespace OpenGLUtils
 {
 	void GLFWErrorCallback(int32_t inErrorType, const char* inErrorDesc)
 	{
-		Logger::Get().Print(inErrorDesc);
+		LOG(inErrorDesc);
 
 		ASSERT(0, "OpenGl Error.");
 	}
@@ -18,11 +18,11 @@ namespace OpenGLUtils
 	{
 		if (inSeverity != GL_DEBUG_SEVERITY_HIGH)
 		{
-			Logger::Get().Print("OpenGL Error: %s", inMessage);
+			LOG("OpenGL Error: %s", inMessage);
 		}
 		else
 		{
-			Logger::Get().Print("OpenGL Critical Error: %s", inMessage);
+			LOG("OpenGL Critical Error: %s", inMessage);
 			ASSERT(0);
 		}
 	}

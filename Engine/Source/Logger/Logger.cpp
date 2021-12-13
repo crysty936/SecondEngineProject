@@ -9,11 +9,9 @@
 
 // Fmt logger is a good source for this
 
-
 Logger::Logger()
 {
 	static bool bLoggerExisting = false;
-
 
     ASSERT(!bLoggerExisting);
 
