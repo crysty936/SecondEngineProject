@@ -15,15 +15,22 @@ public:
 
 public:
 	// Will create the base window and return the context for it
-	virtual eastl::shared_ptr<OpenGLWindow> Init(const WindowProperties& inDefaultWindowProperties);
-	void Draw(const class OpenGLWindow& inWindowToUse);
+	virtual void Init(const WindowProperties& inDefaultWindowProperties);
+	void Terminate();
+	void Draw();
 
 	eastl::shared_ptr<OpenGLWindow> CreateWindow(const WindowProperties& inWindowProperties) const;
 	void DestroyWindow(GLFWwindow* inWindowHandle) const;
 	void SetVSyncEnabled(const bool inEnabled);
+	inline class OpenGLWindow& GetMainWindow() { return *MainWindow; }
+
 
 private:
 	struct GLFWwindow* CreateNewWinowHandle(const WindowProperties& inWindowProperties) const;
+	void CheckShouldCloseWindow(const OpenGLWindow& inWindow);
+
+private:
+	eastl::shared_ptr<class OpenGLWindow> MainWindow;
 
 };
 

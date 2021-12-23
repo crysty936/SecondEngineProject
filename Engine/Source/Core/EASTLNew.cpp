@@ -1,6 +1,6 @@
 #include "EABase/eabase.h"
 
-// Necessary overloads of operator new for EASTL to work.
+// Required overloads of operator new for EASTL
 
 void* __cdecl operator new[](size_t size, const char* name, int flags, unsigned debugFlags, const char* file, int line)
 {

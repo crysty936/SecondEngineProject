@@ -1,6 +1,4 @@
 #pragma once
-#include <memory>
-#include "EASTL/shared_ptr.h"
 
 class EngineCore
 {
@@ -12,9 +10,8 @@ public:
 	void Init();
 	void Run();
 
-private:
-	eastl::shared_ptr<class OpenGLWindow> MainWindow;
-
 };
+
+void StopEngineRunning();
 
 extern EngineCore Engine;

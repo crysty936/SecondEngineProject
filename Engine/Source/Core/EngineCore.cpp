@@ -2,7 +2,7 @@
 #include <thread>
 #include <iostream>
 #include "Core/EngineCore.h"
-#include "Core/WindowsPlatformDependent.h"
+#include "Core/WindowsPlatform.h"
 #include "GLFW/glfw3.h"
 #include "Logger/Logger.h"
 #include "Renderer/OpenGLRenderer.h"
@@ -10,6 +10,13 @@
 #include "InputSystem/InputSystem.h"
 
 const float IdealFrameRate = 60.f;
+
+bool IsRunning = true;
+
+void StopEngineRunning()
+{
+    IsRunning = false;
+}
 
 EngineCore Engine;
 
@@ -28,9 +35,9 @@ void EngineCore::Init()
 {
 
     WindowProperties defaultWindowProperties{};
-    MainWindow = RHI.Init(defaultWindowProperties);
+    RHI.Init(defaultWindowProperties);
 
-    InputSystem::Init(*MainWindow);
+    InputSystem::Init();
     
 
 
@@ -39,25 +46,26 @@ void EngineCore::Init()
 
 void EngineCore::Run()
 {
-    WindowsPlatformDependent::InitCycles();
+    WindowsPlatform::InitCycles();
 	double deltaTime = 0.0;
-	double lastTime = WindowsPlatformDependent::GetTime();
+	double lastTime = WindowsPlatform::GetTime();
 	const float idealFrameTime = 1.0f / IdealFrameRate;
 
- 	while (true)
+ 	while (IsRunning)
  	{
- 		double currentTime = WindowsPlatformDependent::GetTime();
- 		double timeSpent = (currentTime - lastTime);
+ 		double currentTime = WindowsPlatform::GetTime();
+ 		double timeSpent = currentTime - lastTime;
 
  		double timeLeft = idealFrameTime - timeSpent;
 
-        // Sleep 0 until time is out
+        // Sleep 0 until time is out, granularity can be set to avoid this but it's unnecessary given
+        // current context where this works well
  		while (timeLeft > 0)
  		{
-            WindowsPlatformDependent::Sleep(0);
+            WindowsPlatform::Sleep(0);
 
-			currentTime = WindowsPlatformDependent::GetTime();
-			timeSpent = (currentTime - lastTime);
+			currentTime = WindowsPlatform::GetTime();
+			timeSpent = currentTime - lastTime;
 
 			timeLeft = idealFrameTime - timeSpent;
  		}
@@ -67,9 +75,11 @@ void EngineCore::Run()
 
         //Call tickableObjects
 
-        RHI.Draw(*MainWindow);
+        RHI.Draw();
 
  		lastTime = currentTime;
  	}
+
+    RHI.Terminate();
 }
 

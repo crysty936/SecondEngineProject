@@ -269,8 +269,8 @@
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\EngineCore.h" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\EngineUtils.h" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\ITickableObject.h" />
-    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Core\WindowsPlatformDependent.cpp" />
-    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\WindowsPlatformDependent.h" />
+    <ClCompile Include="..\Engine\Source\Core\WindowsPlatform.cpp" />
+    <ClInclude Include="..\Engine\Source\Core\WindowsPlatform.h" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\EntryPoint\EntryPoint.cpp" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\EventSystem\DelegateBase.cpp" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\EventSystem\DelegateBase.h" />

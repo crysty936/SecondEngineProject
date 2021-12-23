@@ -4,6 +4,7 @@
 #include "GLFW/glfw3.h"
 #include "OpenGLUtils.h"
 #include "Core/EngineUtils.h"
+#include "Core/EngineCore.h"
 
 OpenGLRenderer RHI;
 
@@ -13,7 +14,7 @@ OpenGLRenderer::OpenGLRenderer()
 OpenGLRenderer::~OpenGLRenderer()
 = default;
 
-eastl::shared_ptr<OpenGLWindow> OpenGLRenderer::Init(const WindowProperties& inDefaultWindowProperties)
+void OpenGLRenderer::Init(const WindowProperties& inDefaultWindowProperties)
 {
 	const bool glfwSuccess = glfwInit() == GLFW_TRUE;
 
@@ -24,13 +25,14 @@ eastl::shared_ptr<OpenGLWindow> OpenGLRenderer::Init(const WindowProperties& inD
 	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
 
 	// Create new Window for data holding
-	eastl::shared_ptr<OpenGLWindow> defaultWindow = CreateWindow(inDefaultWindowProperties);
+	MainWindow = CreateWindow(inDefaultWindowProperties);
 
-	GLFWwindow* defaultWindowHandle = defaultWindow->GetHandle();
-
+	// Set Context
+	GLFWwindow* defaultWindowHandle = MainWindow->GetHandle();
 	glfwMakeContextCurrent(defaultWindowHandle);
-
 	const bool gladSuccess = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress) == GLFW_TRUE;
+	glfwSetInputMode(defaultWindowHandle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
 
 	glViewport(0, 0, inDefaultWindowProperties.Width, inDefaultWindowProperties.Height);
 
@@ -39,16 +41,25 @@ eastl::shared_ptr<OpenGLWindow> OpenGLRenderer::Init(const WindowProperties& inD
 
 	glDebugMessageCallback(OpenGLUtils::GLDebugCallback, nullptr);
 
-
-
-	return defaultWindow;
 }
 
-void OpenGLRenderer::Draw(const OpenGLWindow& inWindowToUse)
+void OpenGLRenderer::Terminate()
+{
+	MainWindow.reset();
+	glfwTerminate();
+}
+
+void OpenGLRenderer::Draw()
 {
 	glfwPollEvents();
 
-	glfwSwapBuffers(inWindowToUse.GetHandle());
+
+
+
+
+	glfwSwapBuffers(MainWindow->GetHandle());
+
+	CheckShouldCloseWindow(*MainWindow);
 }
 
 eastl::shared_ptr<OpenGLWindow> OpenGLRenderer::CreateWindow(const WindowProperties& inWindowProperties) const
@@ -74,5 +85,13 @@ GLFWwindow* OpenGLRenderer::CreateNewWinowHandle(const WindowProperties& inWindo
 	GLFWwindow* newWindowHandle = glfwCreateWindow(inWindowProperties.Width, inWindowProperties.Height, inWindowProperties.Title.data(), nullptr, nullptr);
 
 	return newWindowHandle;
+}
+
+void OpenGLRenderer::CheckShouldCloseWindow(const OpenGLWindow& inWindow)
+{
+	if (glfwWindowShouldClose(inWindow.GetHandle()))
+	{
+		StopEngineRunning();
+	}
 }
 

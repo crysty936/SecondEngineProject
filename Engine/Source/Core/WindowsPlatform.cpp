@@ -1,7 +1,7 @@
-#include "Core/WindowsPlatformDependent.h"
+#include "Core/WindowsPlatform.h"
 #include <windows.h>
 
-namespace WindowsPlatformDependent
+namespace WindowsPlatform
 {
 	// Class which exposes Windows.h functionality
 	static double SecondsPerCycle = 0;

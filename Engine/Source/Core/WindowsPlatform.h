@@ -3,7 +3,7 @@
 
 // Wrapper for windows.h to not pollute the dev environment
 
-namespace WindowsPlatformDependent
+namespace WindowsPlatform
 {
 	void InitCycles();
 	double GetTime();

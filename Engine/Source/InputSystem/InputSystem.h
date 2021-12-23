@@ -14,7 +14,7 @@ private:
 	~InputSystem();
 
 public:
-	static void Init(const class OpenGLWindow& inWindow);
+	static void Init();
 	static inline InputSystem& Get() { ASSERT(Instance); return *Instance; }
 
 public:
