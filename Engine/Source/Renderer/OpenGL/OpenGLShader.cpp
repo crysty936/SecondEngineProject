@@ -1,4 +1,4 @@
-#include "Renderer/OpenGLShader.h"
+#include "Renderer/OpenGL/OpenGLShader.h"
 #include "EASTL/string.h"
 #include "Utils/IOUtils.h"
 #include <glm/gtc/type_ptr.hpp>

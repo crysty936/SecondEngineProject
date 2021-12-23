@@ -2,8 +2,9 @@
 #include "EventSystem/EventSystem.h"
 #include "GLFW/glfw3.h"
 #include "Core/EngineUtils.h"
-#include "InputSystem/WindowsInputKeys.h"
+#include "InputSystem/GLFWInput/WindowsInputKeys.h"
 #include "InputSystem/InputEventType.h"
+#include "Core/ITickableObject.h"
 
 using KeyDelegate = MulticastDelegate<KeyCode, InputEventType>;
 
@@ -15,10 +16,13 @@ private:
 
 public:
 	static void Init();
-	static inline InputSystem& Get() { ASSERT(Instance); return *Instance; }
+	static void Terminate();
+	void PollEvents();
 
 public:
-	// Callbacks section for others to tie into
+	static inline InputSystem& Get() { ASSERT(Instance); return *Instance; }
+
+	/** Callbacks for others to tie into */
 	inline KeyDelegate& OnKeyInput() { return DelegateKeyInput; }
 
 private:

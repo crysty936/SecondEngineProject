@@ -2,7 +2,6 @@
 #include <stdint.h>
 
 // Wrapper for windows.h to not pollute the dev environment
-
 namespace WindowsPlatform
 {
 	void InitCycles();

@@ -3,10 +3,9 @@
 
 int main(int inArgCount, char* inArgs)
 {
+	EngineCore::Init();
 
-	Engine.Init();
-
-	Engine.Run();
+	Engine->Run();
 
 
 	return 0;

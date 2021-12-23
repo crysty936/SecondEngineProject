@@ -1,27 +1,19 @@
 #include "Camera/Camera.h"
-#include "InputSystem/InputSystem.h"
-
+#include "Controller/Controller.h"
 
 Camera::Camera()
 {
-	InputSystem::Get().OnKeyInput().BindRaw(this, &Camera::OnInputReceived);
+	// Preferrably camera should be constructed by receiving a controller
+	// because multiple cameras can be tied to one controller but until that is necessary,
+	// the camera creates it's own controller
+	OwnedController = eastl::make_shared<class Controller>();
 }
 
 Camera::~Camera()
-{
-
-}
+= default;
 
 void Camera::Tick(const float inDeltaT)
 {
-
-
-
+	
 }
 
-void Camera::OnInputReceived(KeyCode inKeyCode, InputEventType inEventType)
-{
-	const bool pressed = inEventType == InputEventType::InputPress;
-
-	KeyStates[inKeyCode] = pressed;
-}

@@ -7,11 +7,11 @@ public:
 	~EngineCore();
 
 public:
-	void Init();
+	static void Init();
+	static void Terminate();
 	void Run();
-
 };
 
 void StopEngineRunning();
 
-extern EngineCore Engine;
+extern EngineCore* Engine;

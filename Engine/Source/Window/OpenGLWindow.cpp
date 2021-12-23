@@ -1,7 +1,7 @@
 #include "Window/OpenGLWindow.h"
 #include <assert.h>
 #include "Logger/Logger.h"
-#include "Renderer/OpenGLRenderer.h"
+#include "Renderer/OpenGL/OpenGLRenderer.h"
 #include "GLFW/glfw3.h"
 
 // Renderer should have the draw function adn get the window, while the window should contain it's context and other window related
@@ -21,7 +21,7 @@ OpenGLWindow::OpenGLWindow(GLFWwindow* inWindowHandle, const WindowProperties& i
 
 OpenGLWindow::~OpenGLWindow()
 {
-	RHI.DestroyWindow(WindowHandle);
+	RHI->DestroyWindow(WindowHandle);
 }
 
 
@@ -38,6 +38,6 @@ void OpenGLWindow::Open()
 void OpenGLWindow::SetVSyncEnabled(const bool inEnabled)
 {
 	Properties.VSyncEnabled = inEnabled;
-	RHI.SetVSyncEnabled(inEnabled);
+	RHI->SetVSyncEnabled(inEnabled);
 }
 

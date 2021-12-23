@@ -4,10 +4,16 @@
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Camera\Camera.cpp">
       <Filter>Engine\Source\Camera</Filter>
     </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Controller\Controller.cpp">
+      <Filter>Engine\Source\Controller</Filter>
+    </ClCompile>
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Core\EASTLNew.cpp">
       <Filter>Engine\Source\Core</Filter>
     </ClCompile>
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Core\EngineCore.cpp">
+      <Filter>Engine\Source\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Core\WindowsPlatform.cpp">
       <Filter>Engine\Source\Core</Filter>
     </ClCompile>
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\EntryPoint\EntryPoint.cpp">
@@ -19,23 +25,26 @@
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\EventSystem\EventSystem.cpp">
       <Filter>Engine\Source\EventSystem</Filter>
     </ClCompile>
-    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\InputSystem\InputEventType.cpp">
-      <Filter>Engine\Source\InputSystem</Filter>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\InputSystem\GLFWInput\InputSystem.cpp">
+      <Filter>Engine\Source\InputSystem\GLFWInput</Filter>
     </ClCompile>
-    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\InputSystem\InputSystem.cpp">
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\InputSystem\InputEventType.cpp">
       <Filter>Engine\Source\InputSystem</Filter>
     </ClCompile>
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Logger\Logger.cpp">
       <Filter>Engine\Source\Logger</Filter>
     </ClCompile>
-    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGLRenderer.cpp">
-      <Filter>Engine\Source\Renderer</Filter>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\OpenGLRenderer.cpp">
+      <Filter>Engine\Source\Renderer\OpenGL</Filter>
     </ClCompile>
-    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGLShader.cpp">
-      <Filter>Engine\Source\Renderer</Filter>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\OpenGLShader.cpp">
+      <Filter>Engine\Source\Renderer\OpenGL</Filter>
     </ClCompile>
-    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGLUtils.cpp">
-      <Filter>Engine\Source\Renderer</Filter>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\OpenGLUtils.cpp">
+      <Filter>Engine\Source\Renderer\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Utils\IOUtils.cpp">
+      <Filter>Engine\Source\Utils</Filter>
     </ClCompile>
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Utils\InlineAllocator.cpp">
       <Filter>Engine\Source\Utils</Filter>
@@ -43,16 +52,16 @@
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Window\OpenGLWindow.cpp">
       <Filter>Engine\Source\Window</Filter>
     </ClCompile>
-    <ClCompile Include="..\Engine\Source\Utils\IOUtils.cpp">
-      <Filter>Engine\Source\Utils</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\Source\Core\WindowsPlatform.cpp">
-      <Filter>Engine\Source\Core</Filter>
+    <ClCompile Include="..\Engine\Source\Renderer\Scene\Scene.cpp">
+      <Filter>Engine\Source\Renderer\Scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Camera\Camera.h">
       <Filter>Engine\Source\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Controller\Controller.h">
+      <Filter>Engine\Source\Controller</Filter>
     </ClInclude>
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\EngineCore.h">
       <Filter>Engine\Source\Core</Filter>
@@ -61,6 +70,9 @@
       <Filter>Engine\Source\Core</Filter>
     </ClInclude>
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\ITickableObject.h">
+      <Filter>Engine\Source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\WindowsPlatform.h">
       <Filter>Engine\Source\Core</Filter>
     </ClInclude>
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\EventSystem\DelegateBase.h">
@@ -72,26 +84,29 @@
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\EventSystem\IFunctionContainerBase.h">
       <Filter>Engine\Source\EventSystem</Filter>
     </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\InputSystem\GLFWInput\InputSystem.h">
+      <Filter>Engine\Source\InputSystem\GLFWInput</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\InputSystem\GLFWInput\WindowsInputKeys.h">
+      <Filter>Engine\Source\InputSystem\GLFWInput</Filter>
+    </ClInclude>
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\InputSystem\InputEventType.h">
-      <Filter>Engine\Source\InputSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\InputSystem\InputSystem.h">
-      <Filter>Engine\Source\InputSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\InputSystem\WindowsInputKeys.h">
       <Filter>Engine\Source\InputSystem</Filter>
     </ClInclude>
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Logger\Logger.h">
       <Filter>Engine\Source\Logger</Filter>
     </ClInclude>
-    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGLRenderer.h">
-      <Filter>Engine\Source\Renderer</Filter>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\OpenGLRenderer.h">
+      <Filter>Engine\Source\Renderer\OpenGL</Filter>
     </ClInclude>
-    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGLShader.h">
-      <Filter>Engine\Source\Renderer</Filter>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\OpenGLShader.h">
+      <Filter>Engine\Source\Renderer\OpenGL</Filter>
     </ClInclude>
-    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGLUtils.h">
-      <Filter>Engine\Source\Renderer</Filter>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\OpenGLUtils.h">
+      <Filter>Engine\Source\Renderer\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Utils\IOUtils.h">
+      <Filter>Engine\Source\Utils</Filter>
     </ClInclude>
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Utils\InlineAllocator.h">
       <Filter>Engine\Source\Utils</Filter>
@@ -102,11 +117,8 @@
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Window\WindowProperties.h">
       <Filter>Engine\Source\Window</Filter>
     </ClInclude>
-    <ClInclude Include="..\Engine\Source\Utils\IOUtils.h">
-      <Filter>Engine\Source\Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\Source\Core\WindowsPlatform.h">
-      <Filter>Engine\Source\Core</Filter>
+    <ClInclude Include="..\Engine\Source\Renderer\Scene\Scene.h">
+      <Filter>Engine\Source\Renderer\Scene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -118,6 +130,9 @@
     </Filter>
     <Filter Include="Engine\Source\Camera">
       <UniqueIdentifier>{DD20D998-8F81-3138-B957-E49ADF34648C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\Controller">
+      <UniqueIdentifier>{89669B8D-F211-3354-A423-A125D2784344}</UniqueIdentifier>
     </Filter>
     <Filter Include="Engine\Source\Core">
       <UniqueIdentifier>{F33D7D25-A1C9-3DB2-8BCB-77735BD726B9}</UniqueIdentifier>
@@ -131,17 +146,26 @@
     <Filter Include="Engine\Source\InputSystem">
       <UniqueIdentifier>{D2C490B8-B828-3411-936E-8265824BB9B8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine\Source\InputSystem\GLFWInput">
+      <UniqueIdentifier>{08500160-C9E6-35E4-9B2D-57E7CCC24796}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Engine\Source\Logger">
       <UniqueIdentifier>{8CA88269-8D94-3FA4-84BA-37BA657F37D5}</UniqueIdentifier>
     </Filter>
     <Filter Include="Engine\Source\Renderer">
       <UniqueIdentifier>{257D7CF0-8FA7-32C5-A267-5CB51E8AEFA1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine\Source\Renderer\OpenGL">
+      <UniqueIdentifier>{C3B59E16-5F48-355D-811F-0F87608C6230}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Engine\Source\Utils">
       <UniqueIdentifier>{75B3C83B-1FEA-39A9-BDF9-D9EDBA99A05A}</UniqueIdentifier>
     </Filter>
     <Filter Include="Engine\Source\Window">
       <UniqueIdentifier>{29E68D5E-4245-3A87-86BE-77379684E2DF}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\Renderer\Scene">
+      <UniqueIdentifier>{112f9416-299f-42d6-8da1-d73ef02adbfb}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

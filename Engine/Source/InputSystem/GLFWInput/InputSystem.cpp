@@ -1,6 +1,6 @@
-#include "InputSystem/InputSystem.h"
+#include "InputSystem/GLFWInput/InputSystem.h"
 #include "Window/OpenGLWindow.h"
-#include "Renderer/OpenGLRenderer.h"
+#include "Renderer/OpenGL/OpenGLRenderer.h"
 
 InputSystem* InputSystem::Instance;
 
@@ -37,11 +37,21 @@ void InputSystem::Init()
 {
 	Instance = new InputSystem{};
 	
-	OpenGLWindow& mainWindow = RHI.GetMainWindow();
+	OpenGLWindow& mainWindow = RHI->GetMainWindow();
 
  	glfwSetKeyCallback(mainWindow.GetHandle(), &GLFWKeyCallback);
 
  	Instance->DelegateKeyInput.BindRaw(Instance, &InputSystem::OnKeyPressedLog);
+}
+
+void InputSystem::Terminate()
+{
+
+}
+
+void InputSystem::PollEvents()
+{
+	glfwPollEvents();
 }
 
 void InputSystem::OnKeyPressedLog(KeyCode inKeyCode, InputEventType inEventType)

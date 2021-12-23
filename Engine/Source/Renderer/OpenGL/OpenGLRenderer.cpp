@@ -1,20 +1,18 @@
 #include <assert.h>
-#include "Renderer/OpenGLRenderer.h"
+#include "Renderer/OpenGL/OpenGLRenderer.h"
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 #include "OpenGLUtils.h"
 #include "Core/EngineUtils.h"
 #include "Core/EngineCore.h"
+#include "Renderer/Scene/Scene.h"
+#include "Camera/Camera.h"
 
-OpenGLRenderer RHI;
+#define CLEAR_COLOR 0.3f, 0.5f, 1.f, 0.4f
 
-OpenGLRenderer::OpenGLRenderer()
-= default;
+OpenGLRenderer* RHI = nullptr;
 
-OpenGLRenderer::~OpenGLRenderer()
-= default;
-
-void OpenGLRenderer::Init(const WindowProperties& inDefaultWindowProperties)
+OpenGLRenderer::OpenGLRenderer(const WindowProperties& inDefaultWindowProperties)
 {
 	const bool glfwSuccess = glfwInit() == GLFW_TRUE;
 
@@ -33,7 +31,6 @@ void OpenGLRenderer::Init(const WindowProperties& inDefaultWindowProperties)
 	const bool gladSuccess = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress) == GLFW_TRUE;
 	glfwSetInputMode(defaultWindowHandle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-
 	glViewport(0, 0, inDefaultWindowProperties.Width, inDefaultWindowProperties.Height);
 
 	glEnable(GL_DEBUG_OUTPUT);
@@ -41,31 +38,47 @@ void OpenGLRenderer::Init(const WindowProperties& inDefaultWindowProperties)
 
 	glDebugMessageCallback(OpenGLUtils::GLDebugCallback, nullptr);
 
+
+
+	CurrentScene = eastl::make_shared<Scene>();
+	CurrentScene->SceneObjects.push_back(eastl::make_shared<Camera>());
+}
+
+OpenGLRenderer::~OpenGLRenderer()
+= default;
+
+void OpenGLRenderer::Init(const WindowProperties& inDefaultWindowProperties)
+{
+	RHI = new OpenGLRenderer{ inDefaultWindowProperties };
 }
 
 void OpenGLRenderer::Terminate()
 {
-	MainWindow.reset();
+	RHI->MainWindow.reset();
 	glfwTerminate();
+
+	delete RHI;
 }
 
 void OpenGLRenderer::Draw()
 {
-	glfwPollEvents();
 
 
 
 
+	// Get matrices from Camera, issue Rendering commands
+	CheckShouldCloseWindow(*MainWindow);
+
+	glClearColor(CLEAR_COLOR);
+	glClear(GL_COLOR_BUFFER_BIT);
 
 	glfwSwapBuffers(MainWindow->GetHandle());
-
-	CheckShouldCloseWindow(*MainWindow);
 }
 
-eastl::shared_ptr<OpenGLWindow> OpenGLRenderer::CreateWindow(const WindowProperties& inWindowProperties) const
+eastl::unique_ptr<OpenGLWindow> OpenGLRenderer::CreateWindow(const WindowProperties& inWindowProperties) const
 {
 	GLFWwindow* newHandle = CreateNewWinowHandle(inWindowProperties);
-	eastl::shared_ptr<OpenGLWindow> newWindow = eastl::make_shared<OpenGLWindow>(newHandle);
+	eastl::unique_ptr<OpenGLWindow> newWindow = eastl::make_unique<OpenGLWindow>(newHandle);
 
 	return newWindow;
 }
