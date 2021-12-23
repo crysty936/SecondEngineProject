@@ -5,8 +5,9 @@
 #include "OpenGLUtils.h"
 #include "Core/EngineUtils.h"
 #include "Core/EngineCore.h"
-#include "Renderer/Scene/Scene.h"
+#include "Scene/Scene.h"
 #include "Camera/Camera.h"
+#include "Scene/SceneManager.h"
 
 #define CLEAR_COLOR 0.3f, 0.5f, 1.f, 0.4f
 
@@ -37,11 +38,6 @@ OpenGLRenderer::OpenGLRenderer(const WindowProperties& inDefaultWindowProperties
 	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 
 	glDebugMessageCallback(OpenGLUtils::GLDebugCallback, nullptr);
-
-
-
-	CurrentScene = eastl::make_shared<Scene>();
-	CurrentScene->SceneObjects.push_back(eastl::make_shared<Camera>());
 }
 
 OpenGLRenderer::~OpenGLRenderer()
@@ -57,16 +53,18 @@ void OpenGLRenderer::Terminate()
 	RHI->MainWindow.reset();
 	glfwTerminate();
 
+	ASSERT(RHI);
 	delete RHI;
 }
 
 void OpenGLRenderer::Draw()
 {
-
-
+	const SceneManager& sceneMan = SceneManager::Get();
+	const Scene& currentScene = sceneMan.GetCurrentScene();
 
 
 	// Get matrices from Camera, issue Rendering commands
+
 	CheckShouldCloseWindow(*MainWindow);
 
 	glClearColor(CLEAR_COLOR);

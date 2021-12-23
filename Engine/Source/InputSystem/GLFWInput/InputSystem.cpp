@@ -46,7 +46,9 @@ void InputSystem::Init()
 
 void InputSystem::Terminate()
 {
+	ASSERT(Instance);
 
+	delete(Instance);
 }
 
 void InputSystem::PollEvents()

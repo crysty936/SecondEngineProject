@@ -40,6 +40,9 @@
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\OpenGLUtils.cpp">
       <Filter>Engine\Source\Renderer\OpenGL</Filter>
     </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Scene\Scene.cpp">
+      <Filter>Engine\Source\Scene</Filter>
+    </ClCompile>
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Utils\IOUtils.cpp">
       <Filter>Engine\Source\Utils</Filter>
     </ClCompile>
@@ -102,6 +105,9 @@
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\OpenGLUtils.h">
       <Filter>Engine\Source\Renderer\OpenGL</Filter>
     </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Scene\Scene.h">
+      <Filter>Engine\Source\Scene</Filter>
+    </ClInclude>
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Utils\IOUtils.h">
       <Filter>Engine\Source\Utils</Filter>
     </ClInclude>
@@ -148,6 +154,9 @@
     </Filter>
     <Filter Include="Engine\Source\Renderer\OpenGL">
       <UniqueIdentifier>{C3B59E16-5F48-355D-811F-0F87608C6230}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\Scene">
+      <UniqueIdentifier>{0540D719-54D0-3325-8DE9-97618BA3175C}</UniqueIdentifier>
     </Filter>
     <Filter Include="Engine\Source\Utils">
       <UniqueIdentifier>{75B3C83B-1FEA-39A9-BDF9-D9EDBA99A05A}</UniqueIdentifier>

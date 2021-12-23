@@ -5,6 +5,7 @@
 #include "Renderer/OpenGL/OpenGLRenderer.h"
 #include "Window/OpenGLWindow.h"
 #include "InputSystem/GLFWInput/InputSystem.h"
+#include "Scene/SceneManager.h"
 
 constexpr float IdealFrameRate = 60.f;
 constexpr float IdealFrameTime = 1.0f / IdealFrameRate;
@@ -30,21 +31,20 @@ EngineCore::~EngineCore() = default;
 void EngineCore::Init()
 {
     Engine = new EngineCore{};
-
-    WindowProperties defaultWindowProperties{};
+    OpenGLRenderer::Init();
     InputSystem::Init();
-    OpenGLRenderer::Init(defaultWindowProperties);
+    SceneManager::Init();
 
+    SceneManager::Get().LoadScene();
 }
 
 void EngineCore::Terminate()
 {
-
-
+    SceneManager::Terminate();
     OpenGLRenderer::Terminate();
-
 	InputSystem::Terminate();
 
+    ASSERT(Engine);
     delete Engine;
 }
 

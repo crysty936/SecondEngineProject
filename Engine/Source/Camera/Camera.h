@@ -12,7 +12,6 @@ public:
 
 public:
 	eastl::shared_ptr<class Controller> OwnedController;
-
 };
 
 
