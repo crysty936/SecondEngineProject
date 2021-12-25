@@ -18,7 +18,18 @@ void SceneManager::LoadScene()
 	// TODO Should be implemented to read the scene from a serialized input
 
 	Instance->CurrentScene = eastl::make_unique<class Scene>();
+	//Instance->CurrentScene->SceneObjects.push_back(eastl::make_shared<Camera>());
+
+
+
+
+
+
+
 	Instance->CurrentScene->SceneObjects.push_back(eastl::make_shared<Camera>());
+
+
+
 }
 
 void SceneManager::Terminate()

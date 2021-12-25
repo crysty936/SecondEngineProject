@@ -61,7 +61,19 @@
     <ClCompile Include="..\Engine\Source\Renderer\Buffer\VertexBufferLayout.cpp">
       <Filter>Engine\Source\Renderer\Buffer</Filter>
     </ClCompile>
-    <ClCompile Include="..\Source\Renderer\Buffer\VertexBuffer.cpp">
+    <ClCompile Include="..\Engine\Source\Renderer\Buffer\VertexBuffer.cpp">
+      <Filter>Engine\Source\Renderer\Buffer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\Source\Renderer\Buffer\IndexBuffer.cpp">
+      <Filter>Engine\Source\Renderer\Buffer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\Source\Renderer\RenderableObject.cpp">
+      <Filter>Engine\Source\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\Source\Renderer\Buffer\VAO.cpp">
+      <Filter>Engine\Source\Renderer\Buffer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\Source\Renderer\Buffer\BufferBase.cpp">
       <Filter>Engine\Source\Renderer\Buffer</Filter>
     </ClCompile>
   </ItemGroup>
@@ -138,10 +150,22 @@
     <ClInclude Include="..\Engine\Source\Renderer\Buffer\VertexBufferLayout.h">
       <Filter>Engine\Source\Renderer\Buffer</Filter>
     </ClInclude>
-    <ClInclude Include="..\Source\Renderer\Buffer\BufferBase.h">
+    <ClInclude Include="..\Engine\Source\Renderer\Buffer\BufferBase.h">
       <Filter>Engine\Source\Renderer\Buffer</Filter>
     </ClInclude>
-    <ClInclude Include="..\Source\Renderer\Buffer\VertexBuffer.h">
+    <ClInclude Include="..\Engine\Source\Renderer\Buffer\VertexBuffer.h">
+      <Filter>Engine\Source\Renderer\Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\Source\Renderer\Buffer\IndexBuffer.h">
+      <Filter>Engine\Source\Renderer\Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\Source\Renderer\BasicShapesData\BasicShapesData.h">
+      <Filter>Engine\Source\Renderer\BasicShapesData</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\Source\Renderer\RenderableObject.h">
+      <Filter>Engine\Source\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\Source\Renderer\Buffer\VAO.h">
       <Filter>Engine\Source\Renderer\Buffer</Filter>
     </ClInclude>
   </ItemGroup>
@@ -193,6 +217,9 @@
     </Filter>
     <Filter Include="Engine\Source\Renderer\Buffer">
       <UniqueIdentifier>{76ce2da4-0fd8-4dce-b218-bd3d75a44e2d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\Renderer\BasicShapesData">
+      <UniqueIdentifier>{489b5206-52f6-433b-a0e5-6b5963f5fc06}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

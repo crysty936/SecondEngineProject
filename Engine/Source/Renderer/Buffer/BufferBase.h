@@ -4,9 +4,11 @@
 class BufferBase
 {
 public:
-	BufferBase() = default;
-	virtual ~BufferBase() = default;
-	
+	BufferBase();
+	virtual ~BufferBase();
+
+	virtual void DeleteBuffer();
+
 public:
 	virtual void Bind() = 0;
 	virtual void Unbind() = 0;

@@ -65,6 +65,10 @@ void OpenGLRenderer::Draw()
 
 	// Get matrices from Camera, issue Rendering commands
 
+
+
+
+
 	CheckShouldCloseWindow(*MainWindow);
 
 	glClearColor(CLEAR_COLOR);
