@@ -8,6 +8,7 @@
 #include "Scene/Scene.h"
 #include "Camera/Camera.h"
 #include "Scene/SceneManager.h"
+#include "../RenderableObject.h"
 
 #define CLEAR_COLOR 0.3f, 0.5f, 1.f, 0.4f
 
@@ -27,10 +28,10 @@ OpenGLRenderer::OpenGLRenderer(const WindowProperties& inDefaultWindowProperties
 	MainWindow = CreateWindow(inDefaultWindowProperties);
 
 	// Set Context
-	GLFWwindow* defaultWindowHandle = MainWindow->GetHandle();
-	glfwMakeContextCurrent(defaultWindowHandle);
+	GLFWwindow* mainWindowHandle = MainWindow->GetHandle();
+	glfwMakeContextCurrent(mainWindowHandle);
 	const bool gladSuccess = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress) == GLFW_TRUE;
-	glfwSetInputMode(defaultWindowHandle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetInputMode(mainWindowHandle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	glViewport(0, 0, inDefaultWindowProperties.Width, inDefaultWindowProperties.Height);
 
@@ -38,12 +39,13 @@ OpenGLRenderer::OpenGLRenderer(const WindowProperties& inDefaultWindowProperties
 	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 
 	glDebugMessageCallback(OpenGLUtils::GLDebugCallback, nullptr);
+	glClearColor(CLEAR_COLOR);
 }
 
 OpenGLRenderer::~OpenGLRenderer()
 = default;
 
-void OpenGLRenderer::Init(const WindowProperties& inDefaultWindowProperties)
+void OpenGLRenderer::Init(const WindowProperties & inDefaultWindowProperties)
 {
 	RHI = new OpenGLRenderer{ inDefaultWindowProperties };
 }
@@ -59,25 +61,37 @@ void OpenGLRenderer::Terminate()
 
 void OpenGLRenderer::Draw()
 {
-	const SceneManager& sceneMan = SceneManager::Get();
-	const Scene& currentScene = sceneMan.GetCurrentScene();
+	glClear(GL_COLOR_BUFFER_BIT);
 
+	SceneManager& sceneMan = SceneManager::Get();
+	Scene& currentScene = sceneMan.GetCurrentScene();
+	eastl::vector<eastl::shared_ptr<ITickableObject>>& sceneObjects = currentScene.SceneObjects;
+
+	for (eastl::shared_ptr<ITickableObject>& object : sceneObjects)
+	{
+		ITickableObject* tickable = object.get();
+		RenderableObject* renderable = dynamic_cast<RenderableObject*>(tickable);
+
+		if (renderable)
+		{
+			uint32_t indicesCount = renderable->ObjectVAO.GetVertexBuffer().GetIndicesCount();
+
+			renderable->Shader.Bind();
+			renderable->ObjectVAO.Bind();
+			glDrawElements(GL_TRIANGLES, indicesCount, GL_UNSIGNED_INT, 0);
+
+			renderable->Shader.UnBind();
+			renderable->ObjectVAO.Unbind();
+		}
+	}
 
 	// Get matrices from Camera, issue Rendering commands
 
-
-
-
-
 	CheckShouldCloseWindow(*MainWindow);
-
-	glClearColor(CLEAR_COLOR);
-	glClear(GL_COLOR_BUFFER_BIT);
-
 	glfwSwapBuffers(MainWindow->GetHandle());
 }
 
-eastl::unique_ptr<OpenGLWindow> OpenGLRenderer::CreateWindow(const WindowProperties& inWindowProperties) const
+eastl::unique_ptr<OpenGLWindow> OpenGLRenderer::CreateWindow(const WindowProperties & inWindowProperties) const
 {
 	GLFWwindow* newHandle = CreateNewWinowHandle(inWindowProperties);
 	eastl::unique_ptr<OpenGLWindow> newWindow = eastl::make_unique<OpenGLWindow>(newHandle);
@@ -85,7 +99,7 @@ eastl::unique_ptr<OpenGLWindow> OpenGLRenderer::CreateWindow(const WindowPropert
 	return newWindow;
 }
 
-void OpenGLRenderer::DestroyWindow(GLFWwindow* inWindowHandle) const
+void OpenGLRenderer::DestroyWindow(GLFWwindow * inWindowHandle) const
 {
 	glfwDestroyWindow(inWindowHandle);
 }
@@ -95,14 +109,14 @@ void OpenGLRenderer::SetVSyncEnabled(const bool inEnabled)
 	glfwSwapInterval(inEnabled);
 }
 
-GLFWwindow* OpenGLRenderer::CreateNewWinowHandle(const WindowProperties& inWindowProperties) const
+GLFWwindow* OpenGLRenderer::CreateNewWinowHandle(const WindowProperties & inWindowProperties) const
 {
 	GLFWwindow* newWindowHandle = glfwCreateWindow(inWindowProperties.Width, inWindowProperties.Height, inWindowProperties.Title.data(), nullptr, nullptr);
 
 	return newWindowHandle;
 }
 
-void OpenGLRenderer::CheckShouldCloseWindow(const OpenGLWindow& inWindow)
+void OpenGLRenderer::CheckShouldCloseWindow(const OpenGLWindow & inWindow)
 {
 	if (glfwWindowShouldClose(inWindow.GetHandle()))
 	{

@@ -58,23 +58,26 @@
     <ClCompile Include="..\Engine\Source\Scene\SceneManager.cpp">
       <Filter>Engine\Source\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="..\Engine\Source\Renderer\Buffer\VertexBufferLayout.cpp">
-      <Filter>Engine\Source\Renderer\Buffer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\Source\Renderer\Buffer\VertexBuffer.cpp">
-      <Filter>Engine\Source\Renderer\Buffer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\Source\Renderer\Buffer\IndexBuffer.cpp">
-      <Filter>Engine\Source\Renderer\Buffer</Filter>
-    </ClCompile>
     <ClCompile Include="..\Engine\Source\Renderer\RenderableObject.cpp">
       <Filter>Engine\Source\Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="..\Engine\Source\Renderer\Buffer\VAO.cpp">
-      <Filter>Engine\Source\Renderer\Buffer</Filter>
+    <ClCompile Include="..\Engine\Source\Renderer\ShapesUtils\BasicShapes.cpp">
+      <Filter>Engine\Source\Renderer\ShapesUtils</Filter>
     </ClCompile>
-    <ClCompile Include="..\Engine\Source\Renderer\Buffer\BufferBase.cpp">
-      <Filter>Engine\Source\Renderer\Buffer</Filter>
+    <ClCompile Include="..\Engine\Source\Renderer\OpenGL\Buffer\BufferBase.cpp">
+      <Filter>Engine\Source\Renderer\OpenGL\Buffer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\Source\Renderer\OpenGL\Buffer\IndexBuffer.cpp">
+      <Filter>Engine\Source\Renderer\OpenGL\Buffer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\Source\Renderer\OpenGL\Buffer\VAO.cpp">
+      <Filter>Engine\Source\Renderer\OpenGL\Buffer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\Source\Renderer\OpenGL\Buffer\VertexBuffer.cpp">
+      <Filter>Engine\Source\Renderer\OpenGL\Buffer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\Source\Renderer\OpenGL\Buffer\VertexBufferLayout.cpp">
+      <Filter>Engine\Source\Renderer\OpenGL\Buffer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -144,29 +147,32 @@
     <ClInclude Include="..\Engine\Source\Scene\SceneManager.h">
       <Filter>Engine\Source\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="..\Engine\Source\Renderer\Buffer\LayoutProperties.h">
-      <Filter>Engine\Source\Renderer\Buffer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\Source\Renderer\Buffer\VertexBufferLayout.h">
-      <Filter>Engine\Source\Renderer\Buffer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\Source\Renderer\Buffer\BufferBase.h">
-      <Filter>Engine\Source\Renderer\Buffer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\Source\Renderer\Buffer\VertexBuffer.h">
-      <Filter>Engine\Source\Renderer\Buffer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\Source\Renderer\Buffer\IndexBuffer.h">
-      <Filter>Engine\Source\Renderer\Buffer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\Source\Renderer\BasicShapesData\BasicShapesData.h">
-      <Filter>Engine\Source\Renderer\BasicShapesData</Filter>
-    </ClInclude>
     <ClInclude Include="..\Engine\Source\Renderer\RenderableObject.h">
       <Filter>Engine\Source\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="..\Engine\Source\Renderer\Buffer\VAO.h">
-      <Filter>Engine\Source\Renderer\Buffer</Filter>
+    <ClInclude Include="..\Engine\Source\Renderer\ShapesUtils\BasicShapesData.h">
+      <Filter>Engine\Source\Renderer\ShapesUtils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\Source\Renderer\ShapesUtils\BasicShapes.h">
+      <Filter>Engine\Source\Renderer\ShapesUtils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\Source\Renderer\OpenGL\Buffer\BufferBase.h">
+      <Filter>Engine\Source\Renderer\OpenGL\Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\Source\Renderer\OpenGL\Buffer\IndexBuffer.h">
+      <Filter>Engine\Source\Renderer\OpenGL\Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\Source\Renderer\OpenGL\Buffer\LayoutProperties.h">
+      <Filter>Engine\Source\Renderer\OpenGL\Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\Source\Renderer\OpenGL\Buffer\VAO.h">
+      <Filter>Engine\Source\Renderer\OpenGL\Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\Source\Renderer\OpenGL\Buffer\VertexBuffer.h">
+      <Filter>Engine\Source\Renderer\OpenGL\Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\Source\Renderer\OpenGL\Buffer\VertexBufferLayout.h">
+      <Filter>Engine\Source\Renderer\OpenGL\Buffer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -215,11 +221,11 @@
     <Filter Include="Engine\Source\Window">
       <UniqueIdentifier>{29E68D5E-4245-3A87-86BE-77379684E2DF}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\Source\Renderer\Buffer">
-      <UniqueIdentifier>{76ce2da4-0fd8-4dce-b218-bd3d75a44e2d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Engine\Source\Renderer\BasicShapesData">
+    <Filter Include="Engine\Source\Renderer\ShapesUtils">
       <UniqueIdentifier>{489b5206-52f6-433b-a0e5-6b5963f5fc06}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\Renderer\OpenGL\Buffer">
+      <UniqueIdentifier>{85fae7f0-22bb-4c35-bd22-c3ed230638d1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

@@ -25,6 +25,9 @@ VAO::VAO(VertexBuffer& inBuffer)
 
 		offset += prop.Count * prop.GetSizeOfType();
 	}
+
+	Unbind();
+	VBuffer.Unbind();
 }
 
 VAO::~VAO() = default;

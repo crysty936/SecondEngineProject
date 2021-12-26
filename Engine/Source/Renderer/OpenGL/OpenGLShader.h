@@ -21,8 +21,9 @@ public:
 	void SetUniformValue3fv(const eastl::string& UniformName, glm::vec3 vec);
 
 	uint32_t inline GetHandle() const { return ShaderHandle; }
+	void DeleteShader();
 
-private:
+public:
 	OpenGLShader(const eastl::string& inVertexSrc, const eastl::string& inFragmentSrc);
 	~OpenGLShader();
 	OpenGLShader(const OpenGLShader& inOther) = default;

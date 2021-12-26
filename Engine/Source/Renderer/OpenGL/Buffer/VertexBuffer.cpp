@@ -28,7 +28,9 @@ void VertexBuffer::Unbind()
 
 void VertexBuffer::SetVertices(const float* inVertices, const int inCount, const uint32_t inBufferAccessType)
 {
+	Bind();
 	glNamedBufferData(Handle, sizeof(float) * inCount, inVertices, inBufferAccessType);
+	Unbind();
 }
 
 void VertexBuffer::SetVerticesRaw(const void* inData, const size_t inSize, const uint32_t inBufferAccessType)

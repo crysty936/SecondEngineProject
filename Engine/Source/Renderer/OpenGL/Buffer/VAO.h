@@ -10,6 +10,7 @@ public:
 	void Bind();
 	void Unbind();
 	void DeleteBuffers();
+	inline const VertexBuffer& GetVertexBuffer() const { return VBuffer; }
 
 private:
 	uint32_t Handle;

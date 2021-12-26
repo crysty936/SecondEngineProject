@@ -21,6 +21,8 @@ void IndexBuffer::Unbind()
 
 void IndexBuffer::SetIndices(const uint32_t* inIndices, const int32_t inCount, const GLenum inBufferAccessType)
 {
+	Bind();
 	glNamedBufferData(Handle, sizeof(uint32_t) * inCount, inIndices, inBufferAccessType);
+	Unbind();
 	IndicesCount = inCount;
 }

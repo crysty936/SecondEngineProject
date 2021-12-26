@@ -19,6 +19,14 @@ OpenGLShader OpenGLShader::ConstructShaderFromPath(const eastl::string& inVertex
 	return ConstructShaderFromSource(vertexShaderCode, fragmentShaderCode);
 }
 
+void OpenGLShader::DeleteShader()
+{
+	if (ShaderHandle != 0)
+	{
+		glDeleteProgram(ShaderHandle);
+	}
+}
+
 OpenGLShader::OpenGLShader(const eastl::string& inVertexSrc, const eastl::string& inFragmentSrc)
 {
 	// Create an empty vertex shader handle
@@ -69,10 +77,7 @@ OpenGLShader::OpenGLShader(const eastl::string& inVertexSrc, const eastl::string
 	glDetachShader(program, fragmentShader);
 }
 
-OpenGLShader::~OpenGLShader()
-{
-	glDeleteProgram(ShaderHandle);
-}
+OpenGLShader::~OpenGLShader() = default;
 
 void OpenGLShader::Bind() const
 {
@@ -84,36 +89,36 @@ void OpenGLShader::UnBind()
 	glUseProgram(0);
 }
 
-void OpenGLShader::SetUniformValue4f(const eastl::string& UniformName, float v1, float v2, float v3, float v4)
+void OpenGLShader::SetUniformValue4f(const eastl::string & UniformName, float v1, float v2, float v3, float v4)
 {
 	glUniform4f(GetUniformLocation(UniformName), v1, v2, v3, v4);
 }
-void OpenGLShader::SetUniformValue3f(const eastl::string& UniformName, float v1, float v2, float v3)
+void OpenGLShader::SetUniformValue3f(const eastl::string & UniformName, float v1, float v2, float v3)
 {
 	glUniform3f(GetUniformLocation(UniformName), v1, v2, v3);
 }
 
-void OpenGLShader::SetUniformValue1f(const eastl::string& UniformName, float v1)
+void OpenGLShader::SetUniformValue1f(const eastl::string & UniformName, float v1)
 {
 	glUniform1f(GetUniformLocation(UniformName), v1);
 }
 
-void OpenGLShader::SetUniformValue1i(const eastl::string& UniformName, int v1)
+void OpenGLShader::SetUniformValue1i(const eastl::string & UniformName, int v1)
 {
 	glUniform1i(GetUniformLocation(UniformName), v1);
 }
 
-void OpenGLShader::SetUniformValue4fv(const eastl::string& UniformName, glm::mat4 matrix)
+void OpenGLShader::SetUniformValue4fv(const eastl::string & UniformName, glm::mat4 matrix)
 {
 	glUniformMatrix4fv(GetUniformLocation(UniformName), 1, GL_FALSE, glm::value_ptr(matrix));
 }
 
-void OpenGLShader::SetUniformValue3fv(const eastl::string& UniformName, glm::vec3 vec)
+void OpenGLShader::SetUniformValue3fv(const eastl::string & UniformName, glm::vec3 vec)
 {
 	glUniform3fv(GetUniformLocation(UniformName), 1, glm::value_ptr(vec));
 }
 
-int OpenGLShader::GetUniformLocation(const eastl::string& UniformName)
+int OpenGLShader::GetUniformLocation(const eastl::string & UniformName)
 {
 	if (UniformLocations.find(UniformName) != UniformLocations.end())
 		return UniformLocations[UniformName];
@@ -127,7 +132,7 @@ int OpenGLShader::GetUniformLocation(const eastl::string& UniformName)
 	return uniformLocation;
 }
 
-uint32_t OpenGLShader::CreateShader(const eastl::string& Source, GLenum ShaderType)
+uint32_t OpenGLShader::CreateShader(const eastl::string & Source, GLenum ShaderType)
 {
 	GLuint shaderHandle = glCreateShader(ShaderType);
 

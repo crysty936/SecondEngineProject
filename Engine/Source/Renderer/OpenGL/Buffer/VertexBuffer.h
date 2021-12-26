@@ -19,7 +19,7 @@ public:
 	void SetVertices(const float* inVertices, const int inCount, const uint32_t inBufferAccessType);
 	void SetVerticesRaw(const void* inData, const size_t inSize, const uint32_t inBufferAccessType);
 	inline VertexBufferLayout& GetLayout() { return Layout; }
-
+	inline uint32_t GetIndicesCount() const { return Indices.IndicesCount; }
 
 private:
 	IndexBuffer Indices;

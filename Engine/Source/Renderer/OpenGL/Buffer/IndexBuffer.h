@@ -14,5 +14,5 @@ public:
 	void SetIndices(const uint32_t* inIndices, const int32_t inCount, const GLenum inBufferAccessType);
 
 public:
-	size_t IndicesCount;
+	int32_t IndicesCount;
 };

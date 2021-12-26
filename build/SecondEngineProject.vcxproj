@@ -260,22 +260,24 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\Engine\Source\Renderer\Buffer\BufferBase.cpp" />
-    <ClCompile Include="..\Engine\Source\Renderer\Buffer\IndexBuffer.cpp" />
-    <ClCompile Include="..\Engine\Source\Renderer\Buffer\VAO.cpp" />
-    <ClCompile Include="..\Engine\Source\Renderer\Buffer\VertexBuffer.cpp" />
-    <ClCompile Include="..\Engine\Source\Renderer\Buffer\VertexBufferLayout.cpp" />
+    <ClCompile Include="..\Engine\Source\Renderer\OpenGL\Buffer\BufferBase.cpp" />
+    <ClCompile Include="..\Engine\Source\Renderer\OpenGL\Buffer\IndexBuffer.cpp" />
+    <ClCompile Include="..\Engine\Source\Renderer\OpenGL\Buffer\VAO.cpp" />
+    <ClCompile Include="..\Engine\Source\Renderer\OpenGL\Buffer\VertexBuffer.cpp" />
+    <ClCompile Include="..\Engine\Source\Renderer\OpenGL\Buffer\VertexBufferLayout.cpp" />
     <ClCompile Include="..\Engine\Source\Renderer\RenderableObject.cpp" />
+    <ClCompile Include="..\Engine\Source\Renderer\ShapesUtils\BasicShapes.cpp" />
     <ClCompile Include="..\Engine\Source\Scene\SceneManager.cpp" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Camera\Camera.cpp" />
-    <ClInclude Include="..\Engine\Source\Renderer\BasicShapesData\BasicShapesData.h" />
-    <ClInclude Include="..\Engine\Source\Renderer\Buffer\BufferBase.h" />
-    <ClInclude Include="..\Engine\Source\Renderer\Buffer\IndexBuffer.h" />
-    <ClInclude Include="..\Engine\Source\Renderer\Buffer\LayoutProperties.h" />
-    <ClInclude Include="..\Engine\Source\Renderer\Buffer\VAO.h" />
-    <ClInclude Include="..\Engine\Source\Renderer\Buffer\VertexBuffer.h" />
-    <ClInclude Include="..\Engine\Source\Renderer\Buffer\VertexBufferLayout.h" />
+    <ClInclude Include="..\Engine\Source\Renderer\OpenGL\Buffer\BufferBase.h" />
+    <ClInclude Include="..\Engine\Source\Renderer\OpenGL\Buffer\IndexBuffer.h" />
+    <ClInclude Include="..\Engine\Source\Renderer\OpenGL\Buffer\LayoutProperties.h" />
+    <ClInclude Include="..\Engine\Source\Renderer\OpenGL\Buffer\VAO.h" />
+    <ClInclude Include="..\Engine\Source\Renderer\OpenGL\Buffer\VertexBuffer.h" />
+    <ClInclude Include="..\Engine\Source\Renderer\OpenGL\Buffer\VertexBufferLayout.h" />
     <ClInclude Include="..\Engine\Source\Renderer\RenderableObject.h" />
+    <ClInclude Include="..\Engine\Source\Renderer\ShapesUtils\BasicShapesData.h" />
+    <ClInclude Include="..\Engine\Source\Renderer\ShapesUtils\BasicShapes.h" />
     <ClInclude Include="..\Engine\Source\Scene\SceneManager.h" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Camera\Camera.h" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Controller\Controller.cpp" />
