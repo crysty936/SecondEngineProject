@@ -1,4 +1,9 @@
 #pragma once
+#include "EASTL/shared_ptr.h"
 
-
-namespace 
+class BasicShapes
+{
+public:
+	static eastl::shared_ptr<class RenderableObject> GetTriangleRenderable();
+	static eastl::shared_ptr<class RenderableObject> GetSquareRenderable();
+};

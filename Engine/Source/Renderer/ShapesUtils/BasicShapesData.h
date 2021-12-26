@@ -4,7 +4,7 @@
  * File containing basic shapes vertices and indices
  */
 
-namespace BasicShapes
+namespace BasicShapesData
 {
 	// Triangle
 	const float TriangleVertices[] =
@@ -21,12 +21,14 @@ namespace BasicShapes
 	// Triangle
 
 	// Square
-	float SquareVertices[] = {
-		0, 1, 3,   // first triangle
-		1, 2, 3    // second triangle
+	const float SquareVertices[] = {
+	 0.5f,  0.5f, 0.0f,  // top right
+	 0.5f, -0.5f, 0.0f,  // bottom right
+	-0.5f, -0.5f, 0.0f,  // bottom left
+	-0.5f,  0.5f, 0.0f   // top left 
 	};
 
-	uint32_t SquareIndices[] = {
+	const uint32_t SquareIndices[] = {
 		0, 1, 3,   // first triangle
 		1, 2, 3    // second triangle
 	};
