@@ -1,10 +1,21 @@
 #pragma once
 
 #ifndef NDEBUG
-#define LOG(x, ...){Logger::Get().Print(x, __VA_ARGS__);}
+#define LOG_INFO(x, ...)	{Logger::Get().Print(x, Severity::Info,		__VA_ARGS__);}
+#define LOG_WARNING(x, ...)	{Logger::Get().Print(x, Severity::Warning,	__VA_ARGS__);}
+#define LOG_ERROR(x, ...)	{Logger::Get().Print(x, Severity::Error,	__VA_ARGS__);}
 #else
-#define LOG(x, ...)
+#define LOG_INFO(x, ...)
+#define LOG_WARNING(x, ...)
+#define LOG_ERROR(x, ...)
 #endif
+
+enum class Severity
+{
+	Info,
+	Warning,
+	Error
+};
 
 class Logger
 {
@@ -15,10 +26,10 @@ private:
 public:
 
 	inline static Logger& Get() { return Instance; }
-	void Print(const char* inFormat, ...);
+	void Print(const char* inFormat, Severity inSeverity, ...);
 
 private:
-	// To be developed
+	// To be developed for argument {#} replacing
 
 // 	enum FormatValueType : char
 // 	{

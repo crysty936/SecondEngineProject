@@ -22,7 +22,7 @@ void SceneManager::LoadScene()
 	Instance->CurrentScene = eastl::make_unique<class Scene>();
 	Instance->CurrentScene->SceneObjects.push_back(eastl::make_shared<Camera>());
 
-	eastl::shared_ptr<RenderableObject> obj = BasicShapes::GetSquareRenderable();
+	eastl::shared_ptr<RenderableObject> obj = BasicShapes::GetTriangleRenderable();
  	Instance->CurrentScene->SceneObjects.push_back(obj);
 }
 

@@ -8,7 +8,11 @@
 #include "Scene/Scene.h"
 #include "Camera/Camera.h"
 #include "Scene/SceneManager.h"
-#include "../RenderableObject.h"
+#include "Renderer/RenderableObject.h"
+#include "glm/ext/matrix_float4x4.hpp"
+#include "glm/ext/matrix_clip_space.hpp"
+#include "glm/trigonometric.hpp"
+#include "../ShapesUtils/BasicShapesData.h"
 
 #define CLEAR_COLOR 0.3f, 0.5f, 1.f, 0.4f
 
@@ -67,6 +71,12 @@ void OpenGLRenderer::Draw()
 	Scene& currentScene = sceneMan.GetCurrentScene();
 	eastl::vector<eastl::shared_ptr<ITickableObject>>& sceneObjects = currentScene.SceneObjects;
 
+	glm::mat4 perspprojection = glm::perspective(glm::radians(45.0f), (float)MainWindow->GetProperties().Width / (float)MainWindow->GetProperties().Height, 0.1f, 100.0f);
+
+	glm::mat4 view = glm::mat4(1.0f);
+	// note that we're translating the scene in the reverse direction of where we want to move
+	view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+
 	for (eastl::shared_ptr<ITickableObject>& object : sceneObjects)
 	{
 		ITickableObject* tickable = object.get();
@@ -77,6 +87,9 @@ void OpenGLRenderer::Draw()
 			uint32_t indicesCount = renderable->ObjectVAO.GetVertexBuffer().GetIndicesCount();
 
 			renderable->Shader.Bind();
+			renderable->Shader.SetUniformValue4fv("projection", perspprojection);
+			renderable->Shader.SetUniformValue4fv("view", view);
+
 			renderable->ObjectVAO.Bind();
 			glDrawElements(GL_TRIANGLES, indicesCount, GL_UNSIGNED_INT, 0);
 
@@ -93,7 +106,7 @@ void OpenGLRenderer::Draw()
 
 eastl::unique_ptr<OpenGLWindow> OpenGLRenderer::CreateWindow(const WindowProperties & inWindowProperties) const
 {
-	GLFWwindow* newHandle = CreateNewWinowHandle(inWindowProperties);
+	GLFWwindow* newHandle = CreateNewWindowHandle(inWindowProperties);
 	eastl::unique_ptr<OpenGLWindow> newWindow = eastl::make_unique<OpenGLWindow>(newHandle);
 
 	return newWindow;
@@ -109,7 +122,7 @@ void OpenGLRenderer::SetVSyncEnabled(const bool inEnabled)
 	glfwSwapInterval(inEnabled);
 }
 
-GLFWwindow* OpenGLRenderer::CreateNewWinowHandle(const WindowProperties & inWindowProperties) const
+GLFWwindow* OpenGLRenderer::CreateNewWindowHandle(const WindowProperties & inWindowProperties) const
 {
 	GLFWwindow* newWindowHandle = glfwCreateWindow(inWindowProperties.Width, inWindowProperties.Height, inWindowProperties.Title.data(), nullptr, nullptr);
 

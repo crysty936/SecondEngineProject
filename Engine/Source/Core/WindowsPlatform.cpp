@@ -32,4 +32,32 @@ namespace WindowsPlatform
  	{
  		::Sleep(inMilliseconds);
  	}
+
+	void SetCLITextColor(CLITextColor inColor)
+	{
+		HANDLE hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
+		WORD color = 0;
+
+		switch (inColor)
+		{
+		case CLITextColor::Red:
+		{
+			color = FOREGROUND_RED;
+			break;
+		}
+		case CLITextColor::Yellow:
+		{
+			color = FOREGROUND_RED | FOREGROUND_GREEN;
+			break;
+		}
+		case CLITextColor::White:
+		{
+			color = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE;
+			break;
+		}
+		}
+
+		SetConsoleTextAttribute(hStdOut, color);
+	}
+
 }

@@ -6,7 +6,7 @@
 #define ASSERT(x, ...)										\
  {															\
  if(!(x))													\
- {Logger::Get().Print("Assertion Failed");					\
+ {LOG_ERROR("Assertion Failed");							\
 __debugbreak();}											\
 }
 

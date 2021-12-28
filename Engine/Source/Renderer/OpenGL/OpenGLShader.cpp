@@ -2,6 +2,7 @@
 #include "EASTL/string.h"
 #include "Utils/IOUtils.h"
 #include <glm/gtc/type_ptr.hpp>
+#include "Core/EngineUtils.h"
 
 OpenGLShader OpenGLShader::ConstructShaderFromSource(const eastl::string& inVertexSource, const eastl::string& inFragmentSource)
 {
@@ -127,7 +128,7 @@ int OpenGLShader::GetUniformLocation(const eastl::string & UniformName)
 	if (uniformLocation != -1)
 		UniformLocations[UniformName] = uniformLocation;
 
-	//ENGINE_CORE_ASSERT(uniformLocation != -1, "Uniform location could not be found!");
+	ASSERT(uniformLocation != -1, "Uniform location could not be found!");
 
 	return uniformLocation;
 }

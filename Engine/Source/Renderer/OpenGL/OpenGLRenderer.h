@@ -25,7 +25,7 @@ public:
 	inline class OpenGLWindow& GetMainWindow() { return *MainWindow; }
 
 private:
-	struct GLFWwindow* CreateNewWinowHandle(const WindowProperties& inWindowProperties) const;
+	struct GLFWwindow* CreateNewWindowHandle(const WindowProperties& inWindowProperties) const;
 	void CheckShouldCloseWindow(const OpenGLWindow& inWindow);
 
 private:

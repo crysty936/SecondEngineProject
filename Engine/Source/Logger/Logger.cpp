@@ -6,7 +6,7 @@
 #include <type_traits>
 #include "Logger/Logger.h"
 #include "Core/EngineUtils.h"
-
+#include "Core/WindowsPlatform.h"
 // Fmt logger is a good source for this
 
 Logger::Logger()
@@ -25,7 +25,7 @@ Logger::Logger()
 
 Logger::~Logger() = default;
 
-void Logger::Print(const char* inFormat, ...)
+void Logger::Print(const char* inFormat, Severity inSeverity, ...)
 {
  #ifdef NDEBUG
      return;
@@ -37,7 +37,7 @@ void Logger::Print(const char* inFormat, ...)
  
   	va_list argumentList;
   
-  	va_start(argumentList, inFormat);
+  	va_start(argumentList, &inSeverity);
   
   	int32_t result = vsprintf_s(stackArray, bufferSize, inFormat, argumentList);
   
@@ -45,9 +45,28 @@ void Logger::Print(const char* inFormat, ...)
   
     // Means our allocated buffer is not enough, the log to be printed is too big
     ASSERT(result != -1);
+
+    switch (inSeverity)
+    {
+    case Severity::Info:
+    {
+		WindowsPlatform::SetCLITextColor(CLITextColor::White);
+        break;
+    }
+    case Severity::Warning:
+    {
+		WindowsPlatform::SetCLITextColor(CLITextColor::Yellow);
+        break;
+    }
+    case Severity::Error:
+    {
+        WindowsPlatform::SetCLITextColor(CLITextColor::Red);
+        break;
+    }
+    }
   
-  
-     std::cout << stackArray << std::endl;
+
+    std::cout << stackArray << std::endl;
 }
 
 Logger Logger::Instance;

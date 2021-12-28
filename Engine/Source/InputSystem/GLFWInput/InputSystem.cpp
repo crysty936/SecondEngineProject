@@ -58,5 +58,5 @@ void InputSystem::PollEvents()
 
 void InputSystem::OnKeyPressedLog(KeyCode inKeyCode, InputEventType inEventType)
 {
-	LOG("Key input received for key %d with action: %s", static_cast<int32_t>(inKeyCode), ToString(inEventType));
+	LOG_INFO("Key input received for key %d with action: %s", static_cast<int32_t>(inKeyCode), ToString(inEventType));
 }

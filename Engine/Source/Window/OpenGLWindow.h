@@ -11,6 +11,7 @@ public:
 	inline struct GLFWwindow* GetHandle() const { return WindowHandle; }
 
 	void SetVSyncEnabled(const bool inEnabled);
+	const WindowProperties& GetProperties() const { return Properties; }
 
 private:
 	struct GLFWwindow* WindowHandle;
