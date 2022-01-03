@@ -16,7 +16,7 @@ bool TryFastReadFile(const eastl::string& inFilePath, eastl::string& outData)
 
 		return false;
 	}
-
+	 
 	const uintmax_t size = std::filesystem::file_size(inFilePath.data());
 	outData.InitialiseToSize(size, '\0');
 	fileStream.read(outData.data(), size);

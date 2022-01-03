@@ -23,6 +23,9 @@ list(APPEND extra_libs EASTL)
 # used to add all .cpp and .h files under source
 file(GLOB_RECURSE source_files CONFIGURE_DEPENDS "${CMAKE_CURRENT_LIST_DIR}/Engine/*.cpp" "${CMAKE_CURRENT_LIST_DIR}/Engine/*.h")
 
+# Add stb_image
+list(APPEND EXTRA_INCLUDES "${CMAKE_CURRENT_LIST_DIR}/Plugins/stb_image/")
+
 # Add GLM
 list(APPEND EXTRA_INCLUDES "${CMAKE_CURRENT_LIST_DIR}/Plugins/glm/")
 
@@ -45,8 +48,6 @@ target_include_directories(SecondEngineProject PUBLIC
 
 # Stop it from creating unnecessary Project
 set(CMAKE_SUPPRESS_REGENERATION true)
-
-
 
 
 

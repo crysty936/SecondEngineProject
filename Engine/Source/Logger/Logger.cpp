@@ -64,7 +64,6 @@ void Logger::Print(const char* inFormat, Severity inSeverity, ...)
         break;
     }
     }
-  
 
     std::cout << stackArray << std::endl;
 }

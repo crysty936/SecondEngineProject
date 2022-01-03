@@ -31,19 +31,46 @@
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Logger\Logger.cpp">
       <Filter>Engine\Source\Logger</Filter>
     </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\Buffer\BufferBase.cpp">
+      <Filter>Engine\Source\Renderer\OpenGL\Buffer</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\Buffer\IndexBuffer.cpp">
+      <Filter>Engine\Source\Renderer\OpenGL\Buffer</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\Buffer\VAO.cpp">
+      <Filter>Engine\Source\Renderer\OpenGL\Buffer</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\Buffer\VertexBuffer.cpp">
+      <Filter>Engine\Source\Renderer\OpenGL\Buffer</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\Buffer\VertexBufferLayout.cpp">
+      <Filter>Engine\Source\Renderer\OpenGL\Buffer</Filter>
+    </ClCompile>
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\OpenGLRenderer.cpp">
       <Filter>Engine\Source\Renderer\OpenGL</Filter>
     </ClCompile>
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\OpenGLShader.cpp">
       <Filter>Engine\Source\Renderer\OpenGL</Filter>
     </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\OpenGLTexture.cpp">
+      <Filter>Engine\Source\Renderer\OpenGL</Filter>
+    </ClCompile>
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\OpenGLUtils.cpp">
       <Filter>Engine\Source\Renderer\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\ShapesUtils\BasicShapes.cpp">
+      <Filter>Engine\Source\Renderer\ShapesUtils</Filter>
     </ClCompile>
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Scene\Scene.cpp">
       <Filter>Engine\Source\Scene</Filter>
     </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Scene\SceneManager.cpp">
+      <Filter>Engine\Source\Scene</Filter>
+    </ClCompile>
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Utils\IOUtils.cpp">
+      <Filter>Engine\Source\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Utils\ImageLoading.cpp">
       <Filter>Engine\Source\Utils</Filter>
     </ClCompile>
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Utils\InlineAllocator.cpp">
@@ -54,6 +81,9 @@
     </ClCompile>
     <ClCompile Include="D:\Projects\SecondEngineProject\UnitTests\test.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\Source\Renderer\RenderableModel.cpp">
+      <Filter>Engine\Source\Renderer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -96,19 +126,52 @@
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Logger\Logger.h">
       <Filter>Engine\Source\Logger</Filter>
     </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\Buffer\BufferBase.h">
+      <Filter>Engine\Source\Renderer\OpenGL\Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\Buffer\IndexBuffer.h">
+      <Filter>Engine\Source\Renderer\OpenGL\Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\Buffer\LayoutProperties.h">
+      <Filter>Engine\Source\Renderer\OpenGL\Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\Buffer\VAO.h">
+      <Filter>Engine\Source\Renderer\OpenGL\Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\Buffer\VertexBuffer.h">
+      <Filter>Engine\Source\Renderer\OpenGL\Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\Buffer\VertexBufferLayout.h">
+      <Filter>Engine\Source\Renderer\OpenGL\Buffer</Filter>
+    </ClInclude>
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\OpenGLRenderer.h">
       <Filter>Engine\Source\Renderer\OpenGL</Filter>
     </ClInclude>
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\OpenGLShader.h">
       <Filter>Engine\Source\Renderer\OpenGL</Filter>
     </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\OpenGLTexture.h">
+      <Filter>Engine\Source\Renderer\OpenGL</Filter>
+    </ClInclude>
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\OpenGLUtils.h">
       <Filter>Engine\Source\Renderer\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\ShapesUtils\BasicShapes.h">
+      <Filter>Engine\Source\Renderer\ShapesUtils</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\ShapesUtils\BasicShapesData.h">
+      <Filter>Engine\Source\Renderer\ShapesUtils</Filter>
     </ClInclude>
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Scene\Scene.h">
       <Filter>Engine\Source\Scene</Filter>
     </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Scene\SceneManager.h">
+      <Filter>Engine\Source\Scene</Filter>
+    </ClInclude>
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Utils\IOUtils.h">
+      <Filter>Engine\Source\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Utils\ImageLoading.h">
       <Filter>Engine\Source\Utils</Filter>
     </ClInclude>
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Utils\InlineAllocator.h">
@@ -119,6 +182,9 @@
     </ClInclude>
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Window\WindowProperties.h">
       <Filter>Engine\Source\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\Source\Renderer\RenderableModel.h">
+      <Filter>Engine\Source\Renderer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -154,6 +220,12 @@
     </Filter>
     <Filter Include="Engine\Source\Renderer\OpenGL">
       <UniqueIdentifier>{C3B59E16-5F48-355D-811F-0F87608C6230}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\Renderer\OpenGL\Buffer">
+      <UniqueIdentifier>{4689F68E-A6BC-30A7-9F3F-7078FCB119F2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\Renderer\ShapesUtils">
+      <UniqueIdentifier>{5A4F490E-B6BB-3A74-8D54-6EFFAD490788}</UniqueIdentifier>
     </Filter>
     <Filter Include="Engine\Source\Scene">
       <UniqueIdentifier>{0540D719-54D0-3325-8DE9-97618BA3175C}</UniqueIdentifier>

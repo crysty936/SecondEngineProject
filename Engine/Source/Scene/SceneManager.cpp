@@ -2,7 +2,7 @@
 #include "Core/EngineUtils.h"
 #include "Scene/Scene.h"
 #include "Camera/Camera.h"
-#include "Renderer/RenderableObject.h"
+#include "Renderer/RenderableModel.h"
 #include "Renderer/ShapesUtils/BasicShapes.h"
 
 SceneManager* SceneManager::Instance = nullptr;
@@ -22,7 +22,7 @@ void SceneManager::LoadScene()
 	Instance->CurrentScene = eastl::make_unique<class Scene>();
 	Instance->CurrentScene->SceneObjects.push_back(eastl::make_shared<Camera>());
 
-	eastl::shared_ptr<RenderableObject> obj = BasicShapes::GetTriangleRenderable();
+	eastl::shared_ptr<RenderableModel> obj = BasicShapes::GetSquareRenderable();
  	Instance->CurrentScene->SceneObjects.push_back(obj);
 }
 

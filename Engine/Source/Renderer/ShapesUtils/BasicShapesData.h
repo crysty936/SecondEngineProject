@@ -1,36 +1,19 @@
 #pragma once
+#include <stdint.h>
 
 /**
- * File containing basic shapes vertices and indices
+ * Container for basic shapes data
  */
 
 namespace BasicShapesData
 {
-	// Triangle
-	const float TriangleVertices[] =
-	{
-		-0.5f, -0.5f, 0.0f,
-		 0.5f, -0.5f, 0.0f,
-		 0.0f,  0.5f, 0.0f
-	};
+	const float* GetTriangleVertices();
+	const uint32_t* GetTriangleIndices();
+	int32_t GetTriangleVerticesCount();
+	int32_t GetTriangleIndicesCount();
 
-	const uint32_t TriangleIndices[] =
-	{
-		0, 1, 2
-	};
-	// Triangle
-
-	// Square
-	const float SquareVertices[] = {
-	 0.5f,  0.5f, 0.0f,  // top right
-	 0.5f, -0.5f, 0.0f,  // bottom right
-	-0.5f, -0.5f, 0.0f,  // bottom left
-	-0.5f,  0.5f, 0.0f   // top left 
-	};
-
-	const uint32_t SquareIndices[] = {
-		0, 1, 3,   // first triangle
-		1, 2, 3    // second triangle
-	};
-	// Square
+	const float* GetSquareVertices();
+	const uint32_t* GetSquareIndices();
+	int32_t GetSquareVerticesCount();
+	int32_t GetSquareIndicesCount();
 }

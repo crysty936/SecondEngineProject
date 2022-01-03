@@ -8,11 +8,11 @@
 #include "Scene/Scene.h"
 #include "Camera/Camera.h"
 #include "Scene/SceneManager.h"
-#include "Renderer/RenderableObject.h"
+#include "Renderer/RenderableModel.h"
 #include "glm/ext/matrix_float4x4.hpp"
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/trigonometric.hpp"
-#include "../ShapesUtils/BasicShapesData.h"
+#include "Renderer/ShapesUtils/BasicShapesData.h"
 
 #define CLEAR_COLOR 0.3f, 0.5f, 1.f, 0.4f
 
@@ -80,7 +80,7 @@ void OpenGLRenderer::Draw()
 	for (eastl::shared_ptr<ITickableObject>& object : sceneObjects)
 	{
 		ITickableObject* tickable = object.get();
-		RenderableObject* renderable = dynamic_cast<RenderableObject*>(tickable);
+		RenderableModel* renderable = dynamic_cast<RenderableModel*>(tickable);
 
 		if (renderable)
 		{
@@ -90,11 +90,21 @@ void OpenGLRenderer::Draw()
 			renderable->Shader.SetUniformValue4fv("projection", perspprojection);
 			renderable->Shader.SetUniformValue4fv("view", view);
 
+			eastl::vector<OpenGLTexture>& textures = renderable->GetTextures();
+			for (OpenGLTexture& tex : textures)
+			{
+				tex.Bind();
+			}
+
 			renderable->ObjectVAO.Bind();
 			glDrawElements(GL_TRIANGLES, indicesCount, GL_UNSIGNED_INT, 0);
 
 			renderable->Shader.UnBind();
 			renderable->ObjectVAO.Unbind();
+			for (OpenGLTexture& tex : textures)
+			{
+				tex.Unbind();
+			}
 		}
 	}
 

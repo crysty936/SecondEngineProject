@@ -6,9 +6,17 @@
 #define ASSERT(x, ...)										\
  {															\
  if(!(x))													\
- {LOG_ERROR("Assertion Failed");							\
+ {LOG_ERROR("Assertion failed: %s", __VA_ARGS__);			\
 __debugbreak();}											\
-}
+ }
+
+#define ENSURE(x, ...)										\
+  (!!x) && ([x](){											\
+  if(!(x))													\
+  {LOG_ERROR("Assertion failed: %s", __VA_ARGS__);			\
+ __debugbreak();}											\
+ return true;												\
+  }())														\
 
 #else
 #define ASSERT(x, ...)
