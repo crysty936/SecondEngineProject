@@ -32,7 +32,7 @@ list(APPEND EXTRA_INCLUDES "${CMAKE_CURRENT_LIST_DIR}/Plugins/glm/")
 # used to create filters for all files one to one with their folder structure
 source_group(TREE ${CMAKE_CURRENT_LIST_DIR} FILES ${source_files})
 
-add_executable(SecondEngineProject ${source_files})
+add_library(SecondEngineProject ${source_files})
 
 target_link_libraries(SecondEngineProject PUBLIC ${extra_libs})
 

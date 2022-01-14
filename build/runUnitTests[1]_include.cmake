@@ -1,5 +1,0 @@
-if(EXISTS "D:/Projects/SecondEngineProject/build/runUnitTests[1]_tests.cmake")
-  include("D:/Projects/SecondEngineProject/build/runUnitTests[1]_tests.cmake")
-else()
-  add_test(runUnitTests_NOT_BUILT runUnitTests_NOT_BUILT)
-endif()
