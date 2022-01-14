@@ -2,6 +2,7 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
+#include "Core/EngineUtils.h"
 
 ImageData ImageLoading::LoadImageData(const char* inTexurePath)
 {

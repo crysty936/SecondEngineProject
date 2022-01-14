@@ -1,5 +1,6 @@
 #pragma once
 #include "EASTL/unique_ptr.h"
+#include "EASTL/shared_ptr.h"
 
 /**
  * Handles Scene loading, management, delivers current scene to renderer
@@ -22,4 +23,5 @@ public:
 private:
 	static SceneManager* Instance;
 	eastl::unique_ptr<class Scene> CurrentScene;
+	eastl::shared_ptr<class Camera> CurrentCamera;
 };

@@ -20,4 +20,5 @@ __debugbreak();}											\
 
 #else
 #define ASSERT(x, ...)
+#define ENSURE(x, ...) x
 #endif

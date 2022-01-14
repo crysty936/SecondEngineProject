@@ -30,7 +30,6 @@ private:
 
 private:
 	eastl::unique_ptr<class OpenGLWindow> MainWindow;
-
 };
 
 

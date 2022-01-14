@@ -260,7 +260,6 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\Engine\Source\Renderer\ShapesUtils\BasicShapesData.cpp" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Camera\Camera.cpp" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Camera\Camera.h" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Controller\Controller.cpp" />
@@ -296,6 +295,8 @@
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\Buffer\VertexBuffer.h" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\Buffer\VertexBufferLayout.cpp" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\Buffer\VertexBufferLayout.h" />
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\OpenGLRenderableObject.cpp" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\OpenGLRenderableObject.h" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\OpenGLRenderer.cpp" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\OpenGLRenderer.h" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\OpenGLShader.cpp" />
@@ -304,10 +305,9 @@
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\OpenGLTexture.h" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\OpenGLUtils.cpp" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\OpenGLUtils.h" />
-    <ClCompile Include="..\Engine\Source\Renderer\RenderableModel.cpp" />
-    <ClInclude Include="..\Engine\Source\Renderer\RenderableModel.h" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\ShapesUtils\BasicShapes.cpp" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\ShapesUtils\BasicShapes.h" />
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\ShapesUtils\BasicShapesData.cpp" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\ShapesUtils\BasicShapesData.h" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Scene\Scene.cpp" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Scene\Scene.h" />

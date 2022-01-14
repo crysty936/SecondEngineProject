@@ -46,6 +46,9 @@
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\Buffer\VertexBufferLayout.cpp">
       <Filter>Engine\Source\Renderer\OpenGL\Buffer</Filter>
     </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\OpenGLRenderableObject.cpp">
+      <Filter>Engine\Source\Renderer\OpenGL</Filter>
+    </ClCompile>
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\OpenGLRenderer.cpp">
       <Filter>Engine\Source\Renderer\OpenGL</Filter>
     </ClCompile>
@@ -59,6 +62,9 @@
       <Filter>Engine\Source\Renderer\OpenGL</Filter>
     </ClCompile>
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\ShapesUtils\BasicShapes.cpp">
+      <Filter>Engine\Source\Renderer\ShapesUtils</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\ShapesUtils\BasicShapesData.cpp">
       <Filter>Engine\Source\Renderer\ShapesUtils</Filter>
     </ClCompile>
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Scene\Scene.cpp">
@@ -81,9 +87,6 @@
     </ClCompile>
     <ClCompile Include="D:\Projects\SecondEngineProject\UnitTests\test.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Engine\Source\Renderer\RenderableModel.cpp">
-      <Filter>Engine\Source\Renderer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -144,6 +147,9 @@
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\Buffer\VertexBufferLayout.h">
       <Filter>Engine\Source\Renderer\OpenGL\Buffer</Filter>
     </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\OpenGLRenderableObject.h">
+      <Filter>Engine\Source\Renderer\OpenGL</Filter>
+    </ClInclude>
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\OpenGLRenderer.h">
       <Filter>Engine\Source\Renderer\OpenGL</Filter>
     </ClInclude>
@@ -182,9 +188,6 @@
     </ClInclude>
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Window\WindowProperties.h">
       <Filter>Engine\Source\Window</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Engine\Source\Renderer\RenderableModel.h">
-      <Filter>Engine\Source\Renderer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

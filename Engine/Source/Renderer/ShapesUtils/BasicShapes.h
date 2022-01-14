@@ -4,6 +4,6 @@
 class BasicShapes
 {
 public:
-	static eastl::shared_ptr<class RenderableModel> GetTriangleRenderable();
-	static eastl::shared_ptr<class RenderableModel> GetSquareRenderable();
+	static eastl::shared_ptr<class OpenGLRenderableObject> GetTriangleRenderable();
+	static eastl::shared_ptr<class OpenGLRenderableObject> GetSquareRenderable();
 };

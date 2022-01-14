@@ -8,7 +8,7 @@
 #include "Scene/Scene.h"
 #include "Camera/Camera.h"
 #include "Scene/SceneManager.h"
-#include "Renderer/RenderableModel.h"
+#include "Renderer/OpenGL/OpenGLRenderableObject.h"
 #include "glm/ext/matrix_float4x4.hpp"
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/trigonometric.hpp"
@@ -41,13 +41,13 @@ OpenGLRenderer::OpenGLRenderer(const WindowProperties& inDefaultWindowProperties
 
 	glEnable(GL_DEBUG_OUTPUT);
 	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+	glEnable(GL_DEPTH_TEST);
 
 	glDebugMessageCallback(OpenGLUtils::GLDebugCallback, nullptr);
 	glClearColor(CLEAR_COLOR);
 }
 
-OpenGLRenderer::~OpenGLRenderer()
-= default;
+OpenGLRenderer::~OpenGLRenderer() = default;
 
 void OpenGLRenderer::Init(const WindowProperties & inDefaultWindowProperties)
 {
@@ -66,45 +66,33 @@ void OpenGLRenderer::Terminate()
 void OpenGLRenderer::Draw()
 {
 	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_DEPTH_BUFFER_BIT);
 
 	SceneManager& sceneMan = SceneManager::Get();
 	Scene& currentScene = sceneMan.GetCurrentScene();
 	eastl::vector<eastl::shared_ptr<ITickableObject>>& sceneObjects = currentScene.SceneObjects;
 
-	glm::mat4 perspprojection = glm::perspective(glm::radians(45.0f), (float)MainWindow->GetProperties().Width / (float)MainWindow->GetProperties().Height, 0.1f, 100.0f);
+	glm::mat4 perspProjection = glm::perspective(glm::radians(45.0f), (float)MainWindow->GetProperties().Width / (float)MainWindow->GetProperties().Height, 0.1f, 100.0f);
 
 	glm::mat4 view = glm::mat4(1.0f);
-	// note that we're translating the scene in the reverse direction of where we want to move
+	// we're translating the scene in the reverse direction of where we want to move
 	view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
 
 	for (eastl::shared_ptr<ITickableObject>& object : sceneObjects)
 	{
 		ITickableObject* tickable = object.get();
-		RenderableModel* renderable = dynamic_cast<RenderableModel*>(tickable);
+		OpenGLRenderableObject* renderable = dynamic_cast<OpenGLRenderableObject*>(tickable);
 
 		if (renderable)
 		{
-			uint32_t indicesCount = renderable->ObjectVAO.GetVertexBuffer().GetIndicesCount();
+			// Bind and set all uniforms
+			OpenGLShader& shader = renderable->GetShader();
+			shader.Bind();
+ 			shader.SetUniformValue4fv("projection", perspProjection);
+ 			shader.SetUniformValue4fv("view", view);
 
-			renderable->Shader.Bind();
-			renderable->Shader.SetUniformValue4fv("projection", perspprojection);
-			renderable->Shader.SetUniformValue4fv("view", view);
-
-			eastl::vector<OpenGLTexture>& textures = renderable->GetTextures();
-			for (OpenGLTexture& tex : textures)
-			{
-				tex.Bind();
-			}
-
-			renderable->ObjectVAO.Bind();
-			glDrawElements(GL_TRIANGLES, indicesCount, GL_UNSIGNED_INT, 0);
-
-			renderable->Shader.UnBind();
-			renderable->ObjectVAO.Unbind();
-			for (OpenGLTexture& tex : textures)
-			{
-				tex.Unbind();
-			}
+			// Draw using shader
+			renderable->Draw();
 		}
 	}
 

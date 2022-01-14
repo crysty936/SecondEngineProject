@@ -5,12 +5,12 @@
 #include "Renderer/OpenGL/Buffer/VertexBuffer.h"
 #include "Renderer/OpenGL/Buffer/VAO.h"
 #include "Renderer/OpenGL/OpenGLShader.h"
-#include "Renderer/RenderableModel.h"
+#include "Renderer/OpenGL/OpenGLRenderableObject.h"
 #include "Renderer/OpenGL/OpenGLTexture.h"
 
 const uint32_t texureBaseNr = GL_TEXTURE0;
 
-eastl::shared_ptr<RenderableModel> BasicShapes::GetTriangleRenderable()
+eastl::shared_ptr<OpenGLRenderableObject> BasicShapes::GetTriangleRenderable()
 {
 	IndexBuffer ibo = IndexBuffer{};
 	int32_t indicesCount = BasicShapesData::GetTriangleIndicesCount();
@@ -30,15 +30,15 @@ eastl::shared_ptr<RenderableModel> BasicShapes::GetTriangleRenderable()
 
 	OpenGLShader basicShaderProgram = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/BasicProjectionVertexShader.glsl", "../Data/Shaders/BasicTexFragmentShader.glsl");
 
-	eastl::shared_ptr<RenderableModel> model = eastl::make_shared<RenderableModel>(vertexArray, basicShaderProgram);
+	eastl::shared_ptr<OpenGLRenderableObject> model = eastl::make_shared<OpenGLRenderableObject>(vertexArray, basicShaderProgram);
 
-	OpenGLTexture tex{ "../Data/Textures/ExampleContainer.jpg", texureBaseNr + 0 };
+	OpenGLTexture tex{ "../Data/Textures/TEST.jpg", texureBaseNr + 0 };
 	model->AddTexture(tex);
 	
 	return model;
 }
 
-eastl::shared_ptr<RenderableModel> BasicShapes::GetSquareRenderable()
+eastl::shared_ptr<OpenGLRenderableObject> BasicShapes::GetSquareRenderable()
 {
 	IndexBuffer ibo = IndexBuffer{};
 	int32_t indicesCount = BasicShapesData::GetSquareIndicesCount();
@@ -58,9 +58,9 @@ eastl::shared_ptr<RenderableModel> BasicShapes::GetSquareRenderable()
 
 	OpenGLShader basicShaderProgram = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/BasicProjectionVertexShader.glsl", "../Data/Shaders/BasicTexFragmentShader.glsl");
 
-	eastl::shared_ptr<RenderableModel> model = eastl::make_shared<RenderableModel>(vertexArray, basicShaderProgram);
+	eastl::shared_ptr<OpenGLRenderableObject> model = eastl::make_shared<OpenGLRenderableObject>(vertexArray, basicShaderProgram);
 
-	OpenGLTexture tex{ "../Data/Textures/ExampleContainer.jpg", texureBaseNr + 0 };
+	OpenGLTexture tex{ "../Data/Textures/TEST.jpg", texureBaseNr + 0 };
 	model->AddTexture(tex);
 
 	return model;
