@@ -5,6 +5,7 @@ class VAO
 {
 public:
 	VAO(VertexBuffer& inBuffer);
+	VAO();
 	~VAO();
 
 	void Bind();

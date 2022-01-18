@@ -6,6 +6,9 @@ VertexBuffer::VertexBuffer(const IndexBuffer& inIndices, const VertexBufferLayou
 {
 }
 
+VertexBuffer::VertexBuffer()
+{}
+
 VertexBuffer::~VertexBuffer() = default;
 
 void VertexBuffer::DeleteBuffer()

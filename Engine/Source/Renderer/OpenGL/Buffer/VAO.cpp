@@ -30,6 +30,11 @@ VAO::VAO(VertexBuffer& inBuffer)
 	VBuffer.Unbind();
 }
 
+VAO::VAO()
+{
+
+}
+
 VAO::~VAO() = default;
 
 void VAO::Bind()

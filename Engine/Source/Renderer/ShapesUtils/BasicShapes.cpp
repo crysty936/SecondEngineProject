@@ -40,6 +40,13 @@ eastl::shared_ptr<OpenGLRenderableObject> BasicShapes::GetTriangleRenderable()
 
 eastl::shared_ptr<OpenGLRenderableObject> BasicShapes::GetSquareRenderable()
 {
+	eastl::shared_ptr<OpenGLRenderableObject> model = eastl::make_shared<SquareShape>();
+
+	return model;
+}
+
+SquareShape::SquareShape()
+{
 	IndexBuffer ibo = IndexBuffer{};
 	int32_t indicesCount = BasicShapesData::GetSquareIndicesCount();
 	ibo.SetIndices(BasicShapesData::GetSquareIndices(), indicesCount, GL_STATIC_DRAW);
@@ -58,10 +65,21 @@ eastl::shared_ptr<OpenGLRenderableObject> BasicShapes::GetSquareRenderable()
 
 	OpenGLShader basicShaderProgram = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/BasicProjectionVertexShader.glsl", "../Data/Shaders/BasicTexFragmentShader.glsl");
 
-	eastl::shared_ptr<OpenGLRenderableObject> model = eastl::make_shared<OpenGLRenderableObject>(vertexArray, basicShaderProgram);
+	ObjectVAO = vertexArray;
+	Shader = basicShaderProgram;
 
 	OpenGLTexture tex{ "../Data/Textures/TEST.jpg", texureBaseNr + 0 };
-	model->AddTexture(tex);
+	AddTexture(tex);
+}
 
-	return model;
+SquareShape::~SquareShape()
+{
+
+}
+
+void SquareShape::Tick(const float inDeltaT)
+{
+	Model.Translation.x += 0.01f;
+
+	//Model.Scale.x += 0.1f;
 }

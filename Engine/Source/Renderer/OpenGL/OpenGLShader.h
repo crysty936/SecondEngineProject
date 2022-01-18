@@ -25,6 +25,7 @@ public:
 
 public:
 	OpenGLShader(const eastl::string& inVertexSrc, const eastl::string& inFragmentSrc);
+	OpenGLShader() = default;
 	~OpenGLShader();
 	OpenGLShader(const OpenGLShader& inOther) = default;
 	OpenGLShader& operator=(const OpenGLShader& inOther) = default;

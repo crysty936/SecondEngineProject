@@ -8,6 +8,7 @@ class OpenGLRenderableObject : public IGameObject
 {
 public:
 	OpenGLRenderableObject(VAO& inVAO, OpenGLShader& inShader);
+	OpenGLRenderableObject();
 	virtual ~OpenGLRenderableObject();
 
 	virtual void Init() override;

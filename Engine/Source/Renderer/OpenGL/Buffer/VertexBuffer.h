@@ -8,6 +8,7 @@ class VertexBuffer : public BufferBase
 {
 public:
 	VertexBuffer(const IndexBuffer& inIndices, const VertexBufferLayout& inLayout);
+	VertexBuffer();
 	virtual ~VertexBuffer();
 
 	virtual void DeleteBuffer() override;

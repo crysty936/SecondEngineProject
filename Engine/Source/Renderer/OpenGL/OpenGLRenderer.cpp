@@ -91,9 +91,9 @@ void OpenGLRenderer::RecursiveDrawObjects(eastl::vector<eastl::shared_ptr<IGameO
 	for (eastl::shared_ptr<IGameObject>& object : inObjects)
 	{
 		IGameObject* tickable = object.get();
-		tickable->Model.Translation.x += 0.01f;
 		OpenGLRenderableObject* renderable = dynamic_cast<OpenGLRenderableObject*>(tickable);
 		glm::mat4 currentModel = tickable->Model.GetModel();
+		currentModel = inParentModel *currentModel;
 
 		RecursiveDrawObjects(tickable->Children, currentModel);
 

@@ -5,9 +5,11 @@ OpenGLRenderableObject::OpenGLRenderableObject(VAO& inVAO, OpenGLShader& inShade
 {
 }
 
+OpenGLRenderableObject::OpenGLRenderableObject()
+{}
+
 OpenGLRenderableObject::~OpenGLRenderableObject()
-{
-}
+{}
 
 void OpenGLRenderableObject::Tick(const float inDeltaT)
 {
