@@ -2,6 +2,8 @@
 #include "Window/OpenGLWindow.h"
 #include "EASTL/unique_ptr.h"
 #include "EASTL/shared_ptr.h"
+#include "EASTL/vector.h"
+#include "glm/ext/matrix_float4x4.hpp"
 
 /**
  * To make the renderer Generic, a base RHI class should be made, this should be renamed to OpenGLRHI,
@@ -19,6 +21,7 @@ public:
 	static void Terminate();
 	void Draw();
 
+	void RecursiveDrawObjects(eastl::vector<eastl::shared_ptr<struct IGameObject>>& inObjects, const glm::mat4 inParentModel);
 	eastl::unique_ptr<OpenGLWindow> CreateWindow(const WindowProperties& inWindowProperties) const;
 	void DestroyWindow(GLFWwindow* inWindowHandle) const;
 	void SetVSyncEnabled(const bool inEnabled);
@@ -30,6 +33,7 @@ private:
 
 private:
 	eastl::unique_ptr<class OpenGLWindow> MainWindow;
+	glm::mat4 Perspective;
 };
 
 

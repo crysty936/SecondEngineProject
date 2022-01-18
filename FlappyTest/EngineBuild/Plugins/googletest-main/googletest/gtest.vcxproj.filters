@@ -6,9 +6,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\CMakeLists.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <Filter Include="Source Files">
       <UniqueIdentifier>{CF7D678E-2594-3DA5-90A3-45AB48936918}</UniqueIdentifier>
     </Filter>

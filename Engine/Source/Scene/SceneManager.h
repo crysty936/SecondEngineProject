@@ -23,5 +23,4 @@ public:
 private:
 	static SceneManager* Instance;
 	eastl::unique_ptr<class Scene> CurrentScene;
-	eastl::shared_ptr<class Camera> CurrentCamera;
 };

@@ -14,9 +14,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\examples\CMakeLists.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <ResourceCompile Include="D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\examples\glfw.rc">
       <Filter>Source Files</Filter>
     </ResourceCompile>

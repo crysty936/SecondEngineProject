@@ -185,12 +185,6 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="D:\Projects\SecondEngineProject\FlappyTest\Build\ZERO_CHECK.vcxproj">
-      <Project>{9A666E8F-F6F9-3CC4-9B42-C21634D29502}</Project>
-      <Name>ZERO_CHECK</Name>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </ProjectReference>
     <ProjectReference Include="D:\Projects\SecondEngineProject\FlappyTest\Build\ALL_BUILD.vcxproj">
       <Project>{6550AC95-E897-36B6-8F90-AA545BA72533}</Project>
       <Name>ALL_BUILD</Name>

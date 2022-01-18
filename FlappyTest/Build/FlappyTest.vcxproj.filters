@@ -4,9 +4,14 @@
     <ClCompile Include="D:\Projects\SecondEngineProject\FlappyTest\Source\EntryPoint\EntryPoint.cpp">
       <Filter>Source\EntryPoint</Filter>
     </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\FlappyTest\Source\GameMode\FlappyGameMode.cpp">
+      <Filter>Source\GameMode</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="D:\Projects\SecondEngineProject\FlappyTest\CMakeLists.txt" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\FlappyTest\Source\GameMode\FlappyGameMode.h">
+      <Filter>Source\GameMode</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source">
@@ -14,6 +19,9 @@
     </Filter>
     <Filter Include="Source\EntryPoint">
       <UniqueIdentifier>{F0710870-4288-3F7C-B0A7-0CBEED707EDA}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\GameMode">
+      <UniqueIdentifier>{40059E7C-3294-3E54-BE02-C0C8C7C179C9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

@@ -39,7 +39,6 @@ target_link_libraries(SecondEngineProject PUBLIC ${extra_libs})
 list(APPEND EXTRA_INCLUDES ${CMAKE_CURRENT_LIST_DIR}/Engine/Source)	
 
 target_include_directories(SecondEngineProject PUBLIC
-                           "${PROJECT_BINARY_DIR}"
                            ${EXTRA_INCLUDES}
                            )
 						   

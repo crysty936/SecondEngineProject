@@ -803,9 +803,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="D:\Projects\SecondEngineProject\Plugins\EASTL\CMakeLists.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <Natvis Include="D:\Projects\SecondEngineProject\Plugins\EASTL\doc\EASTL.natvis" />
   </ItemGroup>
   <ItemGroup>

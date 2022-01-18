@@ -22,5 +22,12 @@ add_executable(FlappyTest ${source_files})
 
 target_link_libraries(FlappyTest PUBLIC ${extra_libs})
 
+list(APPEND EXTRA_INCLUDES ${CMAKE_CURRENT_LIST_DIR}/Source)	
 
+target_include_directories(FlappyTest PUBLIC
+                           ${EXTRA_INCLUDES}
+                           )
+
+# Stop it from creating unnecessary Project
+set(CMAKE_SUPPRESS_REGENERATION true)
 

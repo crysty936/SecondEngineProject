@@ -4,7 +4,6 @@
     <CustomBuild Include="D:\Projects\SecondEngineProject\FlappyTest\Build\CMakeFiles\24be1b11e06de9e4ddee16b9698e4584\uninstall.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="D:\Projects\SecondEngineProject\FlappyTest\EngineBuild\Plugins\glfw-3.3.4\CMakeFiles\uninstall" />

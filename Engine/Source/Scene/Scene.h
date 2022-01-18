@@ -16,5 +16,6 @@ public:
 	~Scene();
 
 public:
-	eastl::vector<eastl::shared_ptr<struct ITickableObject>> SceneObjects;
+	eastl::vector<eastl::shared_ptr<struct IGameObject>> SceneObjects;
+	eastl::shared_ptr<class Camera> CurrentCamera;
 };

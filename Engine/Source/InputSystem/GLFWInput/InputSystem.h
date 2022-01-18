@@ -4,7 +4,7 @@
 #include "Core/EngineUtils.h"
 #include "InputSystem/GLFWInput/WindowsInputKeys.h"
 #include "InputSystem/InputEventType.h"
-#include "Core/ITickableObject.h"
+#include "Core/IGameObject.h"
 
 using KeyDelegate = MulticastDelegate<KeyCode, InputEventType>;
 

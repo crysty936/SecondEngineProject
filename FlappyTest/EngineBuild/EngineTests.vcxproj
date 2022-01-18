@@ -308,63 +308,6 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <CustomBuild Include="D:\Projects\SecondEngineProject\CMakeLists.txt">
-      <StdOutEncoding>UTF-8</StdOutEncoding>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule D:/Projects/SecondEngineProject/CMakeLists.txt</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -SD:/Projects/SecondEngineProject/FlappyTest -BD:/Projects/SecondEngineProject/FlappyTest/Build --check-stamp-file D:/Projects/SecondEngineProject/FlappyTest/EngineBuild/CMakeFiles/generate.stamp
-if %errorlevel% neq 0 goto :cmEnd
-:cmEnd
-endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
-:cmErrorLevel
-exit /b %1
-:cmDone
-if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Program Files\CMake\share\cmake-3.22\Modules\GoogleTest.cmake;D:\Projects\SecondEngineProject\FlappyTest\Build\CMakeFiles\cmake.verify_globs;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\Projects\SecondEngineProject\FlappyTest\EngineBuild\CMakeFiles\generate.stamp</Outputs>
-      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule D:/Projects/SecondEngineProject/CMakeLists.txt</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -SD:/Projects/SecondEngineProject/FlappyTest -BD:/Projects/SecondEngineProject/FlappyTest/Build --check-stamp-file D:/Projects/SecondEngineProject/FlappyTest/EngineBuild/CMakeFiles/generate.stamp
-if %errorlevel% neq 0 goto :cmEnd
-:cmEnd
-endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
-:cmErrorLevel
-exit /b %1
-:cmDone
-if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Program Files\CMake\share\cmake-3.22\Modules\GoogleTest.cmake;D:\Projects\SecondEngineProject\FlappyTest\Build\CMakeFiles\cmake.verify_globs;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\Projects\SecondEngineProject\FlappyTest\EngineBuild\CMakeFiles\generate.stamp</Outputs>
-      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
-      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule D:/Projects/SecondEngineProject/CMakeLists.txt</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -SD:/Projects/SecondEngineProject/FlappyTest -BD:/Projects/SecondEngineProject/FlappyTest/Build --check-stamp-file D:/Projects/SecondEngineProject/FlappyTest/EngineBuild/CMakeFiles/generate.stamp
-if %errorlevel% neq 0 goto :cmEnd
-:cmEnd
-endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
-:cmErrorLevel
-exit /b %1
-:cmDone
-if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Program Files\CMake\share\cmake-3.22\Modules\GoogleTest.cmake;D:\Projects\SecondEngineProject\FlappyTest\Build\CMakeFiles\cmake.verify_globs;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:\Projects\SecondEngineProject\FlappyTest\EngineBuild\CMakeFiles\generate.stamp</Outputs>
-      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
-      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule D:/Projects/SecondEngineProject/CMakeLists.txt</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -SD:/Projects/SecondEngineProject/FlappyTest -BD:/Projects/SecondEngineProject/FlappyTest/Build --check-stamp-file D:/Projects/SecondEngineProject/FlappyTest/EngineBuild/CMakeFiles/generate.stamp
-if %errorlevel% neq 0 goto :cmEnd
-:cmEnd
-endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
-:cmErrorLevel
-exit /b %1
-:cmDone
-if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Program Files\CMake\share\cmake-3.22\Modules\GoogleTest.cmake;D:\Projects\SecondEngineProject\FlappyTest\Build\CMakeFiles\cmake.verify_globs;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:\Projects\SecondEngineProject\FlappyTest\EngineBuild\CMakeFiles\generate.stamp</Outputs>
-      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
-    </CustomBuild>
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Camera\Camera.cpp" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Camera\Camera.h" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Controller\Controller.cpp" />
@@ -373,7 +316,9 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Core\EngineCore.cpp" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\EngineCore.h" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\EngineUtils.h" />
-    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\ITickableObject.h" />
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Core\GameModeBase.cpp" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\GameModeBase.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\IGameObject.h" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Core\WindowsPlatform.cpp" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\WindowsPlatform.h" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\EntryPoint\EntryPoint.h" />
@@ -389,6 +334,8 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\InputSystem\InputEventType.h" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Logger\Logger.cpp" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Logger\Logger.h" />
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Math\Transform.cpp" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Math\Transform.h" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\Buffer\BufferBase.cpp" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\Buffer\BufferBase.h" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\Buffer\IndexBuffer.cpp" />
@@ -430,12 +377,6 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="D:\Projects\SecondEngineProject\UnitTests\test.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="D:\Projects\SecondEngineProject\FlappyTest\Build\ZERO_CHECK.vcxproj">
-      <Project>{9A666E8F-F6F9-3CC4-9B42-C21634D29502}</Project>
-      <Name>ZERO_CHECK</Name>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </ProjectReference>
     <ProjectReference Include="D:\Projects\SecondEngineProject\FlappyTest\EngineBuild\Plugins\EASTL\EASTL.vcxproj">
       <Project>{B71319F2-3A30-38FF-BCAA-F9F94C36A947}</Project>
       <Name>EASTL</Name>

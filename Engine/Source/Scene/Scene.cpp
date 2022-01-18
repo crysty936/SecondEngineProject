@@ -1,5 +1,5 @@
 #include "Scene.h"
-#include "Core/ITickableObject.h"
+#include "Core/IGameObject.h"
 
 Scene::Scene() = default;
 Scene::~Scene() = default;

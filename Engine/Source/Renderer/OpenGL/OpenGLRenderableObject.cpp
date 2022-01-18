@@ -49,3 +49,8 @@ void OpenGLRenderableObject::DeleteObject()
 		tex.DeleteTexture();
 	}
 }
+
+void OpenGLRenderableObject::Init()
+{
+	
+}

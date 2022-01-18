@@ -9,6 +9,11 @@ Camera::Camera()
 Camera::~Camera()
 = default;
 
+void Camera::Init()
+{
+
+}
+
 void Camera::Tick(const float inDeltaT)
 {
 	

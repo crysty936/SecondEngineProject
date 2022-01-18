@@ -9,6 +9,7 @@ set(OLD_GLOB
   "D:/Projects/SecondEngineProject/Engine/Source/Controller/Controller.cpp"
   "D:/Projects/SecondEngineProject/Engine/Source/Core/EASTLNew.cpp"
   "D:/Projects/SecondEngineProject/Engine/Source/Core/EngineCore.cpp"
+  "D:/Projects/SecondEngineProject/Engine/Source/Core/GameModeBase.cpp"
   "D:/Projects/SecondEngineProject/Engine/Source/Core/WindowsPlatform.cpp"
   "D:/Projects/SecondEngineProject/Engine/Source/EntryPoint/EntryPoint.cpp"
   "D:/Projects/SecondEngineProject/Engine/Source/EventSystem/DelegateBase.cpp"
@@ -16,6 +17,7 @@ set(OLD_GLOB
   "D:/Projects/SecondEngineProject/Engine/Source/InputSystem/GLFWInput/InputSystem.cpp"
   "D:/Projects/SecondEngineProject/Engine/Source/InputSystem/InputEventType.cpp"
   "D:/Projects/SecondEngineProject/Engine/Source/Logger/Logger.cpp"
+  "D:/Projects/SecondEngineProject/Engine/Source/Math/Transform.cpp"
   "D:/Projects/SecondEngineProject/Engine/Source/Renderer/OpenGL/Buffer/BufferBase.cpp"
   "D:/Projects/SecondEngineProject/Engine/Source/Renderer/OpenGL/Buffer/IndexBuffer.cpp"
   "D:/Projects/SecondEngineProject/Engine/Source/Renderer/OpenGL/Buffer/VAO.cpp"
@@ -47,7 +49,8 @@ set(OLD_GLOB
   "D:/Projects/SecondEngineProject/Engine/Source/Controller/Controller.h"
   "D:/Projects/SecondEngineProject/Engine/Source/Core/EngineCore.h"
   "D:/Projects/SecondEngineProject/Engine/Source/Core/EngineUtils.h"
-  "D:/Projects/SecondEngineProject/Engine/Source/Core/ITickableObject.h"
+  "D:/Projects/SecondEngineProject/Engine/Source/Core/GameModeBase.h"
+  "D:/Projects/SecondEngineProject/Engine/Source/Core/IGameObject.h"
   "D:/Projects/SecondEngineProject/Engine/Source/Core/WindowsPlatform.h"
   "D:/Projects/SecondEngineProject/Engine/Source/EntryPoint/EntryPoint.h"
   "D:/Projects/SecondEngineProject/Engine/Source/EventSystem/DelegateBase.h"
@@ -57,6 +60,7 @@ set(OLD_GLOB
   "D:/Projects/SecondEngineProject/Engine/Source/InputSystem/GLFWInput/WindowsInputKeys.h"
   "D:/Projects/SecondEngineProject/Engine/Source/InputSystem/InputEventType.h"
   "D:/Projects/SecondEngineProject/Engine/Source/Logger/Logger.h"
+  "D:/Projects/SecondEngineProject/Engine/Source/Math/Transform.h"
   "D:/Projects/SecondEngineProject/Engine/Source/Renderer/OpenGL/Buffer/BufferBase.h"
   "D:/Projects/SecondEngineProject/Engine/Source/Renderer/OpenGL/Buffer/IndexBuffer.h"
   "D:/Projects/SecondEngineProject/Engine/Source/Renderer/OpenGL/Buffer/LayoutProperties.h"
@@ -87,6 +91,7 @@ endif()
 file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "D:/Projects/SecondEngineProject/FlappyTest/Source/*.cpp")
 set(OLD_GLOB
   "D:/Projects/SecondEngineProject/FlappyTest/Source/EntryPoint/EntryPoint.cpp"
+  "D:/Projects/SecondEngineProject/FlappyTest/Source/GameMode/FlappyGameMode.cpp"
   )
 if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
   message("-- GLOB mismatch!")
@@ -96,6 +101,7 @@ endif()
 # source_files at CMakeLists.txt:16 (file)
 file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "D:/Projects/SecondEngineProject/FlappyTest/Source/*.h")
 set(OLD_GLOB
+  "D:/Projects/SecondEngineProject/FlappyTest/Source/GameMode/FlappyGameMode.h"
   )
 if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
   message("-- GLOB mismatch!")

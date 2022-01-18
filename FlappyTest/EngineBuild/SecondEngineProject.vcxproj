@@ -78,7 +78,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\FlappyTest\EngineBuild;D:\Projects\SecondEngineProject\Plugins\stb_image;D:\Projects\SecondEngineProject\Plugins\glm;D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Plugins\stb_image;D:\Projects\SecondEngineProject\Plugins\glm;D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -96,10 +96,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\FlappyTest\EngineBuild;D:\Projects\SecondEngineProject\Plugins\stb_image;D:\Projects\SecondEngineProject\Plugins\glm;D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Plugins\stb_image;D:\Projects\SecondEngineProject\Plugins\glm;D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\FlappyTest\EngineBuild;D:\Projects\SecondEngineProject\Plugins\stb_image;D:\Projects\SecondEngineProject\Plugins\glm;D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Plugins\stb_image;D:\Projects\SecondEngineProject\Plugins\glm;D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -112,7 +112,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\FlappyTest\EngineBuild;D:\Projects\SecondEngineProject\Plugins\stb_image;D:\Projects\SecondEngineProject\Plugins\glm;D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Plugins\stb_image;D:\Projects\SecondEngineProject\Plugins\glm;D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <ExceptionHandling>Sync</ExceptionHandling>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
@@ -130,10 +130,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\FlappyTest\EngineBuild;D:\Projects\SecondEngineProject\Plugins\stb_image;D:\Projects\SecondEngineProject\Plugins\glm;D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Plugins\stb_image;D:\Projects\SecondEngineProject\Plugins\glm;D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\FlappyTest\EngineBuild;D:\Projects\SecondEngineProject\Plugins\stb_image;D:\Projects\SecondEngineProject\Plugins\glm;D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Plugins\stb_image;D:\Projects\SecondEngineProject\Plugins\glm;D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -146,7 +146,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\FlappyTest\EngineBuild;D:\Projects\SecondEngineProject\Plugins\stb_image;D:\Projects\SecondEngineProject\Plugins\glm;D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Plugins\stb_image;D:\Projects\SecondEngineProject\Plugins\glm;D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <ExceptionHandling>Sync</ExceptionHandling>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
@@ -164,10 +164,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR=\"MinSizeRel\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\FlappyTest\EngineBuild;D:\Projects\SecondEngineProject\Plugins\stb_image;D:\Projects\SecondEngineProject\Plugins\glm;D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Plugins\stb_image;D:\Projects\SecondEngineProject\Plugins\glm;D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\FlappyTest\EngineBuild;D:\Projects\SecondEngineProject\Plugins\stb_image;D:\Projects\SecondEngineProject\Plugins\glm;D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Plugins\stb_image;D:\Projects\SecondEngineProject\Plugins\glm;D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -180,7 +180,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\FlappyTest\EngineBuild;D:\Projects\SecondEngineProject\Plugins\stb_image;D:\Projects\SecondEngineProject\Plugins\glm;D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Plugins\stb_image;D:\Projects\SecondEngineProject\Plugins\glm;D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -197,10 +197,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR=\"RelWithDebInfo\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\FlappyTest\EngineBuild;D:\Projects\SecondEngineProject\Plugins\stb_image;D:\Projects\SecondEngineProject\Plugins\glm;D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Plugins\stb_image;D:\Projects\SecondEngineProject\Plugins\glm;D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\FlappyTest\EngineBuild;D:\Projects\SecondEngineProject\Plugins\stb_image;D:\Projects\SecondEngineProject\Plugins\glm;D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Plugins\stb_image;D:\Projects\SecondEngineProject\Plugins\glm;D:\Projects\SecondEngineProject\Engine\Source;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest\include;D:\Projects\SecondEngineProject\Plugins\googletest-main\googletest;D:\Projects\SecondEngineProject\Plugins\glfw-3.3.4\include;D:\Projects\SecondEngineProject\Plugins\glad\include;D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -212,63 +212,6 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <CustomBuild Include="D:\Projects\SecondEngineProject\CMakeLists.txt">
-      <StdOutEncoding>UTF-8</StdOutEncoding>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule D:/Projects/SecondEngineProject/CMakeLists.txt</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -SD:/Projects/SecondEngineProject/FlappyTest -BD:/Projects/SecondEngineProject/FlappyTest/Build --check-stamp-file D:/Projects/SecondEngineProject/FlappyTest/EngineBuild/CMakeFiles/generate.stamp
-if %errorlevel% neq 0 goto :cmEnd
-:cmEnd
-endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
-:cmErrorLevel
-exit /b %1
-:cmDone
-if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Program Files\CMake\share\cmake-3.22\Modules\GoogleTest.cmake;D:\Projects\SecondEngineProject\FlappyTest\Build\CMakeFiles\cmake.verify_globs;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\Projects\SecondEngineProject\FlappyTest\EngineBuild\CMakeFiles\generate.stamp</Outputs>
-      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule D:/Projects/SecondEngineProject/CMakeLists.txt</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -SD:/Projects/SecondEngineProject/FlappyTest -BD:/Projects/SecondEngineProject/FlappyTest/Build --check-stamp-file D:/Projects/SecondEngineProject/FlappyTest/EngineBuild/CMakeFiles/generate.stamp
-if %errorlevel% neq 0 goto :cmEnd
-:cmEnd
-endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
-:cmErrorLevel
-exit /b %1
-:cmDone
-if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Program Files\CMake\share\cmake-3.22\Modules\GoogleTest.cmake;D:\Projects\SecondEngineProject\FlappyTest\Build\CMakeFiles\cmake.verify_globs;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\Projects\SecondEngineProject\FlappyTest\EngineBuild\CMakeFiles\generate.stamp</Outputs>
-      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
-      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule D:/Projects/SecondEngineProject/CMakeLists.txt</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -SD:/Projects/SecondEngineProject/FlappyTest -BD:/Projects/SecondEngineProject/FlappyTest/Build --check-stamp-file D:/Projects/SecondEngineProject/FlappyTest/EngineBuild/CMakeFiles/generate.stamp
-if %errorlevel% neq 0 goto :cmEnd
-:cmEnd
-endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
-:cmErrorLevel
-exit /b %1
-:cmDone
-if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Program Files\CMake\share\cmake-3.22\Modules\GoogleTest.cmake;D:\Projects\SecondEngineProject\FlappyTest\Build\CMakeFiles\cmake.verify_globs;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:\Projects\SecondEngineProject\FlappyTest\EngineBuild\CMakeFiles\generate.stamp</Outputs>
-      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
-      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule D:/Projects/SecondEngineProject/CMakeLists.txt</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -SD:/Projects/SecondEngineProject/FlappyTest -BD:/Projects/SecondEngineProject/FlappyTest/Build --check-stamp-file D:/Projects/SecondEngineProject/FlappyTest/EngineBuild/CMakeFiles/generate.stamp
-if %errorlevel% neq 0 goto :cmEnd
-:cmEnd
-endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
-:cmErrorLevel
-exit /b %1
-:cmDone
-if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Program Files\CMake\share\cmake-3.22\Modules\GoogleTest.cmake;D:\Projects\SecondEngineProject\FlappyTest\Build\CMakeFiles\cmake.verify_globs;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:\Projects\SecondEngineProject\FlappyTest\EngineBuild\CMakeFiles\generate.stamp</Outputs>
-      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
-    </CustomBuild>
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Camera\Camera.cpp" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Camera\Camera.h" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Controller\Controller.cpp" />
@@ -277,7 +220,9 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Core\EngineCore.cpp" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\EngineCore.h" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\EngineUtils.h" />
-    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\ITickableObject.h" />
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Core\GameModeBase.cpp" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\GameModeBase.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\IGameObject.h" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Core\WindowsPlatform.cpp" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\WindowsPlatform.h" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\EntryPoint\EntryPoint.cpp" />
@@ -294,6 +239,8 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\InputSystem\InputEventType.h" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Logger\Logger.cpp" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Logger\Logger.h" />
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Math\Transform.cpp" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Math\Transform.h" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\Buffer\BufferBase.cpp" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\Buffer\BufferBase.h" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\Buffer\IndexBuffer.cpp" />
@@ -334,12 +281,6 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Window\WindowProperties.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="D:\Projects\SecondEngineProject\FlappyTest\Build\ZERO_CHECK.vcxproj">
-      <Project>{9A666E8F-F6F9-3CC4-9B42-C21634D29502}</Project>
-      <Name>ZERO_CHECK</Name>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </ProjectReference>
     <ProjectReference Include="D:\Projects\SecondEngineProject\FlappyTest\EngineBuild\Plugins\EASTL\EASTL.vcxproj">
       <Project>{B71319F2-3A30-38FF-BCAA-F9F94C36A947}</Project>
       <Name>EASTL</Name>
