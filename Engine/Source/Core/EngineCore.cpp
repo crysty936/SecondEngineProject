@@ -36,11 +36,16 @@ void EngineCore::Init(eastl::shared_ptr<GameModeBase> inGameMode)
 {
 	Engine = new EngineCore{};
 	Engine->CurrentGameMode = inGameMode;
+
+	// Init all engine subsystems
 	OpenGLRenderer::Init();
 	InputSystem::Init();
 	SceneManager::Init();
 
 	SceneManager::Get().LoadScene();
+
+	// After initializing all engine subsystems, Game Mode init is called
+	Engine->CurrentGameMode->Init();
 }
 
 void EngineCore::Terminate()

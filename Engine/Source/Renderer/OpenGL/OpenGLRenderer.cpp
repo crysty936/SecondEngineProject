@@ -84,9 +84,7 @@ void OpenGLRenderer::Draw()
 
 void OpenGLRenderer::RecursiveDrawObjects(eastl::vector<eastl::shared_ptr<IGameObject>>& inObjects, const glm::mat4 inParentModel)
 {
-	glm::mat4 view = glm::mat4(1.0f);
-	// we're translating the scene in the reverse direction of where we want to move
-	view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+	glm::mat4 view = SceneManager::Get().GetCurrentScene().CurrentCamera->GetLookAt();
 
 	for (eastl::shared_ptr<IGameObject>& object : inObjects)
 	{

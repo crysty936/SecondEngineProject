@@ -1,6 +1,5 @@
 #pragma once
 
-
 class GameModeBase
 {
 public:
@@ -13,4 +12,5 @@ public:
 
 	// Game Mode Tick is Run after all other objects
 	virtual void Tick(float inDelta);
+
 };

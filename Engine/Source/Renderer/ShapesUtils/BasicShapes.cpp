@@ -10,7 +10,7 @@
 
 const uint32_t texureBaseNr = GL_TEXTURE0;
 
-eastl::shared_ptr<OpenGLRenderableObject> BasicShapes::GetTriangleRenderable()
+eastl::shared_ptr<IGameObject> BasicShapes::CreateTriangleObject()
 {
 	IndexBuffer ibo = IndexBuffer{};
 	int32_t indicesCount = BasicShapesData::GetTriangleIndicesCount();
@@ -38,7 +38,7 @@ eastl::shared_ptr<OpenGLRenderableObject> BasicShapes::GetTriangleRenderable()
 	return model;
 }
 
-eastl::shared_ptr<OpenGLRenderableObject> BasicShapes::GetSquareRenderable()
+eastl::shared_ptr<IGameObject> BasicShapes::CreateSquareObject()
 {
 	eastl::shared_ptr<OpenGLRenderableObject> model = eastl::make_shared<SquareShape>();
 
@@ -79,7 +79,7 @@ SquareShape::~SquareShape()
 
 void SquareShape::Tick(const float inDeltaT)
 {
-	Model.Translation.x += 0.01f;
-
-	//Model.Scale.x += 0.1f;
+	//Model.Translation.x += 0.01f;
+ 	//Model.Rotation.x += 1.f;
+	//Model.Scale.x *= 0.99f;
 }

@@ -11,8 +11,7 @@ public:
 	virtual void Init() override;
 	virtual void Tick(const float inDeltaT) override;
 
-public:
-	eastl::shared_ptr<class Controller> OwnedController;
+	glm::mat4 GetLookAt();
 };
 
 

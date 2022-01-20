@@ -25,5 +25,4 @@ protected:
 	VAO ObjectVAO;
 	OpenGLShader Shader;
 	eastl::vector<OpenGLTexture> Textures;
-
 };

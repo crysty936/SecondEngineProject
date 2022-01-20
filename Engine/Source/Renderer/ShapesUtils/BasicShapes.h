@@ -15,6 +15,6 @@ public:
 class BasicShapes
 {
 public:
-	static eastl::shared_ptr<class OpenGLRenderableObject> GetTriangleRenderable();
-	static eastl::shared_ptr<class OpenGLRenderableObject> GetSquareRenderable();
+	static eastl::shared_ptr<class IGameObject> CreateTriangleObject();
+	static eastl::shared_ptr<class IGameObject> CreateSquareObject();
 };
