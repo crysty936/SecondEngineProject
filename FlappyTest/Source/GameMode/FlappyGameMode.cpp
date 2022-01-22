@@ -9,9 +9,14 @@
 #include "Timer/TimersManager.h"
 #include "Objects/CeilingAndFloor.h"
 #include "Entity/TransformEntity.h"
+#include "Objects/Pillar.h"
+#include "glm/common.hpp"
+#include <stdlib.h>
 
 const float FallSpeed = 2.f;
 const float RiseSpeed = 4.f;
+float MoveSpeedNormal = 2.f;
+float MoveSpeedFast = 2.f;
 
 FlappyGameMode::FlappyGameMode()
 	:
@@ -37,13 +42,31 @@ void FlappyGameMode::Init()
 	GameController->AddListener(jumpAction);
 
 	// Debug
-	KeyActionDelegate createFloorDelegate = KeyActionDelegate::CreateRaw(this, &FlappyGameMode::CreateFloor);
+	KeyActionDelegate createFloorDelegate = KeyActionDelegate::CreateRaw(this, &FlappyGameMode::DebugCreateFloor);
 	KeyCode createFloorKey = KeyCode::C;
 	OnKeyAction createFloorAction = { createFloorDelegate, createFloorKey };
 
 	GameController->AddListener(createFloorAction);
 
+	KeyActionDelegate moveBirdDelegate = KeyActionDelegate::CreateRaw(this, &FlappyGameMode::DebugMoveBird);
+	KeyCode moveBirdKey = KeyCode::F;
+	OnKeyAction moveBirdAction = { moveBirdDelegate, moveBirdKey };
 
+	GameController->AddListener(moveBirdAction);
+
+	KeyActionDelegate moveCameraLeftDelegate = KeyActionDelegate::CreateRaw(this, &FlappyGameMode::DebugMoveCameraLeft);
+	KeyCode moveCameraLeftKey = KeyCode::A;
+
+	OnKeyAction moveCameraLeftAction = { moveCameraLeftDelegate, moveCameraLeftKey };
+
+	GameController->AddListener(moveCameraLeftAction);
+
+	KeyActionDelegate moveCameraRightDelegate = KeyActionDelegate::CreateRaw(this, &FlappyGameMode::DebugMoveCameraRight);
+	KeyCode moveCameraRightKey = KeyCode::D;
+
+	OnKeyAction moveCameraRightAction = { moveCameraRightDelegate, moveCameraRightKey };
+
+	GameController->AddListener(moveCameraRightAction);
 	//
 
 	// Scene setup
@@ -59,22 +82,12 @@ void FlappyGameMode::Init()
 	BirdObject->Model.Rotation.y = 180.f;
 
 	BirdParent = eastl::make_shared<TransformEntity>();
-	BirdParent->Children.push_back(BirdObject);
+	BirdParent->AddChild(BirdObject);
 
-	currentScene.SceneObjects.push_back(BirdParent);
+	currentScene.AddEntity(BirdParent);
 
-	Floors.push_back(eastl::make_shared<CeilingAndFloor>());
-	Floors.push_back(eastl::make_shared<CeilingAndFloor>());
-
-	for (int32_t i = 0; i < Floors.size(); i++)
-	{
-		const EntityPtr& floor = Floors[i];
-		floor->Model.Translation.x -= 25.f * i;
-
-		// Place the walls a bit ahead of the bird for the z test
-		floor->Model.Translation.z += 1.f;
-		currentScene.SceneObjects.push_back(floor);
-	}
+	constexpr bool firstTime = true;
+	CreateFloor(firstTime);
 
 	GameRunning = true;
 }
@@ -90,11 +103,12 @@ void FlappyGameMode::Tick(float inDeltaT)
 
 	if (!IsJumping)
 	{
-		float fallOffset = FallSpeed * inDeltaT;
+		const float fallOffset = FallSpeed * inDeltaT;
+		const float moveOffset = MoveSpeedNormal * inDeltaT;
 
 		for (const EntityPtr& floor : Floors)
 		{
-			floor->Model.Translation.x += fallOffset;
+			floor->Model.Translation.x += moveOffset;
 		}
 
 		BirdParent->Model.Translation.y -= fallOffset;
@@ -104,8 +118,6 @@ void FlappyGameMode::Tick(float inDeltaT)
 		currentRotation = glm::clamp(currentRotation, 0.f, 75.f);
 		BirdObject->Model.Rotation.z = currentRotation;
 	}
-
-	GameCamera->Model.Translation.x = BirdParent->Model.Translation.x;
 
 	const float birdHeight = BirdParent->Model.Translation.y;
 	const float floorY = CeilingAndFloor::GetFloorY();
@@ -142,10 +154,11 @@ void FlappyGameMode::OnJumpTick(float inDeltaT, float inTimeLeft)
 	}
 
 	float riseOffset = RiseSpeed * (inDeltaT * inTimeLeft);
+	float moveOffset = MoveSpeedFast * (inDeltaT * inTimeLeft);
 
 	for (const EntityPtr& floor : Floors)
 	{
-		floor->Model.Translation.x += riseOffset / 5.f;
+		floor->Model.Translation.x += moveOffset / 5.f;
 	}
 
 	BirdParent->Model.Translation.y += riseOffset;
@@ -185,7 +198,11 @@ void FlappyGameMode::EraseFloors()
 		Floors.erase(iter);
 		SceneManager& sManager = SceneManager::Get();
 		Scene& currentScene = sManager.GetCurrentScene();
-		currentScene.SceneObjects.erase_first(*iter);
+
+		EntityIterator sceneIter = eastl::find(currentScene.Entities.begin(), currentScene.Entities.end(), *iter);
+		ENSURE(sceneIter);
+
+		currentScene.Entities.erase(sceneIter);
 	}
 }
 
@@ -195,24 +212,61 @@ void FlappyGameMode::CreateFloors()
 	EntityIterator lastFloorIter = --lastFloorPlusOne;
 	EntityPtr lastFloor = *lastFloorIter;
 
-	if (lastFloor->Model.Translation.x > 0.f)
+	if (lastFloor->Model.Translation.x > 10.f)
 	{
 		CreateFloor();
 	}
 }
 
-void FlappyGameMode::CreateFloor()
+void FlappyGameMode::DebugCreateFloor()
 {
+	constexpr bool firstTime = false;
+	CreateFloor(firstTime);
+}
+
+void FlappyGameMode::DebugMoveBird()
+{
+	MoveSpeedNormal += 5.f;
+
+}
+
+void FlappyGameMode::CreateFloor(bool firstTime)
+{
+	const float floorOffset = firstTime ? 0.f : 25.f;
+
 	EntityPtr newFloor = eastl::make_shared<CeilingAndFloor>();
-	newFloor->Model.Translation.x -= 25.f;
+	newFloor->Model.Translation.x -= floorOffset;
 	newFloor->Model.Translation.z += 1.f;
 
 	SceneManager& sManager = SceneManager::Get();
-	Scene& currentScene = sManager.GetCurrentScene();
-	currentScene.SceneObjects.push_back(newFloor);
+	sManager.GetCurrentScene().AddEntity(newFloor);
 	Floors.push_back(newFloor);
 
+	constexpr float minHeight = 5.f;
+	constexpr float maxHeight = 10.f;
+
+	const float height = static_cast<float>(glm::max(5, (rand() % 10)));
+	const float distance = 5.f;
+	const float distanceFromStart = -20.f;
+
+	for (int32_t i = 0; i < 3; ++i)
+	{
+		EntityPtr newPillar = eastl::make_shared<Pillar>();
 
 
 
+		newPillar->Model.Translation.x = newFloor->Model.Translation.x - distance *(i + 1);
+
+		newFloor->AddChild(newPillar);
+	}
+}
+
+void FlappyGameMode::DebugMoveCameraLeft()
+{
+	GameCamera->Model.Translation.x += 10.f;
+}
+
+void FlappyGameMode::DebugMoveCameraRight()
+{
+	GameCamera->Model.Translation.x -= 10.f;
 }

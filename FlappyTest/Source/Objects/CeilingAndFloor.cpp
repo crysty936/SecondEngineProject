@@ -2,7 +2,7 @@
 #include "Math/Transform.h"
 #include "Renderer/ShapesUtils/BasicShapes.h"
 
-const float ScaleMultiplier = 25.f;
+const float ScaleMultiplier = 35.f;
 const float HeightOffset = 5.f;
 
 CeilingAndFloor::CeilingAndFloor()
@@ -22,9 +22,8 @@ CeilingAndFloor::CeilingAndFloor()
 	Ceiling->Model = ceilingModel;
 	Floor->Model = floorModel;
 
-
-	Children.push_back(Ceiling);
-	Children.push_back(Floor);
+	AddChild(Ceiling);
+	AddChild(Floor);
 }
 
 CeilingAndFloor::~CeilingAndFloor() = default;

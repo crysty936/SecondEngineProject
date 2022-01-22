@@ -76,7 +76,7 @@ void OpenGLRenderer::Draw()
 
 	SceneManager& sceneMan = SceneManager::Get();
 	Scene& currentScene = sceneMan.GetCurrentScene();
-	eastl::vector<eastl::shared_ptr<Entity>>& sceneObjects = currentScene.SceneObjects;
+	eastl::vector<eastl::shared_ptr<Entity>>& sceneObjects = currentScene.Entities;
 
 	constexpr glm::mat4 identity = glm::mat4(1.f);
 	RecursiveDrawObjects(sceneObjects, identity);

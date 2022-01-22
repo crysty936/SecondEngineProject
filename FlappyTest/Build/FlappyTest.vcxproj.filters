@@ -10,12 +10,18 @@
     <ClCompile Include="..\Source\Objects\CeilingAndFloor.cpp">
       <Filter>Source\Objects</Filter>
     </ClCompile>
+    <ClCompile Include="..\Source\Objects\Pillar.cpp">
+      <Filter>Source\Objects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="D:\Projects\SecondEngineProject\FlappyTest\Source\GameMode\FlappyGameMode.h">
       <Filter>Source\GameMode</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\Objects\CeilingAndFloor.h">
+      <Filter>Source\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Objects\Pillar.h">
       <Filter>Source\Objects</Filter>
     </ClInclude>
   </ItemGroup>

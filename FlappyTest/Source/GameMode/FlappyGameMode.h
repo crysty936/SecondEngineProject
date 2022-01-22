@@ -22,8 +22,12 @@ private:
 	void GameOver();
 	void EraseFloors();
 	void CreateFloors();
-	void CreateFloor();
-	
+	void DebugCreateFloor();
+	void DebugMoveBird();
+	void CreateFloor(bool firstTime = false);
+	void DebugMoveCameraLeft();
+	void DebugMoveCameraRight();
+
 private:
 	eastl::shared_ptr<class Camera> GameCamera;
 	eastl::unique_ptr<class Controller> GameController;

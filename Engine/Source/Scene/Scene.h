@@ -1,6 +1,7 @@
 #pragma once
 #include "EASTL/vector.h"
 #include "EASTL/shared_ptr.h"
+#include "Entity/Entity.h"
 
 /**
  * Scene class precursor
@@ -17,12 +18,13 @@ public:
 
 	void TickObjects(float inDeltaT);
 	void InitObjects();
+	void AddEntity(EntityPtr inEntity);
 
 private:
 	void RecursivelyTickObjects(float inDeltaT, eastl::vector<eastl::shared_ptr<class Entity>>& inObjects);
 	void RecursivelyInitObjects(eastl::vector<eastl::shared_ptr<class Entity>>& inObjects);
 
 public:
-	eastl::vector<eastl::shared_ptr<class Entity>> SceneObjects;
+	eastl::vector<eastl::shared_ptr<class Entity>> Entities;
 	eastl::shared_ptr<class Camera> CurrentCamera;
 };

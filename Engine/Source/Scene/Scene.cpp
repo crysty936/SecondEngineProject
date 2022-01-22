@@ -6,12 +6,17 @@ Scene::~Scene() = default;
 
 void Scene::TickObjects(float inDeltaT)
 {
-	RecursivelyTickObjects(inDeltaT, SceneObjects);
+	RecursivelyTickObjects(inDeltaT, Entities);
 }
 
 void Scene::InitObjects()
 {
-	RecursivelyInitObjects(SceneObjects);
+	RecursivelyInitObjects(Entities);
+}
+
+void Scene::AddEntity(EntityPtr inEntity)
+{
+	Entities.push_back(inEntity);
 }
 
 void Scene::RecursivelyTickObjects(float inDeltaT, eastl::vector<eastl::shared_ptr<Entity>>& inObjects)

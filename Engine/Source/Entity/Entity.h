@@ -18,7 +18,9 @@ public:
 	virtual void Init() = 0;
 	virtual void Tick(const float inDeltaT) = 0;
 
+	inline void AddChild(EntityPtr inEntity) { Children.push_back(inEntity); }
+
 public:
 	Transform Model;
-	eastl::vector<eastl::shared_ptr<class Entity>> Children;
+	eastl::vector<EntityPtr> Children;
 };
