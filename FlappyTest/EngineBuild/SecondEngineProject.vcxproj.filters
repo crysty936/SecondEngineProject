@@ -103,6 +103,9 @@
     <ClCompile Include="..\..\Engine\Source\Renderer\OpenGL\DrawableObject.cpp">
       <Filter>Engine\Source\Renderer\OpenGL</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Engine\Source\Entity\TransformEntity.cpp">
+      <Filter>Engine\Source\Entity</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Camera\Camera.h">
@@ -118,9 +121,6 @@
       <Filter>Engine\Source\Core</Filter>
     </ClInclude>
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\GameModeBase.h">
-      <Filter>Engine\Source\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\IGameObject.h">
       <Filter>Engine\Source\Core</Filter>
     </ClInclude>
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\WindowsPlatform.h">
@@ -222,6 +222,12 @@
     <ClInclude Include="..\..\Engine\Source\Renderer\OpenGL\DrawableObject.h">
       <Filter>Engine\Source\Renderer\OpenGL</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Engine\Source\Entity\TransformEntity.h">
+      <Filter>Engine\Source\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\Source\Entity\Entity.h">
+      <Filter>Engine\Source\Entity</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -280,6 +286,9 @@
     </Filter>
     <Filter Include="Engine\Source\Timer">
       <UniqueIdentifier>{c9e5e692-a86d-410d-85fd-7ac0a494b27a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\Entity">
+      <UniqueIdentifier>{37659bad-878e-4e90-a549-795c00af8801}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

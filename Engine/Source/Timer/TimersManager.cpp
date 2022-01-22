@@ -24,18 +24,18 @@ void TimersManager::AddTimer(eastl::shared_ptr<TimerBase> inTimer)
 
 void TimersManager::TickTimers(float inDeltaT)
 {
-	using timersIter = eastl::vector<eastl::shared_ptr<TimerBase>>::iterator;
+	using timerIterator = eastl::shared_ptr<TimerBase>*;
+	eastl::vector<timerIterator> toRemove;
 
-	eastl::vector<timersIter> toRemove;
-
-	for (const eastl::shared_ptr<TimerBase>& timer : Timers)
+	for (timerIterator timerIter = Timers.begin(); timerIter != Timers.end(); ++timerIter)
 	{
+		eastl::shared_ptr<TimerBase> timer = *timerIter;
+
 		if (timer->GetTimeLeft() < 0.f)
 		{
 			timer->End();
-			timersIter currentTimer = eastl::find(Timers.begin(), Timers.end(), timer);
 
-			toRemove.push_back(currentTimer);
+			toRemove.push_back(timerIter);
 
 			continue;
 		}
@@ -43,8 +43,8 @@ void TimersManager::TickTimers(float inDeltaT)
 		timer->Tick(inDeltaT);
 	}
 
- 	for (const timersIter& iter : toRemove)
- 	{
- 		Timers.erase(iter);
- 	}
+	for (timerIterator iter : toRemove)
+	{
+		Timers.erase(iter);
+	}
 }

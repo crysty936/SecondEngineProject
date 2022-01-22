@@ -1,10 +1,10 @@
 #pragma once
-#include "Core/IGameObject.h"
+#include "Entity/Entity.h"
 #include "Renderer/OpenGL/Buffer/VAO.h"
 #include "Renderer/OpenGL/OpenGLShader.h"
 #include "Renderer/OpenGL/OpenGLTexture.h"
 
-class DrawableObject : public IGameObject
+class DrawableObject : public Entity
 {
 public:
 	DrawableObject(VAO& inVAO, OpenGLShader& inShader);

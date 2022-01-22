@@ -13,7 +13,7 @@
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/trigonometric.hpp"
 #include "Renderer/ShapesUtils/BasicShapesData.h"
-#include "Core/IGameObject.h"
+#include "Entity/Entity.h"
 
 #define CLEAR_COLOR 0.3f, 0.5f, 1.f, 0.4f
 
@@ -76,7 +76,7 @@ void OpenGLRenderer::Draw()
 
 	SceneManager& sceneMan = SceneManager::Get();
 	Scene& currentScene = sceneMan.GetCurrentScene();
-	eastl::vector<eastl::shared_ptr<IGameObject>>& sceneObjects = currentScene.SceneObjects;
+	eastl::vector<eastl::shared_ptr<Entity>>& sceneObjects = currentScene.SceneObjects;
 
 	constexpr glm::mat4 identity = glm::mat4(1.f);
 	RecursiveDrawObjects(sceneObjects, identity);
@@ -85,13 +85,13 @@ void OpenGLRenderer::Draw()
 	glfwSwapBuffers(MainWindow->GetHandle());
 }
 
-void OpenGLRenderer::RecursiveDrawObjects(eastl::vector<eastl::shared_ptr<IGameObject>>& inObjects, const glm::mat4 inParentModel)
+void OpenGLRenderer::RecursiveDrawObjects(eastl::vector<eastl::shared_ptr<Entity>>& inObjects, const glm::mat4 inParentModel)
 {
 	glm::mat4 view = SceneManager::Get().GetCurrentScene().CurrentCamera->GetLookAt();
 
-	for (eastl::shared_ptr<IGameObject>& object : inObjects)
+	for (eastl::shared_ptr<Entity>& object : inObjects)
 	{
-		IGameObject* tickable = object.get();
+		Entity* tickable = object.get();
 		DrawableObject* renderable = dynamic_cast<DrawableObject*>(tickable);
 		glm::mat4 currentModel = tickable->Model.GetModel();
 		currentModel = inParentModel *currentModel;

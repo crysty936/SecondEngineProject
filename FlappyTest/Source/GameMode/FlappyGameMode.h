@@ -2,25 +2,27 @@
 #include "Core/GameModeBase.h"
 #include "EASTL/shared_ptr.h"
 #include "EASTL/vector.h"
+#include "Entity/Entity.h"
 
 class FlappyGameMode : public GameModeBase
 {
-	using GameObjectPtr = eastl::shared_ptr<class IGameObject>;
-
 public:
 	FlappyGameMode();
 	virtual ~FlappyGameMode();
 
 public:
 	virtual void Init() override;
-	virtual void Tick(float inDelta) override;
+	virtual void Tick(float inDeltat) override;
 
+private:
 	void Jump();
 	void OnJumpStart();
 	void OnJumpTick(float inDeltaT, float inTimeLeft);
 	void OnJumpEnd();
 	void GameOver();
-
+	void EraseFloors();
+	void CreateFloors();
+	void CreateFloor();
 	
 private:
 	eastl::shared_ptr<class Camera> GameCamera;
@@ -30,7 +32,8 @@ private:
 	// Game logic variables
 	bool IsJumping;
 	bool GameRunning;
-	eastl::shared_ptr<class IGameObject> BirdObject;
-	eastl::vector<GameObjectPtr> Floors;
+	EntityPtr BirdObject;
+	EntityPtr BirdParent;
+	eastl::vector<EntityPtr> Floors;
 
 };

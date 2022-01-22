@@ -7,7 +7,7 @@
 #include "InputSystem/GLFWInput/InputSystem.h"
 #include "Scene/SceneManager.h"
 #include "Scene/Scene.h"
-#include "IGameObject.h"
+#include "Entity/Entity.h"
 #include "Core/GameModeBase.h"
 #include "Timer/TimersManager.h"
 

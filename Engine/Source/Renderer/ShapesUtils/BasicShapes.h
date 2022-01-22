@@ -15,6 +15,6 @@ public:
 class BasicShapes
 {
 public:
-	static eastl::shared_ptr<class IGameObject> CreateTriangleObject(eastl::string inTexturePath = {});
-	static eastl::shared_ptr<class IGameObject> CreateSquareObject(eastl::string inTexturePath = {});
+	static eastl::shared_ptr<class Entity> CreateTriangleObject(eastl::string inTexturePath = {});
+	static eastl::shared_ptr<class Entity> CreateSquareObject(eastl::string inTexturePath = {});
 };

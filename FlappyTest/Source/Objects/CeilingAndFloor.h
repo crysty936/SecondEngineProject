@@ -1,8 +1,8 @@
 #pragma once
-#include "Core/IGameObject.h"
+#include "Entity/Entity.h"
 #include "EASTL/shared_ptr.h"
 
-class CeilingAndFloor : public IGameObject
+class CeilingAndFloor : public Entity
 {
 public:
 	CeilingAndFloor();
@@ -15,8 +15,8 @@ public:
 	static float GetCeilingY();
 
 private:
-	eastl::shared_ptr<class IGameObject> Ceiling;
-	eastl::shared_ptr<class IGameObject> Floor;
+	eastl::shared_ptr<class Entity> Ceiling;
+	eastl::shared_ptr<class Entity> Floor;
 
 
 

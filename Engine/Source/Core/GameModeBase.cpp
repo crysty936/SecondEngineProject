@@ -11,7 +11,7 @@ void GameModeBase::Init()
 
 }
 
-void GameModeBase::Tick(float inDelta)
+void GameModeBase::Tick(float inDeltaT)
 {
 
 }

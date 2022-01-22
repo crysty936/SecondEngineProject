@@ -1,8 +1,8 @@
 #pragma once
-#include "Core/IGameObject.h"
+#include "Entity/Entity.h"
 #include "EASTL/shared_ptr.h"
 
-class Camera : public IGameObject
+class Camera : public Entity
 {
 public:
 	Camera();

@@ -11,6 +11,6 @@ public:
 	virtual void Init();
 
 	// Game Mode Tick is Run after all other objects
-	virtual void Tick(float inDelta);
+	virtual void Tick(float inDeltaT);
 
 };

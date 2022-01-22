@@ -19,10 +19,10 @@ public:
 	void InitObjects();
 
 private:
-	void RecursivelyTickObjects(float inDeltaT, eastl::vector<eastl::shared_ptr<class IGameObject>>& inObjects);
-	void RecursivelyInitObjects(eastl::vector<eastl::shared_ptr<class IGameObject>>& inObjects);
+	void RecursivelyTickObjects(float inDeltaT, eastl::vector<eastl::shared_ptr<class Entity>>& inObjects);
+	void RecursivelyInitObjects(eastl::vector<eastl::shared_ptr<class Entity>>& inObjects);
 
 public:
-	eastl::vector<eastl::shared_ptr<class IGameObject>> SceneObjects;
+	eastl::vector<eastl::shared_ptr<class Entity>> SceneObjects;
 	eastl::shared_ptr<class Camera> CurrentCamera;
 };

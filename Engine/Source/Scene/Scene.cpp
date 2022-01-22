@@ -1,5 +1,5 @@
 #include "Scene.h"
-#include "Core/IGameObject.h"
+#include "Entity/Entity.h"
 
 Scene::Scene() = default;
 Scene::~Scene() = default;
@@ -14,9 +14,9 @@ void Scene::InitObjects()
 	RecursivelyInitObjects(SceneObjects);
 }
 
-void Scene::RecursivelyTickObjects(float inDeltaT, eastl::vector<eastl::shared_ptr<IGameObject>>& inObjects)
+void Scene::RecursivelyTickObjects(float inDeltaT, eastl::vector<eastl::shared_ptr<Entity>>& inObjects)
 {
-	for (eastl::shared_ptr<IGameObject>& obj : inObjects)
+	for (eastl::shared_ptr<Entity>& obj : inObjects)
 	{
 		RecursivelyTickObjects(inDeltaT, obj->Children);
 
@@ -24,9 +24,9 @@ void Scene::RecursivelyTickObjects(float inDeltaT, eastl::vector<eastl::shared_p
 	}
 }
 
-void Scene::RecursivelyInitObjects(eastl::vector<eastl::shared_ptr<IGameObject>>& inObjects)
+void Scene::RecursivelyInitObjects(eastl::vector<eastl::shared_ptr<Entity>>& inObjects)
 {
-	for (eastl::shared_ptr<IGameObject>& obj : inObjects)
+	for (eastl::shared_ptr<Entity>& obj : inObjects)
 	{
 		RecursivelyInitObjects(obj->Children);
 

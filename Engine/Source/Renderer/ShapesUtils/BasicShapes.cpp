@@ -10,7 +10,7 @@
 
 const uint32_t texureBaseNr = GL_TEXTURE0;
 
-eastl::shared_ptr<IGameObject> BasicShapes::CreateTriangleObject(eastl::string inTexturePath)
+eastl::shared_ptr<Entity> BasicShapes::CreateTriangleObject(eastl::string inTexturePath)
 {
 	IndexBuffer ibo = IndexBuffer{};
 	int32_t indicesCount = BasicShapesData::GetTriangleIndicesCount();
@@ -43,7 +43,7 @@ eastl::shared_ptr<IGameObject> BasicShapes::CreateTriangleObject(eastl::string i
 	return model;
 }
 
-eastl::shared_ptr<IGameObject> BasicShapes::CreateSquareObject(eastl::string inTexturePath)
+eastl::shared_ptr<Entity> BasicShapes::CreateSquareObject(eastl::string inTexturePath)
 {
 	if (inTexturePath.empty())
 	{
