@@ -5,7 +5,7 @@
 #include "Renderer/OpenGL/Buffer/VertexBuffer.h"
 #include "Renderer/OpenGL/Buffer/VAO.h"
 #include "Renderer/OpenGL/OpenGLShader.h"
-#include "Renderer/OpenGL/OpenGLRenderableObject.h"
+#include "Renderer/OpenGL/DrawableObject.h"
 #include "Renderer/OpenGL/OpenGLTexture.h"
 
 const uint32_t texureBaseNr = GL_TEXTURE0;
@@ -30,7 +30,7 @@ eastl::shared_ptr<IGameObject> BasicShapes::CreateTriangleObject()
 
 	OpenGLShader basicShaderProgram = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/BasicProjectionVertexShader.glsl", "../Data/Shaders/BasicTexFragmentShader.glsl");
 
-	eastl::shared_ptr<OpenGLRenderableObject> model = eastl::make_shared<OpenGLRenderableObject>(vertexArray, basicShaderProgram);
+	eastl::shared_ptr<DrawableObject> model = eastl::make_shared<DrawableObject>(vertexArray, basicShaderProgram);
 
 	OpenGLTexture tex{ "../Data/Textures/TEST.jpg", texureBaseNr + 0 };
 	model->AddTexture(tex);
@@ -40,7 +40,7 @@ eastl::shared_ptr<IGameObject> BasicShapes::CreateTriangleObject()
 
 eastl::shared_ptr<IGameObject> BasicShapes::CreateSquareObject()
 {
-	eastl::shared_ptr<OpenGLRenderableObject> model = eastl::make_shared<SquareShape>();
+	eastl::shared_ptr<DrawableObject> model = eastl::make_shared<SquareShape>();
 
 	return model;
 }

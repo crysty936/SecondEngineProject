@@ -15,6 +15,13 @@ public:
 	Scene();
 	~Scene();
 
+	void TickObjects(float inDeltaT);
+	void InitObjects();
+
+private:
+	void RecursivelyTickObjects(float inDeltaT, eastl::vector<eastl::shared_ptr<class IGameObject>>& inObjects);
+	void RecursivelyInitObjects(eastl::vector<eastl::shared_ptr<class IGameObject>>& inObjects);
+
 public:
 	eastl::vector<eastl::shared_ptr<class IGameObject>> SceneObjects;
 	eastl::shared_ptr<class Camera> CurrentCamera;

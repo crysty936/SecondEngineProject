@@ -7,10 +7,16 @@
     <ClCompile Include="D:\Projects\SecondEngineProject\FlappyTest\Source\GameMode\FlappyGameMode.cpp">
       <Filter>Source\GameMode</Filter>
     </ClCompile>
+    <ClCompile Include="..\Source\Objects\CeilingAndFloor.cpp">
+      <Filter>Source\Objects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="D:\Projects\SecondEngineProject\FlappyTest\Source\GameMode\FlappyGameMode.h">
       <Filter>Source\GameMode</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Objects\CeilingAndFloor.h">
+      <Filter>Source\Objects</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -22,6 +28,9 @@
     </Filter>
     <Filter Include="Source\GameMode">
       <UniqueIdentifier>{40059E7C-3294-3E54-BE02-C0C8C7C179C9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Objects">
+      <UniqueIdentifier>{032d6df8-e1f6-4073-a1d6-a6af7c6783ad}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

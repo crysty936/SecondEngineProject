@@ -9,6 +9,7 @@
 #include "Scene/Scene.h"
 #include "IGameObject.h"
 #include "Core/GameModeBase.h"
+#include "Timer/TimersManager.h"
 
 constexpr float IdealFrameRate = 60.f;
 constexpr float IdealFrameTime = 1.0f / IdealFrameRate;
@@ -41,15 +42,18 @@ void EngineCore::Init(eastl::shared_ptr<GameModeBase> inGameMode)
 	OpenGLRenderer::Init();
 	InputSystem::Init();
 	SceneManager::Init();
+	TimersManager::Init();
 
 	SceneManager::Get().LoadScene();
 
 	// After initializing all engine subsystems, Game Mode init is called
 	Engine->CurrentGameMode->Init();
+	SceneManager::Get().GetCurrentScene().InitObjects();
 }
 
 void EngineCore::Terminate()
 {
+	TimersManager::Terminate();
 	SceneManager::Terminate();
 	OpenGLRenderer::Terminate();
 	InputSystem::Terminate();
@@ -90,8 +94,10 @@ void EngineCore::Run()
 		InputSystem::Get().PollEvents();
 		//Call tickableObjects: Camera, etc
 
-		Scene& currentScene = SceneManager::Get().GetCurrentScene();
-		RecursivelyTickObjects(currentScene.SceneObjects);
+		// Tick Timers
+		TimersManager::Get().TickTimers(CurrentDeltaT);
+
+		SceneManager::Get().GetCurrentScene().TickObjects(CurrentDeltaT);
 		CurrentGameMode->Tick(CurrentDeltaT);
 
 		RHI->Draw();
@@ -99,14 +105,3 @@ void EngineCore::Run()
 
 	Terminate();
 }
-
-void EngineCore::RecursivelyTickObjects(eastl::vector<eastl::shared_ptr<IGameObject>>&inObjects)
-{
-	for (eastl::shared_ptr<IGameObject>& obj : inObjects)
-	{
-		RecursivelyTickObjects(obj->Children);
-
-		obj->Tick(CurrentDeltaT);
-	}
-}
-

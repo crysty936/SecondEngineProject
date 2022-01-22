@@ -8,7 +8,7 @@
 #include "Scene/Scene.h"
 #include "Camera/Camera.h"
 #include "Scene/SceneManager.h"
-#include "Renderer/OpenGL/OpenGLRenderableObject.h"
+#include "Renderer/OpenGL/DrawableObject.h"
 #include "glm/ext/matrix_float4x4.hpp"
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/trigonometric.hpp"
@@ -89,7 +89,7 @@ void OpenGLRenderer::RecursiveDrawObjects(eastl::vector<eastl::shared_ptr<IGameO
 	for (eastl::shared_ptr<IGameObject>& object : inObjects)
 	{
 		IGameObject* tickable = object.get();
-		OpenGLRenderableObject* renderable = dynamic_cast<OpenGLRenderableObject*>(tickable);
+		DrawableObject* renderable = dynamic_cast<DrawableObject*>(tickable);
 		glm::mat4 currentModel = tickable->Model.GetModel();
 		currentModel = inParentModel *currentModel;
 

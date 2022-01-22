@@ -260,8 +260,10 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\Source\Objects\CeilingAndFloor.cpp" />
     <ClCompile Include="D:\Projects\SecondEngineProject\FlappyTest\Source\EntryPoint\EntryPoint.cpp" />
     <ClCompile Include="D:\Projects\SecondEngineProject\FlappyTest\Source\GameMode\FlappyGameMode.cpp" />
+    <ClInclude Include="..\Source\Objects\CeilingAndFloor.h" />
     <ClInclude Include="D:\Projects\SecondEngineProject\FlappyTest\Source\GameMode\FlappyGameMode.h" />
   </ItemGroup>
   <ItemGroup>

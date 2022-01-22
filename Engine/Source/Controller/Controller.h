@@ -18,11 +18,13 @@ public:
 	Controller();
 	virtual ~Controller();
 
-
+	void ExecuteCallbacks();
+	inline void AddListener(OnKeyAction& inKeyAction) { Listeners.push_back(inKeyAction); }
 
 private:
 	void OnInputReceived(KeyCode inKeyCode, InputEventType inEventType);
 
 private:
 	eastl::unordered_map<KeyCode, bool> KeyStates;
+	eastl::vector<OnKeyAction> Listeners;
 };

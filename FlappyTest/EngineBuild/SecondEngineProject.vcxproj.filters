@@ -55,9 +55,6 @@
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\Buffer\VertexBufferLayout.cpp">
       <Filter>Engine\Source\Renderer\OpenGL\Buffer</Filter>
     </ClCompile>
-    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\OpenGLRenderableObject.cpp">
-      <Filter>Engine\Source\Renderer\OpenGL</Filter>
-    </ClCompile>
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\OpenGLRenderer.cpp">
       <Filter>Engine\Source\Renderer\OpenGL</Filter>
     </ClCompile>
@@ -93,6 +90,18 @@
     </ClCompile>
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Window\OpenGLWindow.cpp">
       <Filter>Engine\Source\Window</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\Source\Timer\LogicTimer.cpp">
+      <Filter>Engine\Source\Timer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\Source\Timer\TimerBase.cpp">
+      <Filter>Engine\Source\Timer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\Source\Timer\TimersManager.cpp">
+      <Filter>Engine\Source\Timer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\Source\Renderer\OpenGL\DrawableObject.cpp">
+      <Filter>Engine\Source\Renderer\OpenGL</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -162,9 +171,6 @@
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\Buffer\VertexBufferLayout.h">
       <Filter>Engine\Source\Renderer\OpenGL\Buffer</Filter>
     </ClInclude>
-    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\OpenGLRenderableObject.h">
-      <Filter>Engine\Source\Renderer\OpenGL</Filter>
-    </ClInclude>
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\OpenGLRenderer.h">
       <Filter>Engine\Source\Renderer\OpenGL</Filter>
     </ClInclude>
@@ -203,6 +209,18 @@
     </ClInclude>
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Window\WindowProperties.h">
       <Filter>Engine\Source\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\Source\Timer\LogicTimer.h">
+      <Filter>Engine\Source\Timer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\Source\Timer\TimerBase.h">
+      <Filter>Engine\Source\Timer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\Source\Timer\TimersManager.h">
+      <Filter>Engine\Source\Timer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\Source\Renderer\OpenGL\DrawableObject.h">
+      <Filter>Engine\Source\Renderer\OpenGL</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -259,6 +277,9 @@
     </Filter>
     <Filter Include="Engine\Source\Window">
       <UniqueIdentifier>{0DDF4BF2-1562-3E7A-AA7A-6C06EB1BD5FE}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\Timer">
+      <UniqueIdentifier>{c9e5e692-a86d-410d-85fd-7ac0a494b27a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

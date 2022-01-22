@@ -4,12 +4,12 @@
 #include "Renderer/OpenGL/OpenGLShader.h"
 #include "Renderer/OpenGL/OpenGLTexture.h"
 
-class OpenGLRenderableObject : public IGameObject
+class DrawableObject : public IGameObject
 {
 public:
-	OpenGLRenderableObject(VAO& inVAO, OpenGLShader& inShader);
-	OpenGLRenderableObject();
-	virtual ~OpenGLRenderableObject();
+	DrawableObject(VAO& inVAO, OpenGLShader& inShader);
+	DrawableObject();
+	virtual ~DrawableObject();
 
 	virtual void Init() override;
 	virtual void Tick(const float inDeltaT) override;

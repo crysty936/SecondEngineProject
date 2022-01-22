@@ -1,22 +1,22 @@
-#include "OpenGLRenderableObject.h"
+#include "DrawableObject.h"
 
-OpenGLRenderableObject::OpenGLRenderableObject(VAO& inVAO, OpenGLShader& inShader)
+DrawableObject::DrawableObject(VAO& inVAO, OpenGLShader& inShader)
 	: ObjectVAO{ inVAO }, Shader{ inShader }
 {
 }
 
-OpenGLRenderableObject::OpenGLRenderableObject()
+DrawableObject::DrawableObject()
 {}
 
-OpenGLRenderableObject::~OpenGLRenderableObject()
+DrawableObject::~DrawableObject()
 {}
 
-void OpenGLRenderableObject::Tick(const float inDeltaT)
+void DrawableObject::Tick(const float inDeltaT)
 {
 
 }
 
-void OpenGLRenderableObject::Draw()
+void DrawableObject::Draw()
 {
 	uint32_t indicesCount = ObjectVAO.GetVertexBuffer().GetIndicesCount();
 
@@ -37,12 +37,12 @@ void OpenGLRenderableObject::Draw()
 	}
 }
 
-void OpenGLRenderableObject::AddTexture(OpenGLTexture inTexture)
+void DrawableObject::AddTexture(OpenGLTexture inTexture)
 {
 	Textures.push_back(inTexture);
 }
 
-void OpenGLRenderableObject::DeleteObject()
+void DrawableObject::DeleteObject()
 {
 	ObjectVAO.DeleteBuffers();
 	Shader.DeleteShader();
@@ -52,7 +52,7 @@ void OpenGLRenderableObject::DeleteObject()
 	}
 }
 
-void OpenGLRenderableObject::Init()
+void DrawableObject::Init()
 {
 	
 }

@@ -14,9 +14,6 @@ public:
 	void Run();
 
 private:
-	void RecursivelyTickObjects(eastl::vector<eastl::shared_ptr<class IGameObject>>& inObjects);
-
-private:
 	float CurrentDeltaT;
 
 	// TODO 
