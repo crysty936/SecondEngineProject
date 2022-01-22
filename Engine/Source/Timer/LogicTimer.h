@@ -3,7 +3,7 @@
 #include "EventSystem/EventSystem.h"
 
 // DeltaT, TimeLeft
-using LogicDelegate = Delegate<void, float, float>;
+using TimerLogicDelegate = Delegate<void, float, float>;
 
 /**
  * Timer that calls custom logic each frame
@@ -11,11 +11,11 @@ using LogicDelegate = Delegate<void, float, float>;
 class LogicTimer : public TimerBase
 {
 public:
-	LogicTimer(float inDeltaT, LogicDelegate inOnLogic);
+	LogicTimer(float inDeltaT, TimerLogicDelegate inOnLogic);
 	virtual ~LogicTimer();
 
 	virtual void Tick(float inDeltaT) override;
 
 private:
-	LogicDelegate OnLogicDelegate;
+	TimerLogicDelegate OnLogicDelegate;
 };

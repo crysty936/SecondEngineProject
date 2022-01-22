@@ -10,7 +10,7 @@
 
 const uint32_t texureBaseNr = GL_TEXTURE0;
 
-eastl::shared_ptr<IGameObject> BasicShapes::CreateTriangleObject()
+eastl::shared_ptr<IGameObject> BasicShapes::CreateTriangleObject(eastl::string inTexturePath)
 {
 	IndexBuffer ibo = IndexBuffer{};
 	int32_t indicesCount = BasicShapesData::GetTriangleIndicesCount();
@@ -32,20 +32,30 @@ eastl::shared_ptr<IGameObject> BasicShapes::CreateTriangleObject()
 
 	eastl::shared_ptr<DrawableObject> model = eastl::make_shared<DrawableObject>(vertexArray, basicShaderProgram);
 
-	OpenGLTexture tex{ "../Data/Textures/TEST.jpg", texureBaseNr + 0 };
+	if (inTexturePath.empty())
+	{
+		inTexturePath = eastl::string("../Data/Textures/ExampleContainer.jpg");
+	}
+
+	OpenGLTexture tex{ inTexturePath, texureBaseNr + 0 };
 	model->AddTexture(tex);
 	
 	return model;
 }
 
-eastl::shared_ptr<IGameObject> BasicShapes::CreateSquareObject()
+eastl::shared_ptr<IGameObject> BasicShapes::CreateSquareObject(eastl::string inTexturePath)
 {
-	eastl::shared_ptr<DrawableObject> model = eastl::make_shared<SquareShape>();
+	if (inTexturePath.empty())
+	{
+		inTexturePath = eastl::string("../Data/Textures/ExampleContainer.jpg");
+	}
+
+	eastl::shared_ptr<DrawableObject> model = eastl::make_shared<SquareShape>(inTexturePath);
 
 	return model;
 }
 
-SquareShape::SquareShape()
+SquareShape::SquareShape(const eastl::string& inTexturePath)
 {
 	IndexBuffer ibo = IndexBuffer{};
 	int32_t indicesCount = BasicShapesData::GetSquareIndicesCount();
@@ -63,12 +73,13 @@ SquareShape::SquareShape()
 
 	VAO vertexArray = VAO{ vbo };
 
+
 	OpenGLShader basicShaderProgram = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/BasicProjectionVertexShader.glsl", "../Data/Shaders/BasicTexFragmentShader.glsl");
 
 	ObjectVAO = vertexArray;
 	Shader = basicShaderProgram;
 
-	OpenGLTexture tex{ "../Data/Textures/TEST.jpg", texureBaseNr + 0 };
+	OpenGLTexture tex{ inTexturePath, texureBaseNr + 0 };
 	AddTexture(tex);
 }
 

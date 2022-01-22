@@ -46,6 +46,9 @@ OpenGLRenderer::OpenGLRenderer(const WindowProperties& inDefaultWindowProperties
 	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 	glEnable(GL_DEPTH_TEST);
 
+ 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+// 	glEnable(GL_BLEND);
+
 	glDebugMessageCallback(OpenGLUtils::GLDebugCallback, nullptr);
 	glClearColor(CLEAR_COLOR);
 }

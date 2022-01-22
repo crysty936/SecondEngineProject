@@ -16,6 +16,7 @@ public:
 private:
 	uint32_t TexHandle;
 	int32_t TexNr;
+	int32_t NrChannels;
 	bool Bound = false;
 	bool Valid = false;
 };

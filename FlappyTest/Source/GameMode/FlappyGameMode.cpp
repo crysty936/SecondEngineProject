@@ -16,9 +16,10 @@ FlappyGameMode::FlappyGameMode()
 	: 
 	GameModeBase(),
 	GameCamera{ nullptr },
-	BirdObject{ nullptr },
 	GameController{},
-	IsJumping{false}
+	IsJumping{false},
+	GameRunning{false},
+	BirdObject{ nullptr }
 {
 }
 
@@ -43,40 +44,64 @@ void FlappyGameMode::Init()
 	GameCamera->Model.Translation.z = 15.f;
 	GameCamera->Model.Rotation.z = -1.f;
 
-	BirdObject = BasicShapes::CreateSquareObject();
+	BirdObject = BasicShapes::CreateSquareObject("../Data/Textures/flappy.png");
+	BirdObject->Model.Rotation.y = 180.f;
 
 	currentScene.SceneObjects.push_back(BirdObject);
 
-	currentScene.SceneObjects.push_back(BasicShapes::CreateTriangleObject());
+	Floors.push_back(eastl::make_shared<CeilingAndFloor>());
+	Floors.push_back(eastl::make_shared<CeilingAndFloor>());
 
+	for (int32_t i = 0; i < Floors.size(); i++)
+	{
+		const GameObjectPtr& floor = Floors[i];
+		floor->Model.Translation.x -= 15.f * i;
 
-	currentScene.SceneObjects.push_back(eastl::make_shared<CeilingAndFloor>());
+		// Place the walls a bit ahead of the bird for the z test
+		floor->Model.Translation.z += 1.f;
+		currentScene.SceneObjects.push_back(floor);
+	}
+
+	GameRunning = true;
 }
 
 void FlappyGameMode::Tick(float inDelta)
 {
+	if (!GameRunning)
+	{
+		return;
+	}
+
 	GameController->ExecuteCallbacks();
 
 	if (!IsJumping)
 	{
 		float fallOffset = FallSpeed * inDelta;
 
-		BirdObject->Model.Translation.x -= fallOffset;
+		for (const GameObjectPtr& floor : Floors)
+		{
+			floor->Model.Translation.x += fallOffset;
+		}
+
 		BirdObject->Model.Translation.y -= fallOffset;
 	}
 
 	GameCamera->Model.Translation.x = BirdObject->Model.Translation.x;
 
+	const float birdHeight = BirdObject->Model.Translation.y;
+	const float floorY = CeilingAndFloor::GetFloorY();
+	const float ceilingY = CeilingAndFloor::GetCeilingY();
 
-
-
-
+	if (birdHeight <= (floorY + 1.f) || birdHeight >= (ceilingY - 1.f))
+	{
+		GameOver();
+	}
 }
 
 void FlappyGameMode::Jump()
 {
 	constexpr float timerTime = 1.f;
-	LogicDelegate del = LogicDelegate::CreateRaw(this, &FlappyGameMode::OnJumpTick);
+	TimerLogicDelegate del = TimerLogicDelegate::CreateRaw(this, &FlappyGameMode::OnJumpTick);
 
  	eastl::shared_ptr<LogicTimer> jumpTimer = eastl::make_shared<LogicTimer>(timerTime, del);
  	TimersManager::Get().AddTimer(jumpTimer);
@@ -89,13 +114,27 @@ void FlappyGameMode::OnJumpStart()
 
 void FlappyGameMode::OnJumpTick(float inDeltaT, float inTimeLeft)
 {
+	if (!GameRunning)
+	{
+		return;
+	}
+
 	float riseOffset = RiseSpeed * (inDeltaT * inTimeLeft);
 
-	BirdObject->Model.Translation.x -= riseOffset / 5.f;
+	for (const GameObjectPtr& floor : Floors)
+	{
+		floor->Model.Translation.x += riseOffset / 5.f;
+	}
+
 	BirdObject->Model.Translation.y += riseOffset;
 }
 
 void FlappyGameMode::OnJumpEnd()
 {
 	IsJumping = false;
+}
+
+void FlappyGameMode::GameOver()
+{
+	GameRunning = false;
 }

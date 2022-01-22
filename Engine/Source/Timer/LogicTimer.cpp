@@ -1,6 +1,6 @@
 #include "LogicTimer.h"
 
-LogicTimer::LogicTimer(float inDeltaT, LogicDelegate inOnLogic)
+LogicTimer::LogicTimer(float inDeltaT, TimerLogicDelegate inOnLogic)
 	:TimerBase{inDeltaT}, OnLogicDelegate{inOnLogic}
 {
 

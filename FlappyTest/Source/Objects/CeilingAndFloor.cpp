@@ -2,16 +2,19 @@
 #include "Math/Transform.h"
 #include "Renderer/ShapesUtils/BasicShapes.h"
 
+const float ScaleMultiplier = 25.f;
+const float HeightOffset = 5.f;
+
 CeilingAndFloor::CeilingAndFloor()
 	: Ceiling{ nullptr }, Floor{ nullptr }
 {
 	Transform ceilingModel;
 	Transform floorModel;
 
-	ceilingModel.Translation.y = 5.f;
-	floorModel.Translation.y = -5.f;
-	ceilingModel.Scale.x = 20.f;
-	floorModel.Scale.x = 20.f;
+	ceilingModel.Translation.y = HeightOffset;
+	floorModel.Translation.y = -HeightOffset;
+	ceilingModel.Scale.x = ScaleMultiplier;
+	floorModel.Scale.x = ScaleMultiplier;
 
 	Ceiling = BasicShapes::CreateSquareObject();
 	Floor = BasicShapes::CreateSquareObject();
@@ -34,5 +37,15 @@ void CeilingAndFloor::Init()
 void CeilingAndFloor::Tick(const float inDeltaT)
 {
 	
+}
+
+float CeilingAndFloor::GetFloorY()
+{
+	return (Transform{}).Translation.y - HeightOffset;
+}
+
+float CeilingAndFloor::GetCeilingY()
+{
+	return (Transform{}).Translation.y + HeightOffset;
 }
 
