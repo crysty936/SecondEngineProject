@@ -16,12 +16,12 @@ void DrawableObject::Tick(const float inDeltaT)
 
 }
 
-void DrawableObject::Draw()
+void DrawableObject::Draw() const
 {
 	uint32_t indicesCount = ObjectVAO.GetVertexBuffer().GetIndicesCount();
 
-	eastl::vector<OpenGLTexture>& textures = GetTextures();
-	for (OpenGLTexture& tex : textures)
+	const eastl::vector<OpenGLTexture>& textures = GetTextures();
+	for (const OpenGLTexture& tex : textures)
 	{
 		tex.Bind();
 	}
@@ -31,7 +31,7 @@ void DrawableObject::Draw()
 
 	Shader.UnBind();
 	ObjectVAO.Unbind();
-	for (OpenGLTexture& tex : textures)
+	for (const OpenGLTexture& tex : textures)
 	{
 		tex.Unbind();
 	}

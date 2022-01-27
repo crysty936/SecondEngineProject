@@ -8,8 +8,8 @@ public:
 	OpenGLTexture(const eastl::string& inTexturePath, int32_t inTextNr);
 	~OpenGLTexture();
 
-	void Bind();
-	void Unbind();
+	void Bind() const;
+	void Unbind() const;
 	 
 	void DeleteTexture();
 
@@ -17,6 +17,5 @@ private:
 	uint32_t TexHandle;
 	int32_t TexNr;
 	int32_t NrChannels;
-	bool Bound = false;
 	bool Valid = false;
 };

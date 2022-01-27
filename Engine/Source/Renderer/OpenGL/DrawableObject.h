@@ -13,9 +13,9 @@ public:
 
 	virtual void Init() override;
 	virtual void Tick(const float inDeltaT) override;
-	void Draw();
-	inline eastl::vector<OpenGLTexture>& GetTextures(){ return Textures; }
-	inline OpenGLShader& GetShader() { return Shader; }
+	void Draw() const;
+	inline const eastl::vector<OpenGLTexture>& GetTextures() const { return Textures; }
+	inline const OpenGLShader& GetShader() const { return Shader; }
 	void AddTexture(OpenGLTexture inTexture);
 	void DeleteObject();
 

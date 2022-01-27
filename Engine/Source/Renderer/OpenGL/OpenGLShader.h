@@ -13,12 +13,12 @@ public:
 public:
 	void Bind() const;
 	static void UnBind();
-	void SetUniformValue4f(const eastl::string& UniformName, float v1, float v2, float v3, float v4);
-	void SetUniformValue3f(const eastl::string& UniformName, float v1, float v2, float v3);
-	void SetUniformValue1f(const eastl::string& UniformName, float v1);
-	void SetUniformValue1i(const eastl::string& UniformName, int v1);
-	void SetUniformValue4fv(const eastl::string& UniformName, glm::mat4 matrix);
-	void SetUniformValue3fv(const eastl::string& UniformName, glm::vec3 vec);
+	void SetUniformValue4f(const eastl::string& UniformName, float v1, float v2, float v3, float v4) const;
+	void SetUniformValue3f(const eastl::string& UniformName, float v1, float v2, float v3) const;
+	void SetUniformValue1f(const eastl::string& UniformName, float v1) const;
+	void SetUniformValue1i(const eastl::string& UniformName, int v1) const;
+	void SetUniformValue4fv(const eastl::string& UniformName, glm::mat4 matrix) const;
+	void SetUniformValue3fv(const eastl::string& UniformName, glm::vec3 vec) const;
 
 	uint32_t inline GetHandle() const { return ShaderHandle; }
 	void DeleteShader();
@@ -33,7 +33,7 @@ public:
 	OpenGLShader& operator=(OpenGLShader&& inOther) = default;
 
 private:
-	int GetUniformLocation(const eastl::string& UniformName);
+	int GetUniformLocation(const eastl::string& UniformName) const;
 	uint32_t CreateShader(const eastl::string& Source, GLenum ShaderType);
 
 private:

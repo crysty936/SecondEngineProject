@@ -7,5 +7,5 @@ struct Transform
 	glm::vec3 Rotation = glm::vec3(0.f);
 	glm::vec3 Scale = glm::vec3(1.f);
 
-	glm::mat4 GetModel();
+	glm::mat4 GetModel() const;
 };

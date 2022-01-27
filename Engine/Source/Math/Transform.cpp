@@ -1,6 +1,6 @@
 #include "Transform.h"
 
-glm::mat4 Transform::GetModel()
+glm::mat4 Transform::GetModel() const
 {
 	glm::mat4 model(1.f);
 

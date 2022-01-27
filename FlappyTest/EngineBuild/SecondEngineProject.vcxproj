@@ -212,13 +212,16 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Engine\Source\Entity\Entity.cpp" />
     <ClCompile Include="..\..\Engine\Source\Entity\TransformEntity.cpp" />
+    <ClCompile Include="..\..\Engine\Source\Math\MathUtils.cpp" />
     <ClCompile Include="..\..\Engine\Source\Timer\LogicTimer.cpp" />
     <ClCompile Include="..\..\Engine\Source\Timer\TimerBase.cpp" />
     <ClCompile Include="..\..\Engine\Source\Timer\TimersManager.cpp" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Camera\Camera.cpp" />
     <ClInclude Include="..\..\Engine\Source\Entity\Entity.h" />
     <ClInclude Include="..\..\Engine\Source\Entity\TransformEntity.h" />
+    <ClInclude Include="..\..\Engine\Source\Math\MathUtils.h" />
     <ClInclude Include="..\..\Engine\Source\Timer\LogicTimer.h" />
     <ClInclude Include="..\..\Engine\Source\Timer\TimerBase.h" />
     <ClInclude Include="..\..\Engine\Source\Timer\TimersManager.h" />

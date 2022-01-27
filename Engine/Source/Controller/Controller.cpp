@@ -16,10 +16,20 @@ void Controller::ExecuteCallbacks()
 {
 	for (const OnKeyAction& actionListener : Listeners)
 	{
-		if (KeyStates[actionListener.RequiredKey])
+		if (KeyStates[actionListener.RequiredKey] == InputEventType::InputPress || KeyStates[actionListener.RequiredKey]== InputEventType::InputRepeat)
 		{
-			// Consume it
-			KeyStates[actionListener.RequiredKey] = false;
+			if (actionListener.Once)
+			{
+				if (KeyStates[actionListener.RequiredKey] == InputEventType::InputPress)
+				{
+					// Declare it repeat until it's released
+					KeyStates[actionListener.RequiredKey] = InputEventType::InputRepeat;
+
+					actionListener.Del.Execute();
+				}
+
+				return;
+			}
 
 			actionListener.Del.Execute();
 		}
@@ -32,8 +42,6 @@ void Controller::OnInputReceived(KeyCode inKeyCode, InputEventType inEventType)
 	{
 		StopEngineRunning();
 	}
-
-	const bool pressed = inEventType == InputEventType::InputPress;
 
 // 	switch (inEventType)
 // 	{
@@ -50,6 +58,6 @@ void Controller::OnInputReceived(KeyCode inKeyCode, InputEventType inEventType)
 // 		break;
 // 	}
 
-	KeyStates[inKeyCode] = pressed;
+	KeyStates[inKeyCode] = inEventType;
 }
 

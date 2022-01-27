@@ -37,12 +37,12 @@ VAO::VAO()
 
 VAO::~VAO() = default;
 
-void VAO::Bind()
+void VAO::Bind() const
 {
 	glBindVertexArray(Handle);
 }
 
-void VAO::Unbind()
+void VAO::Unbind() const
 {
 	glBindVertexArray(0);
 }

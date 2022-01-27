@@ -9,7 +9,6 @@
 #include "Timer/TimersManager.h"
 #include "Objects/CeilingAndFloor.h"
 #include "Entity/TransformEntity.h"
-#include "Objects/Pillar.h"
 #include "glm/common.hpp"
 #include <stdlib.h>
 
@@ -37,37 +36,37 @@ void FlappyGameMode::Init()
 
 	KeyActionDelegate jumpDelegate = KeyActionDelegate::CreateRaw(this, &FlappyGameMode::Jump);
 	KeyCode jumpKey = KeyCode::LeftAlt;
-	OnKeyAction jumpAction = { jumpDelegate, jumpKey };
+	OnKeyAction jumpAction = { jumpDelegate, jumpKey, true };
 
 	GameController->AddListener(jumpAction);
 
 	// Debug
-	KeyActionDelegate createFloorDelegate = KeyActionDelegate::CreateRaw(this, &FlappyGameMode::DebugCreateFloor);
+	KeyActionDelegate createFloorDelegate = KeyActionDelegate::CreateRaw(this, &FlappyGameMode::SwitchFloors);
 	KeyCode createFloorKey = KeyCode::C;
-	OnKeyAction createFloorAction = { createFloorDelegate, createFloorKey };
+	OnKeyAction createFloorAction = { createFloorDelegate, createFloorKey, true };
 
 	GameController->AddListener(createFloorAction);
 
 	KeyActionDelegate moveBirdDelegate = KeyActionDelegate::CreateRaw(this, &FlappyGameMode::DebugMoveBird);
 	KeyCode moveBirdKey = KeyCode::F;
-	OnKeyAction moveBirdAction = { moveBirdDelegate, moveBirdKey };
+	OnKeyAction moveBirdAction = { moveBirdDelegate, moveBirdKey, true };
 
 	GameController->AddListener(moveBirdAction);
 
 	KeyActionDelegate moveCameraLeftDelegate = KeyActionDelegate::CreateRaw(this, &FlappyGameMode::DebugMoveCameraLeft);
-	KeyCode moveCameraLeftKey = KeyCode::A;
+	KeyCode moveCameraLeftKey = KeyCode::D;
 
-	OnKeyAction moveCameraLeftAction = { moveCameraLeftDelegate, moveCameraLeftKey };
+	OnKeyAction moveCameraLeftAction = { moveCameraLeftDelegate, moveCameraLeftKey, false };
 
 	GameController->AddListener(moveCameraLeftAction);
 
 	KeyActionDelegate moveCameraRightDelegate = KeyActionDelegate::CreateRaw(this, &FlappyGameMode::DebugMoveCameraRight);
-	KeyCode moveCameraRightKey = KeyCode::D;
+	KeyCode moveCameraRightKey = KeyCode::A;
 
-	OnKeyAction moveCameraRightAction = { moveCameraRightDelegate, moveCameraRightKey };
+	OnKeyAction moveCameraRightAction = { moveCameraRightDelegate, moveCameraRightKey, false };
 
 	GameController->AddListener(moveCameraRightAction);
-	//
+	// Debug
 
 	// Scene setup
 	SceneManager& sManager = SceneManager::Get();
@@ -86,8 +85,12 @@ void FlappyGameMode::Init()
 
 	currentScene.AddEntity(BirdParent);
 
-	constexpr bool firstTime = true;
-	CreateFloor(firstTime);
+	// Add the 2 floors to the pool
+	Floors[0] = CreateFloor();
+	Floors[1] = CreateFloor();
+
+	const float floorWidth = CeilingAndFloor::GetWidth();
+	Floors[1]->Model.Translation.x = -floorWidth;
 
 	GameRunning = true;
 }
@@ -106,10 +109,10 @@ void FlappyGameMode::Tick(float inDeltaT)
 		const float fallOffset = FallSpeed * inDeltaT;
 		const float moveOffset = MoveSpeedNormal * inDeltaT;
 
-		for (const EntityPtr& floor : Floors)
-		{
-			floor->Model.Translation.x += moveOffset;
-		}
+ 		for (const EntityPtr& floor : Floors)
+ 		{
+ 			floor->Model.Translation.x += moveOffset;
+ 		}
 
 		BirdParent->Model.Translation.y -= fallOffset;
 
@@ -128,8 +131,8 @@ void FlappyGameMode::Tick(float inDeltaT)
 		GameOver();
 	}
 
-	CreateFloors();
-	EraseFloors();
+	CheckFloors();
+	CheckPillarsCollision();
 }
 
 void FlappyGameMode::Jump()
@@ -156,10 +159,10 @@ void FlappyGameMode::OnJumpTick(float inDeltaT, float inTimeLeft)
 	float riseOffset = RiseSpeed * (inDeltaT * inTimeLeft);
 	float moveOffset = MoveSpeedFast * (inDeltaT * inTimeLeft);
 
-	for (const EntityPtr& floor : Floors)
-	{
-		floor->Model.Translation.x += moveOffset / 5.f;
-	}
+ 	for (const EntityPtr& floor : Floors)
+ 	{
+ 		floor->Model.Translation.x += moveOffset / 5.f;
+ 	}
 
 	BirdParent->Model.Translation.y += riseOffset;
 
@@ -179,86 +182,55 @@ void FlappyGameMode::GameOver()
 	//GameRunning = false;
 }
 
-void FlappyGameMode::EraseFloors()
-{
-	eastl::vector<EntityIterator> toRemove;
-
-	for (EntityIterator iter = Floors.begin(); iter != Floors.end(); ++iter)
-	{
-		EntityPtr floor = *iter;
-
-		if (floor->Model.Translation.x > 50.f)
-		{
-			toRemove.push_back(iter);
-		}
-	}
-
-	for (EntityIterator iter : toRemove)
-	{
-		Floors.erase(iter);
-		SceneManager& sManager = SceneManager::Get();
-		Scene& currentScene = sManager.GetCurrentScene();
-
-		EntityIterator sceneIter = eastl::find(currentScene.Entities.begin(), currentScene.Entities.end(), *iter);
-		ENSURE(sceneIter);
-
-		currentScene.Entities.erase(sceneIter);
-	}
-}
-
-void FlappyGameMode::CreateFloors()
-{
-	EntityIterator lastFloorPlusOne = Floors.end();
-	EntityIterator lastFloorIter = --lastFloorPlusOne;
-	EntityPtr lastFloor = *lastFloorIter;
-
-	if (lastFloor->Model.Translation.x > 10.f)
-	{
-		CreateFloor();
-	}
-}
-
-void FlappyGameMode::DebugCreateFloor()
-{
-	constexpr bool firstTime = false;
-	CreateFloor(firstTime);
-}
-
 void FlappyGameMode::DebugMoveBird()
 {
 	MoveSpeedNormal += 5.f;
-
 }
 
-void FlappyGameMode::CreateFloor(bool firstTime)
+void FlappyGameMode::CheckFloors()
 {
-	const float floorOffset = firstTime ? 0.f : 25.f;
+ 	// Check floors positions, teleport if necessary
+ 	constexpr float floorLimit = 50.f;
+ 
+ 	// Floor at 0 position should always be the right most
+ 	eastl::shared_ptr<CeilingAndFloor> rightFloor = Floors[0];
+ 	eastl::shared_ptr<CeilingAndFloor> leftFloor = Floors[1];
+ 
+ 	const float rightFloorX = rightFloor->GetLocation().x;
+ 
+ 	// If floor has moved enough to the right and is out of camera
+ 	if (rightFloorX > floorLimit)
+ 	{
+ 		SwitchFloors();
+ 	}
+}
 
-	EntityPtr newFloor = eastl::make_shared<CeilingAndFloor>();
-	newFloor->Model.Translation.x -= floorOffset;
+void FlappyGameMode::SwitchFloors()
+{
+	const float floorSize = CeilingAndFloor::GetWidth();
+
+	eastl::shared_ptr<CeilingAndFloor> rightFloor = Floors[0];
+	eastl::shared_ptr<CeilingAndFloor> leftFloor = Floors[1];
+
+	const float leftFloorX = leftFloor->GetLocation().x;
+	const float newFloorX = leftFloorX - floorSize;
+
+	rightFloor->Model.Translation.x = newFloorX;
+
+	// Switch floors
+  	Floors[0] = leftFloor;
+  	Floors[1] = rightFloor;
+}
+
+eastl::shared_ptr<CeilingAndFloor> FlappyGameMode::CreateFloor()
+{
+	eastl::shared_ptr<CeilingAndFloor> newFloor = eastl::make_shared<CeilingAndFloor>();
 	newFloor->Model.Translation.z += 1.f;
 
 	SceneManager& sManager = SceneManager::Get();
 	sManager.GetCurrentScene().AddEntity(newFloor);
-	Floors.push_back(newFloor);
 
-	constexpr float minHeight = 5.f;
-	constexpr float maxHeight = 10.f;
-
-	const float height = static_cast<float>(glm::max(5, (rand() % 10)));
-	const float distance = 5.f;
-	const float distanceFromStart = -20.f;
-
-	for (int32_t i = 0; i < 3; ++i)
-	{
-		EntityPtr newPillar = eastl::make_shared<Pillar>();
-
-
-
-		newPillar->Model.Translation.x = newFloor->Model.Translation.x - distance *(i + 1);
-
-		newFloor->AddChild(newPillar);
-	}
+	return newFloor;
 }
 
 void FlappyGameMode::DebugMoveCameraLeft()
@@ -270,3 +242,25 @@ void FlappyGameMode::DebugMoveCameraRight()
 {
 	GameCamera->Model.Translation.x -= 10.f;
 }
+
+void FlappyGameMode::CheckPillarsCollision()
+{
+	eastl::vector<EntityPtr> pillars;
+
+	for (const EntityPtr& floor : Floors)
+	{
+		//pillars.insert(pillars.end(), floor->GetChildren().begin(), floor->GetChildren().end());
+	}
+
+
+	for (const EntityPtr& pillar : pillars)
+	{
+
+		//if()
+
+
+
+	}
+
+}
+

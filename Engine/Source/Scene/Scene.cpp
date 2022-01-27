@@ -33,8 +33,8 @@ void Scene::RecursivelyInitObjects(eastl::vector<eastl::shared_ptr<Entity>>& inO
 {
 	for (eastl::shared_ptr<Entity>& obj : inObjects)
 	{
-		RecursivelyInitObjects(obj->Children);
-
 		obj->Init();
+
+		RecursivelyInitObjects(obj->Children);
 	}
 }

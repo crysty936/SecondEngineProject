@@ -10,6 +10,11 @@ namespace glm
 	{
 		GLM_STATIC_ASSERT(std::numeric_limits<genType>::is_iec559, "'radians' only accept floating-point input");
 
+		// To convert degrees to radians, multiply the degrees with pi/180
+		// Because 180 degrees = 1 radian so basically find out how much
+		// of a radian a degree is then multiply that by the number of degrees
+		// pi/180 = 0.01745329251994329576923690768489 - precalculated
+
 		return degrees * static_cast<genType>(0.01745329251994329576923690768489);
 	}
 

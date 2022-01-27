@@ -9,18 +9,28 @@ using EntityIterator = eastl::vector<eastl::shared_ptr<class Entity>>::iterator;
 /**
  * Main Game Entity with Transform and Init and Tick functions
  */
-class Entity
+class Entity : public eastl::enable_shared_from_this<Entity>
 {
 public:
-	Entity() = default;
+	Entity();
 	virtual ~Entity() = default;
 
-	virtual void Init() = 0;
+	virtual void Init();
 	virtual void Tick(const float inDeltaT) = 0;
 
-	inline void AddChild(EntityPtr inEntity) { Children.push_back(inEntity); }
-
+	inline void AddChild(EntityPtr inEntity) { inEntity->SetParent(shared_from_this()); }
+	inline glm::vec3 GetLocation() { return Model.Translation; }
+	inline const eastl::vector<EntityPtr> GetChildren() const { return Children; }
+	void SetParent(eastl::shared_ptr<Entity> inParent);
+	
 public:
+	int32_t EntityId;
 	Transform Model;
+	eastl::weak_ptr<Entity> Parent;
+
+private:
 	eastl::vector<EntityPtr> Children;
+	static int32_t Entities;
+
+	friend class Scene;
 };

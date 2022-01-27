@@ -15,6 +15,8 @@ public:
 };
 
 
+// TODO: Implement raycasts
 
-
+// Deprojecting screen to world, used to convert mouse position to world space to be able to do raycasts - in Unreal in method DeprojectScreenToWorld
+// used by GetHitResultUnderCursorByHand to get the location of the raycast
 

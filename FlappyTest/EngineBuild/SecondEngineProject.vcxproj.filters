@@ -106,6 +106,12 @@
     <ClCompile Include="..\..\Engine\Source\Entity\TransformEntity.cpp">
       <Filter>Engine\Source\Entity</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Engine\Source\Entity\Entity.cpp">
+      <Filter>Engine\Source\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\Source\Math\MathUtils.cpp">
+      <Filter>Engine\Source\Math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Camera\Camera.h">
@@ -227,6 +233,9 @@
     </ClInclude>
     <ClInclude Include="..\..\Engine\Source\Entity\Entity.h">
       <Filter>Engine\Source\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\Source\Math\MathUtils.h">
+      <Filter>Engine\Source\Math</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

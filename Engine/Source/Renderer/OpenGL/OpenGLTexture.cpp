@@ -3,7 +3,7 @@
 #include "GLFW/glfw3.h"
 
 OpenGLTexture::OpenGLTexture(const eastl::string& inTexturePath, int32_t inTexNr)
-	: TexHandle{ 0 }, TexNr{ inTexNr }, NrChannels{ 0 }, Bound{ false }, Valid{ false }
+	: TexHandle{ 0 }, TexNr{ inTexNr }, NrChannels{ 0 }, Valid{ false }
 {
 	ImageData data = ImageLoading::LoadImageData(inTexturePath.data());
 
@@ -59,7 +59,7 @@ OpenGLTexture::OpenGLTexture(const eastl::string& inTexturePath, int32_t inTexNr
 
 OpenGLTexture::~OpenGLTexture() = default;
 
-void OpenGLTexture::Bind()
+void OpenGLTexture::Bind() const
 {
 	if (NrChannels == 4)
 	{
@@ -69,11 +69,9 @@ void OpenGLTexture::Bind()
 
 	glActiveTexture(TexNr);
 	glBindTexture(GL_TEXTURE_2D, TexHandle);
-
-	Bound = true;
 }
 
-void OpenGLTexture::Unbind()
+void OpenGLTexture::Unbind() const
 {
 	glActiveTexture(TexNr);
 	glBindTexture(GL_TEXTURE_2D, 0);
@@ -82,8 +80,6 @@ void OpenGLTexture::Unbind()
 	{
 		glDisable(GL_BLEND);
 	}
-
-	Bound = false;
 }
 
 void OpenGLTexture::DeleteTexture()

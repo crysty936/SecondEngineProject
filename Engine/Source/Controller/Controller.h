@@ -10,6 +10,7 @@ struct OnKeyAction
 {
 	KeyActionDelegate Del;
 	KeyCode RequiredKey;
+	bool Once = false;
 };
 
 class Controller
@@ -25,6 +26,6 @@ private:
 	void OnInputReceived(KeyCode inKeyCode, InputEventType inEventType);
 
 private:
-	eastl::unordered_map<KeyCode, bool> KeyStates;
+	eastl::unordered_map<KeyCode, InputEventType> KeyStates;
 	eastl::vector<OnKeyAction> Listeners;
 };

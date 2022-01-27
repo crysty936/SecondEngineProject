@@ -85,23 +85,23 @@ void OpenGLRenderer::Draw()
 	glfwSwapBuffers(MainWindow->GetHandle());
 }
 
-void OpenGLRenderer::RecursiveDrawObjects(eastl::vector<eastl::shared_ptr<Entity>>& inObjects, const glm::mat4 inParentModel)
+void OpenGLRenderer::RecursiveDrawObjects(const eastl::vector<eastl::shared_ptr<Entity>>& inObjects, const glm::mat4 inParentModel)
 {
 	glm::mat4 view = SceneManager::Get().GetCurrentScene().CurrentCamera->GetLookAt();
 
-	for (eastl::shared_ptr<Entity>& object : inObjects)
+	for (const eastl::shared_ptr<Entity>& object : inObjects)
 	{
-		Entity* tickable = object.get();
-		DrawableObject* renderable = dynamic_cast<DrawableObject*>(tickable);
+		const Entity* tickable = object.get();
+		const DrawableObject* renderable = dynamic_cast<const DrawableObject*>(tickable);
 		glm::mat4 currentModel = tickable->Model.GetModel();
 		currentModel = inParentModel *currentModel;
 
-		RecursiveDrawObjects(tickable->Children, currentModel);
+		RecursiveDrawObjects(tickable->GetChildren(), currentModel);
 
 		if (renderable)
 		{
 			// Bind and set all uniforms
-			OpenGLShader& shader = renderable->GetShader();
+			const OpenGLShader& shader = renderable->GetShader();
 			shader.Bind();
 
 			shader.SetUniformValue4fv("model", currentModel);

@@ -90,43 +90,46 @@ void OpenGLShader::UnBind()
 	glUseProgram(0);
 }
 
-void OpenGLShader::SetUniformValue4f(const eastl::string & UniformName, float v1, float v2, float v3, float v4)
+void OpenGLShader::SetUniformValue4f(const eastl::string & UniformName, float v1, float v2, float v3, float v4) const
 {
 	glUniform4f(GetUniformLocation(UniformName), v1, v2, v3, v4);
 }
-void OpenGLShader::SetUniformValue3f(const eastl::string & UniformName, float v1, float v2, float v3)
+void OpenGLShader::SetUniformValue3f(const eastl::string & UniformName, float v1, float v2, float v3) const
 {
 	glUniform3f(GetUniformLocation(UniformName), v1, v2, v3);
 }
 
-void OpenGLShader::SetUniformValue1f(const eastl::string & UniformName, float v1)
+void OpenGLShader::SetUniformValue1f(const eastl::string & UniformName, float v1) const
 {
 	glUniform1f(GetUniformLocation(UniformName), v1);
 }
 
-void OpenGLShader::SetUniformValue1i(const eastl::string & UniformName, int v1)
+void OpenGLShader::SetUniformValue1i(const eastl::string & UniformName, int v1) const
 {
 	glUniform1i(GetUniformLocation(UniformName), v1);
 }
 
-void OpenGLShader::SetUniformValue4fv(const eastl::string & UniformName, glm::mat4 matrix)
+void OpenGLShader::SetUniformValue4fv(const eastl::string & UniformName, glm::mat4 matrix) const
 {
 	glUniformMatrix4fv(GetUniformLocation(UniformName), 1, GL_FALSE, glm::value_ptr(matrix));
 }
 
-void OpenGLShader::SetUniformValue3fv(const eastl::string & UniformName, glm::vec3 vec)
+void OpenGLShader::SetUniformValue3fv(const eastl::string & UniformName, glm::vec3 vec) const
 {
 	glUniform3fv(GetUniformLocation(UniformName), 1, glm::value_ptr(vec));
 }
 
-int OpenGLShader::GetUniformLocation(const eastl::string & UniformName)
+int OpenGLShader::GetUniformLocation(const eastl::string & UniformName) const
 {
+	// Workaround for small optimization that should not require removing const
+	OpenGLShader& nonConstThis = const_cast<OpenGLShader&>(*this);
+
 	if (UniformLocations.find(UniformName) != UniformLocations.end())
-		return UniformLocations[UniformName];
+		return nonConstThis.UniformLocations[UniformName];
 
 	int uniformLocation = glGetUniformLocation(GetHandle(), UniformName.c_str());
 	if (uniformLocation != -1)
-		UniformLocations[UniformName] = uniformLocation;
+		nonConstThis.UniformLocations[UniformName] = uniformLocation;
 
 	ASSERT(uniformLocation != -1, "Uniform location could not be found!");
 

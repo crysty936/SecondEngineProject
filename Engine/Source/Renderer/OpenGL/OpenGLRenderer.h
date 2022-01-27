@@ -21,7 +21,7 @@ public:
 	static void Terminate();
 	void Draw();
 
-	void RecursiveDrawObjects(eastl::vector<eastl::shared_ptr<class Entity>>& inObjects, const glm::mat4 inParentModel);
+	void RecursiveDrawObjects(const eastl::vector<eastl::shared_ptr<class Entity>>& inObjects, const glm::mat4 inParentModel);
 	eastl::unique_ptr<OpenGLWindow> CreateWindow(const WindowProperties& inWindowProperties) const;
 	void DestroyWindow(GLFWwindow* inWindowHandle) const;
 	void SetVSyncEnabled(const bool inEnabled);
