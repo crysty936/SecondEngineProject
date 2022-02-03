@@ -5,6 +5,7 @@
 #include "EventSystem/EventSystem.h"
 
 using KeyActionDelegate = Delegate<void>;
+using MouseMovedDelegate = Delegate<void, float, float>;
 
 struct OnKeyAction
 {
@@ -20,12 +21,18 @@ public:
 	virtual ~Controller();
 
 	void ExecuteCallbacks();
-	inline void AddListener(OnKeyAction& inKeyAction) { Listeners.push_back(inKeyAction); }
+	inline void AddListener(OnKeyAction& inKeyAction) { KeyListeners.push_back(inKeyAction); }
+	inline void AddMouseListener(MouseMovedDelegate inDelegate) { MouseListeners.push_back(inDelegate); }
 
 private:
-	void OnInputReceived(KeyCode inKeyCode, InputEventType inEventType);
+	void OnKeyInputReceived(KeyCode inKeyCode, InputEventType inEventType);
+	void OnMouseInputReceived(const float inNewYaw, const float inNewPitch);
 
 private:
 	eastl::unordered_map<KeyCode, InputEventType> KeyStates;
-	eastl::vector<OnKeyAction> Listeners;
+	eastl::vector<OnKeyAction> KeyListeners;
+	eastl::vector<MouseMovedDelegate> MouseListeners;
+	bool bMouseMoved;
+	float NewPitch;
+	float NewYaw;
 };

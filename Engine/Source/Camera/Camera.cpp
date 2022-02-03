@@ -3,7 +3,10 @@
 #include "glm/gtc/type_ptr.hpp"
 
 Camera::Camera()
-= default;
+	: FirstMouse{true}
+	, MouseLastYaw{0.0f}
+	, MouseLastPitch{0.0f}
+{}
 
 Camera::~Camera()
 = default;
@@ -18,10 +21,47 @@ void Camera::Tick(const float inDeltaT)
 	
 }
 
+void Camera::SetMovementDelegates(Controller& inController)
+{
+	MouseMovedDelegate del = MouseMovedDelegate::CreateRaw(this, &Camera::OnMousePosChanged);
+	del.Execute(0.f, 0.f);
+	inController.AddMouseListener(del);
+}
+
+void Camera::OnMousePosChanged(const float inNewYaw, const float inNewPitch)
+{
+	if (FirstMouse)
+	{
+		FirstMouse = false;
+
+		MouseLastYaw = inNewYaw;
+		MouseLastPitch = inNewPitch;
+	}
+
+	const float yawOffset = inNewYaw - MouseLastYaw;
+	const float pitchOffset = inNewPitch - MouseLastPitch;
+
+	MouseLastYaw = inNewYaw;
+	MouseLastPitch = inNewPitch;
+
+	const float sensitivity = 0.1f;
+	
+	Yaw += (yawOffset * sensitivity);
+	Pitch += (pitchOffset * sensitivity);
+
+// 	const float newYaw = Model.Rotation.x + yawOffset;;
+// 	const float newPitch = Model.Rotation.y + pitchOffset;
+
+	glm::vec3 newRotation;
+	newRotation.x = cos(glm::radians(Yaw)) * cos(glm::radians(Pitch));
+	newRotation.y = sin(glm::radians(Pitch));
+	newRotation.z = sin(glm::radians(Yaw)) * cos(glm::radians(Pitch));
+
+	Model.Rotation = glm::normalize(newRotation);
+}
+
 glm::mat4 Camera::GetLookAt()
 {
-	//glm::lookAt()
-
 	constexpr glm::vec3 globalUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
 	//glm::vec3 euler = glm::eulerAngles(Model.NewRotation);
@@ -32,6 +72,8 @@ glm::mat4 Camera::GetLookAt()
  	glm::vec3 right = glm::normalize(glm::cross(globalUp, cameraFront));
  	glm::vec3 cameraUp = glm::cross(cameraFront, right);
  
+	//return glm::lookAt(Model.Translation, glm::normalize(-Model.Rotation), cameraUp);
+
 	// Rotation Matrix
  	float firstMatrixA[16] =
  	{

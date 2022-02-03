@@ -10,8 +10,19 @@ public:
 
 	virtual void Init() override;
 	virtual void Tick(const float inDeltaT) override;
-
+	
+	void SetMovementDelegates(class Controller& inController);
 	glm::mat4 GetLookAt();
+
+private:
+	void OnMousePosChanged(const float inNewYaw, const float inNewPitch);
+	
+private:
+	bool FirstMouse;
+	float MouseLastYaw;
+	float MouseLastPitch;
+	float Yaw = 0.f;
+	float Pitch = 0.f;
 };
 
 

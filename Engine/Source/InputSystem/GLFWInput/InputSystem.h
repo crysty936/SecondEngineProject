@@ -7,6 +7,7 @@
 #include "Entity/Entity.h"
 
 using KeyDelegate = MulticastDelegate<KeyCode, InputEventType>;
+using MousePosDelegate = MulticastDelegate<float, float>;
 
 class InputSystem
 {
@@ -23,15 +24,18 @@ public:
 	static inline InputSystem& Get() { ASSERT(Instance); return *Instance; }
 
 	/** Callbacks for others to tie into */
-	inline KeyDelegate& OnKeyInput() { return DelegateKeyInput; }
+	inline KeyDelegate& OnKeyInput() { return OnKeyInputDelegate; }
+	inline MousePosDelegate& OnMouseMoved() { return OnMouseMovedDelegate; }
 
 private:
 	void OnKeyPressedLog(KeyCode inKeyCode, InputEventType inEventType);
 	static void GLFWKeyCallback(GLFWwindow*, int32_t inKeycode, int32_t inScanCode, int32_t inAction, int32_t inMods);
+	static void MousePosChangedCallback(GLFWwindow*, const double inNewYaw, const double inNewPitch);
 
 private:
 	static InputSystem* Instance;
 
 private:
-	KeyDelegate DelegateKeyInput;
+	KeyDelegate OnKeyInputDelegate;
+	MousePosDelegate OnMouseMovedDelegate;
 };

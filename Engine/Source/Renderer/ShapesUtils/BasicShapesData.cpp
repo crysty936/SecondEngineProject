@@ -74,6 +74,14 @@ const float CubeVertices[] = {
 	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
 };
 
+const uint32_t CubeIndices[] = {
+	0, 1, 2,
+	1, 2, 3
+
+
+
+};
+
 // Cube
 
 const float* BasicShapesData::GetTriangleVertices()
@@ -114,4 +122,24 @@ int32_t BasicShapesData::GetSquareVerticesCount()
 int32_t BasicShapesData::GetSquareIndicesCount()
 {
 	return sizeof(SquareIndices) / sizeof(uint32_t);
+}
+
+const float* BasicShapesData::GetCubeVertices()
+{
+	return CubeVertices;
+}
+
+const uint32_t* BasicShapesData::GetCubeIndices()
+{
+	return CubeIndices;
+}
+
+int32_t BasicShapesData::GetCubeVerticesCount()
+{
+	return sizeof(CubeVertices) / sizeof(float);
+}
+
+int32_t BasicShapesData::GetCubeIndicesCount()
+{
+	return sizeof(CubeIndices) / sizeof(uint32_t);
 }

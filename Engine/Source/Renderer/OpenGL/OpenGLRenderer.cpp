@@ -8,7 +8,7 @@
 #include "Scene/Scene.h"
 #include "Camera/Camera.h"
 #include "Scene/SceneManager.h"
-#include "Renderer/OpenGL/DrawableObject.h"
+#include "Renderer/OpenGL/SimpleShapeDrawable.h"
 #include "glm/ext/matrix_float4x4.hpp"
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/trigonometric.hpp"
@@ -93,7 +93,7 @@ void OpenGLRenderer::RecursiveDrawObjects(const eastl::vector<eastl::shared_ptr<
 	for (const eastl::shared_ptr<Entity>& object : inObjects)
 	{
 		const Entity* tickable = object.get();
-		const DrawableObject* renderable = dynamic_cast<const DrawableObject*>(tickable);
+		const SimpleShapeDrawable* renderable = dynamic_cast<const SimpleShapeDrawable*>(tickable);
 		Transform currentTransform = tickable->Model;
 		Transform result = inParentTransform * currentTransform;
 		glm::mat4 currentModel = result.GetModel();
@@ -123,7 +123,7 @@ void OpenGLRenderer::RecursiveDrawObjects(const eastl::vector<eastl::shared_ptr<
 	for (const eastl::shared_ptr<Entity>& object : inObjects)
 	{
 		const Entity* tickable = object.get();
-		const DrawableObject* renderable = dynamic_cast<const DrawableObject*>(tickable);
+		const SimpleShapeDrawable* renderable = dynamic_cast<const SimpleShapeDrawable*>(tickable);
 		glm::mat4 currentModel = tickable->Model.GetModel();
 		currentModel = inParentModel * currentModel;
 

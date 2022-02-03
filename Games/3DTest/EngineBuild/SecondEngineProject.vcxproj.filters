@@ -64,9 +64,6 @@
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\Buffer\VertexBufferLayout.cpp">
       <Filter>Engine\Source\Renderer\OpenGL\Buffer</Filter>
     </ClCompile>
-    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\DrawableObject.cpp">
-      <Filter>Engine\Source\Renderer\OpenGL</Filter>
-    </ClCompile>
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\OpenGLRenderer.cpp">
       <Filter>Engine\Source\Renderer\OpenGL</Filter>
     </ClCompile>
@@ -111,6 +108,9 @@
     </ClCompile>
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Window\OpenGLWindow.cpp">
       <Filter>Engine\Source\Window</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Engine\Source\Renderer\OpenGL\SimpleShapeDrawable.cpp">
+      <Filter>Engine\Source\Renderer\OpenGL</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -186,9 +186,6 @@
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\Buffer\VertexBufferLayout.h">
       <Filter>Engine\Source\Renderer\OpenGL\Buffer</Filter>
     </ClInclude>
-    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\DrawableObject.h">
-      <Filter>Engine\Source\Renderer\OpenGL</Filter>
-    </ClInclude>
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\OpenGLRenderer.h">
       <Filter>Engine\Source\Renderer\OpenGL</Filter>
     </ClInclude>
@@ -236,6 +233,12 @@
     </ClInclude>
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Window\WindowProperties.h">
       <Filter>Engine\Source\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Engine\Source\Renderer\OpenGL\IDrawable.h">
+      <Filter>Engine\Source\Renderer\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Engine\Source\Renderer\OpenGL\SimpleShapeDrawable.h">
+      <Filter>Engine\Source\Renderer\OpenGL</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

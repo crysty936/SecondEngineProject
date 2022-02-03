@@ -30,7 +30,15 @@ void InputSystem::GLFWKeyCallback(GLFWwindow*, int32_t inKeycode, int32_t inScan
 		break;
 	}
 
-	instance.DelegateKeyInput.Invoke(code, actionType);
+	instance.OnKeyInputDelegate.Invoke(code, actionType);
+}
+
+void InputSystem::MousePosChangedCallback(GLFWwindow*, const double inNewYaw, const double inNewPitch)
+{
+	const float yawFloat = static_cast<float>(inNewYaw);
+	const float pitchFloat = static_cast<float>(inNewPitch);
+
+	Instance->OnMouseMovedDelegate.Invoke(yawFloat, pitchFloat);
 }
 
 void InputSystem::Init()
@@ -41,7 +49,9 @@ void InputSystem::Init()
 
  	glfwSetKeyCallback(mainWindow.GetHandle(), &GLFWKeyCallback);
 
- 	Instance->DelegateKeyInput.BindRaw(Instance, &InputSystem::OnKeyPressedLog);
+ 	Instance->OnKeyInputDelegate.BindRaw(Instance, &InputSystem::OnKeyPressedLog);
+
+	glfwSetCursorPosCallback(mainWindow.GetHandle(), &MousePosChangedCallback);
 }
 
 void InputSystem::Terminate()

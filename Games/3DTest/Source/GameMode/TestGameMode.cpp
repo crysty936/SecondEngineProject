@@ -2,7 +2,7 @@
 #include "Camera/Camera.h"
 #include "Scene/SceneManager.h"
 #include "Scene/Scene.h"
-#include "Renderer/OpenGL/DrawableObject.h"
+#include "Renderer/OpenGL/SimpleShapeDrawable.h"
 #include "Renderer/ShapesUtils/BasicShapes.h"
 #include "Controller/Controller.h"
 #include "Entity/TransformEntity.h"
@@ -41,9 +41,10 @@ void TestGameMode::Init()
 	SceneManager& sManager = SceneManager::Get();
 	Scene& currentScene = sManager.GetCurrentScene();
 	GameCamera = currentScene.CurrentCamera;
+	GameCamera->SetMovementDelegates(*GameController);
 
 	// Push camera back a bit and orient it towards center
-	GameCamera->Model.Translation.z = 50.f;
+	GameCamera->Model.Translation.z = 10.f;
 	GameCamera->Model.Rotation.z = -1.f;
 
 	// Why 90 degrees and not 180
@@ -56,11 +57,16 @@ void TestGameMode::Init()
 	//currentScene.AddEntity(BirdParent);
 
 
+	Object = BasicShapes::CreateCubeObject();
+	currentScene.AddEntity(Object);
+
+
 }
 
 void TestGameMode::Tick(float inDeltaT)
 {
+	GameController->ExecuteCallbacks();
 
-
+	//Object->Model.Rotation.y += 0.5f;
 }
 

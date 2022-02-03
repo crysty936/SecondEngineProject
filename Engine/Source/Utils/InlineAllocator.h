@@ -5,7 +5,7 @@
  * Allocator that allocates inline up to a point, from which it allocates on the heap.
  */
 
-constexpr int StackSize = 30;
+constexpr int StackSize = 32;
 
 class InlineAllocator
 {

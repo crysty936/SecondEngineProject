@@ -1,17 +1,14 @@
-#include "DrawableObject.h"
+#include "SimpleShapeDrawable.h"
 
-DrawableObject::DrawableObject(VAO& inVAO, OpenGLShader& inShader)
+SimpleShapeDrawable::SimpleShapeDrawable(VAO& inVAO, OpenGLShader& inShader)
 	: ObjectVAO{ inVAO }, Shader{ inShader }
 {
 }
 
-DrawableObject::DrawableObject()
-{}
+SimpleShapeDrawable::SimpleShapeDrawable() = default;
+SimpleShapeDrawable::~SimpleShapeDrawable() = default;
 
-DrawableObject::~DrawableObject()
-{}
-
-void DrawableObject::Draw() const
+void SimpleShapeDrawable::Draw() const
 {
 	uint32_t indicesCount = ObjectVAO.GetVertexBuffer().GetIndicesCount();
 
@@ -32,12 +29,12 @@ void DrawableObject::Draw() const
 	}
 }
 
-void DrawableObject::AddTexture(OpenGLTexture inTexture)
+void SimpleShapeDrawable::AddTexture(OpenGLTexture inTexture)
 {
 	Textures.push_back(inTexture);
 }
 
-void DrawableObject::DeleteObject()
+void SimpleShapeDrawable::DeleteObject()
 {
 	ObjectVAO.DeleteBuffers();
 	Shader.DeleteShader();
@@ -47,7 +44,7 @@ void DrawableObject::DeleteObject()
 	}
 }
 
-void DrawableObject::Init()
+void SimpleShapeDrawable::Init()
 {
 	
 }

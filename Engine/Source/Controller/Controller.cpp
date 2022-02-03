@@ -3,61 +3,82 @@
 #include "Core/EngineCore.h"
 
 Controller::Controller()
+	: KeyStates()
+	, KeyListeners()
+	, MouseListeners()
+	, bMouseMoved{ false }
+	, NewPitch{0.0f}
+	, NewYaw{0.0f}
 {
-	InputSystem::Get().OnKeyInput().BindRaw(this, &Controller::OnInputReceived);
+	InputSystem::Get().OnKeyInput().BindRaw(this, &Controller::OnKeyInputReceived);
+	InputSystem::Get().OnMouseMoved().BindRaw(this, &Controller::OnMouseInputReceived);
 }
 
-Controller::~Controller()
-{
-
-}
+Controller::~Controller() = default;
 
 void Controller::ExecuteCallbacks()
 {
-	for (const OnKeyAction& actionListener : Listeners)
+	if (bMouseMoved)
 	{
-		if (KeyStates[actionListener.RequiredKey] == InputEventType::InputPress || KeyStates[actionListener.RequiredKey]== InputEventType::InputRepeat)
+		bMouseMoved = false;
+
+		for (const MouseMovedDelegate& listener : MouseListeners)
 		{
-			if (actionListener.Once)
+			listener.Execute(NewYaw, NewPitch);
+		}
+	}
+
+	for (const OnKeyAction& listener : KeyListeners)
+	{
+		if (KeyStates[listener.RequiredKey] == InputEventType::InputPress || KeyStates[listener.RequiredKey] == InputEventType::InputRepeat)
+		{
+			if (listener.Once)
 			{
-				if (KeyStates[actionListener.RequiredKey] == InputEventType::InputPress)
+				if (KeyStates[listener.RequiredKey] == InputEventType::InputPress)
 				{
 					// Declare it repeat until it's released
-					KeyStates[actionListener.RequiredKey] = InputEventType::InputRepeat;
+					KeyStates[listener.RequiredKey] = InputEventType::InputRepeat;
 
-					actionListener.Del.Execute();
+					listener.Del.Execute();
 				}
 
 				return;
 			}
 
-			actionListener.Del.Execute();
+			listener.Del.Execute();
 		}
 	}
 }
 
-void Controller::OnInputReceived(KeyCode inKeyCode, InputEventType inEventType)
+void Controller::OnKeyInputReceived(KeyCode inKeyCode, InputEventType inEventType)
 {
 	if (inKeyCode == KeyCode::Escape)
 	{
 		StopEngineRunning();
 	}
 
-// 	switch (inEventType)
-// 	{
-// 	case InputEventType::InputPress:
-// 		LOG_INFO("Press detected");
-// 		break;
-// 
-// 	case InputEventType::InputRelease:
-// 		LOG_INFO("Release detected");
-// 		break;
-// 
-// 	case InputEventType::InputRepeat:
-// 		LOG_INFO("Repeat detected");
-// 		break;
-// 	}
+	// 	switch (inEventType)
+	// 	{
+	// 	case InputEventType::InputPress:
+	// 		LOG_INFO("Press detected");
+	// 		break;
+	// 
+	// 	case InputEventType::InputRelease:
+	// 		LOG_INFO("Release detected");
+	// 		break;
+	// 
+	// 	case InputEventType::InputRepeat:
+	// 		LOG_INFO("Repeat detected");
+	// 		break;
+	// 	}
 
 	KeyStates[inKeyCode] = inEventType;
+}
+
+void Controller::OnMouseInputReceived(const float inNewYaw, const float inNewPitch)
+{
+	bMouseMoved = true;
+	NewYaw = inNewYaw;
+	NewPitch = inNewPitch;
 }
 

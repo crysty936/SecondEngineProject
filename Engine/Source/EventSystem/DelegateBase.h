@@ -33,6 +33,10 @@ class InlineAllocator;
 	 InlineAllocator Allocator;
  };
 
+
+ // Placement new in combination with the new operator overriden on the Delegate base
+ // The size is given automatically, the DelegateBase is the one sent in the placement new and
+ // at the pointer that is returned, the specific container type is created
  inline void* operator new(size_t inSize, DelegateBase& inBase)
  {
 	 return inBase.Allocate(inSize);

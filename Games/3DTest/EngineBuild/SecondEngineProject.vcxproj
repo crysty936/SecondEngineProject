@@ -213,6 +213,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Camera\Camera.cpp" />
+    <ClInclude Include="..\..\..\Engine\Source\Renderer\OpenGL\IDrawable.h" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Camera\Camera.h" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Controller\Controller.cpp" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Controller\Controller.h" />
@@ -257,8 +258,8 @@
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\Buffer\VertexBuffer.h" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\Buffer\VertexBufferLayout.cpp" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\Buffer\VertexBufferLayout.h" />
-    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\DrawableObject.cpp" />
-    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\DrawableObject.h" />
+    <ClCompile Include="..\..\..\Engine\Source\Renderer\OpenGL\SimpleShapeDrawable.cpp" />
+    <ClInclude Include="..\..\..\Engine\Source\Renderer\OpenGL\SimpleShapeDrawable.h" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\OpenGLRenderer.cpp" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\OpenGLRenderer.h" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\OpenGLShader.cpp" />

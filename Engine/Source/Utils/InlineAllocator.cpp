@@ -87,16 +87,16 @@ void* InlineAllocator::Allocate(const size_t inSize)
 
 		Free();
 
+		AllocatedSize = inSize;
+
 		if (reqHeap)
 		{
-			void* ptr = operator new(inSize);
+			HeapPtr = operator new(inSize);
 
-			return ptr;
+			return HeapPtr;
 		}
 		else
 		{
-			AllocatedSize = inSize;
-
 			return StackPtr;
 		}
 	}
