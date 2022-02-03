@@ -1,0 +1,306 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Camera\Camera.cpp">
+      <Filter>Engine\Source\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Controller\Controller.cpp">
+      <Filter>Engine\Source\Controller</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Core\EASTLNew.cpp">
+      <Filter>Engine\Source\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Core\EngineCore.cpp">
+      <Filter>Engine\Source\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Core\GameModeBase.cpp">
+      <Filter>Engine\Source\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Core\WindowsPlatform.cpp">
+      <Filter>Engine\Source\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Entity\Entity.cpp">
+      <Filter>Engine\Source\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Entity\TransformEntity.cpp">
+      <Filter>Engine\Source\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\EventSystem\DelegateBase.cpp">
+      <Filter>Engine\Source\EventSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\EventSystem\EventSystem.cpp">
+      <Filter>Engine\Source\EventSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\InputSystem\GLFWInput\InputSystem.cpp">
+      <Filter>Engine\Source\InputSystem\GLFWInput</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\InputSystem\InputEventType.cpp">
+      <Filter>Engine\Source\InputSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Logger\Logger.cpp">
+      <Filter>Engine\Source\Logger</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Math\MathUtils.cpp">
+      <Filter>Engine\Source\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Math\Transform.cpp">
+      <Filter>Engine\Source\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\Buffer\BufferBase.cpp">
+      <Filter>Engine\Source\Renderer\OpenGL\Buffer</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\Buffer\IndexBuffer.cpp">
+      <Filter>Engine\Source\Renderer\OpenGL\Buffer</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\Buffer\VAO.cpp">
+      <Filter>Engine\Source\Renderer\OpenGL\Buffer</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\Buffer\VertexBuffer.cpp">
+      <Filter>Engine\Source\Renderer\OpenGL\Buffer</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\Buffer\VertexBufferLayout.cpp">
+      <Filter>Engine\Source\Renderer\OpenGL\Buffer</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\DrawableObject.cpp">
+      <Filter>Engine\Source\Renderer\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\OpenGLRenderer.cpp">
+      <Filter>Engine\Source\Renderer\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\OpenGLShader.cpp">
+      <Filter>Engine\Source\Renderer\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\OpenGLTexture.cpp">
+      <Filter>Engine\Source\Renderer\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\OpenGLUtils.cpp">
+      <Filter>Engine\Source\Renderer\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\ShapesUtils\BasicShapes.cpp">
+      <Filter>Engine\Source\Renderer\ShapesUtils</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\ShapesUtils\BasicShapesData.cpp">
+      <Filter>Engine\Source\Renderer\ShapesUtils</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Scene\Scene.cpp">
+      <Filter>Engine\Source\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Scene\SceneManager.cpp">
+      <Filter>Engine\Source\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Timer\LogicTimer.cpp">
+      <Filter>Engine\Source\Timer</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Timer\TimerBase.cpp">
+      <Filter>Engine\Source\Timer</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Timer\TimersManager.cpp">
+      <Filter>Engine\Source\Timer</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Utils\IOUtils.cpp">
+      <Filter>Engine\Source\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Utils\ImageLoading.cpp">
+      <Filter>Engine\Source\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Utils\InlineAllocator.cpp">
+      <Filter>Engine\Source\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Window\OpenGLWindow.cpp">
+      <Filter>Engine\Source\Window</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\UnitTests\test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Camera\Camera.h">
+      <Filter>Engine\Source\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Controller\Controller.h">
+      <Filter>Engine\Source\Controller</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\EngineCore.h">
+      <Filter>Engine\Source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\EngineUtils.h">
+      <Filter>Engine\Source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\GameModeBase.h">
+      <Filter>Engine\Source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\WindowsPlatform.h">
+      <Filter>Engine\Source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Entity\Entity.h">
+      <Filter>Engine\Source\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Entity\TransformEntity.h">
+      <Filter>Engine\Source\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\EntryPoint\EntryPoint.h">
+      <Filter>Engine\Source\EntryPoint</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\EventSystem\DelegateBase.h">
+      <Filter>Engine\Source\EventSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\EventSystem\EventSystem.h">
+      <Filter>Engine\Source\EventSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\EventSystem\IFunctionContainerBase.h">
+      <Filter>Engine\Source\EventSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\InputSystem\GLFWInput\InputSystem.h">
+      <Filter>Engine\Source\InputSystem\GLFWInput</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\InputSystem\GLFWInput\WindowsInputKeys.h">
+      <Filter>Engine\Source\InputSystem\GLFWInput</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\InputSystem\InputEventType.h">
+      <Filter>Engine\Source\InputSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Logger\Logger.h">
+      <Filter>Engine\Source\Logger</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Math\MathUtils.h">
+      <Filter>Engine\Source\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Math\Transform.h">
+      <Filter>Engine\Source\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\Buffer\BufferBase.h">
+      <Filter>Engine\Source\Renderer\OpenGL\Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\Buffer\IndexBuffer.h">
+      <Filter>Engine\Source\Renderer\OpenGL\Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\Buffer\LayoutProperties.h">
+      <Filter>Engine\Source\Renderer\OpenGL\Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\Buffer\VAO.h">
+      <Filter>Engine\Source\Renderer\OpenGL\Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\Buffer\VertexBuffer.h">
+      <Filter>Engine\Source\Renderer\OpenGL\Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\Buffer\VertexBufferLayout.h">
+      <Filter>Engine\Source\Renderer\OpenGL\Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\DrawableObject.h">
+      <Filter>Engine\Source\Renderer\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\OpenGLRenderer.h">
+      <Filter>Engine\Source\Renderer\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\OpenGLShader.h">
+      <Filter>Engine\Source\Renderer\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\OpenGLTexture.h">
+      <Filter>Engine\Source\Renderer\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\OpenGLUtils.h">
+      <Filter>Engine\Source\Renderer\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\ShapesUtils\BasicShapes.h">
+      <Filter>Engine\Source\Renderer\ShapesUtils</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\ShapesUtils\BasicShapesData.h">
+      <Filter>Engine\Source\Renderer\ShapesUtils</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Scene\Scene.h">
+      <Filter>Engine\Source\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Scene\SceneManager.h">
+      <Filter>Engine\Source\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Timer\LogicTimer.h">
+      <Filter>Engine\Source\Timer</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Timer\TimerBase.h">
+      <Filter>Engine\Source\Timer</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Timer\TimersManager.h">
+      <Filter>Engine\Source\Timer</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Utils\IOUtils.h">
+      <Filter>Engine\Source\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Utils\ImageLoading.h">
+      <Filter>Engine\Source\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Utils\InlineAllocator.h">
+      <Filter>Engine\Source\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Window\OpenGLWindow.h">
+      <Filter>Engine\Source\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Window\WindowProperties.h">
+      <Filter>Engine\Source\Window</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Engine">
+      <UniqueIdentifier>{57A6910E-243B-3CDF-82A5-B4680458C634}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source">
+      <UniqueIdentifier>{620A7758-CF0E-36B1-BF04-5DF2AD62BD5B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\Camera">
+      <UniqueIdentifier>{58CE8688-EEB8-3245-9E35-E3004765DD11}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\Controller">
+      <UniqueIdentifier>{9408019E-FD73-36B3-A985-099C825396E1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\Core">
+      <UniqueIdentifier>{F2C8293D-0D5F-3844-B21E-439B480E5589}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\Entity">
+      <UniqueIdentifier>{D5D2852C-0BB4-3E54-B37B-68954B1FA5E2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\EntryPoint">
+      <UniqueIdentifier>{D51F175E-2C81-3A41-B308-6D4694A4F92B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\EventSystem">
+      <UniqueIdentifier>{56CE865F-019E-34DE-A2C9-4BB09A867EFF}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\InputSystem">
+      <UniqueIdentifier>{0D8F4BB1-5B75-3C6B-BB41-0F77E5AF51D2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\InputSystem\GLFWInput">
+      <UniqueIdentifier>{50D15EEE-22CE-37C2-9A71-01A6C6785B9F}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\Logger">
+      <UniqueIdentifier>{516B86C6-83B8-355B-9432-53CAD425959E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\Math">
+      <UniqueIdentifier>{87E887EC-E05D-3EC6-8764-7BFBD635841F}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\Renderer">
+      <UniqueIdentifier>{BA9BD5B0-2CE7-3354-B0F0-37A13ECA8181}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\Renderer\OpenGL">
+      <UniqueIdentifier>{F9E71BFC-FDCC-35D7-9B11-2C563B6675D2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\Renderer\OpenGL\Buffer">
+      <UniqueIdentifier>{4F3B6B18-CF00-31BB-BEE0-F956A536AA14}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\Renderer\ShapesUtils">
+      <UniqueIdentifier>{F33C3496-0AF3-3B2F-B61B-F40A559CB98C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\Scene">
+      <UniqueIdentifier>{E2EB69D3-321D-3110-A3AF-BC1B4B4C74AB}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\Timer">
+      <UniqueIdentifier>{433CDF3B-D634-3A37-957B-A243E341A88B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\Utils">
+      <UniqueIdentifier>{265716CC-9C0B-3528-84F4-963AF0EE7133}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\Window">
+      <UniqueIdentifier>{B073DB84-8D43-34D5-8217-C660044B7981}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4CE14075-4603-38F2-93DA-673D82853987}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

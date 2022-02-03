@@ -11,11 +11,6 @@ DrawableObject::DrawableObject()
 DrawableObject::~DrawableObject()
 {}
 
-void DrawableObject::Tick(const float inDeltaT)
-{
-
-}
-
 void DrawableObject::Draw() const
 {
 	uint32_t indicesCount = ObjectVAO.GetVertexBuffer().GetIndicesCount();

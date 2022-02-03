@@ -1,0 +1,18 @@
+# CMake generation dependency list for this directory.
+C:/Program Files/CMake/share/cmake-3.22/Modules/BasicConfigVersion-AnyNewerVersion.cmake.in
+C:/Program Files/CMake/share/cmake-3.22/Modules/CMakePackageConfigHelpers.cmake
+C:/Program Files/CMake/share/cmake-3.22/Modules/CheckCSourceCompiles.cmake
+C:/Program Files/CMake/share/cmake-3.22/Modules/CheckIncludeFile.cmake
+C:/Program Files/CMake/share/cmake-3.22/Modules/CheckLibraryExists.cmake
+C:/Program Files/CMake/share/cmake-3.22/Modules/FindPackageHandleStandardArgs.cmake
+C:/Program Files/CMake/share/cmake-3.22/Modules/FindPackageMessage.cmake
+C:/Program Files/CMake/share/cmake-3.22/Modules/FindPython.cmake
+C:/Program Files/CMake/share/cmake-3.22/Modules/FindPython/Support.cmake
+C:/Program Files/CMake/share/cmake-3.22/Modules/FindThreads.cmake
+C:/Program Files/CMake/share/cmake-3.22/Modules/WriteBasicConfigVersionFile.cmake
+D:/Projects/SecondEngineProject/Games/FlappyTest/Build/CMakeFiles/cmake.verify_globs
+D:/Projects/SecondEngineProject/Plugins/googletest-main/googletest/CMakeLists.txt
+D:/Projects/SecondEngineProject/Plugins/googletest-main/googletest/cmake/Config.cmake.in
+D:/Projects/SecondEngineProject/Plugins/googletest-main/googletest/cmake/gtest.pc.in
+D:/Projects/SecondEngineProject/Plugins/googletest-main/googletest/cmake/gtest_main.pc.in
+D:/Projects/SecondEngineProject/Plugins/googletest-main/googletest/cmake/internal_utils.cmake

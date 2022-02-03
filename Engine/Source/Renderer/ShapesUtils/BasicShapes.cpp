@@ -12,6 +12,18 @@ const uint32_t texureBaseNr = GL_TEXTURE0;
 
 eastl::shared_ptr<Entity> BasicShapes::CreateTriangleObject(eastl::string inTexturePath)
 {
+	if (inTexturePath.empty())
+	{
+		inTexturePath = eastl::string("../Data/Textures/ExampleContainer.jpg");
+	}
+
+	eastl::shared_ptr<DrawableObject> obj = eastl::make_shared<TriangleShape>(inTexturePath);
+
+	return obj;
+}
+
+TriangleShape::TriangleShape(const eastl::string& inTexturePath)
+{
 	IndexBuffer ibo = IndexBuffer{};
 	int32_t indicesCount = BasicShapesData::GetTriangleIndicesCount();
 	ibo.SetIndices(BasicShapesData::GetTriangleIndices(), indicesCount, GL_STATIC_DRAW);
@@ -30,17 +42,18 @@ eastl::shared_ptr<Entity> BasicShapes::CreateTriangleObject(eastl::string inText
 
 	OpenGLShader basicShaderProgram = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/BasicProjectionVertexShader.glsl", "../Data/Shaders/BasicTexFragmentShader.glsl");
 
-	eastl::shared_ptr<DrawableObject> model = eastl::make_shared<DrawableObject>(vertexArray, basicShaderProgram);
-
-	if (inTexturePath.empty())
-	{
-		inTexturePath = eastl::string("../Data/Textures/ExampleContainer.jpg");
-	}
+	ObjectVAO = vertexArray;
+	Shader = basicShaderProgram;
 
 	OpenGLTexture tex{ inTexturePath, texureBaseNr + 0 };
-	model->AddTexture(tex);
-	
-	return model;
+	AddTexture(tex);
+}
+
+TriangleShape::~TriangleShape() = default;
+
+void TriangleShape::Tick(const float inDeltaT)
+{
+
 }
 
 eastl::shared_ptr<Entity> BasicShapes::CreateSquareObject(eastl::string inTexturePath)
@@ -50,9 +63,9 @@ eastl::shared_ptr<Entity> BasicShapes::CreateSquareObject(eastl::string inTextur
 		inTexturePath = eastl::string("../Data/Textures/ExampleContainer.jpg");
 	}
 
-	eastl::shared_ptr<DrawableObject> model = eastl::make_shared<SquareShape>(inTexturePath);
+	eastl::shared_ptr<DrawableObject> obj = eastl::make_shared<SquareShape>(inTexturePath);
 
-	return model;
+	return obj;
 }
 
 SquareShape::SquareShape(const eastl::string& inTexturePath)
@@ -83,10 +96,7 @@ SquareShape::SquareShape(const eastl::string& inTexturePath)
 	AddTexture(tex);
 }
 
-SquareShape::~SquareShape()
-{
-
-}
+SquareShape::~SquareShape() = default;
 
 void SquareShape::Tick(const float inDeltaT)
 {
@@ -94,3 +104,4 @@ void SquareShape::Tick(const float inDeltaT)
  	//Model.Rotation.x += 1.f;
 	//Model.Scale.x *= 0.99f;
 }
+

@@ -1,0 +1,234 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|x64">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|x64">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{67490F99-08E8-3742-B282-F45F80C1FB8A}</ProjectGuid>
+    <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
+    <Keyword>Win32Proj</Keyword>
+    <Platform>x64</Platform>
+    <ProjectName>ALL_BUILD</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="D:\Projects\SecondEngineProject\Games\FlappyTest\EngineBuild\Plugins\glfw-3.3.4\examples\boing.vcxproj">
+      <Project>{A2EE3A39-210D-3BCA-A58A-43F153A1BC1D}</Project>
+      <Name>boing</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Projects\SecondEngineProject\Games\FlappyTest\EngineBuild\Plugins\glfw-3.3.4\tests\clipboard.vcxproj">
+      <Project>{AE05BEBD-867F-3559-AFA2-1504ADC87987}</Project>
+      <Name>clipboard</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Projects\SecondEngineProject\Games\FlappyTest\EngineBuild\Plugins\glfw-3.3.4\tests\cursor.vcxproj">
+      <Project>{C9DB73E7-21F4-3B4E-A9DF-5F03B7920C01}</Project>
+      <Name>cursor</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Projects\SecondEngineProject\Games\FlappyTest\EngineBuild\Plugins\glfw-3.3.4\tests\empty.vcxproj">
+      <Project>{33FFF0D7-081E-3E6B-BE03-1938CC1C33D2}</Project>
+      <Name>empty</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Projects\SecondEngineProject\Games\FlappyTest\EngineBuild\Plugins\glfw-3.3.4\tests\events.vcxproj">
+      <Project>{478FF4E0-88D4-31FC-A292-EC0F22192D16}</Project>
+      <Name>events</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Projects\SecondEngineProject\Games\FlappyTest\EngineBuild\Plugins\glfw-3.3.4\tests\gamma.vcxproj">
+      <Project>{C996F83E-CFE8-3137-8766-C7343748E90F}</Project>
+      <Name>gamma</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Projects\SecondEngineProject\Games\FlappyTest\EngineBuild\Plugins\glfw-3.3.4\examples\gears.vcxproj">
+      <Project>{841BC6AA-EC2D-3ED8-954B-CB3ED45150D2}</Project>
+      <Name>gears</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Projects\SecondEngineProject\Games\FlappyTest\EngineBuild\Plugins\glfw-3.3.4\src\glfw.vcxproj">
+      <Project>{5D62E7CA-3C06-3B9A-BC06-95BDC7FEC0AD}</Project>
+      <Name>glfw</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Projects\SecondEngineProject\Games\FlappyTest\EngineBuild\Plugins\glfw-3.3.4\tests\glfwinfo.vcxproj">
+      <Project>{58790EE1-55AE-3BB9-9A3F-92EEB7851C22}</Project>
+      <Name>glfwinfo</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Projects\SecondEngineProject\Games\FlappyTest\EngineBuild\Plugins\glfw-3.3.4\examples\heightmap.vcxproj">
+      <Project>{540977E2-261B-32CE-A867-2DDE00AE7A9F}</Project>
+      <Name>heightmap</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Projects\SecondEngineProject\Games\FlappyTest\EngineBuild\Plugins\glfw-3.3.4\tests\icon.vcxproj">
+      <Project>{779C9C35-C325-3FB9-B543-738F1BC594E2}</Project>
+      <Name>icon</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Projects\SecondEngineProject\Games\FlappyTest\EngineBuild\Plugins\glfw-3.3.4\tests\iconify.vcxproj">
+      <Project>{DEE8F2EE-85A3-317A-A369-496E96D5675E}</Project>
+      <Name>iconify</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Projects\SecondEngineProject\Games\FlappyTest\EngineBuild\Plugins\glfw-3.3.4\tests\inputlag.vcxproj">
+      <Project>{23E7930A-11B1-30E7-8912-30CA6F4B6DA9}</Project>
+      <Name>inputlag</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Projects\SecondEngineProject\Games\FlappyTest\EngineBuild\Plugins\glfw-3.3.4\tests\joysticks.vcxproj">
+      <Project>{88662E9F-692E-36C1-A04A-547024B11C72}</Project>
+      <Name>joysticks</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Projects\SecondEngineProject\Games\FlappyTest\EngineBuild\Plugins\glfw-3.3.4\tests\monitors.vcxproj">
+      <Project>{09E88D2D-3B84-3096-AE98-44218E35A52C}</Project>
+      <Name>monitors</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Projects\SecondEngineProject\Games\FlappyTest\EngineBuild\Plugins\glfw-3.3.4\tests\msaa.vcxproj">
+      <Project>{85F15B35-CF16-37DD-8841-D6CCF0867285}</Project>
+      <Name>msaa</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Projects\SecondEngineProject\Games\FlappyTest\EngineBuild\Plugins\glfw-3.3.4\examples\offscreen.vcxproj">
+      <Project>{03AD8AB0-611F-34CA-8A88-865CA9146156}</Project>
+      <Name>offscreen</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Projects\SecondEngineProject\Games\FlappyTest\EngineBuild\Plugins\glfw-3.3.4\tests\opacity.vcxproj">
+      <Project>{7F157FEB-B338-3EDB-8D2C-ADC9C4ACD1B6}</Project>
+      <Name>opacity</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Projects\SecondEngineProject\Games\FlappyTest\EngineBuild\Plugins\glfw-3.3.4\examples\particles.vcxproj">
+      <Project>{8EFB356B-EDF0-302D-B4FE-A1C881A8AA65}</Project>
+      <Name>particles</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Projects\SecondEngineProject\Games\FlappyTest\EngineBuild\Plugins\glfw-3.3.4\tests\reopen.vcxproj">
+      <Project>{9CD68035-B4D1-3CC0-9703-5671D7D21D61}</Project>
+      <Name>reopen</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Projects\SecondEngineProject\Games\FlappyTest\EngineBuild\Plugins\glfw-3.3.4\examples\sharing.vcxproj">
+      <Project>{E3EBA45C-819E-3B3F-9379-AFF8C72E3960}</Project>
+      <Name>sharing</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Projects\SecondEngineProject\Games\FlappyTest\EngineBuild\Plugins\glfw-3.3.4\examples\simple.vcxproj">
+      <Project>{D924002C-0267-3F14-8A37-167CA37A4F12}</Project>
+      <Name>simple</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Projects\SecondEngineProject\Games\FlappyTest\EngineBuild\Plugins\glfw-3.3.4\examples\splitview.vcxproj">
+      <Project>{F37CA5E8-8CDC-3407-88B0-35AC8929CBC7}</Project>
+      <Name>splitview</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Projects\SecondEngineProject\Games\FlappyTest\EngineBuild\Plugins\glfw-3.3.4\tests\tearing.vcxproj">
+      <Project>{BF3AC593-19DF-33F7-AC66-BA8BC268D57F}</Project>
+      <Name>tearing</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Projects\SecondEngineProject\Games\FlappyTest\EngineBuild\Plugins\glfw-3.3.4\tests\threads.vcxproj">
+      <Project>{421F57E4-8846-39A2-BC2A-A9B40A2648D7}</Project>
+      <Name>threads</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Projects\SecondEngineProject\Games\FlappyTest\EngineBuild\Plugins\glfw-3.3.4\tests\timeout.vcxproj">
+      <Project>{F3526930-6B02-3D59-A0FD-30EB5FBC83F7}</Project>
+      <Name>timeout</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Projects\SecondEngineProject\Games\FlappyTest\EngineBuild\Plugins\glfw-3.3.4\tests\title.vcxproj">
+      <Project>{BB05C222-E7F4-3C5B-809D-B8BEEC64EC15}</Project>
+      <Name>title</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Projects\SecondEngineProject\Games\FlappyTest\EngineBuild\Plugins\glfw-3.3.4\tests\triangle-vulkan.vcxproj">
+      <Project>{29B2BD24-D65F-31F7-A168-36C2E4EE2781}</Project>
+      <Name>triangle-vulkan</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Projects\SecondEngineProject\Games\FlappyTest\EngineBuild\Plugins\glfw-3.3.4\examples\wave.vcxproj">
+      <Project>{FDBD1359-2A9C-3CCC-8A52-59D97DBB89AF}</Project>
+      <Name>wave</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Projects\SecondEngineProject\Games\FlappyTest\EngineBuild\Plugins\glfw-3.3.4\tests\windows.vcxproj">
+      <Project>{9AD81CC5-087C-321D-AAC8-16128ADB3436}</Project>
+      <Name>windows</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

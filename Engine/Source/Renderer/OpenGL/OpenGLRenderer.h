@@ -4,6 +4,7 @@
 #include "EASTL/shared_ptr.h"
 #include "EASTL/vector.h"
 #include "glm/ext/matrix_float4x4.hpp"
+#include "Math/Transform.h"
 
 /**
  * To make the renderer Generic, a base RHI class should be made, this should be renamed to OpenGLRHI,
@@ -21,7 +22,8 @@ public:
 	static void Terminate();
 	void Draw();
 
-	void RecursiveDrawObjects(const eastl::vector<eastl::shared_ptr<class Entity>>& inObjects, const glm::mat4 inParentModel);
+	void RecursiveDrawObjects(const eastl::vector<eastl::shared_ptr<class Entity>>& inObjects, const Transform inParentTransform);
+	void RecursiveDrawObjects(const eastl::vector<eastl::shared_ptr<Entity>>& inObjects, const glm::mat4 inParentModel);
 	eastl::unique_ptr<OpenGLWindow> CreateWindow(const WindowProperties& inWindowProperties) const;
 	void DestroyWindow(GLFWwindow* inWindowHandle) const;
 	void SetVSyncEnabled(const bool inEnabled);

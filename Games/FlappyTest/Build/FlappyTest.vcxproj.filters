@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Games\FlappyTest\Source\EntryPoint\EntryPoint.cpp">
+      <Filter>Source\EntryPoint</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Games\FlappyTest\Source\GameMode\FlappyGameMode.cpp">
+      <Filter>Source\GameMode</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Games\FlappyTest\Source\Objects\CeilingAndFloor.cpp">
+      <Filter>Source\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Games\FlappyTest\Source\Objects\Pillar.cpp">
+      <Filter>Source\Objects</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Games\FlappyTest\Source\GameMode\FlappyGameMode.h">
+      <Filter>Source\GameMode</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Games\FlappyTest\Source\Objects\CeilingAndFloor.h">
+      <Filter>Source\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Games\FlappyTest\Source\Objects\Pillar.h">
+      <Filter>Source\Objects</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source">
+      <UniqueIdentifier>{48EEC1F4-5012-3DD0-B8CA-D1DADACBE36A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\EntryPoint">
+      <UniqueIdentifier>{D6F3654C-0A84-354E-9E02-BF992129D8C1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\GameMode">
+      <UniqueIdentifier>{986606F5-6F1C-3C85-A934-194E6155A3AA}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Objects">
+      <UniqueIdentifier>{228BA3D7-E6F3-3409-AA83-DB4784852FF6}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
