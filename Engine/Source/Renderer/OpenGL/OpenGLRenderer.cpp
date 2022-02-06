@@ -32,7 +32,7 @@ OpenGLRenderer::OpenGLRenderer(const WindowProperties& inDefaultWindowProperties
 	// Create new Window for data holding
 	MainWindow = CreateWindow(inDefaultWindowProperties);
 
-	Perspective = glm::perspective(glm::radians(45.0f), (float)MainWindow->GetProperties().Width / (float)MainWindow->GetProperties().Height, 0.1f, 100.0f);
+	Perspective = glm::perspective(glm::radians(45.0f), (float)MainWindow->GetProperties().Width / (float)MainWindow->GetProperties().Height, 0.1f, 1000.0f);
 
 	// Set Context
 	GLFWwindow* mainWindowHandle = MainWindow->GetHandle();

@@ -14,10 +14,15 @@ public:
 	virtual void Init() override;
 	virtual void Tick(float inDeltat) override;
 
+	void MoveCameraLeft();
+	void MoveCameraRight();
+	void MoveCameraUp();
+	void MoveCameraDown();
 private:
 	eastl::shared_ptr<class Camera> GameCamera;
 	eastl::unique_ptr<class Controller> GameController;
 
 
 	EntityPtr Object;
+	EntityPtr Ground;
 };

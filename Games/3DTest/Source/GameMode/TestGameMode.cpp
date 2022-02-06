@@ -21,20 +21,38 @@ TestGameMode::~TestGameMode() = default;
 
 void TestGameMode::Init()
 {
-	GameController = eastl::make_unique<class Controller>();
-
-// 	KeyActionDelegate jumpDelegate = KeyActionDelegate::CreateRaw(this, &TestGameMode::Jump);
-// 	KeyCode jumpKey = KeyCode::LeftAlt;
-// 	OnKeyAction jumpAction = { jumpDelegate, jumpKey, true };
-// 
-// 	GameController->AddListener(jumpAction);
+	GameController = eastl::make_unique<Controller>();
 
 	// Debug
-// 	KeyActionDelegate createFloorDelegate = KeyActionDelegate::CreateRaw(this, &TestGameMode::SwitchFloors);
-// 	KeyCode createFloorKey = KeyCode::C;
-// 	OnKeyAction createFloorAction = { createFloorDelegate, createFloorKey, true };
-// 
-// 	GameController->AddListener(createFloorAction);
+	{
+		KeyActionDelegate cameraMovementDelegate = KeyActionDelegate::CreateRaw(this, &TestGameMode::MoveCameraLeft);
+		KeyCode createFloorKey = KeyCode::A;
+		OnKeyAction createFloorAction = { cameraMovementDelegate, createFloorKey, false };
+		GameController->AddListener(createFloorAction);
+	}
+
+	{
+		KeyActionDelegate cameraMovementDelegate = KeyActionDelegate::CreateRaw(this, &TestGameMode::MoveCameraRight);
+		KeyCode createFloorKey = KeyCode::D;
+		OnKeyAction createFloorAction = { cameraMovementDelegate, createFloorKey, false };
+
+		GameController->AddListener(createFloorAction);
+	}
+
+	{
+		KeyActionDelegate cameraMovementDelegate = KeyActionDelegate::CreateRaw(this, &TestGameMode::MoveCameraUp);
+		KeyCode createFloorKey = KeyCode::W;
+		OnKeyAction createFloorAction = { cameraMovementDelegate, createFloorKey, false };
+		GameController->AddListener(createFloorAction);
+	}
+
+	{
+		KeyActionDelegate cameraMovementDelegate = KeyActionDelegate::CreateRaw(this, &TestGameMode::MoveCameraDown);
+		KeyCode createFloorKey = KeyCode::S;
+		OnKeyAction createFloorAction = { cameraMovementDelegate, createFloorKey, false };
+
+		GameController->AddListener(createFloorAction);
+	}
 	// Debug
 
 	// Scene setup
@@ -45,28 +63,56 @@ void TestGameMode::Init()
 
 	// Push camera back a bit and orient it towards center
 	GameCamera->Model.Translation.z = 10.f;
-	GameCamera->Model.Rotation.z = -1.f;
-
-	// Why 90 degrees and not 180
-	//GameCamera->Model.Rotate(180.f, glm::vec3(0.f, 0.f, 1.f));
-
-// 	BirdObject = BasicShapes::CreateSquareObject("../Data/Textures/flappy.png");
-// 
-// 	BirdParent = eastl::make_shared<TransformEntity>();
-// 	BirdParent->AddChild(BirdObject);
-	//currentScene.AddEntity(BirdParent);
-
+	//GameCamera->Model.Rotation.z = -1.f;
 
 	Object = BasicShapes::CreateCubeObject();
 	currentScene.AddEntity(Object);
 
+	Ground = BasicShapes::CreateCubeObject();
+	Ground->Model.Translation.y = -10.f;
+	Ground->Model.Scale.x = 200.f;
+	Ground->Model.Scale.z = 200.f;
+	currentScene.AddEntity(Ground);
 
+	{
+		EntityPtr obj = BasicShapes::CreateCubeObject();
+		obj->Model.Translation.x += 5.f;
+		Object->AddChild(obj);
+		//currentScene.AddEntity(obj);
+	}
+	{
+		EntityPtr SecondModel = BasicShapes::CreateCubeObject();
+		SecondModel->Model.Translation.z += 20.f;
+		currentScene.AddEntity(SecondModel);
+	}
 }
 
 void TestGameMode::Tick(float inDeltaT)
 {
 	GameController->ExecuteCallbacks();
 
+	Object->Model.Rotate(2.f, glm::vec3(0.f, 1.f, 0.f));
 	//Object->Model.Rotation.y += 0.5f;
 }
 
+void TestGameMode::MoveCameraLeft()
+{
+	GameCamera->Move(MovementDirection::Left);
+	//GameCamera->Model.Rotate(5.f, glm::vec3(0.f, 1.f, 0.f));
+}
+
+void TestGameMode::MoveCameraRight()
+{
+	GameCamera->Move(MovementDirection::Right);
+	//GameCamera->Model.Rotate(-5.f, glm::vec3(0.f, 1.f, 0.f));
+}
+
+void TestGameMode::MoveCameraUp()
+{
+	GameCamera->Move(MovementDirection::Forward);
+}
+
+void TestGameMode::MoveCameraDown()
+{
+	GameCamera->Move(MovementDirection::Back);
+}

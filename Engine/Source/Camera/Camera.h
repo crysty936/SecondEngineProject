@@ -2,6 +2,15 @@
 #include "Entity/Entity.h"
 #include "EASTL/shared_ptr.h"
 
+
+enum class MovementDirection
+{
+	Forward,
+	Back,
+	Left,
+	Right
+};
+
 class Camera : public Entity
 {
 public:
@@ -11,6 +20,7 @@ public:
 	virtual void Init() override;
 	virtual void Tick(const float inDeltaT) override;
 	
+	void Move(MovementDirection inDirection, const float inSpeed = 0.1f);
 	void SetMovementDelegates(class Controller& inController);
 	glm::mat4 GetLookAt();
 
