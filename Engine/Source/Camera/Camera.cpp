@@ -60,8 +60,6 @@ void Camera::SetMovementDelegates(Controller& inController)
 
 void Camera::OnMousePosChanged(const float inNewYaw, const float inNewPitch)
 {
-	//return;
-
 	if (FirstMouse)
 	{
 		FirstMouse = false;
@@ -78,43 +76,20 @@ void Camera::OnMousePosChanged(const float inNewYaw, const float inNewPitch)
 
 	const float sensitivity = 0.1f;
 
-//  	Model.Rotation.y -= glm::radians(yawOffset * sensitivity);
-//  	Model.Rotation.x += glm::radians(pitchOffset * sensitivity);
-// 	Model.Rotation.z -= glm::radians(sin(yawOffset)) * glm::radians(cos(pitchOffset));
-
-	Yaw += (yawOffset * sensitivity);
-	Pitch += (pitchOffset * sensitivity);
+	Yaw += yawOffset * sensitivity;
+	Pitch += pitchOffset * sensitivity;
 
  	// Yaw
- 	glm::quat aroundY = glm::angleAxis(glm::radians(-Yaw), glm::vec3(0, 1, 0));
+ 	glm::quat aroundY = glm::angleAxis(glm::radians(-yawOffset), glm::vec3(0, 1, 0));
  
  	// Pitch
- 	glm::quat aroundX = glm::angleAxis(glm::radians(Pitch), glm::vec3(1, 0, 0));
+ 	glm::quat aroundX = glm::angleAxis(glm::radians(pitchOffset), glm::vec3(1, 0, 0));
 
 	glm::quat rotation = aroundY * aroundX;	
-
 	glm::vec3 euler = glm::eulerAngles(rotation);
-
 	Logger::Get().Print("X: %f  Y: %f  Z:  %f", Severity::Info, euler.x, euler.y, euler.z);
 
- 
- 	Model.Rotation = aroundY * aroundX;
-
-// 	// // Yaw
-// 	glm::quat aroundY = glm::angleAxis(glm::radians(-yawOffset), glm::vec3(0, 1, 0));
-// 
-// 	// // Pitch
-// 	glm::quat aroundX = glm::angleAxis(glm::radians(pitchOffset), glm::vec3(1, 0, 0));
-
-	//Model.Rotation *= (aroundY * aroundX);
-	//Model.Rotation = aroundY * aroundX;
-
-// 	glm::vec3 newRotation;
-// 	newRotation.x = cos(glm::radians(Yaw)) * cos(glm::radians(Pitch));
-// 	newRotation.y = sin(glm::radians(Pitch));
-// 	newRotation.z = sin(glm::radians(Yaw)) * cos(glm::radians(Pitch));
-// 
-// 	Model.Rotation = glm::normalize(newRotation);
+	Model.Rotation *= rotation;
 }
 
 glm::mat4 Camera::GetLookAt()
@@ -183,19 +158,8 @@ glm::mat4 Camera::GetLookAt()
 // 	// inverted.
 // 	glm::mat4 lookAt = rotationMatrix * translationMatrix;
 
-
-
-// 
-//  	glm::quat reverseOrient = glm::conjugate(Model.Rotation);
-//  	glm::mat4 rot = glm::mat4_cast(reverseOrient);
-//  	glm::mat4 translation = glm::translate(glm::mat4(1.0), -Model.Translation);
-//  
-//  	return rot * translation;
-
-
+	//return lookAt;
 
 	return glm::inverse(Model.GetModel());
-
-	//return lookAt;
 }
 

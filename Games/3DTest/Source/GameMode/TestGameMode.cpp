@@ -65,6 +65,8 @@ void TestGameMode::Init()
 
 	// Push camera back a bit
 	GameCamera->Model.Translation.z = 10.f;
+	// Rotate slightly to the side so that we know we're doing additive rotation further on
+	GameCamera->Model.Rotate(-45.f, glm::vec3(0.f, 1.f, 0.f));
 
 	Object = BasicShapes::CreateCubeObject();
 	currentScene.AddEntity(Object);
