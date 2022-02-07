@@ -3,9 +3,11 @@
 
 struct Transform
 {
-	glm::vec3 Translation = glm::vec3(0.f);
-	glm::vec3 Scale = glm::vec3(1.f);
-	glm::quat Rotation = glm::quat(0.f, 0.f, 0.f, 1.f);
+	Transform();
+
+	glm::vec3 Translation;
+	glm::vec3 Scale;
+	glm::quat Rotation;
 
 	glm::mat4 GetModel() const;
 

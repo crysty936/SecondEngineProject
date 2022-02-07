@@ -33,10 +33,10 @@ EngineCore::EngineCore()
 
 EngineCore::~EngineCore() = default;
 
-void EngineCore::Init(eastl::shared_ptr<GameModeBase> inGameMode)
+void EngineCore::Init()
 {
 	Engine = new EngineCore{};
-	Engine->CurrentGameMode = inGameMode;
+	Engine->CurrentGameMode = GameModeBase::Get();
 
 	// Init all engine subsystems
 	OpenGLRenderer::Init();

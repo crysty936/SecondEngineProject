@@ -1,6 +1,7 @@
 #include "Camera/Camera.h"
 #include "Controller/Controller.h"
 #include "glm/gtc/type_ptr.hpp"
+#include "Logger/Logger.h"
 
 Camera::Camera()
 	: FirstMouse{true}
@@ -21,8 +22,8 @@ void Camera::Tick(const float inDeltaT)
 	
 }
 
-void Camera::Move(MovementDirection inDirection, const float inSpeed) {
-
+void Camera::Move(MovementDirection inDirection, const float inSpeed) 
+{
 	constexpr glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
 
 	glm::quat qF = Model.Rotation * glm::quat(0, 0, 0, -1) * glm::conjugate(Model.Rotation);
@@ -89,6 +90,13 @@ void Camera::OnMousePosChanged(const float inNewYaw, const float inNewPitch)
  
  	// Pitch
  	glm::quat aroundX = glm::angleAxis(glm::radians(Pitch), glm::vec3(1, 0, 0));
+
+	glm::quat rotation = aroundY * aroundX;	
+
+	glm::vec3 euler = glm::eulerAngles(rotation);
+
+	Logger::Get().Print("X: %f  Y: %f  Z:  %f", Severity::Info, euler.x, euler.y, euler.z);
+
  
  	Model.Rotation = aroundY * aroundX;
 
@@ -175,12 +183,16 @@ glm::mat4 Camera::GetLookAt()
 // 	// inverted.
 // 	glm::mat4 lookAt = rotationMatrix * translationMatrix;
 
+
+
 // 
- 	glm::quat reverseOrient = glm::conjugate(Model.Rotation);
- 	glm::mat4 rot = glm::mat4_cast(reverseOrient);
- 	glm::mat4 translation = glm::translate(glm::mat4(1.0), -Model.Translation);
- 
- 	return rot * translation;
+//  	glm::quat reverseOrient = glm::conjugate(Model.Rotation);
+//  	glm::mat4 rot = glm::mat4_cast(reverseOrient);
+//  	glm::mat4 translation = glm::translate(glm::mat4(1.0), -Model.Translation);
+//  
+//  	return rot * translation;
+
+
 
 	return glm::inverse(Model.GetModel());
 

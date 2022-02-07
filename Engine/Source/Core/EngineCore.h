@@ -9,7 +9,7 @@ public:
 	~EngineCore();
 
 public:
-	static void Init(eastl::shared_ptr<class GameModeBase> inGameMode);
+	static void Init();
 	static void Terminate();
 	void Run();
 
@@ -19,7 +19,7 @@ private:
 	// TODO 
 	// Engine holds ownership over gamemode for now, it should be abstracted into Scene later on so that
 	// each scene has the possibility of a different GameMode
-	eastl::shared_ptr<class GameModeBase> CurrentGameMode;
+	class GameModeBase* CurrentGameMode;
 
 };
 

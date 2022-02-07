@@ -260,7 +260,6 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="D:\Projects\SecondEngineProject\Games\3DTest\Source\EntryPoint\EntryPoint.cpp" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Games\3DTest\Source\GameMode\TestGameMode.cpp" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Games\3DTest\Source\GameMode\TestGameMode.h" />
   </ItemGroup>

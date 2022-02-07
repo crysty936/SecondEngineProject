@@ -212,6 +212,7 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\Engine\Source\Core\EntryPoint.cpp" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Camera\Camera.cpp" />
     <ClInclude Include="..\..\..\Engine\Source\Renderer\OpenGL\IDrawable.h" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Camera\Camera.h" />
@@ -229,8 +230,6 @@
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Entity\Entity.h" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Entity\TransformEntity.cpp" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Entity\TransformEntity.h" />
-    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\EntryPoint\EntryPoint.cpp" />
-    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\EntryPoint\EntryPoint.h" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\EventSystem\DelegateBase.cpp" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\EventSystem\DelegateBase.h" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\EventSystem\EventSystem.cpp" />

@@ -9,6 +9,8 @@
 #include "glm/common.hpp"
 #include <stdlib.h>
 
+TestGameMode GameMode = {};
+
 TestGameMode::TestGameMode()
 	:
 	GameModeBase(),
@@ -61,9 +63,8 @@ void TestGameMode::Init()
 	GameCamera = currentScene.CurrentCamera;
 	GameCamera->SetMovementDelegates(*GameController);
 
-	// Push camera back a bit and orient it towards center
+	// Push camera back a bit
 	GameCamera->Model.Translation.z = 10.f;
-	//GameCamera->Model.Rotation.z = -1.f;
 
 	Object = BasicShapes::CreateCubeObject();
 	currentScene.AddEntity(Object);

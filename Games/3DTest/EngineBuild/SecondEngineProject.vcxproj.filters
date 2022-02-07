@@ -25,9 +25,6 @@
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Entity\TransformEntity.cpp">
       <Filter>Engine\Source\Entity</Filter>
     </ClCompile>
-    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\EntryPoint\EntryPoint.cpp">
-      <Filter>Engine\Source\EntryPoint</Filter>
-    </ClCompile>
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\EventSystem\DelegateBase.cpp">
       <Filter>Engine\Source\EventSystem</Filter>
     </ClCompile>
@@ -112,6 +109,9 @@
     <ClCompile Include="..\..\..\Engine\Source\Renderer\OpenGL\SimpleShapeDrawable.cpp">
       <Filter>Engine\Source\Renderer\OpenGL</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Engine\Source\Core\EntryPoint.cpp">
+      <Filter>Engine\Source\Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Camera\Camera.h">
@@ -137,9 +137,6 @@
     </ClInclude>
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Entity\TransformEntity.h">
       <Filter>Engine\Source\Entity</Filter>
-    </ClInclude>
-    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\EntryPoint\EntryPoint.h">
-      <Filter>Engine\Source\EntryPoint</Filter>
     </ClInclude>
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\EventSystem\DelegateBase.h">
       <Filter>Engine\Source\EventSystem</Filter>
@@ -259,9 +256,6 @@
     </Filter>
     <Filter Include="Engine\Source\Entity">
       <UniqueIdentifier>{7E7B3762-0A3D-3B9D-ADAA-5E450E08F28D}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Engine\Source\EntryPoint">
-      <UniqueIdentifier>{BCBFCA0E-7F45-3011-A26B-326B385D126F}</UniqueIdentifier>
     </Filter>
     <Filter Include="Engine\Source\EventSystem">
       <UniqueIdentifier>{BCD4F62A-BFFA-3F6B-BF0C-91EEDDDD93CF}</UniqueIdentifier>
