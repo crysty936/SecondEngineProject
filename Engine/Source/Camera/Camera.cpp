@@ -80,16 +80,16 @@ void Camera::OnMousePosChanged(const float inNewYaw, const float inNewPitch)
 	Pitch += pitchOffset * sensitivity;
 
  	// Yaw
- 	glm::quat aroundY = glm::angleAxis(glm::radians(-yawOffset), glm::vec3(0, 1, 0));
+ 	glm::quat aroundY = glm::angleAxis(glm::radians(-Yaw), glm::vec3(0, 1, 0));
  
  	// Pitch
- 	glm::quat aroundX = glm::angleAxis(glm::radians(pitchOffset), glm::vec3(1, 0, 0));
+ 	glm::quat aroundX = glm::angleAxis(glm::radians(Pitch), glm::vec3(1, 0, 0));
 
 	glm::quat rotation = aroundY * aroundX;	
 	glm::vec3 euler = glm::eulerAngles(rotation);
 	Logger::Get().Print("X: %f  Y: %f  Z:  %f", Severity::Info, euler.x, euler.y, euler.z);
 
-	Model.Rotation *= rotation;
+	Model.Rotation = rotation;
 }
 
 glm::mat4 Camera::GetLookAt()

@@ -1,6 +1,10 @@
 #pragma once
 #include "glm/gtc/quaternion.hpp"
 
+/**
+ * Transform containing position, orientation and scale data for entities
+ * Order of multiplication for parent child nodes is always ChildTransform * ParentTransform
+ */
 struct Transform
 {
 	Transform();

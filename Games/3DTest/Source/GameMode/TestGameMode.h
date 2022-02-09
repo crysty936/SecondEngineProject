@@ -24,5 +24,7 @@ private:
 
 
 	EntityPtr Object;
+	EntityPtr Obj;
+	EntityPtr Obj2;
 	EntityPtr Ground;
 };

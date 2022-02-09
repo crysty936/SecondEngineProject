@@ -34,10 +34,10 @@ Transform Transform::operator*(const Transform& inOther) const
 {
 	Transform out;
 
+ 	out.Translation = inOther.Rotation * (inOther.Scale * this->Translation) + inOther.Translation;
  	out.Rotation = inOther.Rotation * this->Rotation;
  	out.Scale = this->Scale * inOther.Scale;
  
- 	out.Translation = inOther.Rotation * (inOther.Scale * this->Translation) + inOther.Translation;
 
 	return out;
 }

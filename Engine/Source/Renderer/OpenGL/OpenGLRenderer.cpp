@@ -78,9 +78,8 @@ void OpenGLRenderer::Draw()
 	Scene& currentScene = sceneMan.GetCurrentScene();
 	eastl::vector<eastl::shared_ptr<Entity>>& sceneObjects = currentScene.Entities;
 
-	//RecursiveDrawObjects(sceneObjects, Transform{});
+	RecursiveDrawObjects(sceneObjects, Transform{});
 	constexpr glm::mat4 identity = glm::mat4(1.f);
-	RecursiveDrawObjects(sceneObjects, identity);
 
 	CheckShouldCloseWindow(*MainWindow);
 	glfwSwapBuffers(MainWindow->GetHandle());
@@ -95,7 +94,7 @@ void OpenGLRenderer::RecursiveDrawObjects(const eastl::vector<eastl::shared_ptr<
 		const Entity* tickable = object.get();
 		const SimpleShapeDrawable* renderable = dynamic_cast<const SimpleShapeDrawable*>(tickable);
 		Transform currentTransform = tickable->Model;
-		Transform result = inParentTransform * currentTransform;
+		Transform result = currentTransform * inParentTransform;
 		glm::mat4 currentModel = result.GetModel();
 
 		RecursiveDrawObjects(tickable->GetChildren(), result);
@@ -115,36 +114,6 @@ void OpenGLRenderer::RecursiveDrawObjects(const eastl::vector<eastl::shared_ptr<
 		}
 	}
 }
-
-void OpenGLRenderer::RecursiveDrawObjects(const eastl::vector<eastl::shared_ptr<Entity>>& inObjects, const glm::mat4 inParentModel)
-{
-	glm::mat4 view = SceneManager::Get().GetCurrentScene().CurrentCamera->GetLookAt();
-
-	for (const eastl::shared_ptr<Entity>& object : inObjects)
-	{
-		const Entity* tickable = object.get();
-		const SimpleShapeDrawable* renderable = dynamic_cast<const SimpleShapeDrawable*>(tickable);
-		glm::mat4 currentModel = tickable->Model.GetModel();
-		currentModel = inParentModel * currentModel;
-
-		RecursiveDrawObjects(tickable->GetChildren(), currentModel);
-
-		if (renderable)
-		{
-			// Bind and set all uniforms
-			const OpenGLShader& shader = renderable->GetShader();
-			shader.Bind();
-
-			shader.SetUniformValue4fv("model", currentModel);
-			shader.SetUniformValue4fv("projection", Perspective);
-			shader.SetUniformValue4fv("view", view);
-
-			// Draw using shader
-			renderable->Draw();
-		}
-	}
-}
-
 
 eastl::unique_ptr<OpenGLWindow> OpenGLRenderer::CreateWindow(const WindowProperties & inWindowProperties) const
 {

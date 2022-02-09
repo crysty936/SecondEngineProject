@@ -78,10 +78,16 @@ void TestGameMode::Init()
 	currentScene.AddEntity(Ground);
 
 	{
-		EntityPtr obj = BasicShapes::CreateCubeObject();
-		obj->Model.Translation.x += 5.f;
-		Object->AddChild(obj);
-		//currentScene.AddEntity(obj);
+		Obj = BasicShapes::CreateCubeObject();
+		Obj->Model.Translation.x += 5.f;
+		Object->AddChild(Obj);
+
+		Obj2 = BasicShapes::CreateCubeObject();
+		Obj2->Model.Translation.x += 3.f;
+		Obj->AddChild(Obj2);
+		Obj2->Model.Scale.x = 0.5f;
+		Obj2->Model.Scale.y = 0.5f;
+		Obj2->Model.Scale.z = 0.5f;
 	}
 	{
 		EntityPtr SecondModel = BasicShapes::CreateCubeObject();
@@ -95,6 +101,8 @@ void TestGameMode::Tick(float inDeltaT)
 	GameController->ExecuteCallbacks();
 
 	Object->Model.Rotate(2.f, glm::vec3(0.f, 1.f, 0.f));
+	Obj->Model.Rotate(2.f, glm::vec3(0.f, 1.f, 0.f));
+	Obj2->Model.Rotate(8.f, glm::vec3(0.f, 1.f, 0.f));
 	//Object->Model.Rotation.y += 0.5f;
 }
 
