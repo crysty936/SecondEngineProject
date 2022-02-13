@@ -4,6 +4,7 @@
 #include "Camera/Camera.h"
 #include "Renderer/OpenGL/SimpleShapeDrawable.h"
 #include "Renderer/ShapesUtils/BasicShapes.h"
+#include "Entity/TransformEntity.h"
 
 SceneManager* SceneManager::Instance = nullptr;
 
@@ -21,6 +22,11 @@ void SceneManager::LoadScene()
 
 	Instance->CurrentScene = eastl::make_unique<class Scene>();
 	Instance->CurrentScene->CurrentCamera = eastl::make_shared<Camera>();
+
+	// !Trying to copy the gameplay tactic to see if it works
+	EntityPtr CameraParent = eastl::make_shared<TransformEntity>();
+	CameraParent->AddChild(Instance->CurrentScene->CurrentCamera);
+	Instance->CurrentScene->AddEntity(CameraParent);
 }
 
 void SceneManager::Terminate()

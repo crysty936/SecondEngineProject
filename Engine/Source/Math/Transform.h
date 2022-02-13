@@ -13,7 +13,7 @@ struct Transform
 	glm::vec3 Scale;
 	glm::quat Rotation;
 
-	glm::mat4 GetModel() const;
+	glm::mat4 GetMatrix() const;
 
 	void Rotate(const float inAmount, const glm::vec3 inAxis);
 

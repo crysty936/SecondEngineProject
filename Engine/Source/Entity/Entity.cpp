@@ -19,3 +19,15 @@ void Entity::SetParent(eastl::shared_ptr<Entity> inParent)
 
 	inParent->Children.push_back(shared_from_this());
 }
+
+const Transform Entity::GetAbsoluteTransform() const
+{
+	if (EntityPtr parentShared = Parent.lock())
+	{
+		const Transform result = Model * parentShared->GetAbsoluteTransform();
+
+		return result;
+	}
+
+	return Model;
+}

@@ -85,11 +85,20 @@ void Camera::OnMousePosChanged(const float inNewYaw, const float inNewPitch)
  	// Pitch
  	glm::quat aroundX = glm::angleAxis(glm::radians(Pitch), glm::vec3(1, 0, 0));
 
-	glm::quat rotation = aroundY * aroundX;	
-	glm::vec3 euler = glm::eulerAngles(rotation);
-	Logger::Get().Print("X: %f  Y: %f  Z:  %f", Severity::Info, euler.x, euler.y, euler.z);
+	//glm::quat rotation = aroundY * aroundX;	
+// 	glm::vec3 euler = glm::eulerAngles(rotation);
+// 	Logger::Get().Print("X: %f  Y: %f  Z:  %f", Severity::Info, euler.x, euler.y, euler.z);
 
-	Model.Rotation = rotation;
+	Model.Rotation = aroundX;
+
+
+
+	if (EntityPtr parentShared = Parent.lock())
+	{
+		parentShared->GetRelativeTransform().Rotation = aroundY;
+	}
+
+
 }
 
 glm::mat4 Camera::GetLookAt()
@@ -160,6 +169,6 @@ glm::mat4 Camera::GetLookAt()
 
 	//return lookAt;
 
-	return glm::inverse(Model.GetModel());
+	return glm::inverse(GetAbsoluteTransform().GetMatrix());
 }
 

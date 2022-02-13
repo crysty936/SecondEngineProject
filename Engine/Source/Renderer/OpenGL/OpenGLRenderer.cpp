@@ -93,9 +93,9 @@ void OpenGLRenderer::RecursiveDrawObjects(const eastl::vector<eastl::shared_ptr<
 	{
 		const Entity* tickable = object.get();
 		const SimpleShapeDrawable* renderable = dynamic_cast<const SimpleShapeDrawable*>(tickable);
-		Transform currentTransform = tickable->Model;
+		Transform currentTransform = tickable->GetRelativeTransform();
 		Transform result = currentTransform * inParentTransform;
-		glm::mat4 currentModel = result.GetModel();
+		glm::mat4 currentModel = result.GetMatrix();
 
 		RecursiveDrawObjects(tickable->GetChildren(), result);
 

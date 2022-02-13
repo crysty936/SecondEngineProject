@@ -22,8 +22,13 @@ public:
 	inline glm::vec3 GetLocation() { return Model.Translation; }
 	inline const eastl::vector<EntityPtr> GetChildren() const { return Children; }
 	void SetParent(eastl::shared_ptr<Entity> inParent);
+	inline eastl::weak_ptr<Entity>& GetParent() { return Parent; }
 	
-public:
+	inline const Transform& GetRelativeTransform() const { return Model; }
+	inline Transform& GetRelativeTransform() { return Model; }
+	const Transform GetAbsoluteTransform() const;
+
+protected:
 	int32_t EntityId;
 	Transform Model;
 	eastl::weak_ptr<Entity> Parent;

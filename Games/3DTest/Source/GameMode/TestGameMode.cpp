@@ -64,34 +64,37 @@ void TestGameMode::Init()
 	GameCamera->SetMovementDelegates(*GameController);
 
 	// Push camera back a bit
-	GameCamera->Model.Translation.z = 10.f;
+	if (EntityPtr parentShared = GameCamera->GetParent().lock())
+	{
+		parentShared->GetRelativeTransform().Translation.z = 10.f;
+	}
 	// Rotate slightly to the side so that we know we're doing additive rotation further on
-	GameCamera->Model.Rotate(-45.f, glm::vec3(0.f, 1.f, 0.f));
+	//GameCamera->GetRelativeTransform().Rotate(-45.f, glm::vec3(0.f, 1.f, 0.f));
 
 	Object = BasicShapes::CreateCubeObject();
 	currentScene.AddEntity(Object);
 
 	Ground = BasicShapes::CreateCubeObject();
-	Ground->Model.Translation.y = -10.f;
-	Ground->Model.Scale.x = 200.f;
-	Ground->Model.Scale.z = 200.f;
+	Ground->GetRelativeTransform().Translation.y = -10.f;
+	Ground->GetRelativeTransform().Scale.x = 200.f;
+	Ground->GetRelativeTransform().Scale.z = 200.f;
 	currentScene.AddEntity(Ground);
 
 	{
 		Obj = BasicShapes::CreateCubeObject();
-		Obj->Model.Translation.x += 5.f;
+		Obj->GetRelativeTransform().Translation.x += 5.f;
 		Object->AddChild(Obj);
 
 		Obj2 = BasicShapes::CreateCubeObject();
-		Obj2->Model.Translation.x += 3.f;
+		Obj2->GetRelativeTransform().Translation.x += 3.f;
 		Obj->AddChild(Obj2);
-		Obj2->Model.Scale.x = 0.5f;
-		Obj2->Model.Scale.y = 0.5f;
-		Obj2->Model.Scale.z = 0.5f;
+		Obj2->GetRelativeTransform().Scale.x = 0.5f;
+		Obj2->GetRelativeTransform().Scale.y = 0.5f;
+		Obj2->GetRelativeTransform().Scale.z = 0.5f;
 	}
 	{
 		EntityPtr SecondModel = BasicShapes::CreateCubeObject();
-		SecondModel->Model.Translation.z += 20.f;
+		SecondModel->GetRelativeTransform().Translation.z += 20.f;
 		currentScene.AddEntity(SecondModel);
 	}
 }
@@ -100,22 +103,22 @@ void TestGameMode::Tick(float inDeltaT)
 {
 	GameController->ExecuteCallbacks();
 
-	Object->Model.Rotate(2.f, glm::vec3(0.f, 1.f, 0.f));
-	Obj->Model.Rotate(2.f, glm::vec3(0.f, 1.f, 0.f));
-	Obj2->Model.Rotate(8.f, glm::vec3(0.f, 1.f, 0.f));
-	//Object->Model.Rotation.y += 0.5f;
+	Object->GetRelativeTransform().Rotate(2.f, glm::vec3(0.f, 1.f, 0.f));
+	Obj->GetRelativeTransform().Rotate(2.f, glm::vec3(0.f, 1.f, 0.f));
+	Obj2->GetRelativeTransform().Rotate(8.f, glm::vec3(0.f, 1.f, 0.f));
+	//Object->GetRelativeTransform().Rotation.y += 0.5f;
 }
 
 void TestGameMode::MoveCameraLeft()
 {
 	GameCamera->Move(MovementDirection::Left);
-	//GameCamera->Model.Rotate(5.f, glm::vec3(0.f, 1.f, 0.f));
+	//GameCamera->GetRelativeTransform().Rotate(5.f, glm::vec3(0.f, 1.f, 0.f));
 }
 
 void TestGameMode::MoveCameraRight()
 {
 	GameCamera->Move(MovementDirection::Right);
-	//GameCamera->Model.Rotate(-5.f, glm::vec3(0.f, 1.f, 0.f));
+	//GameCamera->GetRelativeTransform().Rotate(-5.f, glm::vec3(0.f, 1.f, 0.f));
 }
 
 void TestGameMode::MoveCameraUp()
