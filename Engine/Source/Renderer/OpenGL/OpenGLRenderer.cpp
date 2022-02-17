@@ -79,6 +79,7 @@ void OpenGLRenderer::Draw()
 	eastl::vector<eastl::shared_ptr<Entity>>& sceneObjects = currentScene.Entities;
 
 	RecursiveDrawObjects(sceneObjects, Transform{});
+	//RecursiveDrawObjects(sceneObjects, glm::mat4(1.f));
 	constexpr glm::mat4 identity = glm::mat4(1.f);
 
 	CheckShouldCloseWindow(*MainWindow);

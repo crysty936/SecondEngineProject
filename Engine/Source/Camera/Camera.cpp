@@ -85,17 +85,12 @@ void Camera::OnMousePosChanged(const float inNewYaw, const float inNewPitch)
  	// Pitch
  	glm::quat aroundX = glm::angleAxis(glm::radians(Pitch), glm::vec3(1, 0, 0));
 
-	//glm::quat rotation = aroundY * aroundX;	
-// 	glm::vec3 euler = glm::eulerAngles(rotation);
-// 	Logger::Get().Print("X: %f  Y: %f  Z:  %f", Severity::Info, euler.x, euler.y, euler.z);
-
-	Model.Rotation = aroundX;
-
-
+	Model.Rotate(pitchOffset, glm::vec3(1.f, 0.f, 0.f));
 
 	if (EntityPtr parentShared = Parent.lock())
 	{
-		parentShared->GetRelativeTransform().Rotation = aroundY;
+		parentShared->GetRelativeTransform().Rotate(-yawOffset, glm::vec3(0.f, 1.f, 0.f));
+
 	}
 
 
