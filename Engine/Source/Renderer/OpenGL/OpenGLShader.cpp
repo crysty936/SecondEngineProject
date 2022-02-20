@@ -121,15 +121,12 @@ void OpenGLShader::SetUniformValue3fv(const eastl::string & UniformName, glm::ve
 
 int OpenGLShader::GetUniformLocation(const eastl::string & UniformName) const
 {
-	// Workaround for small optimization that should not require removing const
-	OpenGLShader& nonConstThis = const_cast<OpenGLShader&>(*this);
-
 	if (UniformLocations.find(UniformName) != UniformLocations.end())
-		return nonConstThis.UniformLocations[UniformName];
+		return UniformLocations[UniformName];
 
 	int uniformLocation = glGetUniformLocation(GetHandle(), UniformName.c_str());
 	if (uniformLocation != -1)
-		nonConstThis.UniformLocations[UniformName] = uniformLocation;
+		UniformLocations[UniformName] = uniformLocation;
 
 	ASSERT(uniformLocation != -1, "Uniform location could not be found!");
 

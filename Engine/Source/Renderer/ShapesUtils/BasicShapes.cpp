@@ -151,7 +151,7 @@ void CubeShape::Tick(const float inDeltaT)
 
 }
 
-void CubeShape::Draw() const
+void CubeShape::Draw_Private() const
 {
 	const eastl::vector<OpenGLTexture>& textures = GetTextures();
 	for (const OpenGLTexture& tex : textures)

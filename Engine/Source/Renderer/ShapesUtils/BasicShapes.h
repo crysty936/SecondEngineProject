@@ -29,7 +29,9 @@ public:
 
 	virtual void Tick(const float inDeltaT)	override;
 
-	virtual void Draw() const override;
+protected:
+	virtual void Draw_Private() const override;
+
 };
 
 

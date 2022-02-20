@@ -22,9 +22,6 @@
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Entity\Entity.cpp">
       <Filter>Engine\Source\Entity</Filter>
     </ClCompile>
-    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Entity\TransformEntity.cpp">
-      <Filter>Engine\Source\Entity</Filter>
-    </ClCompile>
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\EventSystem\DelegateBase.cpp">
       <Filter>Engine\Source\EventSystem</Filter>
     </ClCompile>
@@ -112,6 +109,18 @@
     <ClCompile Include="..\..\..\Engine\Source\Core\EntryPoint.cpp">
       <Filter>Engine\Source\Core</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Engine\Source\Renderer\SelfRegisteringUniform\SelfRegisteringUniform4fv.cpp">
+      <Filter>Engine\Source\Renderer\SelfRegisteringUniforms</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Engine\Source\Renderer\SelfRegisteringUniform\SelfRegisteringUniformBase.cpp">
+      <Filter>Engine\Source\Renderer\SelfRegisteringUniforms</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Engine\Source\Renderer\Drawable\DrawableBase.cpp">
+      <Filter>Engine\Source\Renderer\Drawable</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Engine\Source\Renderer\SelfRegisteringUniforms\SelfRegisteringUniform.cpp">
+      <Filter>Engine\Source\Renderer\SelfRegisteringUniforms</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Camera\Camera.h">
@@ -133,9 +142,6 @@
       <Filter>Engine\Source\Core</Filter>
     </ClInclude>
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Entity\Entity.h">
-      <Filter>Engine\Source\Entity</Filter>
-    </ClInclude>
-    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Entity\TransformEntity.h">
       <Filter>Engine\Source\Entity</Filter>
     </ClInclude>
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\EventSystem\DelegateBase.h">
@@ -231,11 +237,20 @@
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Window\WindowProperties.h">
       <Filter>Engine\Source\Window</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Engine\Source\Renderer\OpenGL\IDrawable.h">
-      <Filter>Engine\Source\Renderer\OpenGL</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Engine\Source\Renderer\OpenGL\SimpleShapeDrawable.h">
       <Filter>Engine\Source\Renderer\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Engine\Source\Renderer\SelfRegisteringUniform\SelfRegisteringUniform4fv.h">
+      <Filter>Engine\Source\Renderer\SelfRegisteringUniforms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Engine\Source\Renderer\SelfRegisteringUniform\SelfRegisteringUniformBase.h">
+      <Filter>Engine\Source\Renderer\SelfRegisteringUniforms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Engine\Source\Renderer\Drawable\DrawableBase.h">
+      <Filter>Engine\Source\Renderer\Drawable</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Engine\Source\Renderer\SelfRegisteringUniforms\SelfRegisteringUniform.h">
+      <Filter>Engine\Source\Renderer\SelfRegisteringUniforms</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -295,6 +310,12 @@
     </Filter>
     <Filter Include="Engine\Source\Window">
       <UniqueIdentifier>{35B22F33-2810-36EF-9BC3-24317147BFC8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\Renderer\SelfRegisteringUniforms">
+      <UniqueIdentifier>{6d2a913d-9186-4fba-a130-77ee877cfe27}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\Renderer\Drawable">
+      <UniqueIdentifier>{ea8eeb21-fb2d-4cb7-b919-6e38d0f28025}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

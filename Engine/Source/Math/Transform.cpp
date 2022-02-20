@@ -9,6 +9,14 @@ Transform::Transform()
 
 }
 
+Transform::Transform(const Transform& inOther)
+	:
+	Translation{ inOther.Translation },
+	Scale{ inOther.Scale },
+	Rotation{ inOther.Rotation }
+{
+}
+
 glm::mat4 Transform::GetMatrix() const
 {
 	glm::mat4 model(1.f);

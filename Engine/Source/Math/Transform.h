@@ -8,6 +8,7 @@
 struct Transform
 {
 	Transform();
+	Transform(const Transform& inOther);
 
 	glm::vec3 Translation;
 	glm::vec3 Scale;
@@ -18,4 +19,6 @@ struct Transform
 	void Rotate(const float inAmount, const glm::vec3 inAxis);
 
 	Transform operator*(const Transform& inOther) const;
+	Transform& operator=(const Transform& inOther) = default;
+	Transform& operator=(Transform&& inOther) = default;
 };

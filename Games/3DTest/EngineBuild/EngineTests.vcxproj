@@ -326,8 +326,6 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\WindowsPlatform.h" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Entity\Entity.cpp" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Entity\Entity.h" />
-    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Entity\TransformEntity.cpp" />
-    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Entity\TransformEntity.h" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\EntryPoint\EntryPoint.h" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\EventSystem\DelegateBase.cpp" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\EventSystem\DelegateBase.h" />

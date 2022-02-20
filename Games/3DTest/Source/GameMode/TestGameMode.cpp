@@ -5,7 +5,6 @@
 #include "Renderer/OpenGL/SimpleShapeDrawable.h"
 #include "Renderer/ShapesUtils/BasicShapes.h"
 #include "Controller/Controller.h"
-#include "Entity/TransformEntity.h"
 #include "glm/common.hpp"
 #include <stdlib.h>
 
@@ -66,35 +65,33 @@ void TestGameMode::Init()
 	// Push camera back a bit
 	if (EntityPtr parentShared = GameCamera->GetParent().lock())
 	{
-		parentShared->GetRelativeTransform().Translation.z = 10.f;
+		// Move the camera parent
+		parentShared->Move(glm::vec3(0.f, 0.f, 10.f));
 	}
-	// Rotate slightly to the side so that we know we're doing additive rotation further on
-	//GameCamera->GetRelativeTransform().Rotate(-45.f, glm::vec3(0.f, 1.f, 0.f));
+
+	GameCamera->Rotate(-45.f, glm::vec3(0.f, 1.f, 0.f));
 
 	Object = BasicShapes::CreateCubeObject();
 	currentScene.AddEntity(Object);
 
 	Ground = BasicShapes::CreateCubeObject();
-	Ground->GetRelativeTransform().Translation.y = -10.f;
-	Ground->GetRelativeTransform().Scale.x = 200.f;
-	Ground->GetRelativeTransform().Scale.z = 200.f;
+	Ground->Move(glm::vec3(0.f, -10.f, 0.f));
+	Ground->SetScale(glm::vec3(200.f, 1.f, 200.f));
 	currentScene.AddEntity(Ground);
 
 	{
 		Obj = BasicShapes::CreateCubeObject();
-		Obj->GetRelativeTransform().Translation.x += 5.f;
+		Obj->Move(glm::vec3(5.f, 0., 0.f));
 		Object->AddChild(Obj);
 
 		Obj2 = BasicShapes::CreateCubeObject();
-		Obj2->GetRelativeTransform().Translation.x += 3.f;
+		Obj2->Move(glm::vec3(3.f, 0.f, 0.f));
 		Obj->AddChild(Obj2);
-		Obj2->GetRelativeTransform().Scale.x = 0.5f;
-		Obj2->GetRelativeTransform().Scale.y = 0.5f;
-		Obj2->GetRelativeTransform().Scale.z = 0.5f;
+		Obj->SetScale(glm::vec3(0.5f, 0.5f, 0.5f));
 	}
 	{
 		EntityPtr SecondModel = BasicShapes::CreateCubeObject();
-		SecondModel->GetRelativeTransform().Translation.z += 20.f;
+		SecondModel->Move(glm::vec3(0.f, 0.f, 20.f));
 		currentScene.AddEntity(SecondModel);
 	}
 }
@@ -103,9 +100,9 @@ void TestGameMode::Tick(float inDeltaT)
 {
 	GameController->ExecuteCallbacks();
 
-	Object->GetRelativeTransform().Rotate(2.f, glm::vec3(0.f, 1.f, 0.f));
-	Obj->GetRelativeTransform().Rotate(2.f, glm::vec3(0.f, 1.f, 0.f));
-	Obj2->GetRelativeTransform().Rotate(8.f, glm::vec3(0.f, 1.f, 0.f));
+	Object->Rotate(2.f, glm::vec3(0.f, 1.f, 0.f));
+	Obj->Rotate(2.f, glm::vec3(0.f, 1.f, 0.f));
+	Obj2->Rotate(8.f, glm::vec3(0.f, 1.f, 0.f));
 	//Object->GetRelativeTransform().Rotation.y += 0.5f;
 }
 

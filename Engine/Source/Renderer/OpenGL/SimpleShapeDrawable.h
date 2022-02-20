@@ -1,14 +1,11 @@
 #pragma once
 #include "Entity/Entity.h"
-#include "IDrawable.h"
+#include "Renderer/Drawable/DrawableBase.h"
 #include "Renderer/OpenGL/Buffer/VAO.h"
 #include "Renderer/OpenGL/OpenGLShader.h"
 #include "Renderer/OpenGL/OpenGLTexture.h"
 
-// TODO: Modify drawable so that it gets a map of abstract uniforms 
-// which register themselves given the shader, based on the name
-
-class SimpleShapeDrawable : public Entity, public IDrawable
+class SimpleShapeDrawable : public DrawableBase
 {
 public:
 	SimpleShapeDrawable(VAO& inVAO, OpenGLShader& inShader);
@@ -16,14 +13,16 @@ public:
 	virtual ~SimpleShapeDrawable();
 
 	virtual void Init() override;
-	void Draw() const override;
 	inline const eastl::vector<OpenGLTexture>& GetTextures() const { return Textures; }
 	inline const OpenGLShader& GetShader() const { return Shader; }
 	void AddTexture(OpenGLTexture inTexture);
 	void DeleteObject();
 
 protected:
-	VAO ObjectVAO;
-	OpenGLShader Shader;
+	virtual void Draw_Private() const override;
+
+protected:
 	eastl::vector<OpenGLTexture> Textures;
+
+
 };

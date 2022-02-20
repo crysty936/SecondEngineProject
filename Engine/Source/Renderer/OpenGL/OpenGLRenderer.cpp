@@ -14,6 +14,8 @@
 #include "glm/trigonometric.hpp"
 #include "Renderer/ShapesUtils/BasicShapesData.h"
 #include "Entity/Entity.h"
+#include "Renderer/SelfRegisteringUniform/SelfRegisteringUniformBase.h"
+#include "../SelfRegisteringUniform/SelfRegisteringUniform4fv.h"
 
 #define CLEAR_COLOR 0.3f, 0.5f, 1.f, 0.4f
 
@@ -32,8 +34,6 @@ OpenGLRenderer::OpenGLRenderer(const WindowProperties& inDefaultWindowProperties
 	// Create new Window for data holding
 	MainWindow = CreateWindow(inDefaultWindowProperties);
 
-	Perspective = glm::perspective(glm::radians(45.0f), (float)MainWindow->GetProperties().Width / (float)MainWindow->GetProperties().Height, 0.1f, 1000.0f);
-
 	// Set Context
 	GLFWwindow* mainWindowHandle = MainWindow->GetHandle();
 	glfwMakeContextCurrent(mainWindowHandle);
@@ -46,11 +46,13 @@ OpenGLRenderer::OpenGLRenderer(const WindowProperties& inDefaultWindowProperties
 	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 	glEnable(GL_DEPTH_TEST);
 
- 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-// 	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	// 	glEnable(GL_BLEND);
 
 	glDebugMessageCallback(OpenGLUtils::GLDebugCallback, nullptr);
 	glClearColor(CLEAR_COLOR);
+
+	SetupBaseUniforms();
 }
 
 OpenGLRenderer::~OpenGLRenderer() = default;
@@ -78,40 +80,40 @@ void OpenGLRenderer::Draw()
 	Scene& currentScene = sceneMan.GetCurrentScene();
 	eastl::vector<eastl::shared_ptr<Entity>>& sceneObjects = currentScene.Entities;
 
-	RecursiveDrawObjects(sceneObjects, Transform{});
-	//RecursiveDrawObjects(sceneObjects, glm::mat4(1.f));
+	UpdateUniforms();
+	RecursiveDrawObjects(sceneObjects);
 	constexpr glm::mat4 identity = glm::mat4(1.f);
 
 	CheckShouldCloseWindow(*MainWindow);
 	glfwSwapBuffers(MainWindow->GetHandle());
 }
 
-void OpenGLRenderer::RecursiveDrawObjects(const eastl::vector<eastl::shared_ptr<Entity>>& inObjects, const Transform inParentTransform)
+void OpenGLRenderer::SetupBaseUniforms()
 {
-	glm::mat4 view = SceneManager::Get().GetCurrentScene().CurrentCamera->GetLookAt();
+	const glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)MainWindow->GetProperties().Width / (float)MainWindow->GetProperties().Height, 0.1f, 1000.0f);
+	UniformsCache["projection"] = projection;
+}
+
+void OpenGLRenderer::UpdateUniforms()
+{
+ 	const glm::mat4 view = SceneManager::Get().GetCurrentScene().CurrentCamera->GetLookAt();
+	UniformsCache["view"] = view;
+}
+
+void OpenGLRenderer::RecursiveDrawObjects(const eastl::vector<eastl::shared_ptr<Entity>>& inObjects)
+{
+	const glm::mat4 view = SceneManager::Get().GetCurrentScene().CurrentCamera->GetLookAt();
+	const glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)MainWindow->GetProperties().Width / (float)MainWindow->GetProperties().Height, 0.1f, 1000.0f);
 
 	for (const eastl::shared_ptr<Entity>& object : inObjects)
 	{
-		const Entity* tickable = object.get();
-		const SimpleShapeDrawable* renderable = dynamic_cast<const SimpleShapeDrawable*>(tickable);
-		Transform currentTransform = tickable->GetRelativeTransform();
-		Transform result = currentTransform * inParentTransform;
-		glm::mat4 currentModel = result.GetMatrix();
+		const Entity* entt = object.get();
+		RecursiveDrawObjects(entt->GetChildren());
 
-		RecursiveDrawObjects(tickable->GetChildren(), result);
-
-		if (renderable)
+		const DrawableBase* drawable = dynamic_cast<const DrawableBase*>(entt);
+		if (drawable)
 		{
-			// Bind and set all uniforms
-			const OpenGLShader& shader = renderable->GetShader();
-			shader.Bind();
-
-			shader.SetUniformValue4fv("model", currentModel);
-			shader.SetUniformValue4fv("projection", Perspective);
-			shader.SetUniformValue4fv("view", view);
-
-			// Draw using shader
-			renderable->Draw();
+			drawable->Draw(UniformsCache);
 		}
 	}
 }

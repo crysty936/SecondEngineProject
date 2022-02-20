@@ -37,6 +37,6 @@ private:
 	uint32_t CreateShader(const eastl::string& Source, GLenum ShaderType);
 
 private:
-	eastl::unordered_map<eastl::string, int> UniformLocations;
+	mutable eastl::unordered_map<eastl::string, int> UniformLocations;
 	uint32_t ShaderHandle = 0;
 };

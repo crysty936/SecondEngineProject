@@ -1,14 +1,33 @@
 #include "SimpleShapeDrawable.h"
 
 SimpleShapeDrawable::SimpleShapeDrawable(VAO& inVAO, OpenGLShader& inShader)
-	: ObjectVAO{ inVAO }, Shader{ inShader }
-{
-}
+	: DrawableBase(inVAO, inShader) {}
 
 SimpleShapeDrawable::SimpleShapeDrawable() = default;
 SimpleShapeDrawable::~SimpleShapeDrawable() = default;
 
-void SimpleShapeDrawable::Draw() const
+void SimpleShapeDrawable::Init()
+{
+
+}
+
+
+void SimpleShapeDrawable::AddTexture(OpenGLTexture inTexture)
+{
+	Textures.push_back(inTexture);
+}
+
+void SimpleShapeDrawable::DeleteObject()
+{
+	ObjectVAO.DeleteBuffers();
+	Shader.DeleteShader();
+	for (OpenGLTexture& tex : Textures)
+	{
+		tex.DeleteTexture();
+	}
+}
+
+void SimpleShapeDrawable::Draw_Private() const
 {
 	uint32_t indicesCount = ObjectVAO.GetVertexBuffer().GetIndicesCount();
 
@@ -29,22 +48,3 @@ void SimpleShapeDrawable::Draw() const
 	}
 }
 
-void SimpleShapeDrawable::AddTexture(OpenGLTexture inTexture)
-{
-	Textures.push_back(inTexture);
-}
-
-void SimpleShapeDrawable::DeleteObject()
-{
-	ObjectVAO.DeleteBuffers();
-	Shader.DeleteShader();
-	for (OpenGLTexture& tex : Textures)
-	{
-		tex.DeleteTexture();
-	}
-}
-
-void SimpleShapeDrawable::Init()
-{
-	
-}

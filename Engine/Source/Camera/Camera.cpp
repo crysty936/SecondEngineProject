@@ -26,27 +26,35 @@ void Camera::Move(MovementDirection inDirection, const float inSpeed)
 {
 	constexpr glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
 
-	glm::quat qF = Model.Rotation * glm::quat(0, 0, 0, -1) * glm::conjugate(Model.Rotation);
+	glm::quat absRotation = GetAbsoluteTransform().Rotation;
+
+	glm::quat qF = absRotation * glm::quat(0, 0, 0, -1) * glm::conjugate(absRotation);
 	glm::vec3 Front = { qF.x, qF.y, qF.z };
 	glm::vec3 Right = glm::normalize(glm::cross(Front, up));
 
-
-	switch (inDirection)
+	if (EntityPtr parentShared = Parent.lock())
 	{
-	case MovementDirection::Forward:
-		Model.Translation += Front * inSpeed;
-		break;
-	case MovementDirection::Back:
-		Model.Translation -= Front * inSpeed;
-		break;
-	case MovementDirection::Right:
-		Model.Translation += Right * inSpeed;
-		break;
-	case MovementDirection::Left:
-		Model.Translation -= Right * inSpeed;
-		break;
-	default:
-		break;
+		glm::vec3 movementVector(0.f);
+
+		switch (inDirection)
+		{
+		case MovementDirection::Forward:
+			movementVector = Front * inSpeed;
+			break;
+		case MovementDirection::Back:
+			movementVector -= Front * inSpeed;
+			break;
+		case MovementDirection::Right:
+			movementVector = Right * inSpeed;
+			break;
+		case MovementDirection::Left:
+			movementVector -= Right * inSpeed;
+			break;
+		default:
+			break;
+		}
+
+		parentShared->Move(movementVector);
 	}
 }
 
@@ -79,21 +87,26 @@ void Camera::OnMousePosChanged(const float inNewYaw, const float inNewPitch)
 	Yaw += yawOffset * sensitivity;
 	Pitch += pitchOffset * sensitivity;
 
- 	// Yaw
- 	glm::quat aroundY = glm::angleAxis(glm::radians(-Yaw), glm::vec3(0, 1, 0));
+//  	// Yaw
+//  	glm::quat aroundY = glm::angleAxis(glm::radians(-Yaw), glm::vec3(0, 1, 0));
+//  
+//  	// Pitch
+//  	glm::quat aroundX = glm::angleAxis(glm::radians(Pitch), glm::vec3(1, 0, 0));
+
+// 
+// 	glm::quat pitchAdditiveRotation = glm::angleAxis(glm::radians(pitchOffset), glm::vec3(1.f, 0.f, 0.f));
+// 	glm::quat yawAdditiveRotation = glm::angleAxis(glm::radians(-yawOffset), glm::vec3(0.f, 1.f, 0.f));
+
+	//Model.Rotation = pitchAdditiveRotation * Model.Rotation ;
+	//Model.Rotation = Model.Rotation * pitchAdditiveRotation;
  
- 	// Pitch
- 	glm::quat aroundX = glm::angleAxis(glm::radians(Pitch), glm::vec3(1, 0, 0));
+	Rotate(pitchOffset, glm::vec3(1.f, 0.f, 0.f));
 
-	Model.Rotate(pitchOffset, glm::vec3(1.f, 0.f, 0.f));
-
-	if (EntityPtr parentShared = Parent.lock())
-	{
-		parentShared->GetRelativeTransform().Rotate(-yawOffset, glm::vec3(0.f, 1.f, 0.f));
-
-	}
-
-
+  	if (EntityPtr parentShared = Parent.lock())
+  	{
+  		parentShared->Rotate(-yawOffset, glm::vec3(0.f, 1.f, 0.f));
+  
+  	}
 }
 
 glm::mat4 Camera::GetLookAt()
@@ -164,6 +177,8 @@ glm::mat4 Camera::GetLookAt()
 
 	//return lookAt;
 
-	return glm::inverse(GetAbsoluteTransform().GetMatrix());
+	const glm::mat4 inverse = glm::inverse(GetAbsoluteTransform().GetMatrix());
+
+	return inverse;
 }
 
