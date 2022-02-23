@@ -5,8 +5,8 @@
 #include "Renderer/OpenGL/Buffer/VertexBuffer.h"
 #include "Renderer/OpenGL/Buffer/VAO.h"
 #include "Renderer/OpenGL/OpenGLShader.h"
-#include "Renderer/OpenGL/SimpleShapeDrawable.h"
 #include "Renderer/OpenGL/OpenGLTexture.h"
+#include "Renderer/Drawable/SimpleShapeDrawable.h"
 
 const uint32_t texureBaseNr = GL_TEXTURE0;
 

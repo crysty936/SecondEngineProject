@@ -2,8 +2,8 @@
 #include "Core/EngineUtils.h"
 #include "Scene/Scene.h"
 #include "Camera/Camera.h"
-#include "Renderer/OpenGL/SimpleShapeDrawable.h"
-#include "Renderer/ShapesUtils/BasicShapes.h"
+#include "Renderer/Drawable/SimpleShapeDrawable.h"
+#include "Renderer/Drawable/BasicShapes.h"
 
 SceneManager* SceneManager::Instance = nullptr;
 

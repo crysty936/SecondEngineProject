@@ -17,6 +17,14 @@ Transform::Transform(const Transform& inOther)
 {
 }
 
+Transform::Transform(const glm::vec3 inLocation, const glm::vec3 inRotation, const glm::vec3 inScale)
+	:
+	Translation{ inLocation },
+	Scale{ inScale },
+	Rotation{ inRotation }
+{
+}
+
 glm::mat4 Transform::GetMatrix() const
 {
 	glm::mat4 model(1.f);

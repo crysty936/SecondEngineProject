@@ -8,14 +8,14 @@
 #include "Scene/Scene.h"
 #include "Camera/Camera.h"
 #include "Scene/SceneManager.h"
-#include "Renderer/OpenGL/SimpleShapeDrawable.h"
+#include "Renderer/Drawable/SimpleShapeDrawable.h"
 #include "glm/ext/matrix_float4x4.hpp"
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/trigonometric.hpp"
 #include "Renderer/ShapesUtils/BasicShapesData.h"
 #include "Entity/Entity.h"
 #include "Renderer/SelfRegisteringUniform/SelfRegisteringUniformBase.h"
-#include "../SelfRegisteringUniform/SelfRegisteringUniform4fv.h"
+#include "Renderer/SelfRegisteringUniform/SelfRegisteringUniform4fv.h"
 
 #define CLEAR_COLOR 0.3f, 0.5f, 1.f, 0.4f
 
@@ -102,9 +102,6 @@ void OpenGLRenderer::UpdateUniforms()
 
 void OpenGLRenderer::RecursiveDrawObjects(const eastl::vector<eastl::shared_ptr<Entity>>& inObjects)
 {
-	const glm::mat4 view = SceneManager::Get().GetCurrentScene().CurrentCamera->GetLookAt();
-	const glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)MainWindow->GetProperties().Width / (float)MainWindow->GetProperties().Height, 0.1f, 1000.0f);
-
 	for (const eastl::shared_ptr<Entity>& object : inObjects)
 	{
 		const Entity* entt = object.get();

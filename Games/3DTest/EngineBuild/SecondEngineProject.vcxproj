@@ -213,12 +213,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Engine\Source\Core\EntryPoint.cpp" />
+    <ClCompile Include="..\..\..\Engine\Source\Renderer\Drawable\BasicShapes.cpp" />
     <ClCompile Include="..\..\..\Engine\Source\Renderer\Drawable\DrawableBase.cpp" />
+    <ClCompile Include="..\..\..\Engine\Source\Renderer\Drawable\SimpleShapeDrawable.cpp" />
     <ClCompile Include="..\..\..\Engine\Source\Renderer\SelfRegisteringUniforms\SelfRegisteringUniform.cpp" />
     <ClCompile Include="..\..\..\Engine\Source\Renderer\SelfRegisteringUniform\SelfRegisteringUniform4fv.cpp" />
     <ClCompile Include="..\..\..\Engine\Source\Renderer\SelfRegisteringUniform\SelfRegisteringUniformBase.cpp" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Camera\Camera.cpp" />
+    <ClInclude Include="..\..\..\Engine\Source\Renderer\Drawable\BasicShapes.h" />
     <ClInclude Include="..\..\..\Engine\Source\Renderer\Drawable\DrawableBase.h" />
+    <ClInclude Include="..\..\..\Engine\Source\Renderer\Drawable\SimpleShapeDrawable.h" />
     <ClInclude Include="..\..\..\Engine\Source\Renderer\SelfRegisteringUniforms\SelfRegisteringUniform.h" />
     <ClInclude Include="..\..\..\Engine\Source\Renderer\SelfRegisteringUniform\SelfRegisteringUniform4fv.h" />
     <ClInclude Include="..\..\..\Engine\Source\Renderer\SelfRegisteringUniform\SelfRegisteringUniformBase.h" />
@@ -262,8 +266,6 @@
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\Buffer\VertexBuffer.h" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\Buffer\VertexBufferLayout.cpp" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\Buffer\VertexBufferLayout.h" />
-    <ClCompile Include="..\..\..\Engine\Source\Renderer\OpenGL\SimpleShapeDrawable.cpp" />
-    <ClInclude Include="..\..\..\Engine\Source\Renderer\OpenGL\SimpleShapeDrawable.h" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\OpenGLRenderer.cpp" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\OpenGLRenderer.h" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\OpenGLShader.cpp" />
@@ -272,8 +274,6 @@
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\OpenGLTexture.h" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\OpenGLUtils.cpp" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\OpenGLUtils.h" />
-    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\ShapesUtils\BasicShapes.cpp" />
-    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\ShapesUtils\BasicShapes.h" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\ShapesUtils\BasicShapesData.cpp" />
     <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\ShapesUtils\BasicShapesData.h" />
     <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Scene\Scene.cpp" />

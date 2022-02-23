@@ -9,6 +9,7 @@ struct Transform
 {
 	Transform();
 	Transform(const Transform& inOther);
+	Transform(const glm::vec3 inLocation, const glm::vec3 inRotation, const glm::vec3 inScale);
 
 	glm::vec3 Translation;
 	glm::vec3 Scale;

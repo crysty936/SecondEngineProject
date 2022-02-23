@@ -2,8 +2,8 @@
 #include "Camera/Camera.h"
 #include "Scene/SceneManager.h"
 #include "Scene/Scene.h"
-#include "Renderer/OpenGL/SimpleShapeDrawable.h"
-#include "Renderer/ShapesUtils/BasicShapes.h"
+#include "Renderer/Drawable/SimpleShapeDrawable.h"
+#include "Renderer/Drawable/BasicShapes.h"
 #include "Controller/Controller.h"
 #include "glm/common.hpp"
 #include <stdlib.h>
@@ -69,31 +69,31 @@ void TestGameMode::Init()
 		parentShared->Move(glm::vec3(0.f, 0.f, 10.f));
 	}
 
-	GameCamera->Rotate(-45.f, glm::vec3(0.f, 1.f, 0.f));
+	//GameCamera->Rotate(-45.f, glm::vec3(0.f, 1.f, 0.f));
 
-	Object = BasicShapes::CreateCubeObject();
-	currentScene.AddEntity(Object);
+ 	Object = BasicShapes::CreateCubeObject();
+ 	currentScene.AddEntity(Object);
 
 	Ground = BasicShapes::CreateCubeObject();
 	Ground->Move(glm::vec3(0.f, -10.f, 0.f));
 	Ground->SetScale(glm::vec3(200.f, 1.f, 200.f));
 	currentScene.AddEntity(Ground);
-
-	{
-		Obj = BasicShapes::CreateCubeObject();
-		Obj->Move(glm::vec3(5.f, 0., 0.f));
-		Object->AddChild(Obj);
-
-		Obj2 = BasicShapes::CreateCubeObject();
-		Obj2->Move(glm::vec3(3.f, 0.f, 0.f));
-		Obj->AddChild(Obj2);
-		Obj->SetScale(glm::vec3(0.5f, 0.5f, 0.5f));
-	}
-	{
-		EntityPtr SecondModel = BasicShapes::CreateCubeObject();
-		SecondModel->Move(glm::vec3(0.f, 0.f, 20.f));
-		currentScene.AddEntity(SecondModel);
-	}
+ 
+ 	{
+ 		Obj = BasicShapes::CreateCubeObject();
+ 		Obj->Move(glm::vec3(5.f, 0., 0.f));
+ 		Object->AddChild(Obj);
+ 
+ 		Obj2 = BasicShapes::CreateCubeObject();
+ 		Obj2->Move(glm::vec3(3.f, 0.f, 0.f));
+ 		Obj->AddChild(Obj2);
+ 		Obj->SetScale(glm::vec3(0.5f, 0.5f, 0.5f));
+ 	}
+ 	{
+ 		EntityPtr SecondModel = BasicShapes::CreateCubeObject();
+ 		SecondModel->Move(glm::vec3(0.f, 0.f, 20.f));
+ 		currentScene.AddEntity(SecondModel);
+ 	}
 }
 
 void TestGameMode::Tick(float inDeltaT)
@@ -103,7 +103,6 @@ void TestGameMode::Tick(float inDeltaT)
 	Object->Rotate(2.f, glm::vec3(0.f, 1.f, 0.f));
 	Obj->Rotate(2.f, glm::vec3(0.f, 1.f, 0.f));
 	Obj2->Rotate(8.f, glm::vec3(0.f, 1.f, 0.f));
-	//Object->GetRelativeTransform().Rotation.y += 0.5f;
 }
 
 void TestGameMode::MoveCameraLeft()

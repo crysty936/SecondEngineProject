@@ -74,6 +74,8 @@ void Camera::OnMousePosChanged(const float inNewYaw, const float inNewPitch)
 
 		MouseLastYaw = inNewYaw;
 		MouseLastPitch = inNewPitch;
+
+		return;
 	}
 
 	const float yawOffset = inNewYaw - MouseLastYaw;
@@ -82,10 +84,10 @@ void Camera::OnMousePosChanged(const float inNewYaw, const float inNewPitch)
 	MouseLastYaw = inNewYaw;
 	MouseLastPitch = inNewPitch;
 
-	const float sensitivity = 0.1f;
-
-	Yaw += yawOffset * sensitivity;
-	Pitch += pitchOffset * sensitivity;
+// 	const float sensitivity = 0.1f;
+// 
+// 	Yaw += yawOffset * sensitivity;
+// 	Pitch += pitchOffset * sensitivity;
 
 //  	// Yaw
 //  	glm::quat aroundY = glm::angleAxis(glm::radians(-Yaw), glm::vec3(0, 1, 0));
@@ -100,13 +102,14 @@ void Camera::OnMousePosChanged(const float inNewYaw, const float inNewPitch)
 	//Model.Rotation = pitchAdditiveRotation * Model.Rotation ;
 	//Model.Rotation = Model.Rotation * pitchAdditiveRotation;
  
-	Rotate(pitchOffset, glm::vec3(1.f, 0.f, 0.f));
 
-  	if (EntityPtr parentShared = Parent.lock())
-  	{
-  		parentShared->Rotate(-yawOffset, glm::vec3(0.f, 1.f, 0.f));
-  
-  	}
+ 	if (EntityPtr parentShared = Parent.lock())
+ 	{
+ 		parentShared->Rotate(-yawOffset, glm::vec3(0.f, 1.f, 0.f));
+ 	}
+
+	//Rotate(-yawOffset, glm::vec3(0.f, 1.f, 0.f));
+	Rotate(pitchOffset, glm::vec3(1.f, 0.f, 0.f));
 }
 
 glm::mat4 Camera::GetLookAt()
