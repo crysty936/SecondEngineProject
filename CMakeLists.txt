@@ -73,7 +73,8 @@ include(GoogleTest)
 
 list(APPEND source_files UnitTests/test.cpp)
 
-get_filename_component(full_path_test_cpp ${CMAKE_CURRENT_SOURCE_DIR}/Engine/Source/EntryPoint/EntryPoint.cpp ABSOLUTE)
+# Remove the original entry point so that the test one takes it's place
+get_filename_component(full_path_test_cpp ${CMAKE_CURRENT_SOURCE_DIR}/Engine/Source/Core/EntryPoint.cpp ABSOLUTE)
 
 list(REMOVE_ITEM source_files "${full_path_test_cpp}")
 add_executable(EngineTests ${source_files})

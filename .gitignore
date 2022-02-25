@@ -339,3 +339,7 @@ healthchecksdb
 /out/build/x64-Debug (default)/CMakeFiles
 /out/build/x64-Debug (default)/Plugins
 /out/build/x64-Debug (default)
+
+#Build Folders
+[Bb]uild/
+[Ee]ngineBuild/
