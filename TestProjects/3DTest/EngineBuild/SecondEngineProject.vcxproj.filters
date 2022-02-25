@@ -1,0 +1,324 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Camera\Camera.cpp">
+      <Filter>Engine\Source\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Controller\Controller.cpp">
+      <Filter>Engine\Source\Controller</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Core\EASTLNew.cpp">
+      <Filter>Engine\Source\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Core\EngineCore.cpp">
+      <Filter>Engine\Source\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Core\EntryPoint.cpp">
+      <Filter>Engine\Source\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Core\GameModeBase.cpp">
+      <Filter>Engine\Source\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Core\WindowsPlatform.cpp">
+      <Filter>Engine\Source\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Entity\Entity.cpp">
+      <Filter>Engine\Source\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\EventSystem\DelegateBase.cpp">
+      <Filter>Engine\Source\EventSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\EventSystem\EventSystem.cpp">
+      <Filter>Engine\Source\EventSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\InputSystem\GLFWInput\InputSystem.cpp">
+      <Filter>Engine\Source\InputSystem\GLFWInput</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\InputSystem\InputEventType.cpp">
+      <Filter>Engine\Source\InputSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Logger\Logger.cpp">
+      <Filter>Engine\Source\Logger</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Math\MathUtils.cpp">
+      <Filter>Engine\Source\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Math\Transform.cpp">
+      <Filter>Engine\Source\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\Drawable\BasicShapes.cpp">
+      <Filter>Engine\Source\Renderer\Drawable</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\Drawable\DrawableBase.cpp">
+      <Filter>Engine\Source\Renderer\Drawable</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\Drawable\SimpleShapeDrawable.cpp">
+      <Filter>Engine\Source\Renderer\Drawable</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\Buffer\BufferBase.cpp">
+      <Filter>Engine\Source\Renderer\OpenGL\Buffer</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\Buffer\IndexBuffer.cpp">
+      <Filter>Engine\Source\Renderer\OpenGL\Buffer</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\Buffer\VAO.cpp">
+      <Filter>Engine\Source\Renderer\OpenGL\Buffer</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\Buffer\VertexBuffer.cpp">
+      <Filter>Engine\Source\Renderer\OpenGL\Buffer</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\Buffer\VertexBufferLayout.cpp">
+      <Filter>Engine\Source\Renderer\OpenGL\Buffer</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\OpenGLRenderer.cpp">
+      <Filter>Engine\Source\Renderer\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\OpenGLShader.cpp">
+      <Filter>Engine\Source\Renderer\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\OpenGLTexture.cpp">
+      <Filter>Engine\Source\Renderer\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\OpenGLUtils.cpp">
+      <Filter>Engine\Source\Renderer\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\SelfRegisteringUniform\SelfRegisteringUniform4fv.cpp">
+      <Filter>Engine\Source\Renderer\SelfRegisteringUniform</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\SelfRegisteringUniform\SelfRegisteringUniformBase.cpp">
+      <Filter>Engine\Source\Renderer\SelfRegisteringUniform</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\SelfRegisteringUniforms\SelfRegisteringUniform.cpp">
+      <Filter>Engine\Source\Renderer\SelfRegisteringUniforms</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\ShapesUtils\BasicShapesData.cpp">
+      <Filter>Engine\Source\Renderer\ShapesUtils</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Scene\Scene.cpp">
+      <Filter>Engine\Source\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Scene\SceneManager.cpp">
+      <Filter>Engine\Source\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Timer\LogicTimer.cpp">
+      <Filter>Engine\Source\Timer</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Timer\TimerBase.cpp">
+      <Filter>Engine\Source\Timer</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Timer\TimersManager.cpp">
+      <Filter>Engine\Source\Timer</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Utils\IOUtils.cpp">
+      <Filter>Engine\Source\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Utils\ImageLoading.cpp">
+      <Filter>Engine\Source\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Utils\InlineAllocator.cpp">
+      <Filter>Engine\Source\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\SecondEngineProject\Engine\Source\Window\OpenGLWindow.cpp">
+      <Filter>Engine\Source\Window</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Camera\Camera.h">
+      <Filter>Engine\Source\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Controller\Controller.h">
+      <Filter>Engine\Source\Controller</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\EngineCore.h">
+      <Filter>Engine\Source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\EngineUtils.h">
+      <Filter>Engine\Source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\GameModeBase.h">
+      <Filter>Engine\Source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Core\WindowsPlatform.h">
+      <Filter>Engine\Source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Entity\Entity.h">
+      <Filter>Engine\Source\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\EventSystem\DelegateBase.h">
+      <Filter>Engine\Source\EventSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\EventSystem\EventSystem.h">
+      <Filter>Engine\Source\EventSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\EventSystem\IFunctionContainerBase.h">
+      <Filter>Engine\Source\EventSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\InputSystem\GLFWInput\InputSystem.h">
+      <Filter>Engine\Source\InputSystem\GLFWInput</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\InputSystem\GLFWInput\WindowsInputKeys.h">
+      <Filter>Engine\Source\InputSystem\GLFWInput</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\InputSystem\InputEventType.h">
+      <Filter>Engine\Source\InputSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Logger\Logger.h">
+      <Filter>Engine\Source\Logger</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Math\MathUtils.h">
+      <Filter>Engine\Source\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Math\Transform.h">
+      <Filter>Engine\Source\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\Drawable\BasicShapes.h">
+      <Filter>Engine\Source\Renderer\Drawable</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\Drawable\DrawableBase.h">
+      <Filter>Engine\Source\Renderer\Drawable</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\Drawable\SimpleShapeDrawable.h">
+      <Filter>Engine\Source\Renderer\Drawable</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\Buffer\BufferBase.h">
+      <Filter>Engine\Source\Renderer\OpenGL\Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\Buffer\IndexBuffer.h">
+      <Filter>Engine\Source\Renderer\OpenGL\Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\Buffer\LayoutProperties.h">
+      <Filter>Engine\Source\Renderer\OpenGL\Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\Buffer\VAO.h">
+      <Filter>Engine\Source\Renderer\OpenGL\Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\Buffer\VertexBuffer.h">
+      <Filter>Engine\Source\Renderer\OpenGL\Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\Buffer\VertexBufferLayout.h">
+      <Filter>Engine\Source\Renderer\OpenGL\Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\OpenGLRenderer.h">
+      <Filter>Engine\Source\Renderer\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\OpenGLShader.h">
+      <Filter>Engine\Source\Renderer\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\OpenGLTexture.h">
+      <Filter>Engine\Source\Renderer\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\OpenGL\OpenGLUtils.h">
+      <Filter>Engine\Source\Renderer\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\SelfRegisteringUniform\SelfRegisteringUniform4fv.h">
+      <Filter>Engine\Source\Renderer\SelfRegisteringUniform</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\SelfRegisteringUniform\SelfRegisteringUniformBase.h">
+      <Filter>Engine\Source\Renderer\SelfRegisteringUniform</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\SelfRegisteringUniforms\SelfRegisteringUniform.h">
+      <Filter>Engine\Source\Renderer\SelfRegisteringUniforms</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Renderer\ShapesUtils\BasicShapesData.h">
+      <Filter>Engine\Source\Renderer\ShapesUtils</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Scene\Scene.h">
+      <Filter>Engine\Source\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Scene\SceneManager.h">
+      <Filter>Engine\Source\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Timer\LogicTimer.h">
+      <Filter>Engine\Source\Timer</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Timer\TimerBase.h">
+      <Filter>Engine\Source\Timer</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Timer\TimersManager.h">
+      <Filter>Engine\Source\Timer</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Utils\IOUtils.h">
+      <Filter>Engine\Source\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Utils\ImageLoading.h">
+      <Filter>Engine\Source\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Utils\InlineAllocator.h">
+      <Filter>Engine\Source\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Window\OpenGLWindow.h">
+      <Filter>Engine\Source\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Engine\Source\Window\WindowProperties.h">
+      <Filter>Engine\Source\Window</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Engine">
+      <UniqueIdentifier>{F442F325-66B2-398A-B254-460F1F3CB1BD}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source">
+      <UniqueIdentifier>{09EA2B7B-7C12-3E20-B675-27ED6FDBA873}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\Camera">
+      <UniqueIdentifier>{B8EB5A82-58E1-3EBF-8D40-695E38A5DE5F}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\Controller">
+      <UniqueIdentifier>{35E9EEC0-457A-3B76-B9B7-BB0C5E17F28F}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\Core">
+      <UniqueIdentifier>{6BA6FA25-140F-312F-A520-805C89B5610E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\Entity">
+      <UniqueIdentifier>{F5B460A6-4DB9-3819-AED0-E53FB10BE8BF}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\EventSystem">
+      <UniqueIdentifier>{481ADCF2-9EE6-32FE-B8AD-637615F63384}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\InputSystem">
+      <UniqueIdentifier>{5785165B-933D-3ABC-8534-D7C352DE484F}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\InputSystem\GLFWInput">
+      <UniqueIdentifier>{2C87A5C6-C47B-3010-8600-18384B8999D3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\Logger">
+      <UniqueIdentifier>{C768572B-F523-389D-AFB7-284F48532E66}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\Math">
+      <UniqueIdentifier>{C4FB7360-40B1-324F-B938-ABDFA3452D5F}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\Renderer">
+      <UniqueIdentifier>{116F46B0-658E-357C-BB10-172EA2BCC018}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\Renderer\Drawable">
+      <UniqueIdentifier>{10C130B0-07CB-35A3-AD51-D8B84AAA3BEA}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\Renderer\OpenGL">
+      <UniqueIdentifier>{763AF533-642C-3842-A79A-837FC110E182}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\Renderer\OpenGL\Buffer">
+      <UniqueIdentifier>{D335AD3E-C044-3619-AA1D-E76E07DE3726}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\Renderer\SelfRegisteringUniform">
+      <UniqueIdentifier>{AEE0F54C-A9C0-356A-9971-44F9B17A3009}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\Renderer\SelfRegisteringUniforms">
+      <UniqueIdentifier>{6776E411-E499-3BC7-87E9-6C3643A81DE8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\Renderer\ShapesUtils">
+      <UniqueIdentifier>{274AD485-4059-3746-92FF-8F8149A44FF3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\Scene">
+      <UniqueIdentifier>{4C1F0884-F7B6-3855-BCBC-F678A720B1AE}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\Timer">
+      <UniqueIdentifier>{C144E25B-E4D5-3B21-8E88-5ADB8B904321}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\Utils">
+      <UniqueIdentifier>{0B678060-03B1-3397-BE91-CCD0061C79FB}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Source\Window">
+      <UniqueIdentifier>{F6595704-2CC2-3C00-8001-FC3219F2594E}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

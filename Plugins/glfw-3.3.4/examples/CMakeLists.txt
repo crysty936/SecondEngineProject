@@ -54,8 +54,17 @@ set(GUI_ONLY_BINARIES boing gears heightmap particles sharing simple splitview
     wave)
 set(CONSOLE_BINARIES offscreen)
 
+get_target_property(GLFWFOLDER glfw FOLDER)
+message(STATUS "Target folder for glfw is: ${GLFWFOLDER}")
+
+if(DEFINED PLUGINSDIR)
+message(STATUS "Variable PLUGINSDIR exists")
+set(GLFWFOLDER $CACHE{PLUGINSDIR}/${GLFWFOLDER})
+message(STATUS "Target folder for glfw was changed to: ${GLFWFOLDER}")
+endif()
+
 set_target_properties(${GUI_ONLY_BINARIES} ${CONSOLE_BINARIES} PROPERTIES
-                      FOLDER "GLFW3/Examples")
+                      FOLDER "${GLFWFOLDER}/Examples")
 
 if (GLFW_USE_OSMESA)
     target_compile_definitions(offscreen PRIVATE USE_NATIVE_OSMESA)

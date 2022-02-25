@@ -1,0 +1,20 @@
+# CMake generation dependency list for this directory.
+C:/Program Files/CMake/share/cmake-3.22/Modules/BasicConfigVersion-SameMajorVersion.cmake.in
+C:/Program Files/CMake/share/cmake-3.22/Modules/CMakePackageConfigHelpers.cmake
+C:/Program Files/CMake/share/cmake-3.22/Modules/CheckFunctionExists.cmake
+C:/Program Files/CMake/share/cmake-3.22/Modules/CheckIncludeFile.cmake
+C:/Program Files/CMake/share/cmake-3.22/Modules/CheckIncludeFileCXX.cmake
+C:/Program Files/CMake/share/cmake-3.22/Modules/CheckTypeSize.cmake
+C:/Program Files/CMake/share/cmake-3.22/Modules/FindPackageHandleStandardArgs.cmake
+C:/Program Files/CMake/share/cmake-3.22/Modules/FindPackageMessage.cmake
+C:/Program Files/CMake/share/cmake-3.22/Modules/FindPkgConfig.cmake
+C:/Program Files/CMake/share/cmake-3.22/Modules/WriteBasicConfigVersionFile.cmake
+D:/Projects/SecondEngineProject/Plugins/assimp/CMakeLists.txt
+D:/Projects/SecondEngineProject/Plugins/assimp/assimp.pc.in
+D:/Projects/SecondEngineProject/Plugins/assimp/cmake-modules/FindPkgMacros.cmake
+D:/Projects/SecondEngineProject/Plugins/assimp/cmake-modules/FindZLIB.cmake
+D:/Projects/SecondEngineProject/Plugins/assimp/cmake-modules/PrecompiledHeader.cmake
+D:/Projects/SecondEngineProject/Plugins/assimp/cmake-modules/assimp-plain-config.cmake.in
+D:/Projects/SecondEngineProject/Plugins/assimp/include/assimp/config.h.in
+D:/Projects/SecondEngineProject/Plugins/assimp/revision.h.in
+D:/Projects/SecondEngineProject/TestProjects/3DTest/build/CMakeFiles/cmake.verify_globs

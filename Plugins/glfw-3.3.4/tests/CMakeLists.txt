@@ -65,8 +65,17 @@ set(GUI_ONLY_BINARIES empty gamma icon inputlag joysticks opacity tearing
 set(CONSOLE_BINARIES clipboard events msaa glfwinfo iconify monitors reopen
                      cursor)
 
+get_target_property(GLFWFOLDER glfw FOLDER)
+message(STATUS "Target folder for glfw is: ${GLFWFOLDER}")
+
+if(DEFINED PLUGINSDIR)
+message(STATUS "Variable PLUGINSDIR exists")
+set(GLFWFOLDER $CACHE{PLUGINSDIR}/${GLFWFOLDER})
+message(STATUS "Target folder for glfw was changed to: ${GLFWFOLDER}")
+endif()
+
 set_target_properties(${GUI_ONLY_BINARIES} ${CONSOLE_BINARIES} PROPERTIES
-                      FOLDER "GLFW3/Tests")
+                      FOLDER "${GLFWFOLDER}/Tests")
 
 if (MSVC)
     # Tell MSVC to use main instead of WinMain for Windows subsystem executables

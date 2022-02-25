@@ -1,5 +1,0 @@
-# CMake generation dependency list for this directory.
-C:/Program Files/CMake/share/cmake-3.22/Modules/CMakeDependentOption.cmake
-C:/Program Files/CMake/share/cmake-3.22/Modules/GNUInstallDirs.cmake
-D:/Projects/SecondEngineProject/Games/FlappyTest/Build/CMakeFiles/cmake.verify_globs
-D:/Projects/SecondEngineProject/Plugins/googletest-main/CMakeLists.txt

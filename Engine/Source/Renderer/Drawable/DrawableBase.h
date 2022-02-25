@@ -8,8 +8,9 @@
 
 
 // Each Drawable type should take care of it's own drawing.
-// Even Instanced meshes can be drawn this way by having a parent that inherits from IDrawable contain all of them and not having them as exposed children.
+// Even Instanced meshes can be drawn this way by having a parent that inherits from DrawableBase contain all of them and not having them as exposed children.
 // Culling can be done by the Entity's Transform Data.
+// TODO: This should be changed so that all gl draw calls are present in the renderer, and the renderer should take care of rendering and grouping things as it sees fit
 
 class DrawableBase : public Entity
 {

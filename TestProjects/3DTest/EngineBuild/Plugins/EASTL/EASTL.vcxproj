@@ -1,0 +1,493 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|x64">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|x64">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{7EF84100-2C01-30D7-A1B3-649E8FD88D9D}</ProjectGuid>
+    <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
+    <Keyword>Win32Proj</Keyword>
+    <Platform>x64</Platform>
+    <ProjectName>EASTL</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\Projects\SecondEngineProject\TestProjects\3DTest\EngineBuild\Plugins\EASTL\Debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">EASTL.dir\Debug\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">EASTL</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\Projects\SecondEngineProject\TestProjects\3DTest\EngineBuild\Plugins\EASTL\Release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">EASTL.dir\Release\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">EASTL</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:\Projects\SecondEngineProject\TestProjects\3DTest\EngineBuild\Plugins\EASTL\MinSizeRel\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">EASTL.dir\MinSizeRel\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">EASTL</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:\Projects\SecondEngineProject\TestProjects\3DTest\EngineBuild\Plugins\EASTL\RelWithDebInfo\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">EASTL.dir\RelWithDebInfo\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">EASTL</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">.lib</TargetExt>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <ConformanceMode>true</ConformanceMode>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;_CHAR16T;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;EASTL_OPENSOURCE=1;CMAKE_INTDIR="Debug"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;_CHAR16T;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;EASTL_OPENSOURCE=1;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ConformanceMode>true</ConformanceMode>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;_CHAR16T;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;EASTL_OPENSOURCE=1;CMAKE_INTDIR="Release"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;_CHAR16T;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;EASTL_OPENSOURCE=1;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ConformanceMode>true</ConformanceMode>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <Optimization>MinSpace</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;_CHAR16T;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;EASTL_OPENSOURCE=1;CMAKE_INTDIR="MinSizeRel"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;_CHAR16T;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;EASTL_OPENSOURCE=1;CMAKE_INTDIR=\"MinSizeRel\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ConformanceMode>true</ConformanceMode>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;_CHAR16T;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;EASTL_OPENSOURCE=1;CMAKE_INTDIR="RelWithDebInfo"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;_CHAR16T;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;EASTL_OPENSOURCE=1;CMAKE_INTDIR=\"RelWithDebInfo\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>D:\Projects\SecondEngineProject\Plugins\EASTL\include;D:\Projects\SecondEngineProject\Plugins\EASTL\test\packages\EABase\include\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\algorithm.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\allocator.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\allocator_malloc.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\any.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\array.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\atomic.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\bit.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\bitset.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\bitvector.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\bonus\adaptors.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\bonus\call_traits.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\bonus\compressed_pair.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\bonus\fixed_ring_buffer.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\bonus\fixed_tuple_vector.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\bonus\intrusive_sdlist.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\bonus\intrusive_slist.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\bonus\list_map.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\bonus\lru_cache.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\bonus\ring_buffer.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\bonus\sort_extra.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\bonus\tuple_vector.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\chrono.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\core_allocator.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\core_allocator_adapter.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\deque.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\finally.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\fixed_allocator.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\fixed_function.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\fixed_hash_map.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\fixed_hash_set.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\fixed_list.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\fixed_map.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\fixed_set.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\fixed_slist.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\fixed_string.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\fixed_substring.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\fixed_vector.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\functional.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\hash_map.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\hash_set.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\heap.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\initializer_list.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\arch.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\arch_add_fetch.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\arch_and_fetch.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\arch_cmpxchg_strong.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\arch_cmpxchg_weak.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\arch_compiler_barrier.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\arch_cpu_pause.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\arch_exchange.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\arch_fetch_add.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\arch_fetch_and.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\arch_fetch_or.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\arch_fetch_sub.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\arch_fetch_xor.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\arch_load.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\arch_memory_barrier.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\arch_or_fetch.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\arch_signal_fence.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\arch_store.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\arch_sub_fetch.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\arch_thread_fence.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\arch_xor_fetch.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\arm\arch_arm.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\arm\arch_arm_load.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\arm\arch_arm_memory_barrier.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\arm\arch_arm_store.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\arm\arch_arm_thread_fence.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\x86\arch_x86.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\x86\arch_x86_add_fetch.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\x86\arch_x86_and_fetch.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\x86\arch_x86_cmpxchg_strong.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\x86\arch_x86_cmpxchg_weak.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\x86\arch_x86_exchange.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\x86\arch_x86_fetch_add.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\x86\arch_x86_fetch_and.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\x86\arch_x86_fetch_or.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\x86\arch_x86_fetch_sub.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\x86\arch_x86_fetch_xor.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\x86\arch_x86_load.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\x86\arch_x86_memory_barrier.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\x86\arch_x86_or_fetch.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\x86\arch_x86_store.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\x86\arch_x86_sub_fetch.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\x86\arch_x86_thread_fence.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\arch\x86\arch_x86_xor_fetch.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_asserts.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_base_width.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_casts.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_flag.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_flag_standalone.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_integral.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_macros.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_macros\atomic_macros.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_macros\atomic_macros_add_fetch.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_macros\atomic_macros_and_fetch.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_macros\atomic_macros_base.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_macros\atomic_macros_cmpxchg_strong.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_macros\atomic_macros_cmpxchg_weak.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_macros\atomic_macros_compiler_barrier.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_macros\atomic_macros_cpu_pause.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_macros\atomic_macros_exchange.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_macros\atomic_macros_fetch_add.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_macros\atomic_macros_fetch_and.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_macros\atomic_macros_fetch_or.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_macros\atomic_macros_fetch_sub.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_macros\atomic_macros_fetch_xor.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_macros\atomic_macros_load.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_macros\atomic_macros_memory_barrier.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_macros\atomic_macros_or_fetch.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_macros\atomic_macros_signal_fence.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_macros\atomic_macros_store.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_macros\atomic_macros_sub_fetch.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_macros\atomic_macros_thread_fence.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_macros\atomic_macros_xor_fetch.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_memory_order.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_pointer.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_pop_compiler_options.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_push_compiler_options.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_size_aligned.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\atomic_standalone.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\compiler.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\compiler_add_fetch.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\compiler_and_fetch.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\compiler_barrier.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\compiler_cmpxchg_strong.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\compiler_cmpxchg_weak.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\compiler_cpu_pause.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\compiler_exchange.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\compiler_fetch_add.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\compiler_fetch_and.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\compiler_fetch_or.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\compiler_fetch_sub.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\compiler_fetch_xor.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\compiler_load.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\compiler_memory_barrier.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\compiler_or_fetch.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\compiler_signal_fence.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\compiler_store.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\compiler_sub_fetch.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\compiler_thread_fence.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\compiler_xor_fetch.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\gcc\compiler_gcc.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\gcc\compiler_gcc_add_fetch.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\gcc\compiler_gcc_and_fetch.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\gcc\compiler_gcc_barrier.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\gcc\compiler_gcc_cmpxchg_strong.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\gcc\compiler_gcc_cmpxchg_weak.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\gcc\compiler_gcc_cpu_pause.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\gcc\compiler_gcc_exchange.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\gcc\compiler_gcc_fetch_add.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\gcc\compiler_gcc_fetch_and.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\gcc\compiler_gcc_fetch_or.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\gcc\compiler_gcc_fetch_sub.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\gcc\compiler_gcc_fetch_xor.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\gcc\compiler_gcc_load.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\gcc\compiler_gcc_or_fetch.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\gcc\compiler_gcc_signal_fence.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\gcc\compiler_gcc_store.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\gcc\compiler_gcc_sub_fetch.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\gcc\compiler_gcc_thread_fence.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\gcc\compiler_gcc_xor_fetch.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\msvc\compiler_msvc.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\msvc\compiler_msvc_add_fetch.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\msvc\compiler_msvc_and_fetch.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\msvc\compiler_msvc_barrier.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\msvc\compiler_msvc_cmpxchg_strong.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\msvc\compiler_msvc_cmpxchg_weak.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\msvc\compiler_msvc_cpu_pause.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\msvc\compiler_msvc_exchange.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\msvc\compiler_msvc_fetch_add.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\msvc\compiler_msvc_fetch_and.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\msvc\compiler_msvc_fetch_or.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\msvc\compiler_msvc_fetch_sub.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\msvc\compiler_msvc_fetch_xor.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\msvc\compiler_msvc_or_fetch.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\msvc\compiler_msvc_signal_fence.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\msvc\compiler_msvc_sub_fetch.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\atomic\compiler\msvc\compiler_msvc_xor_fetch.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\char_traits.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\config.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\copy_help.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\enable_shared.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\fill_help.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\fixed_pool.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\function.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\function_detail.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\function_help.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\functional_base.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\generic_iterator.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\hashtable.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\in_place_t.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\integer_sequence.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\intrusive_hashtable.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\mem_fn.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\memory_base.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\move_help.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\pair_fwd_decls.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\piecewise_construct_t.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\red_black_tree.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\smart_ptr.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\thread_support.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\tuple_fwd_decls.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\type_compound.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\type_fundamental.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\type_pod.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\type_properties.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\internal\type_transformations.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\intrusive_hash_map.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\intrusive_hash_set.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\intrusive_list.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\intrusive_ptr.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\iterator.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\linked_array.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\linked_ptr.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\list.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\map.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\memory.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\meta.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\numeric.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\numeric_limits.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\optional.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\priority_queue.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\queue.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\random.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\ratio.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\safe_ptr.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\scoped_array.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\scoped_ptr.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\segmented_vector.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\set.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\shared_array.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\shared_ptr.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\slist.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\sort.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\span.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\stack.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\string.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\string_hash_map.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\string_map.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\string_view.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\tuple.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\type_traits.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\unique_ptr.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\unordered_map.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\unordered_set.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\utility.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\variant.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\vector.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\vector_map.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\vector_multimap.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\vector_multiset.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\vector_set.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\version.h" />
+    <ClInclude Include="D:\Projects\SecondEngineProject\Plugins\EASTL\include\EASTL\weak_ptr.h" />
+    <ClCompile Include="D:\Projects\SecondEngineProject\Plugins\EASTL\source\allocator_eastl.cpp" />
+    <ClCompile Include="D:\Projects\SecondEngineProject\Plugins\EASTL\source\assert.cpp" />
+    <ClCompile Include="D:\Projects\SecondEngineProject\Plugins\EASTL\source\atomic.cpp" />
+    <ClCompile Include="D:\Projects\SecondEngineProject\Plugins\EASTL\source\fixed_pool.cpp" />
+    <ClCompile Include="D:\Projects\SecondEngineProject\Plugins\EASTL\source\hashtable.cpp" />
+    <ClCompile Include="D:\Projects\SecondEngineProject\Plugins\EASTL\source\intrusive_list.cpp" />
+    <ClCompile Include="D:\Projects\SecondEngineProject\Plugins\EASTL\source\numeric_limits.cpp" />
+    <ClCompile Include="D:\Projects\SecondEngineProject\Plugins\EASTL\source\red_black_tree.cpp" />
+    <ClCompile Include="D:\Projects\SecondEngineProject\Plugins\EASTL\source\string.cpp" />
+    <ClCompile Include="D:\Projects\SecondEngineProject\Plugins\EASTL\source\thread_support.cpp" />
+    <Natvis Include="D:\Projects\SecondEngineProject\Plugins\EASTL\doc\EASTL.natvis">
+    </Natvis>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

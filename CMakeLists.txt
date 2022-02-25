@@ -9,6 +9,8 @@ project(SecondEngineProject VERSION 1.0)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
+set( PLUGINSDIR "Plugins" CACHE INTERNAL "")
+
 add_subdirectory(Plugins/glfw-3.3.4)
 # add the glfw lib to the linking process so that the includes are added.
 list(APPEND extra_libs glfw)
@@ -19,6 +21,9 @@ list(APPEND extra_libs glad)
 
 add_subdirectory(Plugins/EASTL)
 list(APPEND extra_libs EASTL)
+
+add_subdirectory(Plugins/assimp)
+list(APPEND extra_libs assimp)
 
 # used to add all .cpp and .h files under source
 file(GLOB_RECURSE source_files CONFIGURE_DEPENDS "${CMAKE_CURRENT_LIST_DIR}/Engine/*.cpp" "${CMAKE_CURRENT_LIST_DIR}/Engine/*.h")
@@ -83,3 +88,9 @@ target_include_directories(EngineTests PUBLIC
 target_link_libraries(EngineTests PUBLIC gtest gtest_main ${extra_libs})
 
 gtest_discover_tests(EngineTests)
+
+
+# Group Plugins in a separate folder
+set_target_properties(	glfw glad EASTL assimp gtest gtest_main EngineTests
+						PROPERTIES
+						FOLDER "Plugins")		  
