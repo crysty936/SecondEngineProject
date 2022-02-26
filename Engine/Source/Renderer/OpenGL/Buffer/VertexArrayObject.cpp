@@ -1,11 +1,20 @@
-#include "VAO.h"
+#include "VertexArrayObject.h"
 #include "VertexBufferLayout.h"
 #include "EASTL/vector.h"
 #include "glad/glad.h"
 
-VAO::VAO(VertexBuffer& inBuffer)
-	: Handle{ 0 }, VBuffer{ inBuffer }
+VertexArrayObject::VertexArrayObject()
+	: Handle{ 0 }
 {
+
+}
+
+
+VertexArrayObject::~VertexArrayObject() = default;
+
+void VertexArrayObject::SetupState()
+{
+	// Set up the VAO state
 	glGenVertexArrays(1, &Handle);
 
 	Bind();
@@ -30,24 +39,19 @@ VAO::VAO(VertexBuffer& inBuffer)
 	VBuffer.Unbind();
 }
 
-VAO::VAO()
+void VertexArrayObject::Bind() const
 {
+	ASSERT(Handle != 0);
 
-}
-
-VAO::~VAO() = default;
-
-void VAO::Bind() const
-{
 	glBindVertexArray(Handle);
 }
 
-void VAO::Unbind() const
+void VertexArrayObject::Unbind() const
 {
 	glBindVertexArray(0);
 }
 
-void VAO::DeleteBuffers()
+void VertexArrayObject::DeleteBuffers()
 {
 	glDeleteVertexArrays(1, &Handle);
 	VBuffer.DeleteBuffer();

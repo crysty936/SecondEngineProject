@@ -3,28 +3,21 @@
 
 DrawableBase::DrawableBase()
 {
-	AddRequiredUniform("projection");
-	AddRequiredUniform("view");
-	AddRequiredUniform("model");
 }
 
-DrawableBase::DrawableBase(VAO& inVAO, OpenGLShader& inShader)
-	: ObjectVAO{ inVAO }, Shader{ inShader }
-{
-	AddRequiredUniform("projection");
-	AddRequiredUniform("view");
-	AddRequiredUniform("model");
-}
 
 DrawableBase::~DrawableBase() = default;
 
 void DrawableBase::Draw(const eastl::unordered_map<eastl::string, SelfRegisteringUniform>& inUniformsCache) const
 {
+	if (!bIsVisible)
+		return;
+
 	Shader.Bind();
  
 	using uniformsIterator = const eastl::unordered_map<eastl::string, SelfRegisteringUniform>::const_iterator;
 	// Register all required uniforms
-	for (const eastl::string& thisUniformName : RequiredUniforms)
+	for (const eastl::string& thisUniformName : DrawableMaterial.RequiredUniforms)
 	{
 		const uniformsIterator& iter = inUniformsCache.find(thisUniformName);
 
@@ -38,8 +31,7 @@ void DrawableBase::Draw(const eastl::unordered_map<eastl::string, SelfRegisterin
 	}
 
 	Draw_Private();
+
+	Shader.UnBind();
 }
 
-void DrawableBase::Draw_Private() const
-{
-}

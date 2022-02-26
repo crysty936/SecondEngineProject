@@ -74,6 +74,7 @@ const float CubeVertices[] = {
 	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
 };
 
+// TODO: Add the indices of the cube to get rid of Draw Arrays
 const uint32_t CubeIndices[] = {
 	0, 1, 2,
 	1, 2, 3
@@ -141,5 +142,8 @@ int32_t BasicShapesData::GetCubeVerticesCount()
 
 int32_t BasicShapesData::GetCubeIndicesCount()
 {
+	return 36;
+
+	// TODO: Add the indices of the cube to get rid of Draw Arrays
 	return sizeof(CubeIndices) / sizeof(uint32_t);
 }

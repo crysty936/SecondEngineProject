@@ -3,10 +3,9 @@
 
 namespace DelegatesTests
 {
-
-    constexpr int BoundDelegateSize = 24;
-    constexpr int FreeFuncDelegateSize = 16;
-    constexpr int UnBoundDelegateSize = 0;
+    const int BoundDelegateSize = 24;
+    const int FreeFuncDelegateSize = 16;
+    const int UnBoundDelegateSize = 0;
 
 	struct DelegatesTestClass
 	{

@@ -24,7 +24,13 @@ private:
 
 
 	EntityPtr Object;
+	EntityPtr YObject;
+	EntityPtr ZObject;
 	EntityPtr Obj;
+	EntityPtr YObj;
+	EntityPtr ZObj;
 	EntityPtr Obj2;
+	EntityPtr YObj2;
+	EntityPtr ZObj2;
 	EntityPtr Ground;
 };

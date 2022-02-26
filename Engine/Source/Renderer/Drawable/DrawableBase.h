@@ -2,10 +2,10 @@
 #include "EASTL/unordered_map.h"
 #include "EASTL/string.h"
 #include "EASTL/shared_ptr.h"
-#include "Renderer/OpenGL/Buffer/VAO.h"
-#include "Renderer/OpenGL/OpenGLShader.h"
+#include "Renderer/OpenGL/Buffer/VertexArrayObject.h"
 #include "Entity/Entity.h"
-
+#include "Renderer/OpenGL/OpenGLShader.h"
+#include "Material.h"
 
 // Each Drawable type should take care of it's own drawing.
 // Even Instanced meshes can be drawn this way by having a parent that inherits from DrawableBase contain all of them and not having them as exposed children.
@@ -16,22 +16,20 @@ class DrawableBase : public Entity
 {
 public:
 	DrawableBase();
-	DrawableBase(VAO& inVAO, OpenGLShader& inShader);
 	virtual ~DrawableBase();
 
-	/** Boilerplate draw commands */
 	void Draw(const eastl::unordered_map<eastl::string, struct SelfRegisteringUniform>& inUniformsCache) const;
+	inline void SetVisible(const bool inValue) { bIsVisible = inValue; }
 
 protected:
 	/** Draw commands specific for that object  */
-	virtual void Draw_Private() const;
-	inline const eastl::vector<eastl::string>& GetRequiredUniforms() { return RequiredUniforms; }
-	inline void AddRequiredUniform(const eastl::string& inUniformName) { RequiredUniforms.push_back(inUniformName); }
+	virtual void Draw_Private() const = 0;
+	inline void AddRequiredUniform(const eastl::string& inUniformName) { DrawableMaterial.RequiredUniforms.push_back(inUniformName); }
 
 protected:
-	VAO ObjectVAO;
+	Material DrawableMaterial;
 	OpenGLShader Shader;
 
 private:
-	eastl::vector<eastl::string> RequiredUniforms;
+	bool bIsVisible{ true };
 };

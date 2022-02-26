@@ -1,33 +1,27 @@
 #pragma once
 #include "EASTL/shared_ptr.h"
 #include "Renderer/Drawable/SimpleShapeDrawable.h"
+#include "Renderer/Model/3D/Model3D.h"
 
-class TriangleShape : public SimpleShapeDrawable
-{
-public:
-	TriangleShape(const eastl::string& inTexturePath = {});
-	virtual ~TriangleShape();
+// class TriangleShape : public SimpleShapeDrawable
+// {
+// public:
+// 	TriangleShape(const eastl::string& inTexturePath = {});
+// 	virtual ~TriangleShape();
+// };
+// 
+// class SquareShape : public SimpleShapeDrawable
+// {
+// public:
+// 	SquareShape(const eastl::string& inTexturePath = {});
+// 	virtual ~SquareShape();
+// };
 
-	virtual void Tick(const float inDeltaT) override;
-};
-
-class SquareShape : public SimpleShapeDrawable
-{
-public:
-	SquareShape(const eastl::string& inTexturePath = {});
-	virtual ~SquareShape();
-
-
-	virtual void Tick(const float inDeltaT) override;
-};
-
-class CubeShape : public SimpleShapeDrawable
+class CubeShape : public Model3D
 {
 public:
 	CubeShape(const eastl::string& inTexturePath = {});
 	virtual ~CubeShape();
-
-	virtual void Tick(const float inDeltaT)	override;
 
 protected:
 	virtual void Draw_Private() const override;
@@ -38,7 +32,7 @@ protected:
 class BasicShapes
 {
 public:
-	static eastl::shared_ptr<class Entity> CreateTriangleObject(eastl::string inTexturePath = {});
-	static eastl::shared_ptr<class Entity> CreateSquareObject(eastl::string inTexturePath = {});
-	static eastl::shared_ptr<class Entity> CreateCubeObject(eastl::string inTexturePath = {});
+// 	static eastl::shared_ptr<class DrawableBase> CreateTriangleObject(eastl::string inTexturePath = {});
+// 	static eastl::shared_ptr<class DrawableBase> CreateSquareObject(eastl::string inTexturePath = {});
+	static eastl::shared_ptr<class DrawableBase> CreateCubeObject(eastl::string inTexturePath = {});
 };
