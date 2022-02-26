@@ -1,6 +1,5 @@
 #pragma once
 #include "EASTL/shared_ptr.h"
-#include "Renderer/Drawable/SimpleShapeDrawable.h"
 #include "Renderer/Model/3D/Model3D.h"
 
 // class TriangleShape : public SimpleShapeDrawable

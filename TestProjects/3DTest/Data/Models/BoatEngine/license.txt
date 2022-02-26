@@ -1,0 +1,11 @@
+Model Information:
+* title:	CAT C32 1417KW Yaght/Marine Engine
+* source:	https://sketchfab.com/3d-models/cat-c32-1417kw-yaghtmarine-engine-248adfea566f4b29b4b2fae772a588c9
+* author:	Homo Urbanus (https://sketchfab.com/flatform)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "CAT C32 1417KW Yaght/Marine Engine" (https://sketchfab.com/3d-models/cat-c32-1417kw-yaghtmarine-engine-248adfea566f4b29b4b2fae772a588c9) by Homo Urbanus (https://sketchfab.com/flatform) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

@@ -32,6 +32,8 @@ public:
 	void DestroyWindow(GLFWwindow* inWindowHandle) const;
 	void SetVSyncEnabled(const bool inEnabled);
 	inline class OpenGLWindow& GetMainWindow() { return *MainWindow; }
+	static void LoadTexture();
+	
 
 private:
 	struct GLFWwindow* CreateNewWindowHandle(const WindowProperties& inWindowProperties) const;

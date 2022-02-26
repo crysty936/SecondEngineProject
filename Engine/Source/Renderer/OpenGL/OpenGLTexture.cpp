@@ -3,7 +3,7 @@
 #include "GLFW/glfw3.h"
 
 OpenGLTexture::OpenGLTexture(const eastl::string& inTexturePath, int32_t inTexNr)
-	: TexHandle{ 0 }, TexNr{ inTexNr }, NrChannels{ 0 }, Valid{ false }
+	: TexPath{inTexturePath}, TexHandle{ 0 }, TexNr{ inTexNr }, NrChannels{ 0 }
 {
 	ImageData data = ImageLoading::LoadImageData(inTexturePath.data());
 
@@ -53,10 +53,9 @@ OpenGLTexture::OpenGLTexture(const eastl::string& inTexturePath, int32_t inTexNr
 	ImageLoading::FreeImageData(data.RawData);
 
 	glBindTexture(GL_TEXTURE_2D, 0);
-
-	Valid = true;
 }
 
+OpenGLTexture::OpenGLTexture() = default;
 OpenGLTexture::~OpenGLTexture() = default;
 
 void OpenGLTexture::Bind() const
@@ -85,6 +84,4 @@ void OpenGLTexture::Unbind() const
 void OpenGLTexture::DeleteTexture()
 {
 	glDeleteTextures(1, &TexHandle);
-
-	Valid = false;
 }

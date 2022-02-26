@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include "IndexBuffer.h"
 #include "VertexBufferLayout.h"
+#include "Renderer/RenderingPrimitives.h"
 
 class VertexBuffer : public BufferBase
 {
@@ -18,6 +19,7 @@ public:
 	virtual void Unbind() override;
 
 	void SetVertices(const float* inVertices, const int inCount, const uint32_t inBufferAccessType);
+	void SetVertices(const eastl::vector<Vertex>& inVertices, const uint32_t inBufferAccessType);
 	void SetVerticesRaw(const void* inData, const size_t inSize, const uint32_t inBufferAccessType);
 	inline VertexBufferLayout& GetLayout() { return Layout; }
 	inline uint32_t GetIndicesCount() const { return Indices.IndicesCount; }

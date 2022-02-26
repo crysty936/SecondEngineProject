@@ -22,3 +22,5 @@ __debugbreak();}											\
 #define ASSERT(x, ...)
 #define ENSURE(x, ...) x
 #endif
+
+#define OUT

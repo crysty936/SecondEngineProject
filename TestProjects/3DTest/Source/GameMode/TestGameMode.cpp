@@ -2,11 +2,11 @@
 #include "Camera/Camera.h"
 #include "Scene/SceneManager.h"
 #include "Scene/Scene.h"
-#include "Renderer/Drawable/SimpleShapeDrawable.h"
 #include "Renderer/Drawable/BasicShapes.h"
 #include "Controller/Controller.h"
 #include "glm/common.hpp"
 #include <stdlib.h>
+#include "Renderer/BootlegImplementation/AssimpModel3D.h"
 
 TestGameMode GameMode = {};
 
@@ -135,6 +135,20 @@ void TestGameMode::Init()
 		ZObj->AddChild(ZObj2);
 		ZObj->SetScale(glm::vec3(0.5f, 0.5f, 0.5f));
 	}
+
+// 	eastl::shared_ptr<AssimpModel3D> model = eastl::make_shared<AssimpModel3D>("../Data/Models/Backpack/scene.gltf");
+// 	model->Move(glm::vec3(0.f, 10.f, 5.f));
+// 	currentScene.AddEntity(model);
+
+//  	eastl::shared_ptr<AssimpModel3D> helmetModel = eastl::make_shared<AssimpModel3D>("../Data/Models/Helmet/scene.gltf");
+//  	currentScene.AddEntity(helmetModel);
+// 	helmetModel->Move(glm::vec3(0.f, 10.f, 5.f));
+// 	helmetModel->SetScale(glm::vec3(0.1f, 0.1f, 0.1f));
+
+	eastl::shared_ptr<AssimpModel3D> boatEngine = eastl::make_shared<AssimpModel3D>("../Data/Models/BoatEngine/scene.gltf");
+	boatEngine->Move(glm::vec3(0.f, 10.f, 5.f));
+	currentScene.AddEntity(boatEngine);
+	boatEngine->SetScale(glm::vec3(0.01f, 0.01f, 0.01f));
 }
 
 void TestGameMode::Tick(float inDeltaT)

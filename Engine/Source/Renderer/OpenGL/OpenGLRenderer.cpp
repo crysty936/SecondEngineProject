@@ -8,12 +8,12 @@
 #include "Scene/Scene.h"
 #include "Camera/Camera.h"
 #include "Scene/SceneManager.h"
-#include "Renderer/Drawable/SimpleShapeDrawable.h"
 #include "glm/ext/matrix_float4x4.hpp"
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/trigonometric.hpp"
 #include "Renderer/ShapesUtils/BasicShapesData.h"
 #include "Entity/Entity.h"
+#include "Renderer/Drawable/DrawableBase.h"
 
 #define CLEAR_COLOR 0.3f, 0.5f, 1.f, 0.4f
 
@@ -94,11 +94,11 @@ void OpenGLRenderer::SetupBaseUniforms()
 
 void OpenGLRenderer::UpdateUniforms()
 {
- 	const glm::mat4 view = SceneManager::Get().GetCurrentScene().CurrentCamera->GetLookAt();
+	const glm::mat4 view = SceneManager::Get().GetCurrentScene().CurrentCamera->GetLookAt();
 	UniformsCache["view"] = view;
 }
 
-void OpenGLRenderer::RecursiveDrawObjects(const eastl::vector<eastl::shared_ptr<Entity>>& inObjects)
+void OpenGLRenderer::RecursiveDrawObjects(const eastl::vector<eastl::shared_ptr<Entity>>&inObjects)
 {
 	for (const eastl::shared_ptr<Entity>& object : inObjects)
 	{

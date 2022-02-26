@@ -34,6 +34,14 @@ void VertexBuffer::SetVertices(const float* inVertices, const int inCount, const
 	Unbind();
 }
 
+void VertexBuffer::SetVertices(const eastl::vector<Vertex>& inVertices, const uint32_t inBufferAccessType)
+{
+	Bind();
+	const int32_t verticesCount = static_cast<int32_t>(inVertices.size());
+	glNamedBufferData(Handle, sizeof(Vertex) * verticesCount, inVertices.data(), inBufferAccessType);
+	Unbind();
+}
+
 void VertexBuffer::SetVerticesRaw(const void* inData, const size_t inSize, const uint32_t inBufferAccessType)
 {
 	glBufferData(Handle, inSize, inData, inBufferAccessType);
