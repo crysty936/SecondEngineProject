@@ -19,9 +19,11 @@ public:
 	DrawableBase(VAO& inVAO, OpenGLShader& inShader);
 	virtual ~DrawableBase();
 
+	/** Boilerplate draw commands */
 	void Draw(const eastl::unordered_map<eastl::string, struct SelfRegisteringUniform>& inUniformsCache) const;
 
 protected:
+	/** Draw commands specific for that object  */
 	virtual void Draw_Private() const;
 	inline const eastl::vector<eastl::string>& GetRequiredUniforms() { return RequiredUniforms; }
 	inline void AddRequiredUniform(const eastl::string& inUniformName) { RequiredUniforms.push_back(inUniformName); }

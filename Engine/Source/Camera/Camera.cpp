@@ -89,13 +89,17 @@ void Camera::OnMousePosChanged(const float inNewYaw, const float inNewPitch)
 // 	Yaw += yawOffset * sensitivity;
 // 	Pitch += pitchOffset * sensitivity;
 
-//  	// Yaw
-//  	glm::quat aroundY = glm::angleAxis(glm::radians(-Yaw), glm::vec3(0, 1, 0));
-//  
-//  	// Pitch
-//  	glm::quat aroundX = glm::angleAxis(glm::radians(Pitch), glm::vec3(1, 0, 0));
-
+//   	// Yaw
+//   	glm::quat aroundY = glm::angleAxis(glm::radians(-Yaw), glm::vec3(0, 1, 0));
+//   
+//   	// Pitch
+//   	glm::quat aroundX = glm::angleAxis(glm::radians(Pitch), glm::vec3(1, 0, 0));
 // 
+// 	glm::quat result = aroundY * aroundX;
+// 
+// 	SetRotation(glm::eulerAngles(result));
+
+
 // 	glm::quat pitchAdditiveRotation = glm::angleAxis(glm::radians(pitchOffset), glm::vec3(1.f, 0.f, 0.f));
 // 	glm::quat yawAdditiveRotation = glm::angleAxis(glm::radians(-yawOffset), glm::vec3(0.f, 1.f, 0.f));
 

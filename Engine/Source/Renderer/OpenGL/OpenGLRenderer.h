@@ -7,7 +7,7 @@
 #include "EASTL/string.h"
 #include "glm/ext/matrix_float4x4.hpp"
 #include "Math/Transform.h"
-#include "Renderer/SelfRegisteringUniforms/SelfRegisteringUniform.h"
+#include "Renderer/SelfRegisteringUniform/SelfRegisteringUniform.h"
 
 /**
  * To make the renderer Generic, a base RHI class should be made, this should be renamed to OpenGLRHI

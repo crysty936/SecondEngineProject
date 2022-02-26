@@ -31,6 +31,7 @@ public:
 	void Move(const glm::vec3 inMoveVector);
 	void Rotate(const float inAmount, const glm::vec3 inAxis);
 	void SetRotation(const glm::vec3 inNewRotation);
+	inline glm::vec3 GetRelRotation() const { return Rotation; }
 	inline void SetScale(const glm::vec3 inScale) { Scale = inScale; }
 	inline bool IsTranfsDirty() const { return TransfDirty; }
 

@@ -14,8 +14,6 @@
 #include "glm/trigonometric.hpp"
 #include "Renderer/ShapesUtils/BasicShapesData.h"
 #include "Entity/Entity.h"
-#include "Renderer/SelfRegisteringUniform/SelfRegisteringUniformBase.h"
-#include "Renderer/SelfRegisteringUniform/SelfRegisteringUniform4fv.h"
 
 #define CLEAR_COLOR 0.3f, 0.5f, 1.f, 0.4f
 
@@ -106,6 +104,8 @@ void OpenGLRenderer::RecursiveDrawObjects(const eastl::vector<eastl::shared_ptr<
 	{
 		const Entity* entt = object.get();
 		RecursiveDrawObjects(entt->GetChildren());
+
+		UniformsCache["model"] = entt->GetAbsoluteTransform().GetMatrix();
 
 		const DrawableBase* drawable = dynamic_cast<const DrawableBase*>(entt);
 		if (drawable)
