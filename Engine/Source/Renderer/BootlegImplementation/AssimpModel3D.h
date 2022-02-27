@@ -14,8 +14,8 @@ public:
 
 private:
 	void LoadData(const eastl::string& inPath);
-	void ProcessNode(const struct aiNode& inNode, const struct aiScene& inScene);
-	void ProcessMesh(const struct aiMesh& inMesh, const struct aiScene& inScene);
+	void ProcessNode(const struct aiNode& inNode, const struct aiScene& inScene, MeshNode& inCurrentNode);
+	void ProcessMesh(const struct aiMesh& inMesh, const struct aiScene& inScene, MeshNode& inCurrentNode);
 
 	eastl::vector<OpenGLTexture> AssimpModel3D::LoadMaterialTextures(const aiMaterial& inMat, const aiTextureType& inAssimpTexType, const TextureType inTexType);
 	bool IsTextureLoaded(const eastl::string& inTexPath, OUT class OpenGLTexture& outTex);

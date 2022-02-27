@@ -4,6 +4,13 @@
 #include "Renderer/Drawable/Material.h"
 #include "Mesh3D.h"
 
+struct MeshNode
+{
+	Transform RelativeTranfs{};
+	eastl::vector<Mesh3D> Meshes;
+	eastl::vector<MeshNode> Children;
+};
+
 class Model3D : public DrawableBase
 {
 public:
@@ -14,7 +21,9 @@ public:
 
 protected:
 	virtual void Draw_Private() const override;
+	void DrawMeshesRecursive(const MeshNode& inNode, const Transform inParentWorldTransform) const;
 
 protected:
 	eastl::vector<Mesh3D> Meshes;
+	MeshNode RootMeshNode;
 };

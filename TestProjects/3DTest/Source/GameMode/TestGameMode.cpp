@@ -136,19 +136,20 @@ void TestGameMode::Init()
 		ZObj->SetScale(glm::vec3(0.5f, 0.5f, 0.5f));
 	}
 
-// 	eastl::shared_ptr<AssimpModel3D> model = eastl::make_shared<AssimpModel3D>("../Data/Models/Backpack/scene.gltf");
-// 	model->Move(glm::vec3(0.f, 10.f, 5.f));
-// 	currentScene.AddEntity(model);
+ 	eastl::shared_ptr<AssimpModel3D> model = eastl::make_shared<AssimpModel3D>("../Data/Models/Backpack/scene.gltf");
+ 	model->Move(glm::vec3(0.f, 10.f, 5.f));
+	model->SetScale(glm::vec3(0.01f, 0.01f, 0.01f));
+	currentScene.AddEntity(model);
 
 //  	eastl::shared_ptr<AssimpModel3D> helmetModel = eastl::make_shared<AssimpModel3D>("../Data/Models/Helmet/scene.gltf");
 //  	currentScene.AddEntity(helmetModel);
 // 	helmetModel->Move(glm::vec3(0.f, 10.f, 5.f));
 // 	helmetModel->SetScale(glm::vec3(0.1f, 0.1f, 0.1f));
 
-	eastl::shared_ptr<AssimpModel3D> boatEngine = eastl::make_shared<AssimpModel3D>("../Data/Models/BoatEngine/scene.gltf");
-	boatEngine->Move(glm::vec3(0.f, 10.f, 5.f));
-	currentScene.AddEntity(boatEngine);
-	boatEngine->SetScale(glm::vec3(0.01f, 0.01f, 0.01f));
+// 	eastl::shared_ptr<AssimpModel3D> boatEngine = eastl::make_shared<AssimpModel3D>("../Data/Models/BoatEngine/scene.gltf");
+// 	boatEngine->Move(glm::vec3(0.f, 10.f, 5.f));
+// 	currentScene.AddEntity(boatEngine);
+// 	boatEngine->SetScale(glm::vec3(0.01f, 0.01f, 0.01f));
 }
 
 void TestGameMode::Tick(float inDeltaT)

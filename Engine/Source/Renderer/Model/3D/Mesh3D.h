@@ -5,6 +5,7 @@
 #include "Renderer/OpenGL/OpenGLShader.h"
 #include "EASTL/vector.h"
 #include "Renderer/OpenGL/Buffer/VertexArrayObject.h"
+#include "Math/Transform.h"
 
 enum class MeshType
 {
@@ -26,7 +27,6 @@ public:
 	
 	// Don't need to keep them in memory as vertex and index buffer
 	// are created when mesh is constructed
-
 // 	eastl::vector<Vertex> Vertices;
 // 	eastl::vector<uint32_t> Indices;
 	eastl::vector<OpenGLTexture> Textures;

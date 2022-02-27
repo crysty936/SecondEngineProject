@@ -2,6 +2,7 @@
 #include "assimp/Importer.hpp"
 #include "assimp/scene.h"
 #include "Logger/Logger.h"
+#include "assimp/postprocess.h"
 
 AssimpModel3D::AssimpModel3D(const eastl::string& inPath)
 {
@@ -25,28 +26,40 @@ void AssimpModel3D::LoadData(const eastl::string& inPath)
 
 	ModelDir = inPath.substr(0, inPath.find_last_of('/'));
 
-	ProcessNode(*scene->mRootNode, *scene);
+	ProcessNode(*scene->mRootNode, *scene, RootMeshNode);
 }
 
-void AssimpModel3D::ProcessNode(const aiNode& inNode, const aiScene& inScene)
+void AssimpModel3D::ProcessNode(const aiNode& inNode, const aiScene& inScene, MeshNode& inCurrentNode)
 {
-
 	for (uint32_t i = 0; i < inNode.mNumMeshes; ++i)
 	{
 		const uint32_t meshIndex = inNode.mMeshes[i];
 		const aiMesh* assimpMesh = inScene.mMeshes[meshIndex];
 
-		ProcessMesh(*assimpMesh, inScene);
+		ProcessMesh(*assimpMesh, inScene, inCurrentNode);
 	}
 
 	for (uint32_t i = 0; i < inNode.mNumChildren; ++i)
 	{
-		ProcessNode(*inNode.mChildren[i], inScene);
+		const aiNode & nextAiNode = *inNode.mChildren[i];
+		MeshNode newNode;
+		aiVector3D aiScaling;
+		aiVector3D aiRotation;
+		aiVector3D aiPosition;
+		nextAiNode.mTransformation.Decompose(aiScaling, aiRotation, aiPosition);
+
+		glm::vec3 scaling(aiScaling.x, aiScaling.y, aiScaling.z);
+		glm::vec3 rotation(aiRotation.x, aiRotation.y, aiRotation.z);
+		glm::vec3 translation(aiPosition.x, aiPosition.y, aiPosition.z);
+
+		newNode.RelativeTranfs = Transform(translation, rotation, scaling);
+		ProcessNode(nextAiNode, inScene, newNode);
+		inCurrentNode.Children.push_back(newNode);
 	}
 }
 
 
-void AssimpModel3D::ProcessMesh(const aiMesh& inMesh, const aiScene& inScene)
+void AssimpModel3D::ProcessMesh(const aiMesh& inMesh, const aiScene& inScene, MeshNode& inCurrentNode)
 {
 	eastl::vector<Vertex> vertices;
 	eastl::vector<uint32_t> indices;
@@ -88,6 +101,9 @@ void AssimpModel3D::ProcessMesh(const aiMesh& inMesh, const aiScene& inScene)
 		}
 	}
 
+	// TODO: Have to respect the nodes graph, take a look into aiProcess_PreTransformVertices process to see operations
+	// Find out how to get textures from the gltf file itself
+
 	if (inMesh.mMaterialIndex >= 0)
 	{
 		aiMaterial* Material = inScene.mMaterials[inMesh.mMaterialIndex];
@@ -119,7 +135,8 @@ void AssimpModel3D::ProcessMesh(const aiMesh& inMesh, const aiScene& inScene)
 // 	OpenGLTexture tex{ inTexturePath, texureBaseNr + 0 };
 // 	newMesh.Textures.push_back(tex);
 
-	AddMesh(eastl::move(newMesh));
+	inCurrentNode.Meshes.push_back(newMesh);
+	//AddMesh(eastl::move(newMesh));
 
 	Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/BasicProjectionVertexShader.glsl", "../Data/Shaders/BasicTexFragmentShader.glsl");
 }

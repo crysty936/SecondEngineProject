@@ -42,4 +42,3 @@ void Mesh3D::Draw(const OpenGLShader& inShader) const
 		tex.Unbind();
 	}
 }
-
