@@ -19,6 +19,8 @@ private:
 
 	eastl::vector<OpenGLTexture> AssimpModel3D::LoadMaterialTextures(const aiMaterial& inMat, const aiTextureType& inAssimpTexType, const TextureType inTexType);
 	bool IsTextureLoaded(const eastl::string& inTexPath, OUT class OpenGLTexture& outTex);
+
+	static Transform aiMatrixToTransform(const aiMatrix4x4& inMatrix);
 private:
 	eastl::vector<OpenGLTexture> LoadedTextures;
 	eastl::string ModelDir;

@@ -26,6 +26,7 @@ void AssimpModel3D::LoadData(const eastl::string& inPath)
 
 	ModelDir = inPath.substr(0, inPath.find_last_of('/'));
 
+	RootMeshNode.RelativeTranfs = aiMatrixToTransform(scene->mRootNode->mTransformation);
 	ProcessNode(*scene->mRootNode, *scene, RootMeshNode);
 }
 
@@ -43,16 +44,8 @@ void AssimpModel3D::ProcessNode(const aiNode& inNode, const aiScene& inScene, Me
 	{
 		const aiNode & nextAiNode = *inNode.mChildren[i];
 		MeshNode newNode;
-		aiVector3D aiScaling;
-		aiVector3D aiRotation;
-		aiVector3D aiPosition;
-		nextAiNode.mTransformation.Decompose(aiScaling, aiRotation, aiPosition);
+		newNode.RelativeTranfs = aiMatrixToTransform(nextAiNode.mTransformation);
 
-		glm::vec3 scaling(aiScaling.x, aiScaling.y, aiScaling.z);
-		glm::vec3 rotation(aiRotation.x, aiRotation.y, aiRotation.z);
-		glm::vec3 translation(aiPosition.x, aiPosition.y, aiPosition.z);
-
-		newNode.RelativeTranfs = Transform(translation, rotation, scaling);
 		ProcessNode(nextAiNode, inScene, newNode);
 		inCurrentNode.Children.push_back(newNode);
 	}
@@ -101,9 +94,6 @@ void AssimpModel3D::ProcessMesh(const aiMesh& inMesh, const aiScene& inScene, Me
 		}
 	}
 
-	// TODO: Have to respect the nodes graph, take a look into aiProcess_PreTransformVertices process to see operations
-	// Find out how to get textures from the gltf file itself
-
 	if (inMesh.mMaterialIndex >= 0)
 	{
 		aiMaterial* Material = inScene.mMaterials[inMesh.mMaterialIndex];
@@ -145,8 +135,9 @@ eastl::vector<OpenGLTexture> AssimpModel3D::LoadMaterialTextures(const aiMateria
 {
 	eastl::vector<OpenGLTexture> textures;
 	const uint32_t texureBaseNr = GL_TEXTURE0;
+	const uint32_t texturesCount = inMat.GetTextureCount(inAssimpTexType);
 
-	for (uint32_t i = 0; i < inMat.GetTextureCount(inAssimpTexType); i++)
+	for (uint32_t i = 0; i < texturesCount; ++i)
 	{
 		aiString Str;
 		inMat.GetTexture(inAssimpTexType, i, &Str);
@@ -178,4 +169,18 @@ bool AssimpModel3D::IsTextureLoaded(const eastl::string& inTexPath, OUT OpenGLTe
 		}
 	}
 	return false;
+}
+
+Transform AssimpModel3D::aiMatrixToTransform(const aiMatrix4x4& inMatrix)
+{
+	aiVector3D aiScaling;
+	aiVector3D aiRotation;
+	aiVector3D aiPosition;
+	inMatrix.Decompose(aiScaling, aiRotation, aiPosition);
+
+	glm::vec3 scaling(aiScaling.x, aiScaling.y, aiScaling.z);
+	glm::vec3 rotation(aiRotation.x, aiRotation.y, aiRotation.z);
+	glm::vec3 translation(aiPosition.x, aiPosition.y, aiPosition.z);
+
+	return Transform(translation, rotation, scaling);
 }

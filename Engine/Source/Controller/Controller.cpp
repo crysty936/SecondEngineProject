@@ -1,31 +1,29 @@
 #include "Controller.h"
-#include "InputSystem/GLFWInput/InputSystem.h"
 #include "Core/EngineCore.h"
 
 Controller::Controller()
-	: KeyStates()
-	, KeyListeners()
-	, MouseListeners()
-	, bMouseMoved{ false }
-	, NewPitch{0.0f}
-	, NewYaw{0.0f}
 {
 	InputSystem::Get().OnKeyInput().BindRaw(this, &Controller::OnKeyInputReceived);
-	InputSystem::Get().OnMouseMoved().BindRaw(this, &Controller::OnMouseInputReceived);
+	InputSystem::Get().OnMouseMoved().BindRaw(this, &Controller::OnMouseMoveInputReceived);
+	InputSystem::Get().OnMouseScroll().BindRaw(this, &Controller::OnMouseScrollInputReceived);
 }
 
 Controller::~Controller() = default;
 
 void Controller::ExecuteCallbacks()
 {
+	if (bMouseScrolled)
+	{
+		bMouseScrolled = false;
+
+		OnMouseScrollDelegate.Invoke(NewMouseScrollOffset);
+	}
+
 	if (bMouseMoved)
 	{
 		bMouseMoved = false;
 
-		for (const MouseMovedDelegate& listener : MouseListeners)
-		{
-			listener.Execute(NewYaw, NewPitch);
-		}
+		OnMouseMovedDelegate.Invoke(NewYaw, NewPitch);
 	}
 
 	for (const OnKeyAction& listener : KeyListeners)
@@ -75,10 +73,16 @@ void Controller::OnKeyInputReceived(KeyCode inKeyCode, InputEventType inEventTyp
 	KeyStates[inKeyCode] = inEventType;
 }
 
-void Controller::OnMouseInputReceived(const float inNewYaw, const float inNewPitch)
+void Controller::OnMouseMoveInputReceived(const float inNewYaw, const float inNewPitch)
 {
 	bMouseMoved = true;
 	NewYaw = inNewYaw;
 	NewPitch = inNewPitch;
+}
+
+void Controller::OnMouseScrollInputReceived(const float inNewY)
+{
+	bMouseScrolled = true;
+	NewMouseScrollOffset = inNewY;
 }
 

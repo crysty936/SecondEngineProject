@@ -1,17 +1,18 @@
 #pragma once
+
+#include "InputSystem/GLFWInput/InputSystem.h"
 #include "EASTL/unordered_map.h"
 #include "InputSystem/GLFWInput/WindowsInputKeys.h"
 #include "InputSystem/InputEventType.h"
 #include "EventSystem/EventSystem.h"
 
 using KeyActionDelegate = Delegate<void>;
-using MouseMovedDelegate = Delegate<void, float, float>;
 
 struct OnKeyAction
 {
-	KeyActionDelegate Del;
-	KeyCode RequiredKey;
-	bool Once = false;
+	KeyActionDelegate Del{};
+	KeyCode RequiredKey{};
+	bool Once{ false };
 };
 
 class Controller
@@ -22,17 +23,22 @@ public:
 
 	void ExecuteCallbacks();
 	inline void AddListener(OnKeyAction& inKeyAction) { KeyListeners.push_back(inKeyAction); }
-	inline void AddMouseListener(MouseMovedDelegate inDelegate) { MouseListeners.push_back(inDelegate); }
+	inline MouseScrollDelegate& OnMouseScroll() { return OnMouseScrollDelegate; }
+	inline MousePosDelegate& OnMouseMoved() { return OnMouseMovedDelegate; }
 
 private:
 	void OnKeyInputReceived(KeyCode inKeyCode, InputEventType inEventType);
-	void OnMouseInputReceived(const float inNewYaw, const float inNewPitch);
+	void OnMouseMoveInputReceived(const float inNewYaw, const float inNewPitch);
+	void OnMouseScrollInputReceived(const float inNewY);
 
 private:
-	eastl::unordered_map<KeyCode, InputEventType> KeyStates;
-	eastl::vector<OnKeyAction> KeyListeners;
-	eastl::vector<MouseMovedDelegate> MouseListeners;
-	bool bMouseMoved;
-	float NewPitch;
-	float NewYaw;
+	eastl::unordered_map<KeyCode, InputEventType> KeyStates{};
+	eastl::vector<OnKeyAction> KeyListeners{};
+	MousePosDelegate OnMouseMovedDelegate{};
+	MouseScrollDelegate OnMouseScrollDelegate{};
+	bool bMouseMoved{false};
+	bool bMouseScrolled{false};
+	float NewPitch{0.0f};
+	float NewYaw{0.0f};
+	float NewMouseScrollOffset{ 0.0f };
 };

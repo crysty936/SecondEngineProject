@@ -3,14 +3,8 @@
 #include "glm/gtc/type_ptr.hpp"
 #include "Logger/Logger.h"
 
-Camera::Camera()
-	: FirstMouse{true}
-	, MouseLastYaw{0.0f}
-	, MouseLastPitch{0.0f}
-{}
-
-Camera::~Camera()
-= default;
+Camera::Camera() = default;
+Camera::~Camera() = default;
 
 void Camera::Init()
 {
@@ -26,11 +20,14 @@ void Camera::Move(MovementDirection inDirection, const float inSpeed)
 {
 	constexpr glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
 
-	glm::quat absRotation = GetAbsoluteTransform().Rotation;
+	const glm::quat absRotation = GetAbsoluteTransform().Rotation;
 
-	glm::quat qF = absRotation * glm::quat(0, 0, 0, -1) * glm::conjugate(absRotation);
+	const glm::quat qF = absRotation * glm::quat(0, 0, 0, -1) * glm::conjugate(absRotation);
 	glm::vec3 Front = { qF.x, qF.y, qF.z };
 	glm::vec3 Right = glm::normalize(glm::cross(Front, up));
+
+	Front *= MouseMoveSensitivity;
+	Right *= MouseMoveSensitivity;
 
 	if (EntityPtr parentShared = Parent.lock())
 	{
@@ -61,9 +58,13 @@ void Camera::Move(MovementDirection inDirection, const float inSpeed)
 
 void Camera::SetMovementDelegates(Controller& inController)
 {
-	MouseMovedDelegate del = MouseMovedDelegate::CreateRaw(this, &Camera::OnMousePosChanged);
+	inController.OnMouseMoved().BindRaw(this, &Camera::OnMousePosChanged);
+	inController.OnMouseScroll().BindRaw(this, &Camera::OnMouseScrollChanged);
+}
 
-	inController.AddMouseListener(del);
+void Camera::OnMouseScrollChanged(const float inNewY)
+{
+	MouseMoveSensitivity = glm::max(0.01f, MouseMoveSensitivity + inNewY / 10.f);
 }
 
 void Camera::OnMousePosChanged(const float inNewYaw, const float inNewPitch)
@@ -78,8 +79,10 @@ void Camera::OnMousePosChanged(const float inNewYaw, const float inNewPitch)
 		return;
 	}
 
-	const float yawOffset = inNewYaw - MouseLastYaw;
-	const float pitchOffset = (-1.f) * (inNewPitch - MouseLastPitch);
+	const float yawOffset = (inNewYaw - MouseLastYaw) * MouseLookSensitivity;
+	const float pitchOffset = ((-1.f) * (inNewPitch - MouseLastPitch)) * MouseLookSensitivity;
+
+
 
 	MouseLastYaw = inNewYaw;
 	MouseLastPitch = inNewPitch;

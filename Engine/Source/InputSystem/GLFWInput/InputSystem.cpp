@@ -41,6 +41,13 @@ void InputSystem::MousePosChangedCallback(GLFWwindow*, const double inNewYaw, co
 	Instance->OnMouseMovedDelegate.Invoke(yawFloat, pitchFloat);
 }
 
+void InputSystem::MouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
+{
+	const float yFloat = static_cast<float>(yoffset);
+
+	Instance->OnMouseScrollDelegate.Invoke(yFloat);
+}
+
 void InputSystem::Init()
 {
 	Instance = new InputSystem{};
@@ -52,6 +59,8 @@ void InputSystem::Init()
  	Instance->OnKeyInputDelegate.BindRaw(Instance, &InputSystem::OnKeyPressedLog);
 
 	glfwSetCursorPosCallback(mainWindow.GetHandle(), &MousePosChangedCallback);
+
+	glfwSetScrollCallback(mainWindow.GetHandle(), &MouseScrollCallback);
 }
 
 void InputSystem::Terminate()

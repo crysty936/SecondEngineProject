@@ -5,14 +5,8 @@ Model3D::~Model3D() = default;
 
 void Model3D::Draw_Private() const
 {
-	DrawMeshesRecursive(RootMeshNode, GetAbsoluteTransform());
-
-// 	for (const Mesh3D& childMesh : Meshes)
-// 	{
-// 		childMesh.Draw(Shader, GetAbsoluteTransform());
-// 	}
+	DrawMeshesRecursive(RootMeshNode,RootMeshNode.RelativeTranfs * GetAbsoluteTransform());
 }
-
 
 void Model3D::DrawMeshesRecursive(const MeshNode& inNode, const Transform inParentWorldTransform) const
 {
