@@ -15,6 +15,9 @@ public:
 	OpenGLTexture();
 	~OpenGLTexture();
 
+	// Lazy initialization
+	void Init(const eastl::string& inTexturePath);
+
 	void Bind() const;
 	void Unbind() const;
 	 
@@ -22,8 +25,8 @@ public:
 
 public:
 	eastl::string TexPath{};
-	uint32_t TexHandle{};
-	int32_t TexNr{};
-	int32_t NrChannels{};
+	uint32_t TexHandle{0};
+	int32_t TexNr{0};
+	int32_t NrChannels{0};
 	TextureType TexType{TextureType::Diffuse};
 };

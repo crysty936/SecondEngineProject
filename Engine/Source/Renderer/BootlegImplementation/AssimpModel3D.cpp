@@ -121,6 +121,7 @@ void AssimpModel3D::ProcessMesh(const aiMesh& inMesh, const aiScene& inScene, Me
 	Mesh3D newMesh;
 	newMesh.DrawType = MeshType::DrawElements;
 	newMesh.ObjectVAO.VBuffer = vbo;
+	newMesh.Textures = eastl::move(textures);
 	newMesh.ObjectVAO.SetupState();
 // 	OpenGLTexture tex{ inTexturePath, texureBaseNr + 0 };
 // 	newMesh.Textures.push_back(tex);
@@ -141,18 +142,19 @@ eastl::vector<OpenGLTexture> AssimpModel3D::LoadMaterialTextures(const aiMateria
 	{
 		aiString Str;
 		inMat.GetTexture(inAssimpTexType, i, &Str);
-		OpenGLTexture Tex;
+		OpenGLTexture tex;
+		tex.TexNr = texureBaseNr + i;
 
-		if (!IsTextureLoaded(Str.C_Str(), Tex))
+		if (!IsTextureLoaded(Str.C_Str(), tex))
 		{
 			eastl::string path = ModelDir + eastl::string("/") + eastl::string(Str.C_Str());
-			OpenGLTexture tex(path, texureBaseNr + i);
-			Tex.TexType = inTexType;
-			Tex.TexPath = eastl::string(Str.C_Str());
-			LoadedTextures.push_back(Tex);
+			tex.Init(path);
+			tex.TexType = inTexType;
+			tex.TexPath = eastl::string(Str.C_Str());
+			LoadedTextures.push_back(tex);
 		}
 
-		textures.push_back(Tex);
+		textures.push_back(tex);
 	}
 
 	return textures;
@@ -168,6 +170,7 @@ bool AssimpModel3D::IsTextureLoaded(const eastl::string& inTexPath, OUT OpenGLTe
 			return true;
 		}
 	}
+
 	return false;
 }
 
