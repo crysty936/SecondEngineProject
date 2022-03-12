@@ -5,7 +5,6 @@ struct RenderCommand
 {
 	eastl::shared_ptr<class VertexArrayObject> VAO{ nullptr };
 	eastl::shared_ptr<class RenderMaterial> Material{ nullptr };
-	//eastl::weak_ptr<const class Entity> ParentEntity;
-	class TransformObject* Parent;
-	EDrawType DrawType{ EDrawType::DrawElements };
+	eastl::weak_ptr<const class TransformObject> Parent;
+	EDrawCallType DrawType{ EDrawCallType::DrawElements };
 };

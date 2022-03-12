@@ -1,6 +1,6 @@
 #pragma once
 
-enum class EDrawType
+enum class EDrawCallType
 {
 	DrawElements,
 	DrawArrays

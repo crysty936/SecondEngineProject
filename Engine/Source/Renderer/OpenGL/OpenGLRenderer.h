@@ -17,7 +17,7 @@
 
 extern class OpenGLRenderer* RHI;
 
-enum class DrawType : uint8_t
+enum class EDrawMode : uint8_t
 {
 	NORMAL,
 	DEPTH
@@ -38,12 +38,14 @@ public:
 	void SetupBaseUniforms();
 	void UpdateUniforms();
 	void DrawCommands();
+	eastl::shared_ptr<RenderMaterial> GetMaterial(const RenderCommand& inCommand) const;
 	eastl::unique_ptr<OpenGLWindow> CreateWindow(const WindowProperties& inWindowProperties) const;
 	void DestroyWindow(GLFWwindow* inWindowHandle) const;
 	void SetVSyncEnabled(const bool inEnabled);
 	inline class OpenGLWindow& GetMainWindow() { return *MainWindow; }
 	static void LoadTexture();
 	void AddCommand(const RenderCommand& inCommand);
+	inline void SetDrawMode(const EDrawMode inDrawMode) { DrawMode = inDrawMode; }
 
 private:
 	struct GLFWwindow* CreateNewWindowHandle(const WindowProperties& inWindowProperties) const;
@@ -53,6 +55,5 @@ private:
 	eastl::unique_ptr<class OpenGLWindow> MainWindow;
 	eastl::unordered_map<eastl::string, SelfRegisteringUniform> UniformsCache;
 	eastl::vector<RenderCommand> Commands;
-	DrawType DrawMode{ DrawType::NORMAL };
-
+	EDrawMode DrawMode{ EDrawMode::NORMAL };
 };

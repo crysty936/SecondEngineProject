@@ -143,9 +143,8 @@ void CubeShape::SetupDrawCommand()
 	RenderCommand newCommand;
 	newCommand.Material = cubeMaterial;
 	newCommand.VAO = thisVAO;
-	//newCommand.ParentEntity = weak_from_this();
-	newCommand.Parent = this;
-	newCommand.DrawType = EDrawType::DrawArrays;
+	newCommand.Parent = weak_from_this();
+	newCommand.DrawType = EDrawCallType::DrawArrays;
 
 	RHI->AddCommand(newCommand);
 }

@@ -18,6 +18,7 @@ public:
 	void MoveCameraRight();
 	void MoveCameraUp();
 	void MoveCameraDown();
+	void OnChangeDrawMode();
 private:
 	eastl::shared_ptr<class Camera> GameCamera;
 	eastl::unique_ptr<class Controller> GameController;

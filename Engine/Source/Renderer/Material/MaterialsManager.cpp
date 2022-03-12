@@ -47,12 +47,11 @@ eastl::shared_ptr<RenderMaterial> MaterialsManager::GetOrAddMaterial(const eastl
 {
 	using materialsIterator = const eastl::unordered_map<eastl::string, eastl::shared_ptr<RenderMaterial>>::iterator;
 	const materialsIterator& iter = LoadedMaterials.find(inMaterialID);
-	const bool materialExists = iter != LoadedMaterials.end();
+	outAlreadyExists = iter != LoadedMaterials.end();
 
-	if (!materialExists)
+	if (!outAlreadyExists)
 	{
 		eastl::shared_ptr<RenderMaterial> returnMaterial = eastl::make_shared<RenderMaterial>();
-		outAlreadyExists = false;
 		LoadedMaterials.emplace(inMaterialID, returnMaterial);
 	
 		return returnMaterial;

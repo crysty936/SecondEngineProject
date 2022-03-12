@@ -67,8 +67,8 @@ OpenGLShader::OpenGLShader(const eastl::string& inVertexSrc, const eastl::string
 		glDeleteShader(vertexShader);
 		glDeleteShader(fragmentShader);
 
-		//LOG_CORE_ERROR("{0}", infoLog);
-		//ENGINE_CORE_ASSERT(false, "Shader link failure!");
+		LOG_ERROR("%s", infoLog);
+		ASSERT(0, "Shader Link failure.");
 
 		return;
 	}
@@ -160,8 +160,8 @@ uint32_t OpenGLShader::CreateShader(const eastl::string & Source, GLenum ShaderT
 		// We don't need the shader anymore.
 		glDeleteShader(shaderHandle);
 
-		//LOG_CORE_ERROR("{0}", infoLog);
-		//ENGINE_CORE_ASSERT(false, "Shader compilation failure!");
+		LOG_ERROR("%s", infoLog);
+		ASSERT(0, "Shader Compilation failure.");
 		return -1;
 	}
 

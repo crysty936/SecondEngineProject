@@ -62,7 +62,7 @@ void AssimpModel3D::ProcessNode(const aiNode & inNode, const aiScene & inScene, 
 }
 
 
-void AssimpModel3D::ProcessMesh(const aiMesh & inMesh, const aiScene & inScene, eastl::shared_ptr<MeshNode>&inCurrentNode)
+void AssimpModel3D::ProcessMesh(const aiMesh & inMesh, const aiScene & inScene, eastl::shared_ptr<MeshNode>& inCurrentNode)
 {
 	eastl::vector<Vertex> vertices;
 	eastl::vector<uint32_t> indices;
@@ -145,18 +145,12 @@ void AssimpModel3D::ProcessMesh(const aiMesh & inMesh, const aiScene & inScene, 
 	RenderCommand newCommand;
 	newCommand.Material = thisMaterial;
 	newCommand.VAO = thisVAO;
-	//newCommand.ParentEntity = weak_from_this();
-	newCommand.Parent = inCurrentNode.get();
-	newCommand.DrawType = EDrawType::DrawElements;
+	newCommand.Parent = inCurrentNode;
+	newCommand.DrawType = EDrawCallType::DrawElements;
 
 	RHI->AddCommand(newCommand);
 
 	Mesh3D newMesh;
-	//  	newMesh.DrawType = MeshType::DrawElements;
-	//  	newMesh.ObjectVAO.VBuffer = vbo;
-	//  	newMesh.Textures = eastl::move(textures);
-	//  	newMesh.ObjectVAO.SetupState();
-
 	inCurrentNode->Meshes.push_back(newMesh);
 }
 

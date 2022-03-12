@@ -17,6 +17,7 @@
 #include "EASTL/shared_ptr.h"
 #include "Renderer/Material/RenderMaterial.h"
 #include "Buffer/VertexArrayObject.h"
+#include "Renderer/Material/MaterialsManager.h"
 
 const glm::vec4 ClearColor(0.3f, 0.5f, 1.f, 0.4f);
 
@@ -47,7 +48,12 @@ OpenGLRenderer::OpenGLRenderer(const WindowProperties& inDefaultWindowProperties
 	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 	glEnable(GL_DEPTH_TEST);
 
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	glEnable(GL_STENCIL_TEST);
+	//glStencilMask(0xFF);
+	glDepthFunc(GL_LESS);
+
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	// 	glEnable(GL_BLEND);
 
 	glDebugMessageCallback(OpenGLUtils::GLDebugCallback, nullptr);
@@ -58,7 +64,7 @@ OpenGLRenderer::OpenGLRenderer(const WindowProperties& inDefaultWindowProperties
 
 OpenGLRenderer::~OpenGLRenderer() = default;
 
-void OpenGLRenderer::Init(const WindowProperties& inDefaultWindowProperties)
+void OpenGLRenderer::Init(const WindowProperties & inDefaultWindowProperties)
 {
 	RHI = new OpenGLRenderer{ inDefaultWindowProperties };
 }
@@ -74,7 +80,7 @@ void OpenGLRenderer::Terminate()
 
 void OpenGLRenderer::Draw()
 {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 	SceneManager& sceneMan = SceneManager::Get();
 	Scene& currentScene = sceneMan.GetCurrentScene();
@@ -103,25 +109,21 @@ void OpenGLRenderer::DrawCommands()
 {
 	for (const RenderCommand& renderCommand : Commands)
 	{
-// 		if (renderCommand.ParentEntity.expired())
-// 		{
-// 			continue;
-// 		}
+		if (renderCommand.Parent.expired())
+		{
+			continue;
+		}
 
-		//const eastl::weak_ptr<const Entity>& weakParent = renderCommand.ParentEntity;
-		const eastl::shared_ptr<RenderMaterial>& material = renderCommand.Material;
+		const eastl::shared_ptr<const TransformObject> parent = renderCommand.Parent.lock();
+		const eastl::shared_ptr<RenderMaterial> material = GetMaterial(renderCommand);
 		const eastl::shared_ptr<VertexArrayObject>& vao = renderCommand.VAO;
 
 		// TODO: Abstract the model and parent dependent uniforms to be present in the render command
 		// and updated only if dirty
 
-		//const eastl::shared_ptr<const Entity> entt = weakParent.lock();
-
 		material->Shader.Bind();
 
-		TransformObject* obj = renderCommand.Parent;
-
-		UniformsCache["model"] = obj->GetAbsoluteTransform().GetMatrix();
+		UniformsCache["model"] = parent->GetAbsoluteTransform().GetMatrix();
 
 		for (const OpenGLTexture& tex : material->Textures)
 		{
@@ -134,48 +136,56 @@ void OpenGLRenderer::DrawCommands()
 
 		switch (renderCommand.DrawType)
 		{
-		case EDrawType::DrawElements:
+		case EDrawCallType::DrawElements:
 		{
 			glDrawElements(GL_TRIANGLES, indicesCount, GL_UNSIGNED_INT, 0);
 			break;
 		}
-		case EDrawType::DrawArrays:
+		case EDrawCallType::DrawArrays:
 		{
 			glDrawArrays(GL_TRIANGLES, 0, indicesCount);
 			break;
 		}
 		}
- 
+
 		vao->Unbind();
- 
- 		for (const OpenGLTexture& tex : material->Textures)
- 		{
- 			tex.Unbind();
- 		}
+
+		for (const OpenGLTexture& tex : material->Textures)
+		{
+			tex.Unbind();
+		}
 
 		material->Shader.UnBind();
-
-// 		const DrawableBase* drawable = dynamic_cast<const DrawableBase*>(entt);
-// 		if (drawable)
-// 		{
-// 			const RenderMaterial* drawMaterial = nullptr;
-// 			switch (DrawMode)
-// 			{
-// 			case DrawType::NORMAL:
-// 			{
-// 				drawMaterial = &drawable->OwnedMaterial;
-// 				break;
-// 			}
-// 			case DrawType::DEPTH:
-// 			{
-// 
-// 				break;
-// 			}
-// 			}
-// 			drawable->Draw(UniformsCache, drawable->OwnedMaterial);
-// 
-// 		}
 	}
+}
+
+eastl::shared_ptr<RenderMaterial> OpenGLRenderer::GetMaterial(const RenderCommand & inCommand) const
+{
+	switch (DrawMode)
+	{
+	case EDrawMode::NORMAL:
+	{
+		return inCommand.Material;
+		break;
+	}
+	case EDrawMode::DEPTH:
+	{
+		MaterialsManager& matManager = MaterialsManager::Get();
+		bool materialExists = false;
+		eastl::shared_ptr<RenderMaterial> depthMaterial = matManager.GetOrAddMaterial("depth_material", materialExists);
+
+		if (!materialExists)
+		{
+			depthMaterial->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/BasicProjectionVertexShader.glsl", "../Data/Shaders/DepthFragmentShader.glsl");
+		}
+
+		return depthMaterial;
+		break;
+	}
+
+	}
+
+	return { nullptr };
 }
 
 eastl::unique_ptr<OpenGLWindow> OpenGLRenderer::CreateWindow(const WindowProperties & inWindowProperties) const
@@ -196,7 +206,7 @@ void OpenGLRenderer::SetVSyncEnabled(const bool inEnabled)
 	glfwSwapInterval(inEnabled);
 }
 
-void OpenGLRenderer::AddCommand(const RenderCommand& inCommand)
+void OpenGLRenderer::AddCommand(const RenderCommand & inCommand)
 {
 	Commands.push_back(inCommand);
 }

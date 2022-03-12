@@ -6,7 +6,8 @@
 #include "Controller/Controller.h"
 #include "glm/common.hpp"
 #include <stdlib.h>
-#include "Renderer/BootlegImplementation/AssimpModel3D.h"
+#include "Renderer/Model/3D/Assimp/AssimpModel3D.h"
+#include "Renderer/OpenGL/OpenGLRenderer.h"
 
 TestGameMode GameMode = {};
 
@@ -51,6 +52,14 @@ void TestGameMode::Init()
 		KeyActionDelegate cameraMovementDelegate = KeyActionDelegate::CreateRaw(this, &TestGameMode::MoveCameraDown);
 		KeyCode createFloorKey = KeyCode::S;
 		OnKeyAction createFloorAction = { cameraMovementDelegate, createFloorKey, false };
+
+		GameController->AddListener(createFloorAction);
+	}
+
+	{
+		KeyActionDelegate cameraMovementDelegate = KeyActionDelegate::CreateRaw(this, &TestGameMode::OnChangeDrawMode);
+		KeyCode createFloorKey = KeyCode::F;
+		OnKeyAction createFloorAction = { cameraMovementDelegate, createFloorKey, true };
 
 		GameController->AddListener(createFloorAction);
 	}
@@ -219,4 +228,13 @@ void TestGameMode::MoveCameraUp()
 void TestGameMode::MoveCameraDown()
 {
 	GameCamera->Move(MovementDirection::Back);
+}
+
+void TestGameMode::OnChangeDrawMode()
+{
+	static bool drawMode = false;
+
+	RHI->SetDrawMode(drawMode ? EDrawMode::NORMAL : EDrawMode::DEPTH);
+
+	drawMode = !drawMode;
 }
