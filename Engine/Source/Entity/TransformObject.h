@@ -1,0 +1,46 @@
+#pragma once
+#include "Math/Transform.h"
+#include "EASTL/shared_ptr.h"
+#include "EASTL/vector.h"
+
+using TransformObjPtr = eastl::shared_ptr<class TransformObject>;
+
+class TransformObject : public eastl::enable_shared_from_this<TransformObject>
+{
+public:
+	TransformObject();
+	virtual ~TransformObject();
+
+	inline void AddChild(TransformObjPtr inTransfObj) { inTransfObj->SetParent(shared_from_this()); }
+	inline glm::vec3 GetLocation() { return Location; }
+	inline const eastl::vector<TransformObjPtr> GetChildren() const { return Children; }
+	void SetParent(TransformObjPtr& inParent);
+	inline eastl::weak_ptr<TransformObject>& GetParent() { return Parent; }
+
+	const Transform GetRelativeTransform() const;
+	const Transform& GetAbsoluteTransform() const;
+	void CalculateAbsTransform() const;
+	void Move(const glm::vec3 inMoveVector);
+	void Rotate(const float inAmount, const glm::vec3 inAxis);
+	void SetRotation(const glm::vec3 inNewRotation);
+	inline glm::vec3 GetRelRotation() const { return Rotation; }
+	void SetRelTransform(const Transform& inNewTransf);
+	void SetRelativeLocation(const glm::vec3 inRelLoc);
+	void SetScale(const glm::vec3 inScale);
+	inline bool IsTranfsDirty() const { return TransfDirty; }
+
+protected:
+	void MakeTransfDirty() const;
+	inline void CleanTranfsDirty() const { TransfDirty = false; }
+
+protected:
+	glm::vec3 Location{ 0.f, 0.f, 0.f };
+	glm::vec3 Rotation{ 0.f, 0.f, 0.f };
+	glm::vec3 Scale{ 1.f, 1.f, 1.f };
+	mutable Transform AbsoluteTranfs{};
+	mutable bool TransfDirty{ true };
+	eastl::weak_ptr<TransformObject> Parent{};
+	eastl::vector<TransformObjPtr> Children{};
+
+	friend class Scene;
+};

@@ -6,34 +6,40 @@ Scene::~Scene() = default;
 
 void Scene::TickObjects(float inDeltaT)
 {
-	RecursivelyTickObjects(inDeltaT, Entities);
+	RecursivelyTickObjects(inDeltaT, Objects);
 }
 
 void Scene::InitObjects()
 {
-	RecursivelyInitObjects(Entities);
+	RecursivelyInitObjects(Objects);
 }
 
-void Scene::AddEntity(EntityPtr inEntity)
+void Scene::AddObject(TransformObjPtr inObj)
 {
-	Entities.push_back(inEntity);
+	Objects.push_back(inObj);
 }
 
-void Scene::RecursivelyTickObjects(float inDeltaT, eastl::vector<eastl::shared_ptr<Entity>>& inObjects)
+void Scene::RecursivelyTickObjects(float inDeltaT, eastl::vector<TransformObjPtr>& inObjects)
 {
-	for (eastl::shared_ptr<Entity>& obj : inObjects)
+	for (TransformObjPtr& obj : inObjects)
 	{
 		RecursivelyTickObjects(inDeltaT, obj->Children);
 
-		obj->Tick(inDeltaT);
+		if (Entity* entt = dynamic_cast<Entity*>(obj.get()))
+		{
+			entt->Tick(inDeltaT);
+		}
 	}
 }
 
-void Scene::RecursivelyInitObjects(eastl::vector<eastl::shared_ptr<Entity>>& inObjects)
+void Scene::RecursivelyInitObjects(eastl::vector<TransformObjPtr>& inObjects)
 {
-	for (eastl::shared_ptr<Entity>& obj : inObjects)
+	for (TransformObjPtr& obj : inObjects)
 	{
-		obj->Init();
+		if (Entity* entt = dynamic_cast<Entity*>(obj.get()))
+		{
+			entt->Init();
+		}
 
 		RecursivelyInitObjects(obj->Children);
 	}

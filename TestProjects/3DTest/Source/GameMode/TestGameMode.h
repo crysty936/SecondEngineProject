@@ -32,5 +32,5 @@ private:
 	EntityPtr Obj2;
 	EntityPtr YObj2;
 	EntityPtr ZObj2;
-	EntityPtr Ground;
+	eastl::shared_ptr<class CubeShape> Ground;
 };

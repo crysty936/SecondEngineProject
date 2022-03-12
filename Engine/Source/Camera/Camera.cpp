@@ -2,6 +2,7 @@
 #include "Controller/Controller.h"
 #include "glm/gtc/type_ptr.hpp"
 #include "Logger/Logger.h"
+#include "Entity/TransformObject.h"
 
 Camera::Camera() = default;
 Camera::~Camera() = default;
@@ -29,7 +30,7 @@ void Camera::Move(MovementDirection inDirection, const float inSpeed)
 	Front *= MouseMoveSensitivity;
 	Right *= MouseMoveSensitivity;
 
-	if (EntityPtr parentShared = Parent.lock())
+	if (TransformObjPtr parentShared = Parent.lock())
 	{
 		glm::vec3 movementVector(0.f);
 
@@ -110,7 +111,7 @@ void Camera::OnMousePosChanged(const float inNewYaw, const float inNewPitch)
 	//Model.Rotation = Model.Rotation * pitchAdditiveRotation;
  
 
- 	if (EntityPtr parentShared = Parent.lock())
+ 	if (TransformObjPtr parentShared = Parent.lock())
  	{
  		parentShared->Rotate(-yawOffset, glm::vec3(0.f, 1.f, 0.f));
  	}

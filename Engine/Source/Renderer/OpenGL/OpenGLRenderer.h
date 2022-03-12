@@ -8,10 +8,20 @@
 #include "glm/ext/matrix_float4x4.hpp"
 #include "Math/Transform.h"
 #include "Renderer/SelfRegisteringUniform/SelfRegisteringUniform.h"
+#include "RenderCommand.h"
 
 /**
- * To make the renderer Generic, a base RHI class should be made, this should be renamed to OpenGLRHI
+ * TODO: A Renderer should be made and that should call whatever RHI is present.
+ * Also, Renderers should be differentiated between 2D and 3D because optimizations can be made for 2D only renderers
  */
+
+extern class OpenGLRenderer* RHI;
+
+enum class DrawType : uint8_t
+{
+	NORMAL,
+	DEPTH
+};
 
 class OpenGLRenderer
 {
@@ -27,13 +37,13 @@ public:
 
 	void SetupBaseUniforms();
 	void UpdateUniforms();
-	void RecursiveDrawObjects(const eastl::vector<eastl::shared_ptr<class Entity>>& inObjects);
+	void DrawCommands();
 	eastl::unique_ptr<OpenGLWindow> CreateWindow(const WindowProperties& inWindowProperties) const;
 	void DestroyWindow(GLFWwindow* inWindowHandle) const;
 	void SetVSyncEnabled(const bool inEnabled);
 	inline class OpenGLWindow& GetMainWindow() { return *MainWindow; }
 	static void LoadTexture();
-	
+	void AddCommand(const RenderCommand& inCommand);
 
 private:
 	struct GLFWwindow* CreateNewWindowHandle(const WindowProperties& inWindowProperties) const;
@@ -42,7 +52,7 @@ private:
 private:
 	eastl::unique_ptr<class OpenGLWindow> MainWindow;
 	eastl::unordered_map<eastl::string, SelfRegisteringUniform> UniformsCache;
+	eastl::vector<RenderCommand> Commands;
+	DrawType DrawMode{ DrawType::NORMAL };
+
 };
-
-
-extern OpenGLRenderer* RHI;

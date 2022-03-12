@@ -19,19 +19,16 @@
 class CubeShape : public Model3D
 {
 public:
-	CubeShape(const eastl::string& inTexturePath = {});
+	CubeShape();
 	virtual ~CubeShape();
 
-protected:
-	virtual void Draw_Private() const override;
-
+	virtual void SetupDrawCommand() override;
 };
-
 
 class BasicShapes
 {
 public:
 // 	static eastl::shared_ptr<class DrawableBase> CreateTriangleObject(eastl::string inTexturePath = {});
 // 	static eastl::shared_ptr<class DrawableBase> CreateSquareObject(eastl::string inTexturePath = {});
-	static eastl::shared_ptr<class DrawableBase> CreateCubeObject(eastl::string inTexturePath = {});
+	static eastl::shared_ptr<class CubeShape> CreateCubeObject();
 };

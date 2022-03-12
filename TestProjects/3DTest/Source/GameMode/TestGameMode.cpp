@@ -63,7 +63,7 @@ void TestGameMode::Init()
 	GameCamera->SetMovementDelegates(*GameController);
 
 	// Push camera back a bit
-	if (EntityPtr parentShared = GameCamera->GetParent().lock())
+	if (TransformObjPtr parentShared = GameCamera->GetParent().lock())
 	{
 		// Move the camera parent
 		parentShared->Move(glm::vec3(0.f, 0.f, 10.f));
@@ -71,75 +71,109 @@ void TestGameMode::Init()
 
 	//GameCamera->Rotate(-45.f, glm::vec3(0.f, 1.f, 0.f));
 
-	Ground = BasicShapes::CreateCubeObject();
-	Ground->Move(glm::vec3(0.f, -10.f, 0.f));
-	Ground->SetScale(glm::vec3(200.f, 1.f, 200.f));
-	currentScene.AddEntity(Ground);
- 
-	eastl::shared_ptr<DrawableBase> centerObj = BasicShapes::CreateCubeObject();
-	currentScene.AddEntity(centerObj);
-
-	eastl::shared_ptr<DrawableBase> drawableObject = BasicShapes::CreateCubeObject();
- 	Object = drawableObject;
- 	currentScene.AddEntity(Object);
-	drawableObject->SetVisible(false);
-
- 	{
- 		Obj = BasicShapes::CreateCubeObject();
- 		Obj->Move(glm::vec3(5.f, 0., 0.f));
- 		Object->AddChild(Obj);
- 
- 		Obj2 = BasicShapes::CreateCubeObject();
- 		Obj2->Move(glm::vec3(3.f, 0.f, 0.f));
- 		Obj->AddChild(Obj2);
- 		Obj->SetScale(glm::vec3(0.5f, 0.5f, 0.5f));
- 	}
- 	{
- 		EntityPtr SecondModel = BasicShapes::CreateCubeObject();
- 		SecondModel->Move(glm::vec3(0.f, 0.f, 20.f));
- 		currentScene.AddEntity(SecondModel);
- 	}
-
-
-	eastl::shared_ptr<DrawableBase> drawableYObject = BasicShapes::CreateCubeObject();
-	YObject = drawableYObject;
-	currentScene.AddEntity(YObject);
-	drawableYObject->SetVisible(false);
+ 	Ground = BasicShapes::CreateCubeObject();
+ 	Ground->Move(glm::vec3(0.f, -10.f, 0.f));
+ 	Ground->SetScale(glm::vec3(200.f, 1.f, 200.f));
+ 	currentScene.AddObject(Ground);
 
 	{
-		YObj = BasicShapes::CreateCubeObject();
-		YObj->Move(glm::vec3(5.f, 0., 0.f));
-		YObject->AddChild(YObj);
-
-		YObj2 = BasicShapes::CreateCubeObject();
-		YObj2->Move(glm::vec3(3.f, 0.f, 0.f));
-		YObj->AddChild(YObj2);
-		YObj->SetScale(glm::vec3(0.5f, 0.5f, 0.5f));
+		eastl::shared_ptr<CubeShape> centerObj = BasicShapes::CreateCubeObject();
+		currentScene.AddObject(centerObj);
 	}
-	
+  	{
+  		eastl::shared_ptr<CubeShape> centerObj = BasicShapes::CreateCubeObject();
+  		centerObj->Move(glm::vec3(0.f, 10.f, 0.f));
+  		currentScene.AddObject(centerObj);
+  	}
+  	{
+  		eastl::shared_ptr<CubeShape> centerObj = BasicShapes::CreateCubeObject();
+  		centerObj->Move(glm::vec3(0.f, 20.f, 0.f));
+  		currentScene.AddObject(centerObj);
+  	}
+  	{
+  		eastl::shared_ptr<CubeShape> centerObj = BasicShapes::CreateCubeObject();
+  		centerObj->Move(glm::vec3(0.f, 30.f, 0.f));
+  		currentScene.AddObject(centerObj);
+  	}
+  	{
+  		eastl::shared_ptr<CubeShape> centerObj = BasicShapes::CreateCubeObject();
+  		centerObj->Move(glm::vec3(0.f, 40.f, 0.f));
+  		currentScene.AddObject(centerObj);
+  	}
+  	{
+  		eastl::shared_ptr<CubeShape> centerObj = BasicShapes::CreateCubeObject();
+  		centerObj->Move(glm::vec3(0.f, 50.f, 0.f));
+  		currentScene.AddObject(centerObj);
+  	}
+  	{
+  		eastl::shared_ptr<CubeShape> centerObj = BasicShapes::CreateCubeObject();
+  		centerObj->Move(glm::vec3(0.f, 60.f, 0.f));
+  		currentScene.AddObject(centerObj);
+  	}
 
-	eastl::shared_ptr<DrawableBase> drawableZObject = BasicShapes::CreateCubeObject();
-	ZObject = drawableZObject;
-	currentScene.AddEntity(ZObject);
-	drawableZObject->SetVisible(false);
 
-	ZObject->Rotate(90.f, glm::vec3(0.f, 1.f, 0.f));
+// 	eastl::shared_ptr<DrawableBase> drawableObject = BasicShapes::CreateCubeObject();
+//  	Object = drawableObject;
+//  	currentScene.AddEntity(Object);
+// 	drawableObject->SetVisible(false);
+// 
+//  	{
+//  		Obj = BasicShapes::CreateCubeObject();
+//  		Obj->Move(glm::vec3(5.f, 0., 0.f));
+//  		Object->AddChild(Obj);
+//  
+//  		Obj2 = BasicShapes::CreateCubeObject();
+//  		Obj2->Move(glm::vec3(3.f, 0.f, 0.f));
+//  		Obj->AddChild(Obj2);
+//  		Obj->SetScale(glm::vec3(0.5f, 0.5f, 0.5f));
+//  	}
+//  	{
+//  		EntityPtr SecondModel = BasicShapes::CreateCubeObject();
+//  		SecondModel->Move(glm::vec3(0.f, 0.f, 20.f));
+//  		currentScene.AddEntity(SecondModel);
+//  	}
+// 
+// 
+// 	eastl::shared_ptr<DrawableBase> drawableYObject = BasicShapes::CreateCubeObject();
+// 	YObject = drawableYObject;
+// 	currentScene.AddEntity(YObject);
+// 	drawableYObject->SetVisible(false);
+// 
+// 	{
+// 		YObj = BasicShapes::CreateCubeObject();
+// 		YObj->Move(glm::vec3(5.f, 0., 0.f));
+// 		YObject->AddChild(YObj);
+// 
+// 		YObj2 = BasicShapes::CreateCubeObject();
+// 		YObj2->Move(glm::vec3(3.f, 0.f, 0.f));
+// 		YObj->AddChild(YObj2);
+// 		YObj->SetScale(glm::vec3(0.5f, 0.5f, 0.5f));
+// 	}
+// 	
+// 
+// 	eastl::shared_ptr<DrawableBase> drawableZObject = BasicShapes::CreateCubeObject();
+// 	ZObject = drawableZObject;
+// 	currentScene.AddEntity(ZObject);
+// 	drawableZObject->SetVisible(false);
+// 
+// 	ZObject->Rotate(90.f, glm::vec3(0.f, 1.f, 0.f));
+// 
+// 	{
+// 		ZObj = BasicShapes::CreateCubeObject();
+// 		ZObj->Move(glm::vec3(5.f, 0., 0.f));
+// 		ZObject->AddChild(ZObj);
+// 
+// 		ZObj2 = BasicShapes::CreateCubeObject();
+// 		ZObj2->Move(glm::vec3(3.f, 0.f, 0.f));
+// 		ZObj->AddChild(ZObj2);
+// 		ZObj->SetScale(glm::vec3(0.5f, 0.5f, 0.5f));
+// 	}
 
-	{
-		ZObj = BasicShapes::CreateCubeObject();
-		ZObj->Move(glm::vec3(5.f, 0., 0.f));
-		ZObject->AddChild(ZObj);
-
-		ZObj2 = BasicShapes::CreateCubeObject();
-		ZObj2->Move(glm::vec3(3.f, 0.f, 0.f));
-		ZObj->AddChild(ZObj2);
-		ZObj->SetScale(glm::vec3(0.5f, 0.5f, 0.5f));
-	}
-
-//    	eastl::shared_ptr<AssimpModel3D> model = eastl::make_shared<AssimpModel3D>("../Data/Models/Backpack/scene.gltf");
-//    	model->Move(glm::vec3(0.f, 10.f, 5.f));
-//   	model->SetScale(glm::vec3(0.01f, 0.01f, 0.01f));
-//   	currentScene.AddEntity(model);
+	eastl::shared_ptr<AssimpModel3D> model = eastl::make_shared<AssimpModel3D>("../Data/Models/Backpack/scene.gltf");
+	model->SetupDrawCommand();
+	model->Move(glm::vec3(0.f, 10.f, 5.f));
+	model->SetScale(glm::vec3(0.01f, 0.01f, 0.01f));
+	currentScene.AddObject(model);
 
 //  	eastl::shared_ptr<AssimpModel3D> shibaModel = eastl::make_shared<AssimpModel3D>("../Data/Models/Shiba/scene.gltf");
 //  	currentScene.AddEntity(shibaModel);
@@ -152,17 +186,17 @@ void TestGameMode::Tick(float inDeltaT)
 {
 	GameController->ExecuteCallbacks();
 
-	Object->Rotate(2.f, glm::vec3(0.f, 1.f, 0.f));
-	Obj->Rotate(2.f, glm::vec3(0.f, 1.f, 0.f));
-	Obj2->Rotate(8.f, glm::vec3(0.f, 1.f, 0.f));
+// 	Object->Rotate(2.f, glm::vec3(0.f, 1.f, 0.f));
+// 	Obj->Rotate(2.f, glm::vec3(0.f, 1.f, 0.f));
+// 	Obj2->Rotate(8.f, glm::vec3(0.f, 1.f, 0.f));
 
-	YObject->Rotate(2.f, glm::vec3(0.f, 0.f, 1.f));
-	YObj->Rotate(2.f, glm::vec3(0.f, 1.f, 0.f));
-	YObj2->Rotate(8.f, glm::vec3(0.f, 1.f, 0.f));
-
-	ZObject->Rotate(2.f, glm::vec3(0.f, 0.f, 1.f));
-	ZObj->Rotate(2.f, glm::vec3(0.f, 1.f, 0.f));
-	ZObj2->Rotate(8.f, glm::vec3(0.f, 1.f, 0.f));
+// 	YObject->Rotate(2.f, glm::vec3(0.f, 0.f, 1.f));
+// 	YObj->Rotate(2.f, glm::vec3(0.f, 1.f, 0.f));
+// 	YObj2->Rotate(8.f, glm::vec3(0.f, 1.f, 0.f));
+// 
+// 	ZObject->Rotate(2.f, glm::vec3(0.f, 0.f, 1.f));
+// 	ZObj->Rotate(2.f, glm::vec3(0.f, 1.f, 0.f));
+// 	ZObj2->Rotate(8.f, glm::vec3(0.f, 1.f, 0.f));
 }
 
 void TestGameMode::MoveCameraLeft()

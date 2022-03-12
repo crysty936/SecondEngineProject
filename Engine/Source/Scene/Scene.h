@@ -1,7 +1,7 @@
 #pragma once
 #include "EASTL/vector.h"
 #include "EASTL/shared_ptr.h"
-#include "Entity/Entity.h"
+#include "Entity/TransformObject.h"
 
 /**
  * Scene class precursor
@@ -9,6 +9,8 @@
  * It has a strong reference to them and each time an object get's destroyed, it get's removed from the scene's list
  * 
  */
+
+// TODO: Tick and Init can be made using delegates
 
 class Scene
 {
@@ -18,13 +20,13 @@ public:
 
 	void TickObjects(float inDeltaT);
 	void InitObjects();
-	void AddEntity(EntityPtr inEntity);
+	void AddObject(TransformObjPtr inObj);
 
 private:
-	void RecursivelyTickObjects(float inDeltaT, eastl::vector<eastl::shared_ptr<class Entity>>& inObjects);
-	void RecursivelyInitObjects(eastl::vector<eastl::shared_ptr<class Entity>>& inObjects);
+	void RecursivelyTickObjects(float inDeltaT, eastl::vector<TransformObjPtr>& inObjects);
+	void RecursivelyInitObjects(eastl::vector<TransformObjPtr>& inObjects);
 
 public:
-	eastl::vector<eastl::shared_ptr<class Entity>> Entities;
+	eastl::vector<TransformObjPtr> Objects;
 	eastl::shared_ptr<class Camera> CurrentCamera;
 };

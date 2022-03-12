@@ -3,15 +3,22 @@
 #include "assimp/scene.h"
 #include "Logger/Logger.h"
 #include "assimp/postprocess.h"
+#include "Renderer/Material/MaterialsManager.h"
+#include "Renderer/OpenGL/RenderCommand.h"
+#include "Renderer/OpenGL/OpenGLRenderer.h"
 
 AssimpModel3D::AssimpModel3D(const eastl::string& inPath)
-{
-	LoadData(inPath);
-}
+	: ModelPath{ inPath }
+{}
 
 AssimpModel3D::~AssimpModel3D() = default;
 
-void AssimpModel3D::LoadData(const eastl::string& inPath)
+void AssimpModel3D::SetupDrawCommand()
+{
+	LoadData(ModelPath);
+}
+
+void AssimpModel3D::LoadData(const eastl::string & inPath)
 {
 	Assimp::Importer modelImporter;
 
@@ -26,11 +33,14 @@ void AssimpModel3D::LoadData(const eastl::string& inPath)
 
 	ModelDir = inPath.substr(0, inPath.find_last_of('/'));
 
-	RootMeshNode.RelativeTranfs = aiMatrixToTransform(scene->mRootNode->mTransformation);
-	ProcessNode(*scene->mRootNode, *scene, RootMeshNode);
+	eastl::shared_ptr<MeshNode> newNode = eastl::make_shared<MeshNode>();
+	newNode->SetRelTransform(aiMatrixToTransform(scene->mRootNode->mTransformation));
+	AddChild(newNode);
+
+	ProcessNode(*scene->mRootNode, *scene, newNode);
 }
 
-void AssimpModel3D::ProcessNode(const aiNode& inNode, const aiScene& inScene, MeshNode& inCurrentNode)
+void AssimpModel3D::ProcessNode(const aiNode & inNode, const aiScene & inScene, eastl::shared_ptr<MeshNode>&inCurrentNode)
 {
 	for (uint32_t i = 0; i < inNode.mNumMeshes; ++i)
 	{
@@ -42,17 +52,17 @@ void AssimpModel3D::ProcessNode(const aiNode& inNode, const aiScene& inScene, Me
 
 	for (uint32_t i = 0; i < inNode.mNumChildren; ++i)
 	{
-		const aiNode & nextAiNode = *inNode.mChildren[i];
-		MeshNode newNode;
-		newNode.RelativeTranfs = aiMatrixToTransform(nextAiNode.mTransformation);
+		const aiNode& nextAiNode = *inNode.mChildren[i];
+		eastl::shared_ptr<MeshNode> newNode = eastl::make_shared<MeshNode>();
+		newNode->SetRelTransform(aiMatrixToTransform(nextAiNode.mTransformation));
 
 		ProcessNode(nextAiNode, inScene, newNode);
-		inCurrentNode.Children.push_back(newNode);
+		inCurrentNode->AddChild((newNode));
 	}
 }
 
 
-void AssimpModel3D::ProcessMesh(const aiMesh& inMesh, const aiScene& inScene, MeshNode& inCurrentNode)
+void AssimpModel3D::ProcessMesh(const aiMesh & inMesh, const aiScene & inScene, eastl::shared_ptr<MeshNode>&inCurrentNode)
 {
 	eastl::vector<Vertex> vertices;
 	eastl::vector<uint32_t> indices;
@@ -100,8 +110,8 @@ void AssimpModel3D::ProcessMesh(const aiMesh& inMesh, const aiScene& inScene, Me
 		eastl::vector<OpenGLTexture> DiffuseMaps = LoadMaterialTextures(*Material, aiTextureType_DIFFUSE, TextureType::Diffuse);
 		textures.insert(textures.end(), DiffuseMaps.begin(), DiffuseMaps.end());
 
-// 		std::vector<Texture> SpecularMaps = LoadMaterialTextures(Material, aiTextureType_SPECULAR, TextureType::Specular);
-// 		Textures.insert(Textures.end(), SpecularMaps.begin(), SpecularMaps.end());
+		// 		std::vector<Texture> SpecularMaps = LoadMaterialTextures(Material, aiTextureType_SPECULAR, TextureType::Specular);
+		// 		Textures.insert(Textures.end(), SpecularMaps.begin(), SpecularMaps.end());
 	}
 
 	IndexBuffer ibo = IndexBuffer{};
@@ -113,26 +123,44 @@ void AssimpModel3D::ProcessMesh(const aiMesh& inMesh, const aiScene& inScene, Me
 	layout.Push<float>(3);
 	// Vertex Tex Coords
 	layout.Push<float>(2);
-	
+
 	VertexBuffer vbo = VertexBuffer{ ibo, layout };
 	int32_t verticesCount = static_cast<int32_t>(vertices.size());
 	vbo.SetVertices(vertices, GL_STATIC_DRAW);
 
+	MaterialsManager& matManager = MaterialsManager::Get();
+	bool materialExists = false;
+	eastl::shared_ptr<RenderMaterial> thisMaterial = matManager.GetOrAddMaterial("Assimp_Material_Temp", materialExists);
+
+	if (!materialExists)
+	{
+		thisMaterial->Textures = textures;
+		thisMaterial->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/BasicProjectionVertexShader.glsl", "../Data/Shaders/BasicTexFragmentShader.glsl");
+	}
+
+	eastl::shared_ptr<VertexArrayObject> thisVAO = eastl::make_shared<VertexArrayObject>();
+	thisVAO->VBuffer = vbo;
+	thisVAO->SetupState();
+
+	RenderCommand newCommand;
+	newCommand.Material = thisMaterial;
+	newCommand.VAO = thisVAO;
+	//newCommand.ParentEntity = weak_from_this();
+	newCommand.Parent = inCurrentNode.get();
+	newCommand.DrawType = EDrawType::DrawElements;
+
+	RHI->AddCommand(newCommand);
+
 	Mesh3D newMesh;
-	newMesh.DrawType = MeshType::DrawElements;
-	newMesh.ObjectVAO.VBuffer = vbo;
-	newMesh.Textures = eastl::move(textures);
-	newMesh.ObjectVAO.SetupState();
-// 	OpenGLTexture tex{ inTexturePath, texureBaseNr + 0 };
-// 	newMesh.Textures.push_back(tex);
+	//  	newMesh.DrawType = MeshType::DrawElements;
+	//  	newMesh.ObjectVAO.VBuffer = vbo;
+	//  	newMesh.Textures = eastl::move(textures);
+	//  	newMesh.ObjectVAO.SetupState();
 
-	inCurrentNode.Meshes.push_back(newMesh);
-	//AddMesh(eastl::move(newMesh));
-
-	Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/BasicProjectionVertexShader.glsl", "../Data/Shaders/BasicTexFragmentShader.glsl");
+	inCurrentNode->Meshes.push_back(newMesh);
 }
 
-eastl::vector<OpenGLTexture> AssimpModel3D::LoadMaterialTextures(const aiMaterial& inMat, const aiTextureType& inAssimpTexType, const TextureType inTexType)
+eastl::vector<OpenGLTexture> AssimpModel3D::LoadMaterialTextures(const aiMaterial & inMat, const aiTextureType & inAssimpTexType, const TextureType inTexType)
 {
 	eastl::vector<OpenGLTexture> textures;
 	const uint32_t texureBaseNr = GL_TEXTURE0;
@@ -160,7 +188,7 @@ eastl::vector<OpenGLTexture> AssimpModel3D::LoadMaterialTextures(const aiMateria
 	return textures;
 }
 
-bool AssimpModel3D::IsTextureLoaded(const eastl::string& inTexPath, OUT OpenGLTexture& outTex)
+bool AssimpModel3D::IsTextureLoaded(const eastl::string & inTexPath, OUT OpenGLTexture & outTex)
 {
 	for (const OpenGLTexture& loadedTexture : LoadedTextures)
 	{
@@ -174,7 +202,7 @@ bool AssimpModel3D::IsTextureLoaded(const eastl::string& inTexPath, OUT OpenGLTe
 	return false;
 }
 
-Transform AssimpModel3D::aiMatrixToTransform(const aiMatrix4x4& inMatrix)
+Transform AssimpModel3D::aiMatrixToTransform(const aiMatrix4x4 & inMatrix)
 {
 	aiVector3D aiScaling;
 	aiVector3D aiRotation;

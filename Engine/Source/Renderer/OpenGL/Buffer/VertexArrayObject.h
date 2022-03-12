@@ -1,8 +1,9 @@
 #pragma once
 #include "VertexBuffer.h"
 
-struct VertexArrayObject
+class VertexArrayObject
 {
+public:
 	VertexArrayObject();
 	~VertexArrayObject();
 

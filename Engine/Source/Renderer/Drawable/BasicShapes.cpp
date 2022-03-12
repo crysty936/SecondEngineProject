@@ -7,6 +7,9 @@
 #include "Renderer/OpenGL/OpenGLShader.h"
 #include "Renderer/OpenGL/OpenGLTexture.h"
 #include "Renderer/Model/3D/Mesh3D.h"
+#include "Renderer/Material/MaterialsManager.h"
+#include "Renderer/OpenGL/RenderCommand.h"
+#include "Renderer/OpenGL/OpenGLRenderer.h"
 
 const uint32_t texureBaseNr = GL_TEXTURE0;
 
@@ -61,15 +64,11 @@ const uint32_t texureBaseNr = GL_TEXTURE0;
 // 	return obj;
 // }
 // 
- eastl::shared_ptr<DrawableBase> BasicShapes::CreateCubeObject(eastl::string inTexturePath /*= {}*/)
+ eastl::shared_ptr<CubeShape> BasicShapes::CreateCubeObject()
  {
- 	if (inTexturePath.empty())
- 	{
- 		inTexturePath = eastl::string("../Data/Textures/ExampleContainer.jpg");
- 	}
- 
- 	eastl::shared_ptr<CubeShape> obj = eastl::make_shared<CubeShape>(inTexturePath);
- 
+ 	eastl::shared_ptr<CubeShape> obj = eastl::make_shared<CubeShape>();
+	obj->SetupDrawCommand();
+
  	return obj;
  }
 // 
@@ -100,40 +99,53 @@ const uint32_t texureBaseNr = GL_TEXTURE0;
 // 
 // SquareShape::~SquareShape() = default;
 
-CubeShape::CubeShape(const eastl::string& inTexturePath /*= {}*/)
-{
-	IndexBuffer ibo = IndexBuffer{};
-	int32_t indicesCount = BasicShapesData::GetCubeIndicesCount();
-	ibo.SetIndices(BasicShapesData::GetCubeIndices(), indicesCount, GL_STATIC_DRAW);
-
-	VertexBufferLayout layout = VertexBufferLayout{};
-	// Vertex points
-	layout.Push<float>(3);
-	// Vertex Tex Coords
-	layout.Push<float>(2);
-
-	VertexBuffer vbo = VertexBuffer{ ibo, layout };
-	int32_t verticesCount = BasicShapesData::GetCubeVerticesCount();
-	vbo.SetVertices(BasicShapesData::GetCubeVertices(), verticesCount, GL_STATIC_DRAW);
-
-	Mesh3D newMesh;
-	newMesh.DrawType = MeshType::DrawArrays;
-	newMesh.ObjectVAO.VBuffer = vbo;
-	newMesh.ObjectVAO.SetupState();
-	OpenGLTexture tex{ inTexturePath, texureBaseNr + 0 };
-	newMesh.Textures.push_back(tex);
-
-	AddMesh(eastl::move(newMesh));
-
-	Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/BasicProjectionVertexShader.glsl", "../Data/Shaders/BasicTexFragmentShader.glsl");
-}
-
+CubeShape::CubeShape() = default;
 CubeShape::~CubeShape() = default;
 
-void CubeShape::Draw_Private() const
+void CubeShape::SetupDrawCommand()
 {
-	for (const Mesh3D& childMesh : Meshes)
+	static eastl::shared_ptr<VertexArrayObject> thisVAO{ nullptr };
+
+	if (!thisVAO)
 	{
-		childMesh.Draw(Shader);
+		// TODO: Buffers creation should be delegated to the renderer
+		IndexBuffer ibo = IndexBuffer{};
+		int32_t indicesCount = BasicShapesData::GetCubeIndicesCount();
+		ibo.SetIndices(BasicShapesData::GetCubeIndices(), indicesCount, GL_STATIC_DRAW);
+
+		VertexBufferLayout layout = VertexBufferLayout{};
+		// Vertex points
+		layout.Push<float>(3);
+		// Vertex Tex Coords
+		layout.Push<float>(2);
+
+		VertexBuffer vbo = VertexBuffer{ ibo, layout };
+		int32_t verticesCount = BasicShapesData::GetCubeVerticesCount();
+		vbo.SetVertices(BasicShapesData::GetCubeVertices(), verticesCount, GL_STATIC_DRAW);
+
+		thisVAO = eastl::make_shared<VertexArrayObject>();
+		thisVAO->VBuffer = vbo;
+		thisVAO->SetupState();
 	}
+
+	MaterialsManager& matManager = MaterialsManager::Get();
+	bool materialExists = false;
+	eastl::shared_ptr<RenderMaterial> cubeMaterial = matManager.GetOrAddMaterial("cube_material", materialExists);
+	eastl::string texturePath = "../Data/Textures/ExampleContainer.jpg";
+
+	if (!materialExists)
+	{
+		OpenGLTexture tex{ texturePath, texureBaseNr + 0 };
+		cubeMaterial->Textures.push_back(tex);
+		cubeMaterial->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/BasicProjectionVertexShader.glsl", "../Data/Shaders/BasicTexFragmentShader.glsl");
+	}
+
+	RenderCommand newCommand;
+	newCommand.Material = cubeMaterial;
+	newCommand.VAO = thisVAO;
+	//newCommand.ParentEntity = weak_from_this();
+	newCommand.Parent = this;
+	newCommand.DrawType = EDrawType::DrawArrays;
+
+	RHI->AddCommand(newCommand);
 }

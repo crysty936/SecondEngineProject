@@ -10,6 +10,7 @@
 #include "Entity/Entity.h"
 #include "Core/GameModeBase.h"
 #include "Timer/TimersManager.h"
+#include "Renderer/Material/MaterialsManager.h"
 
 constexpr float IdealFrameRate = 60.f;
 constexpr float IdealFrameTime = 1.0f / IdealFrameRate;
@@ -43,6 +44,7 @@ void EngineCore::Init()
 	InputSystem::Init();
 	SceneManager::Init();
 	TimersManager::Init();
+	MaterialsManager::Init();
 
 	SceneManager::Get().LoadScene();
 
@@ -53,6 +55,7 @@ void EngineCore::Init()
 
 void EngineCore::Terminate()
 {
+	MaterialsManager::Terminate();
 	TimersManager::Terminate();
 	SceneManager::Terminate();
 	OpenGLRenderer::Terminate();

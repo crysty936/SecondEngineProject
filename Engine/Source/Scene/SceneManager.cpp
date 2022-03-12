@@ -24,7 +24,7 @@ void SceneManager::LoadScene()
 	// !Trying to copy the gameplay tactic to see if it works
 	EntityPtr CameraParent = eastl::make_shared<Entity>();
 	CameraParent->AddChild(Instance->CurrentScene->CurrentCamera);
-	Instance->CurrentScene->AddEntity(CameraParent);
+	Instance->CurrentScene->AddObject(CameraParent);
 }
 
 void SceneManager::Terminate()

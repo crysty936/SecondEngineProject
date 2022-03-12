@@ -14,8 +14,11 @@
 #include "Renderer/ShapesUtils/BasicShapesData.h"
 #include "Entity/Entity.h"
 #include "Renderer/Drawable/DrawableBase.h"
+#include "EASTL/shared_ptr.h"
+#include "Renderer/Material/RenderMaterial.h"
+#include "Buffer/VertexArrayObject.h"
 
-#define CLEAR_COLOR 0.3f, 0.5f, 1.f, 0.4f
+const glm::vec4 ClearColor(0.3f, 0.5f, 1.f, 0.4f);
 
 OpenGLRenderer* RHI = nullptr;
 
@@ -48,14 +51,14 @@ OpenGLRenderer::OpenGLRenderer(const WindowProperties& inDefaultWindowProperties
 	// 	glEnable(GL_BLEND);
 
 	glDebugMessageCallback(OpenGLUtils::GLDebugCallback, nullptr);
-	glClearColor(CLEAR_COLOR);
+	glClearColor(ClearColor.x, ClearColor.y, ClearColor.z, ClearColor.w);
 
 	SetupBaseUniforms();
 }
 
 OpenGLRenderer::~OpenGLRenderer() = default;
 
-void OpenGLRenderer::Init(const WindowProperties & inDefaultWindowProperties)
+void OpenGLRenderer::Init(const WindowProperties& inDefaultWindowProperties)
 {
 	RHI = new OpenGLRenderer{ inDefaultWindowProperties };
 }
@@ -71,15 +74,13 @@ void OpenGLRenderer::Terminate()
 
 void OpenGLRenderer::Draw()
 {
-	glClear(GL_COLOR_BUFFER_BIT);
-	glClear(GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	SceneManager& sceneMan = SceneManager::Get();
 	Scene& currentScene = sceneMan.GetCurrentScene();
-	eastl::vector<eastl::shared_ptr<Entity>>& sceneObjects = currentScene.Entities;
 
 	UpdateUniforms();
-	RecursiveDrawObjects(sceneObjects);
+	DrawCommands();
 	constexpr glm::mat4 identity = glm::mat4(1.f);
 
 	CheckShouldCloseWindow(*MainWindow);
@@ -98,20 +99,82 @@ void OpenGLRenderer::UpdateUniforms()
 	UniformsCache["view"] = view;
 }
 
-void OpenGLRenderer::RecursiveDrawObjects(const eastl::vector<eastl::shared_ptr<Entity>>&inObjects)
+void OpenGLRenderer::DrawCommands()
 {
-	for (const eastl::shared_ptr<Entity>& object : inObjects)
+	for (const RenderCommand& renderCommand : Commands)
 	{
-		const Entity* entt = object.get();
-		RecursiveDrawObjects(entt->GetChildren());
+// 		if (renderCommand.ParentEntity.expired())
+// 		{
+// 			continue;
+// 		}
 
-		UniformsCache["model"] = entt->GetAbsoluteTransform().GetMatrix();
+		//const eastl::weak_ptr<const Entity>& weakParent = renderCommand.ParentEntity;
+		const eastl::shared_ptr<RenderMaterial>& material = renderCommand.Material;
+		const eastl::shared_ptr<VertexArrayObject>& vao = renderCommand.VAO;
 
-		const DrawableBase* drawable = dynamic_cast<const DrawableBase*>(entt);
-		if (drawable)
+		// TODO: Abstract the model and parent dependent uniforms to be present in the render command
+		// and updated only if dirty
+
+		//const eastl::shared_ptr<const Entity> entt = weakParent.lock();
+
+		material->Shader.Bind();
+
+		TransformObject* obj = renderCommand.Parent;
+
+		UniformsCache["model"] = obj->GetAbsoluteTransform().GetMatrix();
+
+		for (const OpenGLTexture& tex : material->Textures)
 		{
-			drawable->Draw(UniformsCache);
+			tex.Bind();
 		}
+
+		const uint32_t indicesCount = vao->VBuffer.GetIndicesCount();
+		vao->Bind();
+		material->SetUniforms(UniformsCache);
+
+		switch (renderCommand.DrawType)
+		{
+		case EDrawType::DrawElements:
+		{
+			glDrawElements(GL_TRIANGLES, indicesCount, GL_UNSIGNED_INT, 0);
+			break;
+		}
+		case EDrawType::DrawArrays:
+		{
+			glDrawArrays(GL_TRIANGLES, 0, indicesCount);
+			break;
+		}
+		}
+ 
+		vao->Unbind();
+ 
+ 		for (const OpenGLTexture& tex : material->Textures)
+ 		{
+ 			tex.Unbind();
+ 		}
+
+		material->Shader.UnBind();
+
+// 		const DrawableBase* drawable = dynamic_cast<const DrawableBase*>(entt);
+// 		if (drawable)
+// 		{
+// 			const RenderMaterial* drawMaterial = nullptr;
+// 			switch (DrawMode)
+// 			{
+// 			case DrawType::NORMAL:
+// 			{
+// 				drawMaterial = &drawable->OwnedMaterial;
+// 				break;
+// 			}
+// 			case DrawType::DEPTH:
+// 			{
+// 
+// 				break;
+// 			}
+// 			}
+// 			drawable->Draw(UniformsCache, drawable->OwnedMaterial);
+// 
+// 		}
 	}
 }
 
@@ -131,6 +194,11 @@ void OpenGLRenderer::DestroyWindow(GLFWwindow * inWindowHandle) const
 void OpenGLRenderer::SetVSyncEnabled(const bool inEnabled)
 {
 	glfwSwapInterval(inEnabled);
+}
+
+void OpenGLRenderer::AddCommand(const RenderCommand& inCommand)
+{
+	Commands.push_back(inCommand);
 }
 
 GLFWwindow* OpenGLRenderer::CreateNewWindowHandle(const WindowProperties & inWindowProperties) const

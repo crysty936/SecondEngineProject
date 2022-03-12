@@ -22,8 +22,7 @@ Transform::Transform(const glm::vec3 inLocation, const glm::vec3 inRotation, con
 	Translation{ inLocation },
 	Scale{ inScale },
 	Rotation{ inRotation }
-{
-}
+{}
 
 Transform::Transform(const glm::mat4 inModel)
 {
