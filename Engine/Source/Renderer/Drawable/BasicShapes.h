@@ -28,7 +28,7 @@ public:
 class BasicShapes
 {
 public:
-// 	static eastl::shared_ptr<class DrawableBase> CreateTriangleObject(eastl::string inTexturePath = {});
-// 	static eastl::shared_ptr<class DrawableBase> CreateSquareObject(eastl::string inTexturePath = {});
+// 	static eastl::shared_ptr<class IDrawable> CreateTriangleObject(eastl::string inTexturePath = {});
+// 	static eastl::shared_ptr<class IDrawable> CreateSquareObject(eastl::string inTexturePath = {});
 	static eastl::shared_ptr<class CubeShape> CreateCubeObject();
 };

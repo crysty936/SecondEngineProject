@@ -10,10 +10,11 @@
 #include "Renderer/Material/MaterialsManager.h"
 #include "Renderer/OpenGL/RenderCommand.h"
 #include "Renderer/OpenGL/OpenGLRenderer.h"
+#include "Core/ObjectCreation.h"
 
 const uint32_t texureBaseNr = GL_TEXTURE0;
 
-// eastl::shared_ptr<DrawableBase> BasicShapes::CreateTriangleObject(eastl::string inTexturePath)
+// eastl::shared_ptr<IDrawable> BasicShapes::CreateTriangleObject(eastl::string inTexturePath)
 // {
 // 	if (inTexturePath.empty())
 // 	{
@@ -52,7 +53,7 @@ const uint32_t texureBaseNr = GL_TEXTURE0;
 // 
 // TriangleShape::~TriangleShape() = default;
 
-// eastl::shared_ptr<DrawableBase> BasicShapes::CreateSquareObject(eastl::string inTexturePath)
+// eastl::shared_ptr<IDrawable> BasicShapes::CreateSquareObject(eastl::string inTexturePath)
 // {
 // 	if (inTexturePath.empty())
 // 	{
@@ -66,7 +67,7 @@ const uint32_t texureBaseNr = GL_TEXTURE0;
 // 
  eastl::shared_ptr<CubeShape> BasicShapes::CreateCubeObject()
  {
- 	eastl::shared_ptr<CubeShape> obj = eastl::make_shared<CubeShape>();
+	eastl::shared_ptr<CubeShape> obj = ObjectCreation::CreateDrawable<CubeShape>();
 	obj->SetupDrawCommand();
 
  	return obj;

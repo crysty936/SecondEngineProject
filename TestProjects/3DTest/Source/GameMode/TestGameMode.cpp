@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include "Renderer/Model/3D/Assimp/AssimpModel3D.h"
 #include "Renderer/OpenGL/OpenGLRenderer.h"
+#include "Core/ObjectCreation.h"
 
 TestGameMode GameMode = {};
 
@@ -83,47 +84,38 @@ void TestGameMode::Init()
  	Ground = BasicShapes::CreateCubeObject();
  	Ground->Move(glm::vec3(0.f, -10.f, 0.f));
  	Ground->SetScale(glm::vec3(200.f, 1.f, 200.f));
- 	currentScene.AddObject(Ground);
 
 	{
 		eastl::shared_ptr<CubeShape> centerObj = BasicShapes::CreateCubeObject();
-		currentScene.AddObject(centerObj);
 	}
   	{
   		eastl::shared_ptr<CubeShape> centerObj = BasicShapes::CreateCubeObject();
   		centerObj->Move(glm::vec3(0.f, 10.f, 0.f));
-  		currentScene.AddObject(centerObj);
   	}
   	{
   		eastl::shared_ptr<CubeShape> centerObj = BasicShapes::CreateCubeObject();
   		centerObj->Move(glm::vec3(0.f, 20.f, 0.f));
-  		currentScene.AddObject(centerObj);
   	}
   	{
   		eastl::shared_ptr<CubeShape> centerObj = BasicShapes::CreateCubeObject();
   		centerObj->Move(glm::vec3(0.f, 30.f, 0.f));
-  		currentScene.AddObject(centerObj);
   	}
   	{
   		eastl::shared_ptr<CubeShape> centerObj = BasicShapes::CreateCubeObject();
   		centerObj->Move(glm::vec3(0.f, 40.f, 0.f));
-  		currentScene.AddObject(centerObj);
   	}
   	{
   		eastl::shared_ptr<CubeShape> centerObj = BasicShapes::CreateCubeObject();
   		centerObj->Move(glm::vec3(0.f, 50.f, 0.f));
-  		currentScene.AddObject(centerObj);
   	}
   	{
   		eastl::shared_ptr<CubeShape> centerObj = BasicShapes::CreateCubeObject();
   		centerObj->Move(glm::vec3(0.f, 60.f, 0.f));
-  		currentScene.AddObject(centerObj);
   	}
 
 
 // 	eastl::shared_ptr<DrawableBase> drawableObject = BasicShapes::CreateCubeObject();
 //  	Object = drawableObject;
-//  	currentScene.AddEntity(Object);
 // 	drawableObject->SetVisible(false);
 // 
 //  	{
@@ -139,13 +131,11 @@ void TestGameMode::Init()
 //  	{
 //  		EntityPtr SecondModel = BasicShapes::CreateCubeObject();
 //  		SecondModel->Move(glm::vec3(0.f, 0.f, 20.f));
-//  		currentScene.AddEntity(SecondModel);
 //  	}
 // 
 // 
 // 	eastl::shared_ptr<DrawableBase> drawableYObject = BasicShapes::CreateCubeObject();
 // 	YObject = drawableYObject;
-// 	currentScene.AddEntity(YObject);
 // 	drawableYObject->SetVisible(false);
 // 
 // 	{
@@ -162,7 +152,6 @@ void TestGameMode::Init()
 // 
 // 	eastl::shared_ptr<DrawableBase> drawableZObject = BasicShapes::CreateCubeObject();
 // 	ZObject = drawableZObject;
-// 	currentScene.AddEntity(ZObject);
 // 	drawableZObject->SetVisible(false);
 // 
 // 	ZObject->Rotate(90.f, glm::vec3(0.f, 1.f, 0.f));
@@ -178,14 +167,13 @@ void TestGameMode::Init()
 // 		ZObj->SetScale(glm::vec3(0.5f, 0.5f, 0.5f));
 // 	}
 
-	eastl::shared_ptr<AssimpModel3D> model = eastl::make_shared<AssimpModel3D>("../Data/Models/Backpack/scene.gltf");
+
+	eastl::shared_ptr<AssimpModel3D> model = ObjectCreation::CreateDrawable<AssimpModel3D>("../Data/Models/Backpack/scene.gltf");
 	model->SetupDrawCommand();
 	model->Move(glm::vec3(0.f, 10.f, 5.f));
 	model->SetScale(glm::vec3(0.01f, 0.01f, 0.01f));
-	currentScene.AddObject(model);
 
 //  	eastl::shared_ptr<AssimpModel3D> shibaModel = eastl::make_shared<AssimpModel3D>("../Data/Models/Shiba/scene.gltf");
-//  	currentScene.AddEntity(shibaModel);
 //  	shibaModel->Move(glm::vec3(0.f, 10.f, 5.f));
 //  	shibaModel->SetScale(glm::vec3(0.1f, 0.1f, 0.1f));
 

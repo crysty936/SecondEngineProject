@@ -13,7 +13,7 @@
 #include "glm/trigonometric.hpp"
 #include "Renderer/ShapesUtils/BasicShapesData.h"
 #include "Entity/Entity.h"
-#include "Renderer/Drawable/DrawableBase.h"
+#include "Renderer/Drawable/IDrawable.h"
 #include "EASTL/shared_ptr.h"
 #include "Renderer/Material/RenderMaterial.h"
 #include "Buffer/VertexArrayObject.h"
