@@ -168,8 +168,7 @@ void TestGameMode::Init()
 // 	}
 
 
-	eastl::shared_ptr<AssimpModel3D> model = ObjectCreation::CreateDrawable<AssimpModel3D>("../Data/Models/Backpack/scene.gltf");
-	model->SetupDrawCommand();
+	eastl::shared_ptr<AssimpModel3D> model = ObjectCreation::NewObject<AssimpModel3D>("../Data/Models/Backpack/scene.gltf");
 	model->Move(glm::vec3(0.f, 10.f, 5.f));
 	model->SetScale(glm::vec3(0.01f, 0.01f, 0.01f));
 

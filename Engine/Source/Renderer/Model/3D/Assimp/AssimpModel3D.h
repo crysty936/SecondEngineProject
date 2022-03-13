@@ -12,7 +12,7 @@ public:
 	AssimpModel3D(const eastl::string& inPath);
 	virtual ~AssimpModel3D();
 
-	virtual void SetupDrawCommand() override;
+	virtual void SetupDrawCommands() override;
 
 private:
 	void LoadData(const eastl::string& inPath);

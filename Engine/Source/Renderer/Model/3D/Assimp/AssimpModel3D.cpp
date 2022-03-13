@@ -13,7 +13,7 @@ AssimpModel3D::AssimpModel3D(const eastl::string& inPath)
 
 AssimpModel3D::~AssimpModel3D() = default;
 
-void AssimpModel3D::SetupDrawCommand()
+void AssimpModel3D::SetupDrawCommands()
 {
 	LoadData(ModelPath);
 }
@@ -40,7 +40,7 @@ void AssimpModel3D::LoadData(const eastl::string & inPath)
 	ProcessNode(*scene->mRootNode, *scene, newNode);
 }
 
-void AssimpModel3D::ProcessNode(const aiNode & inNode, const aiScene & inScene, eastl::shared_ptr<MeshNode>&inCurrentNode)
+void AssimpModel3D::ProcessNode(const aiNode & inNode, const aiScene & inScene, eastl::shared_ptr<MeshNode>& inCurrentNode)
 {
 	for (uint32_t i = 0; i < inNode.mNumMeshes; ++i)
 	{

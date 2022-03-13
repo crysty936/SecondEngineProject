@@ -22,7 +22,7 @@ public:
 	CubeShape();
 	virtual ~CubeShape();
 
-	virtual void SetupDrawCommand() override;
+	virtual void SetupDrawCommands() override;
 };
 
 class BasicShapes

@@ -13,7 +13,7 @@
 #include "glm/trigonometric.hpp"
 #include "Renderer/ShapesUtils/BasicShapesData.h"
 #include "Entity/Entity.h"
-#include "Renderer/Drawable/IDrawable.h"
+#include "Renderer/Drawable/Drawable.h"
 #include "EASTL/shared_ptr.h"
 #include "Renderer/Material/RenderMaterial.h"
 #include "Buffer/VertexArrayObject.h"
@@ -114,16 +114,21 @@ void OpenGLRenderer::DrawCommands()
 			continue;
 		}
 
-		const eastl::shared_ptr<const TransformObject> parent = renderCommand.Parent.lock();
+		const eastl::shared_ptr<const DrawableObject> parent = renderCommand.Parent.lock();
 		const eastl::shared_ptr<RenderMaterial> material = GetMaterial(renderCommand);
 		const eastl::shared_ptr<VertexArrayObject>& vao = renderCommand.VAO;
 
-		// TODO: Abstract the model and parent dependent uniforms to be present in the render command
+		if (!parent->IsVisible())
+		{
+			continue;
+		}
+
+		// TODO: Abstract the model and parent dependent uniforms (like the Model Matrix) to be present in the render command 
 		// and updated only if dirty
 
 		material->Shader.Bind();
 
-		UniformsCache["model"] = parent->GetAbsoluteTransform().GetMatrix();
+		UniformsCache["model"] = parent->GetModelMatrix();
 
 		for (const OpenGLTexture& tex : material->Textures)
 		{

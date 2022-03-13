@@ -67,43 +67,15 @@ const uint32_t texureBaseNr = GL_TEXTURE0;
 // 
  eastl::shared_ptr<CubeShape> BasicShapes::CreateCubeObject()
  {
-	eastl::shared_ptr<CubeShape> obj = ObjectCreation::CreateDrawable<CubeShape>();
-	obj->SetupDrawCommand();
+	eastl::shared_ptr<CubeShape> obj = ObjectCreation::NewObject<CubeShape>();
 
  	return obj;
  }
-// 
-// SquareShape::SquareShape(const eastl::string& inTexturePath)
-// {
-// 	IndexBuffer ibo = IndexBuffer{};
-// 	int32_t indicesCount = BasicShapesData::GetSquareIndicesCount();
-// 	ibo.SetIndices(BasicShapesData::GetSquareIndices(), indicesCount, GL_STATIC_DRAW);
-// 
-// 	VertexBufferLayout layout = VertexBufferLayout{};
-// 	// Vertex points
-// 	layout.Push<float>(3);
-// 	// Vertex Tex Coords
-// 	layout.Push<float>(2);
-// 
-// 	VertexBuffer vbo = VertexBuffer{ ibo, layout };
-// 	int32_t verticesCount = BasicShapesData::GetSquareVerticesCount();
-// 	vbo.SetVertices(BasicShapesData::GetSquareVertices(), verticesCount, GL_STATIC_DRAW);
-// 
-// 	ObjectVAO.VBuffer = vbo;
-// 	ObjectVAO.SetupState();
-// 
-// 	Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/BasicProjectionVertexShader.glsl", "../Data/Shaders/BasicTexFragmentShader.glsl");
-// 
-// 	OpenGLTexture tex{ inTexturePath, texureBaseNr + 0 };
-// 	AddTexture(tex);
-// }
-// 
-// SquareShape::~SquareShape() = default;
 
 CubeShape::CubeShape() = default;
 CubeShape::~CubeShape() = default;
 
-void CubeShape::SetupDrawCommand()
+void CubeShape::SetupDrawCommands()
 {
 	static eastl::shared_ptr<VertexArrayObject> thisVAO{ nullptr };
 
@@ -141,10 +113,13 @@ void CubeShape::SetupDrawCommand()
 		cubeMaterial->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/BasicProjectionVertexShader.glsl", "../Data/Shaders/BasicTexFragmentShader.glsl");
 	}
 
+	eastl::shared_ptr<MeshNode> cubeNode = eastl::make_shared<MeshNode>();
+	AddChild(cubeNode);
+
 	RenderCommand newCommand;
 	newCommand.Material = cubeMaterial;
 	newCommand.VAO = thisVAO;
-	newCommand.Parent = weak_from_this();
+	newCommand.Parent = cubeNode;
 	newCommand.DrawType = EDrawCallType::DrawArrays;
 
 	RHI->AddCommand(newCommand);
