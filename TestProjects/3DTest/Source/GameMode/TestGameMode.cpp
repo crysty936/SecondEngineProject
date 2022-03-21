@@ -169,9 +169,9 @@ void TestGameMode::Init()
 // 	}
 
 
-// 	eastl::shared_ptr<AssimpModel3D> model = ObjectCreation::NewObject<AssimpModel3D>("../Data/Models/Backpack/scene.gltf");
-// 	model->Move(glm::vec3(0.f, 10.f, 5.f));
-// 	model->SetScale(glm::vec3(0.01f, 0.01f, 0.01f));
+ 	eastl::shared_ptr<AssimpModel3D> model = ObjectCreation::NewObject<AssimpModel3D>("../Data/Models/Backpack/scene.gltf");
+ 	model->Move(glm::vec3(0.f, 10.f, 5.f));
+ 	model->SetScale(glm::vec3(0.01f, 0.01f, 0.01f));
 
 //  	eastl::shared_ptr<AssimpModel3D> shibaModel = eastl::make_shared<AssimpModel3D>("../Data/Models/Shiba/scene.gltf");
 //  	shibaModel->Move(glm::vec3(0.f, 10.f, 5.f));

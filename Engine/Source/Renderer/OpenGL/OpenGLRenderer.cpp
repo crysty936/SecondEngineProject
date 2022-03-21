@@ -127,19 +127,17 @@ void OpenGLRenderer::DrawCommands()
 
 		glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
 		glStencilMask(0x00);
-		glDisable(GL_DEPTH_TEST);
 
 		SetDrawMode(EDrawMode::OUTLINE);
 
 		DrawableObject& parentNonConst = const_cast<DrawableObject&>(*parent);
 
-		parentNonConst.SetScale(glm::vec3(1.5f, 1.5f, 1.5f));
+		parentNonConst.SetScale(glm::vec3(1.1f, 1.1f, 1.1f));
 
 		DrawCommand(renderCommand);
 
 		parentNonConst.SetScale(glm::vec3(1.0f, 1.0f, 1.0f));
 
-		glEnable(GL_DEPTH_TEST);
  		glStencilMask(0xFF);
  		glStencilFunc(GL_ALWAYS, 1, 0xFF);
 	}
