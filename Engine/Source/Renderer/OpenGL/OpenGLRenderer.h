@@ -20,7 +20,8 @@ extern class OpenGLRenderer* RHI;
 enum class EDrawMode : uint8_t
 {
 	NORMAL,
-	DEPTH
+	DEPTH,
+	OUTLINE
 };
 
 class OpenGLRenderer
@@ -38,6 +39,7 @@ public:
 	void SetupBaseUniforms();
 	void UpdateUniforms();
 	void DrawCommands();
+	void DrawCommand(const RenderCommand& inCommand);
 	eastl::shared_ptr<RenderMaterial> GetMaterial(const RenderCommand& inCommand) const;
 	eastl::unique_ptr<OpenGLWindow> CreateWindow(const WindowProperties& inWindowProperties) const;
 	void DestroyWindow(GLFWwindow* inWindowHandle) const;

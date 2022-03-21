@@ -46,12 +46,12 @@ OpenGLRenderer::OpenGLRenderer(const WindowProperties& inDefaultWindowProperties
 
 	glEnable(GL_DEBUG_OUTPUT);
 	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-	glEnable(GL_DEPTH_TEST);
 
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
 
 	glEnable(GL_STENCIL_TEST);
-	//glStencilMask(0xFF);
-	glDepthFunc(GL_LESS);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
 	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	// 	glEnable(GL_BLEND);
@@ -80,8 +80,6 @@ void OpenGLRenderer::Terminate()
 
 void OpenGLRenderer::Draw()
 {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
 	SceneManager& sceneMan = SceneManager::Get();
 	Scene& currentScene = sceneMan.GetCurrentScene();
 
@@ -107,61 +105,95 @@ void OpenGLRenderer::UpdateUniforms()
 
 void OpenGLRenderer::DrawCommands()
 {
-	for (const RenderCommand& renderCommand : Commands)
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+	for (int32_t commandIndex = 0; commandIndex < Commands.size(); ++commandIndex)
 	{
+		const RenderCommand& renderCommand = Commands[commandIndex];
+		const eastl::shared_ptr<const DrawableObject> parent = renderCommand.Parent.lock();
 		if (renderCommand.Parent.expired())
 		{
 			continue;
 		}
 
-		const eastl::shared_ptr<const DrawableObject> parent = renderCommand.Parent.lock();
-		const eastl::shared_ptr<RenderMaterial> material = GetMaterial(renderCommand);
-		const eastl::shared_ptr<VertexArrayObject>& vao = renderCommand.VAO;
+		glClear(GL_STENCIL_BUFFER_BIT);
 
-		if (!parent->IsVisible())
-		{
-			continue;
-		}
+		SetDrawMode(EDrawMode::NORMAL);
 
-		// TODO: Abstract the model and parent dependent uniforms (like the Model Matrix) to be present in the render command 
-		// and updated only if dirty
+		glStencilFunc(GL_ALWAYS, 1, 0xFF);
+		glStencilMask(0xFF);
 
-		material->Shader.Bind();
+		DrawCommand(renderCommand);
 
-		UniformsCache["model"] = parent->GetModelMatrix();
+		glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+		glStencilMask(0x00);
+		glDisable(GL_DEPTH_TEST);
 
-		for (const OpenGLTexture& tex : material->Textures)
-		{
-			tex.Bind();
-		}
+		SetDrawMode(EDrawMode::OUTLINE);
 
-		const uint32_t indicesCount = vao->VBuffer.GetIndicesCount();
-		vao->Bind();
-		material->SetUniforms(UniformsCache);
+		DrawableObject& parentNonConst = const_cast<DrawableObject&>(*parent);
 
-		switch (renderCommand.DrawType)
-		{
-		case EDrawCallType::DrawElements:
-		{
-			glDrawElements(GL_TRIANGLES, indicesCount, GL_UNSIGNED_INT, 0);
-			break;
-		}
-		case EDrawCallType::DrawArrays:
-		{
-			glDrawArrays(GL_TRIANGLES, 0, indicesCount);
-			break;
-		}
-		}
+		parentNonConst.SetScale(glm::vec3(1.5f, 1.5f, 1.5f));
 
-		vao->Unbind();
+		DrawCommand(renderCommand);
 
-		for (const OpenGLTexture& tex : material->Textures)
-		{
-			tex.Unbind();
-		}
+		parentNonConst.SetScale(glm::vec3(1.0f, 1.0f, 1.0f));
 
-		material->Shader.UnBind();
+		glEnable(GL_DEPTH_TEST);
+ 		glStencilMask(0xFF);
+ 		glStencilFunc(GL_ALWAYS, 1, 0xFF);
 	}
+}
+
+void OpenGLRenderer::DrawCommand(const RenderCommand & inCommand)
+{
+	const eastl::shared_ptr<const DrawableObject> parent = inCommand.Parent.lock();
+	const eastl::shared_ptr<RenderMaterial> material = GetMaterial(inCommand);
+	const eastl::shared_ptr<VertexArrayObject>& vao = inCommand.VAO;
+
+	if (!parent->IsVisible())
+	{
+		return;
+	}
+
+	// TODO: Abstract the model and parent dependent uniforms (like the Model Matrix) to be present in the render command 
+	// and updated only if dirty
+
+	material->Shader.Bind();
+
+	UniformsCache["model"] = parent->GetModelMatrix();
+
+	for (const OpenGLTexture& tex : material->Textures)
+	{
+		tex.Bind();
+	}
+
+	const uint32_t indicesCount = vao->VBuffer.GetIndicesCount();
+	vao->Bind();
+	material->SetUniforms(UniformsCache);
+
+	switch (inCommand.DrawType)
+	{
+	case EDrawCallType::DrawElements:
+	{
+		glDrawElements(GL_TRIANGLES, indicesCount, GL_UNSIGNED_INT, 0);
+		break;
+	}
+	case EDrawCallType::DrawArrays:
+	{
+		glDrawArrays(GL_TRIANGLES, 0, indicesCount);
+		break;
+	}
+	}
+
+	vao->Unbind();
+
+	for (const OpenGLTexture& tex : material->Textures)
+	{
+		tex.Unbind();
+	}
+
+	material->Shader.UnBind();
 }
 
 eastl::shared_ptr<RenderMaterial> OpenGLRenderer::GetMaterial(const RenderCommand & inCommand) const
@@ -171,7 +203,6 @@ eastl::shared_ptr<RenderMaterial> OpenGLRenderer::GetMaterial(const RenderComman
 	case EDrawMode::NORMAL:
 	{
 		return inCommand.Material;
-		break;
 	}
 	case EDrawMode::DEPTH:
 	{
@@ -185,9 +216,20 @@ eastl::shared_ptr<RenderMaterial> OpenGLRenderer::GetMaterial(const RenderComman
 		}
 
 		return depthMaterial;
-		break;
 	}
+	case EDrawMode::OUTLINE:
+	{
+		MaterialsManager& matManager = MaterialsManager::Get();
+		bool materialExists = false;
+		eastl::shared_ptr<RenderMaterial> outlineMaterial = matManager.GetOrAddMaterial("outline_material", materialExists);
 
+		if (!materialExists)
+		{
+			outlineMaterial->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/BasicProjectionVertexShader.glsl", "../Data/Shaders/OutlineFragmentShader.glsl");
+		}
+
+		return outlineMaterial;
+	}
 	}
 
 	return { nullptr };

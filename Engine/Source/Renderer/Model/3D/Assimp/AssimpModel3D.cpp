@@ -150,8 +150,8 @@ void AssimpModel3D::ProcessMesh(const aiMesh & inMesh, const aiScene & inScene, 
 
 	RHI->AddCommand(newCommand);
 
-	Mesh3D newMesh;
-	inCurrentNode->Meshes.push_back(newMesh);
+// 	Mesh3D newMesh;
+// 	inCurrentNode->Meshes.push_back(newMesh);
 }
 
 eastl::vector<OpenGLTexture> AssimpModel3D::LoadMaterialTextures(const aiMaterial & inMat, const aiTextureType & inAssimpTexType, const TextureType inTexType)
