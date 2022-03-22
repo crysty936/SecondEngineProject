@@ -13,7 +13,7 @@ public:
 
 	inline void AddChild(TransformObjPtr inTransfObj) { inTransfObj->SetParent(shared_from_this()); }
 	inline glm::vec3 GetLocation() { return Location; }
-	inline const eastl::vector<TransformObjPtr> GetChildren() const { return Children; }
+	inline const eastl::vector<TransformObjPtr>& GetChildren() const { return Children; }
 	void SetParent(TransformObjPtr& inParent);
 	inline eastl::weak_ptr<TransformObject>& GetParent() { return Parent; }
 
@@ -28,6 +28,17 @@ public:
 	void SetRelativeLocation(const glm::vec3 inRelLoc);
 	void SetScale(const glm::vec3 inScale);
 	inline bool IsTranfsDirty() const { return TransfDirty; }
+
+	template<typename T>
+	void ForEach_Children_Recursive(T inPredicate)
+	{
+		for (const TransformObjPtr& child : GetChildren())
+		{
+			child->ForEach_Children_Recursive(inPredicate);
+
+			inPredicate(child);
+		}
+	}
 
 protected:
 	void MakeTransfDirty() const;

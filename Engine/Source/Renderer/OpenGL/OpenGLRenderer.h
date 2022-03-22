@@ -9,11 +9,21 @@
 #include "Math/Transform.h"
 #include "Renderer/SelfRegisteringUniform/SelfRegisteringUniform.h"
 #include "RenderCommand.h"
+#include "EventSystem/EventSystem.h"
 
 /**
  * TODO: A Renderer should be made and that should call whatever RHI is present.
  * Also, Renderers should be differentiated between 2D and 3D because optimizations can be made for 2D only renderers
  */
+
+using LoadRenderResourceDelegate = Delegate<void, eastl::string, eastl::shared_ptr<class TransformObject>>;
+
+struct RenderingLoadCommand
+{
+	LoadRenderResourceDelegate LoadDel;
+	eastl::string ModelPath;
+	eastl::shared_ptr<class TransformObject> Parent;
+};
 
 extern class OpenGLRenderer* RHI;
 
@@ -59,3 +69,5 @@ private:
 	eastl::vector<RenderCommand> Commands;
 	EDrawMode DrawMode{ EDrawMode::NORMAL };
 };
+
+extern GLFWwindow* LoadingThreadContext;

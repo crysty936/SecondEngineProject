@@ -15,13 +15,13 @@ void VertexBuffer::DeleteBuffer()
 	Indices.DeleteBuffer();
 }
 
-void VertexBuffer::Bind()
+void VertexBuffer::Bind() const
 {
 	glBindBuffer(GL_ARRAY_BUFFER, Handle);
 	Indices.Bind();
 }
 
-void VertexBuffer::Unbind()
+void VertexBuffer::Unbind() const
 {
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	Indices.Unbind();

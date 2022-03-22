@@ -18,10 +18,25 @@
 #include "Renderer/Material/RenderMaterial.h"
 #include "Buffer/VertexArrayObject.h"
 #include "Renderer/Material/MaterialsManager.h"
+#include "EASTL/internal/thread_support.h"
 
 const glm::vec4 ClearColor(0.3f, 0.5f, 1.f, 0.4f);
-
 OpenGLRenderer* RHI = nullptr;
+GLFWwindow* LoadingThreadContext;
+
+
+
+
+static std::mutex RenderCommandsMutex;
+
+void LoaderFunc()
+{
+
+
+
+}
+
+
 
 OpenGLRenderer::OpenGLRenderer(const WindowProperties& inDefaultWindowProperties)
 {
@@ -39,12 +54,15 @@ OpenGLRenderer::OpenGLRenderer(const WindowProperties& inDefaultWindowProperties
 	// Set Context
 	GLFWwindow* mainWindowHandle = MainWindow->GetHandle();
 	glfwMakeContextCurrent(mainWindowHandle);
+
+	glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+	LoadingThreadContext = glfwCreateWindow(640, 480, "Loading Thread Window", NULL, mainWindowHandle);
+
 	const bool gladSuccess = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress) == GLFW_TRUE;
 	glfwSetInputMode(mainWindowHandle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	glViewport(0, 0, inDefaultWindowProperties.Width, inDefaultWindowProperties.Height);
 
-	glEnable(GL_DEBUG_OUTPUT);
 	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 
 	glEnable(GL_DEPTH_TEST);
@@ -53,8 +71,8 @@ OpenGLRenderer::OpenGLRenderer(const WindowProperties& inDefaultWindowProperties
 	glEnable(GL_STENCIL_TEST);
 	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	// 	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_BLEND);
 
 	glDebugMessageCallback(OpenGLUtils::GLDebugCallback, nullptr);
 	glClearColor(ClearColor.x, ClearColor.y, ClearColor.z, ClearColor.w);
@@ -107,39 +125,17 @@ void OpenGLRenderer::DrawCommands()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-	for (int32_t commandIndex = 0; commandIndex < Commands.size(); ++commandIndex)
+	std::unique_lock<std::mutex>(RenderCommandsMutex);
+
+	for (const RenderCommand& renderCommand : Commands)
 	{
-		const RenderCommand& renderCommand = Commands[commandIndex];
 		const eastl::shared_ptr<const DrawableObject> parent = renderCommand.Parent.lock();
 		if (renderCommand.Parent.expired())
 		{
 			continue;
 		}
 
-		glClear(GL_STENCIL_BUFFER_BIT);
-
-		SetDrawMode(EDrawMode::NORMAL);
-
-		glStencilFunc(GL_ALWAYS, 1, 0xFF);
-		glStencilMask(0xFF);
-
 		DrawCommand(renderCommand);
-
-		glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-		glStencilMask(0x00);
-
-		SetDrawMode(EDrawMode::OUTLINE);
-
-		DrawableObject& parentNonConst = const_cast<DrawableObject&>(*parent);
-
-		parentNonConst.SetScale(glm::vec3(1.1f, 1.1f, 1.1f));
-
-		DrawCommand(renderCommand);
-
-		parentNonConst.SetScale(glm::vec3(1.0f, 1.0f, 1.0f));
-
- 		glStencilMask(0xFF);
- 		glStencilFunc(GL_ALWAYS, 1, 0xFF);
 	}
 }
 
@@ -156,6 +152,12 @@ void OpenGLRenderer::DrawCommand(const RenderCommand & inCommand)
 
 	// TODO: Abstract the model and parent dependent uniforms (like the Model Matrix) to be present in the render command 
 	// and updated only if dirty
+
+	// Deffered VAO initialization on the Rendering Thread
+	if (!vao->bReadyForDraw)
+	{
+		vao->SetupState();
+	}
 
 	material->Shader.Bind();
 
@@ -253,6 +255,9 @@ void OpenGLRenderer::SetVSyncEnabled(const bool inEnabled)
 
 void OpenGLRenderer::AddCommand(const RenderCommand & inCommand)
 {
+	std::unique_lock<std::mutex>(RenderCommandsMutex);
+
+
 	Commands.push_back(inCommand);
 }
 

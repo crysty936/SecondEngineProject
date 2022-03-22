@@ -7,11 +7,13 @@ public:
 	VertexArrayObject();
 	~VertexArrayObject();
 
-	void SetupState();
+	void SetupState() const;
 	void Bind() const;
 	void Unbind() const;
 	void DeleteBuffers();
 
-	uint32_t Handle{ 0 };
 	VertexBuffer VBuffer{};
+
+	mutable uint32_t Handle{ 0 };
+	mutable bool bReadyForDraw = false;
 };

@@ -12,7 +12,7 @@ VertexArrayObject::VertexArrayObject()
 
 VertexArrayObject::~VertexArrayObject() = default;
 
-void VertexArrayObject::SetupState()
+void VertexArrayObject::SetupState() const
 {
 	// Set up the VAO state
 	glGenVertexArrays(1, &Handle);
@@ -37,6 +37,8 @@ void VertexArrayObject::SetupState()
 
 	Unbind();
 	VBuffer.Unbind();
+
+	bReadyForDraw = true;
 }
 
 void VertexArrayObject::Bind() const

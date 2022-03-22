@@ -10,10 +10,10 @@ public:
 	virtual void DeleteBuffer();
 
 public:
-	virtual void Bind() = 0;
-	virtual void Unbind() = 0;
+	virtual void Bind() const = 0;
+	virtual void Unbind() const = 0;
 
 protected:
 	uint32_t Handle = 0;
-	bool IsBound = false;
+	mutable bool IsBound = false;
 };

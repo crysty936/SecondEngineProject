@@ -10,6 +10,7 @@ public:
 	static eastl::shared_ptr<T> NewObject(inParamTypes... inParams)
 	{
 		eastl::shared_ptr<T> newObject = eastl::make_shared<T>(std::forward<inParamTypes>(inParams)...);
+
 		SceneManager& sManager = SceneManager::Get();
 		Scene& currentScene = sManager.GetCurrentScene();
 		currentScene.AddObject(newObject);
