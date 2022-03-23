@@ -71,7 +71,7 @@ void OpenGLTexture::Bind() const
 // 
 // 	}
 
-	ASSERT(TexNr != 0);
+	ASSERT_MSG(TexNr != 0);
 
 	glActiveTexture(TexNr);
 	glBindTexture(GL_TEXTURE_2D, TexHandle);

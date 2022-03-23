@@ -22,7 +22,7 @@ public:
 	void PollEvents();
 
 public:
-	static inline InputSystem& Get() { ASSERT(Instance); return *Instance; }
+	static inline InputSystem& Get() { ASSERT_MSG(Instance); return *Instance; }
 
 	/** Callbacks for others to tie into */
 	inline KeyDelegate& OnKeyInput() { return OnKeyInputDelegate; }

@@ -27,7 +27,7 @@ EngineCore::EngineCore()
 	: CurrentDeltaT{ 0.f }
 {
 	static bool engineExists = false;
-	ASSERT(!engineExists);
+	ASSERT_MSG(!engineExists);
 
 	engineExists = true;
 }
@@ -61,7 +61,7 @@ void EngineCore::Terminate()
 	OpenGLRenderer::Terminate();
 	InputSystem::Terminate();
 
-	ASSERT(Engine);
+	ASSERT_MSG(Engine);
 	delete Engine;
 }
 

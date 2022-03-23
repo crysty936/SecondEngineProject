@@ -10,6 +10,7 @@
 #include "Renderer/SelfRegisteringUniform/SelfRegisteringUniform.h"
 #include "RenderCommand.h"
 #include "EventSystem/EventSystem.h"
+#include "EASTL/queue.h"
 
 /**
  * TODO: A Renderer should be made and that should call whatever RHI is present.
@@ -57,7 +58,10 @@ public:
 	inline class OpenGLWindow& GetMainWindow() { return *MainWindow; }
 	static void LoadTexture();
 	void AddCommand(const RenderCommand& inCommand);
+	void AddCommands(eastl::vector<RenderCommand> inCommands);
 	inline void SetDrawMode(const EDrawMode inDrawMode) { DrawMode = inDrawMode; }
+	void AddRenderLoadCommand(const RenderingLoadCommand& inCommand);
+	inline eastl::queue<RenderingLoadCommand>& GetLoadQueue() { return LoadQueue; }
 
 private:
 	struct GLFWwindow* CreateNewWindowHandle(const WindowProperties& inWindowProperties) const;
@@ -68,6 +72,7 @@ private:
 	eastl::unordered_map<eastl::string, SelfRegisteringUniform> UniformsCache;
 	eastl::vector<RenderCommand> Commands;
 	EDrawMode DrawMode{ EDrawMode::NORMAL };
+	eastl::queue<RenderingLoadCommand> LoadQueue;
 };
 
 extern GLFWwindow* LoadingThreadContext;

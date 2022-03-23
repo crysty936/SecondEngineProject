@@ -7,12 +7,16 @@
 #include "Renderer/OpenGL/RenderCommand.h"
 #include "Renderer/OpenGL/OpenGLRenderer.h"
 #include "GLFW/glfw3.h"
+#include "Renderer/OpenGL/OpenGLUtils.h"
 
 AssimpModel3D::AssimpModel3D(const eastl::string& inPath)
 	: ModelPath{ inPath }
 {}
 
 AssimpModel3D::~AssimpModel3D() = default;
+
+
+void LoadTemp(const eastl::string inPath, TransformObjPtr inParent);
 
 void AssimpModel3D::SetupDrawCommands()
 {
@@ -23,11 +27,7 @@ void AssimpModel3D::SetupDrawCommands()
 	loadCommand.ModelPath = ModelPath;
 	loadCommand.Parent = thisShared;
 
-	//RHI->AddRenderLoadCommand(loadCommand);
-
-	std::thread(LoadModelToRoot, ModelPath, thisShared).detach();
-
-	//LoadModelToRoot(ModelPath, this_shared(this));
+	RHI->AddRenderLoadCommand(loadCommand);
 }
 
 class AssimpModel3DLoader
@@ -37,9 +37,9 @@ protected:
 	~AssimpModel3DLoader() = default;
 
 private:
-	eastl::shared_ptr<MeshNode> LoadData();
-	void ProcessNode(const struct aiNode& inNode, const struct aiScene& inScene, eastl::shared_ptr<MeshNode>& inCurrentNode);
-	void ProcessMesh(const struct aiMesh& inMesh, const struct aiScene& inScene, eastl::shared_ptr<MeshNode>& inCurrentNode);
+	eastl::shared_ptr<MeshNode> LoadData(OUT eastl::vector<RenderCommand>& outCommands);
+	void ProcessNode(const struct aiNode& inNode, const struct aiScene& inScene, eastl::shared_ptr<MeshNode>& inCurrentNode, OUT eastl::vector<RenderCommand>& outCommands);
+	void ProcessMesh(const struct aiMesh& inMesh, const struct aiScene& inScene, eastl::shared_ptr<MeshNode>& inCurrentNode, OUT eastl::vector<RenderCommand>& outCommands);
 
 	eastl::vector<OpenGLTexture> LoadMaterialTextures(const struct aiMaterial& inMat, const aiTextureType& inAssimpTexType, const TextureType inTexType);
 	bool IsTextureLoaded(const eastl::string& inTexPath, OUT class OpenGLTexture& outTex);
@@ -55,32 +55,21 @@ private:
 
 void AssimpModel3D::LoadModelToRoot(const eastl::string inPath, TransformObjPtr inParent)
 {
-	glfwMakeContextCurrent(LoadingThreadContext);
-
 	AssimpModel3DLoader modelLoader(inPath);
 
-	eastl::shared_ptr<MeshNode> mesh = modelLoader.LoadData();
+	eastl::vector<RenderCommand> resultingCommands;
+	eastl::shared_ptr<MeshNode> mesh = modelLoader.LoadData(resultingCommands);
+
+	RHI->AddCommands(resultingCommands);
 
 	inParent->AddChild(mesh);
-
-	// TODO: Hacky way to defer showing the mesh until it's ready, have to make the rendering defer adding all Render Commands until the end
-	for (const TransformObjPtr& transformObj : inParent->GetChildren())
-	{
-		transformObj->ForEach_Children_Recursive([](const TransformObjPtr& inChild) {
-
-			const eastl::shared_ptr<DrawableObject> constDrawable = eastl::static_pointer_cast<DrawableObject>(inChild);
-			eastl::shared_ptr<DrawableObject>& nonconstDrawable = const_cast<eastl::shared_ptr<DrawableObject>&>(constDrawable);
-			nonconstDrawable->SetVisible(true);
-			});
-	}
-
 }
 
 AssimpModel3DLoader::AssimpModel3DLoader(const eastl::string & inPath)
 	: ModelPath{ inPath }
 {}
 
-eastl::shared_ptr<MeshNode> AssimpModel3DLoader::LoadData()
+eastl::shared_ptr<MeshNode> AssimpModel3DLoader::LoadData(OUT eastl::vector<RenderCommand>& outCommands)
 {
 	Assimp::Importer modelImporter;
 
@@ -97,20 +86,20 @@ eastl::shared_ptr<MeshNode> AssimpModel3DLoader::LoadData()
 
 	eastl::shared_ptr<MeshNode> newNode = eastl::make_shared<MeshNode>();
 	newNode->SetRelTransform(aiMatrixToTransform(scene->mRootNode->mTransformation));
-	ProcessNode(*scene->mRootNode, *scene, newNode);
+	ProcessNode(*scene->mRootNode, *scene, newNode, outCommands);
 
 	return newNode;
 	//AddChild(newNode); // Cannot multithread this in straightforward way because I need to load transform matrices and add children with them
 }
 
-void AssimpModel3DLoader::ProcessNode(const aiNode & inNode, const aiScene & inScene, eastl::shared_ptr<MeshNode>&inCurrentNode)
+void AssimpModel3DLoader::ProcessNode(const aiNode & inNode, const aiScene & inScene, eastl::shared_ptr<MeshNode>& inCurrentNode, OUT eastl::vector<RenderCommand>& outCommands)
 {
 	for (uint32_t i = 0; i < inNode.mNumMeshes; ++i)
 	{
 		const uint32_t meshIndex = inNode.mMeshes[i];
 		const aiMesh* assimpMesh = inScene.mMeshes[meshIndex];
 
-		ProcessMesh(*assimpMesh, inScene, inCurrentNode);
+		ProcessMesh(*assimpMesh, inScene, inCurrentNode, outCommands);
 	}
 
 	for (uint32_t i = 0; i < inNode.mNumChildren; ++i)
@@ -119,13 +108,13 @@ void AssimpModel3DLoader::ProcessNode(const aiNode & inNode, const aiScene & inS
 		eastl::shared_ptr<MeshNode> newNode = eastl::make_shared<MeshNode>();
 		newNode->SetRelTransform(aiMatrixToTransform(nextAiNode.mTransformation));
 
-		ProcessNode(nextAiNode, inScene, newNode);
+		ProcessNode(nextAiNode, inScene, newNode, outCommands);
 		inCurrentNode->AddChild((newNode));
 	}
 }
 
 
-void AssimpModel3DLoader::ProcessMesh(const aiMesh & inMesh, const aiScene & inScene, eastl::shared_ptr<MeshNode>& inCurrentNode)
+void AssimpModel3DLoader::ProcessMesh(const aiMesh & inMesh, const aiScene & inScene, eastl::shared_ptr<MeshNode>& inCurrentNode, OUT eastl::vector<RenderCommand>& outCommands)
 {
 	eastl::vector<Vertex> vertices;
 	eastl::vector<uint32_t> indices;
@@ -204,16 +193,13 @@ void AssimpModel3DLoader::ProcessMesh(const aiMesh & inMesh, const aiScene & inS
 	eastl::shared_ptr<VertexArrayObject> thisVAO = eastl::make_shared<VertexArrayObject>();
 	thisVAO->VBuffer = vbo;
 
-	// Until the whole object is loaded
-	inCurrentNode->SetVisible(false);
-
 	RenderCommand newCommand;
 	newCommand.Material = thisMaterial;
 	newCommand.VAO = thisVAO;
 	newCommand.Parent = inCurrentNode;
 	newCommand.DrawType = EDrawCallType::DrawElements;
 
-	RHI->AddCommand(newCommand);
+	outCommands.push_back(newCommand);
 
 	// 	Mesh3D newMesh;
 	// 	inCurrentNode->Meshes.push_back(newMesh);

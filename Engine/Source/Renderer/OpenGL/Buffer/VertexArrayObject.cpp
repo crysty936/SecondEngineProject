@@ -9,7 +9,6 @@ VertexArrayObject::VertexArrayObject()
 
 }
 
-
 VertexArrayObject::~VertexArrayObject() = default;
 
 void VertexArrayObject::SetupState() const
@@ -43,7 +42,7 @@ void VertexArrayObject::SetupState() const
 
 void VertexArrayObject::Bind() const
 {
-	ASSERT(Handle != 0);
+	ASSERT_MSG(Handle != 0);
 
 	glBindVertexArray(Handle);
 }

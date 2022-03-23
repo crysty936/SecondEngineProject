@@ -14,7 +14,7 @@ ImageData ImageLoading::LoadImageData(const char* inTexurePath)
 
 	rawData = stbi_load(inTexurePath, &width, &height, &nrChannels, 0);
 
-	if (!ENSURE(rawData, "Image Loading Failed"))
+	if (!ENSURE_MSG(rawData, "Image Loading Failed"))
 	{
 		return {};
 	}

@@ -29,7 +29,7 @@ void SceneManager::LoadScene()
 
 void SceneManager::Terminate()
 {
-	ASSERT(Instance);
+	ASSERT_MSG(Instance);
 
 	delete Instance;
 }

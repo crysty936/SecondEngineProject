@@ -18,31 +18,41 @@
 #include "Renderer/Material/RenderMaterial.h"
 #include "Buffer/VertexArrayObject.h"
 #include "Renderer/Material/MaterialsManager.h"
-#include "EASTL/internal/thread_support.h"
 
-const glm::vec4 ClearColor(0.3f, 0.5f, 1.f, 0.4f);
 OpenGLRenderer* RHI = nullptr;
-GLFWwindow* LoadingThreadContext;
-
-
-
-
 static std::mutex RenderCommandsMutex;
+static std::mutex LoadQueueMutex;
+static std::condition_variable LoadQueueCondition;
 
-void LoaderFunc()
+void LoaderFunc(GLFWwindow* inLoadingThreadContext)
 {
+	while (true)
+	{
+		eastl::queue<RenderingLoadCommand>& loadQueue = RHI->GetLoadQueue();
+		std::unique_lock<std::mutex> lock{ LoadQueueMutex };
+		LoadQueueCondition.wait(lock, [&] {return !loadQueue.empty(); });
 
+		RenderingLoadCommand newCommand = loadQueue.front();
+		loadQueue.pop();
 
+		lock.unlock();
 
+		glfwMakeContextCurrent(inLoadingThreadContext);
+		glEnable(GL_DEBUG_OUTPUT);
+		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+		glDebugMessageCallback(OpenGLUtils::GLDebugCallback, nullptr);
+
+		newCommand.LoadDel.Execute(newCommand.ModelPath, newCommand.Parent);
+
+		glfwMakeContextCurrent(nullptr);
+	}
 }
-
-
 
 OpenGLRenderer::OpenGLRenderer(const WindowProperties& inDefaultWindowProperties)
 {
 	const bool glfwSuccess = glfwInit() == GLFW_TRUE;
 
-	ASSERT(glfwSuccess);
+	ASSERT_MSG(glfwSuccess);
 
 	glfwSetErrorCallback(OpenGLUtils::GLFWErrorCallback);
 
@@ -51,18 +61,19 @@ OpenGLRenderer::OpenGLRenderer(const WindowProperties& inDefaultWindowProperties
 	// Create new Window for data holding
 	MainWindow = CreateWindow(inDefaultWindowProperties);
 
+
 	// Set Context
 	GLFWwindow* mainWindowHandle = MainWindow->GetHandle();
 	glfwMakeContextCurrent(mainWindowHandle);
-
 	glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
-	LoadingThreadContext = glfwCreateWindow(640, 480, "Loading Thread Window", NULL, mainWindowHandle);
+	GLFWwindow* loadingThreadContext = glfwCreateWindow(640, 480, "Loading Thread Window", NULL, mainWindowHandle);
 
 	const bool gladSuccess = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress) == GLFW_TRUE;
 	glfwSetInputMode(mainWindowHandle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	glViewport(0, 0, inDefaultWindowProperties.Width, inDefaultWindowProperties.Height);
 
+	glEnable(GL_DEBUG_OUTPUT);
 	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 
 	glEnable(GL_DEPTH_TEST);
@@ -75,14 +86,18 @@ OpenGLRenderer::OpenGLRenderer(const WindowProperties& inDefaultWindowProperties
 	glEnable(GL_BLEND);
 
 	glDebugMessageCallback(OpenGLUtils::GLDebugCallback, nullptr);
-	glClearColor(ClearColor.x, ClearColor.y, ClearColor.z, ClearColor.w);
+	constexpr glm::vec4 clearColor(0.3f, 0.5f, 1.f, 0.4f);
+	glClearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w);
 
 	SetupBaseUniforms();
+
+	// Create the loading thread
+	std::thread(LoaderFunc, loadingThreadContext).detach();
 }
 
 OpenGLRenderer::~OpenGLRenderer() = default;
 
-void OpenGLRenderer::Init(const WindowProperties & inDefaultWindowProperties)
+void OpenGLRenderer::Init(const WindowProperties& inDefaultWindowProperties)
 {
 	RHI = new OpenGLRenderer{ inDefaultWindowProperties };
 }
@@ -92,7 +107,7 @@ void OpenGLRenderer::Terminate()
 	RHI->MainWindow.reset();
 	glfwTerminate();
 
-	ASSERT(RHI);
+	ASSERT_MSG(RHI);
 	delete RHI;
 }
 
@@ -125,18 +140,20 @@ void OpenGLRenderer::DrawCommands()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-	std::unique_lock<std::mutex>(RenderCommandsMutex);
+	RenderCommandsMutex.lock();
 
-	for (const RenderCommand& renderCommand : Commands)
+	for(const RenderCommand& renderCommand : Commands)
 	{
-		const eastl::shared_ptr<const DrawableObject> parent = renderCommand.Parent.lock();
-		if (renderCommand.Parent.expired())
+		const bool parentValid = !renderCommand.Parent.expired();
+		if (!ENSURE(parentValid))
 		{
 			continue;
 		}
 
 		DrawCommand(renderCommand);
 	}
+
+	RenderCommandsMutex.unlock();
 }
 
 void OpenGLRenderer::DrawCommand(const RenderCommand & inCommand)
@@ -153,7 +170,7 @@ void OpenGLRenderer::DrawCommand(const RenderCommand & inCommand)
 	// TODO: Abstract the model and parent dependent uniforms (like the Model Matrix) to be present in the render command 
 	// and updated only if dirty
 
-	// Deffered VAO initialization on the Rendering Thread
+	// Deffered VAO initialization on the Main Rendering Thread
 	if (!vao->bReadyForDraw)
 	{
 		vao->SetupState();
@@ -196,7 +213,7 @@ void OpenGLRenderer::DrawCommand(const RenderCommand & inCommand)
 	material->Shader.UnBind();
 }
 
-eastl::shared_ptr<RenderMaterial> OpenGLRenderer::GetMaterial(const RenderCommand & inCommand) const
+eastl::shared_ptr<RenderMaterial> OpenGLRenderer::GetMaterial(const RenderCommand& inCommand) const
 {
 	switch (DrawMode)
 	{
@@ -253,12 +270,30 @@ void OpenGLRenderer::SetVSyncEnabled(const bool inEnabled)
 	glfwSwapInterval(inEnabled);
 }
 
-void OpenGLRenderer::AddCommand(const RenderCommand & inCommand)
+void OpenGLRenderer::AddCommand(const RenderCommand& inCommand)
 {
-	std::unique_lock<std::mutex>(RenderCommandsMutex);
-
+	RenderCommandsMutex.lock();
 
 	Commands.push_back(inCommand);
+
+	RenderCommandsMutex.unlock();
+}
+
+void OpenGLRenderer::AddCommands(eastl::vector<RenderCommand> inCommands)
+{
+	RenderCommandsMutex.lock();
+
+	Commands.insert(Commands.end(), inCommands.begin(), inCommands.end());
+
+	RenderCommandsMutex.unlock();
+}
+
+void OpenGLRenderer::AddRenderLoadCommand(const RenderingLoadCommand& inCommand)
+{
+	std::unique_lock<std::mutex> lock{ LoadQueueMutex };
+
+	LoadQueue.push(inCommand);
+	LoadQueueCondition.notify_one();
 }
 
 GLFWwindow* OpenGLRenderer::CreateNewWindowHandle(const WindowProperties & inWindowProperties) const

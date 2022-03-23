@@ -12,7 +12,7 @@ bool TryFastReadFile(const eastl::string& inFilePath, eastl::string& outData)
 	{
 		LOG_ERROR("Failed to open file %s.", inFilePath.data());
 
-		ASSERT(false);
+		ASSERT_MSG(false);
 
 		return false;
 	}

@@ -9,21 +9,21 @@ MaterialsManager::~MaterialsManager() = default;
 
 void MaterialsManager::Init()
 {
-	ASSERT(!Instance);
+	ASSERT_MSG(!Instance);
 
 	Instance = new MaterialsManager();
 }
 
 void MaterialsManager::Terminate()
 {
-	ASSERT(Instance);
+	ASSERT_MSG(Instance);
 
 	delete Instance;
 }
 
 MaterialsManager& MaterialsManager::Get()
 {
-	ASSERT(Instance);
+	ASSERT_MSG(Instance);
 
 	return *Instance;
 }
@@ -34,7 +34,7 @@ eastl::shared_ptr<RenderMaterial>& MaterialsManager::GetMaterial(const eastl::st
 	const materialsIterator& iter = LoadedMaterials.find(inMaterialID);
 	const bool materialExists = iter != LoadedMaterials.end();
 
-	ASSERT(materialExists);
+	ASSERT_MSG(materialExists);
 
 	// TODO: If material does not exist, return placeholder material
 

@@ -68,7 +68,7 @@ OpenGLShader::OpenGLShader(const eastl::string& inVertexSrc, const eastl::string
 		glDeleteShader(fragmentShader);
 
 		LOG_ERROR("%s", infoLog);
-		ASSERT(0, "Shader Link failure.");
+		ASSERT_MSG(0, "Shader Link failure.");
 
 		return;
 	}
@@ -128,7 +128,7 @@ int OpenGLShader::GetUniformLocation(const eastl::string & UniformName) const
 	if (uniformLocation != -1)
 		UniformLocations[UniformName] = uniformLocation;
 
-	ASSERT(uniformLocation != -1, "Uniform location could not be found!");
+	ASSERT_MSG(uniformLocation != -1, "Uniform location could not be found!");
 
 	return uniformLocation;
 }
@@ -161,7 +161,7 @@ uint32_t OpenGLShader::CreateShader(const eastl::string & Source, GLenum ShaderT
 		glDeleteShader(shaderHandle);
 
 		LOG_ERROR("%s", infoLog);
-		ASSERT(0, "Shader Compilation failure.");
+		ASSERT_MSG(0, "Shader Compilation failure.");
 		return -1;
 	}
 

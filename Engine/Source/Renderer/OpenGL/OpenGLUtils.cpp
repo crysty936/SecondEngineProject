@@ -11,7 +11,7 @@ namespace OpenGLUtils
 	{
 		LOG_ERROR(inErrorDesc);
 
-		ASSERT(0, "OpenGl Error.");
+		ASSERT_MSG(0, "OpenGl Error.");
 	}
 
 	void GLDebugCallback(GLenum inSource, GLenum inType, GLenum inId, GLenum inSeverity, GLsizei inLength, const GLchar* inMessage, const void* userParam)
@@ -21,7 +21,7 @@ namespace OpenGLUtils
 		case GL_DEBUG_SEVERITY_HIGH:
 		{
 			LOG_ERROR("OpenGL Critical Error: %s", inMessage);
-			ASSERT(0);
+			ASSERT_MSG(0);
 			break;
 		}
 
