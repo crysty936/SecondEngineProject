@@ -3,14 +3,14 @@
 
 
 #ifndef NDEBUG
-#define ASSERT_MSG(x, ...)										\
+#define ASSERT_MSG(x, ...)									\
  {															\
  if(!(x))													\
  {LOG_ERROR("Assertion failed: %s", __VA_ARGS__);			\
 __debugbreak();}											\
  }
 
-#define ENSURE_MSG(x, ...)										\
+#define ENSURE_MSG(x, ...)									\
   (!!x) && ([x](){											\
   if(!(x))													\
   {LOG_ERROR("Assertion failed: %s", __VA_ARGS__);			\

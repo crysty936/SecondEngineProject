@@ -11,6 +11,7 @@
 #include "RenderCommand.h"
 #include "EventSystem/EventSystem.h"
 #include "EASTL/queue.h"
+#include "Core/EngineUtils.h"
 
 /**
  * TODO: A Renderer should be made and that should call whatever RHI is present.
@@ -62,6 +63,12 @@ public:
 	inline void SetDrawMode(const EDrawMode inDrawMode) { DrawMode = inDrawMode; }
 	void AddRenderLoadCommand(const RenderingLoadCommand& inCommand);
 	inline eastl::queue<RenderingLoadCommand>& GetLoadQueue() { return LoadQueue; }
+	
+	//************************************
+	// Returns:   bool, true if the VAO was already present and is initialized, false otherwise
+	// Parameter: OUT eastl::shared_ptr<VertexArrayObject> & outVAO, newly created or cached existing VAO
+	//************************************
+	bool GetVAO(const eastl::string& inVAOId, OUT eastl::shared_ptr<VertexArrayObject>& outVAO);
 
 private:
 	struct GLFWwindow* CreateNewWindowHandle(const WindowProperties& inWindowProperties) const;
@@ -73,6 +80,7 @@ private:
 	eastl::vector<RenderCommand> Commands;
 	EDrawMode DrawMode{ EDrawMode::NORMAL };
 	eastl::queue<RenderingLoadCommand> LoadQueue;
+	eastl::unordered_map<eastl::string, eastl::shared_ptr<VertexArrayObject>> VAOs;
 };
 
 extern GLFWwindow* LoadingThreadContext;

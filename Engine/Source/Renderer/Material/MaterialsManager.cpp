@@ -2,6 +2,8 @@
 #include "RenderMaterial.h"
 #include "Core/EngineUtils.h"
 
+static std::mutex MaterialsMutex;
+
 MaterialsManager* MaterialsManager::Instance = nullptr;
 
 MaterialsManager::MaterialsManager() = default;
@@ -45,6 +47,8 @@ eastl::shared_ptr<RenderMaterial>& MaterialsManager::GetMaterial(const eastl::st
 
 eastl::shared_ptr<RenderMaterial> MaterialsManager::GetOrAddMaterial(const eastl::string inMaterialID, OUT bool& outAlreadyExists)
 {
+	std::lock_guard<std::mutex> lock(MaterialsMutex);
+
 	using materialsIterator = const eastl::unordered_map<eastl::string, eastl::shared_ptr<RenderMaterial>>::iterator;
 	const materialsIterator& iter = LoadedMaterials.find(inMaterialID);
 	outAlreadyExists = iter != LoadedMaterials.end();

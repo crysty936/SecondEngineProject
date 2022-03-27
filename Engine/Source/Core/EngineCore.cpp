@@ -14,11 +14,11 @@
 
 constexpr float IdealFrameRate = 60.f;
 constexpr float IdealFrameTime = 1.0f / IdealFrameRate;
-bool IsRunning = true;
+bool bIsRunning = true;
 
 void StopEngineRunning()
 {
-	IsRunning = false;
+	bIsRunning = false;
 }
 
 EngineCore* Engine = nullptr;
@@ -71,7 +71,7 @@ void EngineCore::Run()
 	double deltaTime = 0.0;
 	double lastTime = WindowsPlatform::GetTime();
 
-	while (IsRunning)
+	while (bIsRunning)
 	{
 		double currentTime = WindowsPlatform::GetTime();
 		double timeSpent = currentTime - lastTime;
@@ -107,4 +107,9 @@ void EngineCore::Run()
 	}
 
 	Terminate();
+}
+
+bool EngineCore::IsRunning()
+{
+	return bIsRunning;
 }

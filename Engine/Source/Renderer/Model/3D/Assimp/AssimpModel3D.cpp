@@ -114,84 +114,95 @@ void AssimpModel3DLoader::ProcessNode(const aiNode & inNode, const aiScene & inS
 }
 
 
-void AssimpModel3DLoader::ProcessMesh(const aiMesh & inMesh, const aiScene & inScene, eastl::shared_ptr<MeshNode>& inCurrentNode, OUT eastl::vector<RenderCommand>& outCommands)
+void AssimpModel3DLoader::ProcessMesh(const aiMesh& inMesh, const aiScene& inScene, eastl::shared_ptr<MeshNode>& inCurrentNode, OUT eastl::vector<RenderCommand>& outCommands)
 {
-	eastl::vector<Vertex> vertices;
-	eastl::vector<uint32_t> indices;
-	eastl::vector<OpenGLTexture> textures;
-
-	for (uint32_t i = 0; i < inMesh.mNumVertices; i++)
-	{
-		Vertex vert;
-		aiVector3D aiVertex = inMesh.mVertices[i];
-		aiVector3D aiNormal = inMesh.mNormals[i];
-		vert.Position = glm::vec3(aiVertex.x, aiVertex.y, aiVertex.z);
-		//vert.Normal = glm::vec3(aiNormal.x, aiNormal.y, aiNormal.z);
-
-		if (inMesh.mTextureCoords[0])
+	//
+ 	MaterialsManager& matManager = MaterialsManager::Get();
+ 	bool materialExists = false;
+ 	eastl::shared_ptr<RenderMaterial> thisMaterial = matManager.GetOrAddMaterial("Assimp_Material_Temp", materialExists);
+ 
+ 	if (!materialExists)
+ 	{
+		eastl::vector<OpenGLTexture> textures;
+		if (inMesh.mMaterialIndex >= 0)
 		{
-			aiVector3D aiTexCoords = inMesh.mTextureCoords[0][i];
+			aiMaterial* Material = inScene.mMaterials[inMesh.mMaterialIndex];
+			eastl::vector<OpenGLTexture> DiffuseMaps = LoadMaterialTextures(*Material, aiTextureType_DIFFUSE, TextureType::Diffuse);
+			textures.insert(textures.end(), DiffuseMaps.begin(), DiffuseMaps.end());
 
-			glm::vec2 Coords;
-			Coords.x = aiTexCoords.x;
-			Coords.y = aiTexCoords.y;
-
-			vert.TexCoords = Coords;
-		}
-		else
-		{
-			vert.TexCoords = glm::vec2(0.0f, 0.0f);
+			// 		std::vector<Texture> SpecularMaps = LoadMaterialTextures(Material, aiTextureType_SPECULAR, TextureType::Specular);
+			// 		Textures.insert(Textures.end(), SpecularMaps.begin(), SpecularMaps.end());
 		}
 
-		vertices.push_back(vert);
-	}
+ 		thisMaterial->Textures = textures;
+ 		thisMaterial->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/BasicProjectionVertexShader.glsl", "../Data/Shaders/BasicTexFragmentShader.glsl");
+ 	}
+ 
+	eastl::shared_ptr<VertexArrayObject> thisVAO = nullptr;
+	const eastl::string vaoName = inMesh.mName.C_Str();
+	const bool existingVAO = RHI->GetVAO(vaoName, thisVAO);
+	//eastl::shared_ptr<VertexArrayObject> thisVAO = eastl::make_shared<VertexArrayObject>();
+	//const bool existingVAO = false;
 
-	for (uint32_t i = 0; i < inMesh.mNumFaces; i++)
+
+	if (!existingVAO)
 	{
-		aiFace Face = inMesh.mFaces[i];
+		eastl::vector<Vertex> vertices;
+		eastl::vector<uint32_t> indices;
 
-		for (uint32_t j = 0; j < Face.mNumIndices; j++)
+		for (uint32_t i = 0; i < inMesh.mNumVertices; i++)
 		{
-			indices.push_back(Face.mIndices[j]);
+			Vertex vert;
+			aiVector3D aiVertex = inMesh.mVertices[i];
+			aiVector3D aiNormal = inMesh.mNormals[i];
+			vert.Position = glm::vec3(aiVertex.x, aiVertex.y, aiVertex.z);
+			//vert.Normal = glm::vec3(aiNormal.x, aiNormal.y, aiNormal.z);
+
+			if (inMesh.mTextureCoords[0])
+			{
+				aiVector3D aiTexCoords = inMesh.mTextureCoords[0][i];
+
+				glm::vec2 Coords;
+				Coords.x = aiTexCoords.x;
+				Coords.y = aiTexCoords.y;
+
+				vert.TexCoords = Coords;
+			}
+			else
+			{
+				vert.TexCoords = glm::vec2(0.0f, 0.0f);
+			}
+
+			vertices.push_back(vert);
 		}
+
+		for (uint32_t i = 0; i < inMesh.mNumFaces; i++)
+		{
+			aiFace Face = inMesh.mFaces[i];
+
+			for (uint32_t j = 0; j < Face.mNumIndices; j++)
+			{
+				indices.push_back(Face.mIndices[j]);
+			}
+		}
+
+		IndexBuffer ibo = IndexBuffer{};
+		int32_t indicesCount = static_cast<int32_t>(indices.size());
+		ibo.SetIndices(indices.data(), indicesCount, GL_STATIC_DRAW);
+
+		VertexBufferLayout layout = VertexBufferLayout{};
+		// Vertex points
+		layout.Push<float>(3);
+		// Vertex Tex Coords
+		layout.Push<float>(2);
+
+		VertexBuffer vbo = VertexBuffer{ ibo, layout };
+		int32_t verticesCount = static_cast<int32_t>(vertices.size());
+		vbo.SetVertices(vertices, GL_STATIC_DRAW);
+
+
+		thisVAO->VBuffer = vbo;
 	}
-
-	if (inMesh.mMaterialIndex >= 0)
-	{
-		aiMaterial* Material = inScene.mMaterials[inMesh.mMaterialIndex];
-		eastl::vector<OpenGLTexture> DiffuseMaps = LoadMaterialTextures(*Material, aiTextureType_DIFFUSE, TextureType::Diffuse);
-		textures.insert(textures.end(), DiffuseMaps.begin(), DiffuseMaps.end());
-
-		// 		std::vector<Texture> SpecularMaps = LoadMaterialTextures(Material, aiTextureType_SPECULAR, TextureType::Specular);
-		// 		Textures.insert(Textures.end(), SpecularMaps.begin(), SpecularMaps.end());
-	}
-
-	IndexBuffer ibo = IndexBuffer{};
-	int32_t indicesCount = static_cast<int32_t>(indices.size());
-	ibo.SetIndices(indices.data(), indicesCount, GL_STATIC_DRAW);
-
-	VertexBufferLayout layout = VertexBufferLayout{};
-	// Vertex points
-	layout.Push<float>(3);
-	// Vertex Tex Coords
-	layout.Push<float>(2);
-
-	VertexBuffer vbo = VertexBuffer{ ibo, layout };
-	int32_t verticesCount = static_cast<int32_t>(vertices.size());
-	vbo.SetVertices(vertices, GL_STATIC_DRAW);
-
-	MaterialsManager& matManager = MaterialsManager::Get();
-	bool materialExists = false;
-	eastl::shared_ptr<RenderMaterial> thisMaterial = matManager.GetOrAddMaterial("Assimp_Material_Temp", materialExists);
-
-	if (!materialExists)
-	{
-		thisMaterial->Textures = textures;
-		thisMaterial->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/BasicProjectionVertexShader.glsl", "../Data/Shaders/BasicTexFragmentShader.glsl");
-	}
-
-	eastl::shared_ptr<VertexArrayObject> thisVAO = eastl::make_shared<VertexArrayObject>();
-	thisVAO->VBuffer = vbo;
 
 	RenderCommand newCommand;
 	newCommand.Material = thisMaterial;

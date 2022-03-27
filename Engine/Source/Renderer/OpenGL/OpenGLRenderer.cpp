@@ -22,11 +22,12 @@
 OpenGLRenderer* RHI = nullptr;
 static std::mutex RenderCommandsMutex;
 static std::mutex LoadQueueMutex;
+static std::mutex GetVAOMutex;
 static std::condition_variable LoadQueueCondition;
 
 void LoaderFunc(GLFWwindow* inLoadingThreadContext)
 {
-	while (true)
+	while (Engine->IsRunning())
 	{
 		eastl::queue<RenderingLoadCommand>& loadQueue = RHI->GetLoadQueue();
 		std::unique_lock<std::mutex> lock{ LoadQueueMutex };
@@ -252,7 +253,7 @@ eastl::shared_ptr<RenderMaterial> OpenGLRenderer::GetMaterial(const RenderComman
 	return { nullptr };
 }
 
-eastl::unique_ptr<OpenGLWindow> OpenGLRenderer::CreateWindow(const WindowProperties & inWindowProperties) const
+eastl::unique_ptr<OpenGLWindow> OpenGLRenderer::CreateWindow(const WindowProperties& inWindowProperties) const
 {
 	GLFWwindow* newHandle = CreateNewWindowHandle(inWindowProperties);
 	eastl::unique_ptr<OpenGLWindow> newWindow = eastl::make_unique<OpenGLWindow>(newHandle);
@@ -272,20 +273,14 @@ void OpenGLRenderer::SetVSyncEnabled(const bool inEnabled)
 
 void OpenGLRenderer::AddCommand(const RenderCommand& inCommand)
 {
-	RenderCommandsMutex.lock();
-
+	std::lock_guard<std::mutex> lock(RenderCommandsMutex);
 	Commands.push_back(inCommand);
-
-	RenderCommandsMutex.unlock();
 }
 
 void OpenGLRenderer::AddCommands(eastl::vector<RenderCommand> inCommands)
 {
-	RenderCommandsMutex.lock();
-
+	std::lock_guard<std::mutex> lock(RenderCommandsMutex);
 	Commands.insert(Commands.end(), inCommands.begin(), inCommands.end());
-
-	RenderCommandsMutex.unlock();
 }
 
 void OpenGLRenderer::AddRenderLoadCommand(const RenderingLoadCommand& inCommand)
@@ -294,6 +289,32 @@ void OpenGLRenderer::AddRenderLoadCommand(const RenderingLoadCommand& inCommand)
 
 	LoadQueue.push(inCommand);
 	LoadQueueCondition.notify_one();
+}
+
+bool OpenGLRenderer::GetVAO(const eastl::string& inVAOId, OUT eastl::shared_ptr<VertexArrayObject>& outVAO)
+{
+	ASSERT_MSG(inVAOId.size() != 0);
+	std::lock_guard<std::mutex> uniqueMutex(GetVAOMutex);
+	//GetVAOMutex.lock(); // TODO: Why does this not work?
+
+ 	using iterator = const eastl::unordered_map<eastl::string, eastl::shared_ptr<VertexArrayObject>>::iterator;
+ 	const iterator& vaoIter = VAOs.find(inVAOId);
+ 	const bool materialExists = vaoIter != VAOs.end();
+
+	if(materialExists)
+	{
+		outVAO = (*vaoIter).second;
+		
+		return true;
+	}
+ 
+	eastl::shared_ptr<VertexArrayObject> newVAO = eastl::make_shared<VertexArrayObject>();
+	VAOs[inVAOId] = newVAO;
+	outVAO = newVAO;
+
+	//GetVAOMutex.unlock();
+
+	return false;
 }
 
 GLFWwindow* OpenGLRenderer::CreateNewWindowHandle(const WindowProperties & inWindowProperties) const

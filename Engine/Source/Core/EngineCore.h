@@ -12,6 +12,7 @@ public:
 	static void Init();
 	static void Terminate();
 	void Run();
+	bool IsRunning();
 
 private:
 	float CurrentDeltaT;
