@@ -94,13 +94,14 @@ const aiImporterDesc *glTFImporter::GetInfo() const {
 
 bool glTFImporter::CanRead(const std::string &pFile, IOSystem *pIOHandler, bool /* checkSig */) const {
     glTF::Asset asset(pIOHandler);
-    try {
-        asset.Load(pFile, GetExtension(pFile) == "glb");
-        std::string version = asset.asset.version;
-        return !version.empty() && version[0] == '1';
-    } catch (...) {
+    const bool result = asset.Load(pFile, GetExtension(pFile) == "glb");
+
+    if (!result) {
         return false;
     }
+
+    std::string version = asset.asset.version;
+    return !version.empty() && version[0] == '1';
 }
 
 inline void SetMaterialColorProperty(std::vector<int> &embeddedTexIdxs, Asset & /*r*/, glTF::TexProperty prop, aiMaterial *mat,
@@ -224,10 +225,9 @@ void glTFImporter::ImportMeshes(glTF::Asset &r) {
                     Ref<Buffer> buf = r.buffers.Get(o3dgc_ext->Buffer);
 
                     buf->EncodedRegion_SetCurrent(mesh.id);
-                } else
-                {
+                } else {
                     throw DeadlyImportError("GLTF: Can not import mesh: unknown mesh extension (code: \"", ai_to_string(cur_ext->Type),
-                                            "\"), only Open3DGC is supported.");
+                            "\"), only Open3DGC is supported.");
                 }
             }
 #endif

@@ -1090,9 +1090,10 @@ inline void Scene::Read(Value &obj, Asset &r) {
     }
 }
 
-inline void AssetMetadata::Read(Document &doc) {
+inline bool AssetMetadata::Read(Document &doc) {
     // read the version, etc.
-    if (Value *obj = FindObject(doc, "asset")) {
+    if (Value *obj = FindObject(doc, "asset"))
+    {
         ReadMember(*obj, "copyright", copyright);
         ReadMember(*obj, "generator", generator);
 
@@ -1115,9 +1116,13 @@ inline void AssetMetadata::Read(Document &doc) {
         }
     }
 
-    if (version.empty() || version[0] != '1') {
-        throw DeadlyImportError("GLTF: Unsupported glTF version: ", version);
+    if (version.empty() || version[0] != '1')
+    {
+        return false;
+        //throw DeadlyImportError("GLTF: Unsupported glTF version: ", version);
     }
+
+    return true;
 }
 
 //
@@ -1157,7 +1162,7 @@ inline void Asset::ReadBinaryHeader(IOStream &stream) {
     mBodyLength = header.length - mBodyOffset;
 }
 
-inline void Asset::Load(const std::string &pFile, bool isBinary) {
+inline bool Asset::Load(const std::string &pFile, bool isBinary) {
     mCurrentAssetDir.clear();
 
     /*int pos = std::max(int(pFile.rfind('/')), int(pFile.rfind('\\')));
@@ -1221,7 +1226,12 @@ inline void Asset::Load(const std::string &pFile, bool isBinary) {
     }
 
     // Load the metadata
-    asset.Read(doc);
+    const bool valid = asset.Read(doc);
+    if (!valid)
+    {
+        return false;
+    }
+
     ReadExtensionsUsed(doc);
 
     // Prepare the dictionaries
@@ -1240,6 +1250,8 @@ inline void Asset::Load(const std::string &pFile, bool isBinary) {
     for (size_t i = 0; i < mDicts.size(); ++i) {
         mDicts[i]->DetachFromDocument();
     }
+
+    return true;
 }
 
 inline void Asset::SetAsBinary() {

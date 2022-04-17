@@ -75,7 +75,6 @@ void EngineCore::Run()
 	{
 		double currentTime = WindowsPlatform::GetTime();
 		double timeSpent = currentTime - lastTime;
-
 		double timeLeft = IdealFrameTime - timeSpent;
 
 		// Sleep 0 until time is out, granularity can be set to avoid this but it's unnecessary given

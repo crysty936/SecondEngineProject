@@ -900,7 +900,7 @@ struct AssetMetadata {
 
     std::string version; //!< The glTF format version (should be 1.0)
 
-    void Read(Document &doc);
+    bool Read(Document &doc);
 
     AssetMetadata() :
             premultipliedAlpha(false), version() {
@@ -989,7 +989,7 @@ public:
     }
 
     //! Main function
-    void Load(const std::string &file, bool isBinary = false);
+    bool Load(const std::string &file, bool isBinary = false);
 
     //! Enables the "KHR_binary_glTF" extension on the asset
     void SetAsBinary();

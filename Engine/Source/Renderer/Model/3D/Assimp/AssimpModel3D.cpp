@@ -15,7 +15,6 @@ AssimpModel3D::AssimpModel3D(const eastl::string& inPath)
 
 AssimpModel3D::~AssimpModel3D() = default;
 
-
 void LoadTemp(const eastl::string inPath, TransformObjPtr inParent);
 
 void AssimpModel3D::SetupDrawCommands()
@@ -112,7 +111,6 @@ void AssimpModel3DLoader::ProcessNode(const aiNode & inNode, const aiScene & inS
 		inCurrentNode->AddChild((newNode));
 	}
 }
-
 
 void AssimpModel3DLoader::ProcessMesh(const aiMesh& inMesh, const aiScene& inScene, eastl::shared_ptr<MeshNode>& inCurrentNode, OUT eastl::vector<RenderCommand>& outCommands)
 {

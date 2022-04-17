@@ -20,8 +20,8 @@ public:
 	void MoveCameraDown();
 	void OnChangeDrawMode();
 private:
-	eastl::shared_ptr<class Camera> GameCamera;
-	eastl::unique_ptr<class Controller> GameController;
+	eastl::shared_ptr<class Camera> GameCamera = nullptr;
+	eastl::unique_ptr<class Controller> GameController = nullptr;
 
 
 	EntityPtr Object;

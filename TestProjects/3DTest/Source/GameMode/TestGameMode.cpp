@@ -14,9 +14,7 @@ TestGameMode GameMode = {};
 
 TestGameMode::TestGameMode()
 	:
-	GameModeBase(),
-	GameCamera{ nullptr },
-	GameController{}
+	GameModeBase()
 {
 }
 
