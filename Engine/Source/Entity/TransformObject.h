@@ -4,7 +4,10 @@
 #include "EASTL/vector.h"
 
 using TransformObjPtr = eastl::shared_ptr<class TransformObject>;
-
+/// <summary>
+/// An object which contains Transform information.
+/// Base class for all in-game entities
+/// </summary>
 class TransformObject : public eastl::enable_shared_from_this<TransformObject>
 {
 public:
@@ -28,6 +31,7 @@ public:
 	void SetRelativeLocation(const glm::vec3 inRelLoc);
 	void SetScale(const glm::vec3 inScale);
 	inline bool IsTranfsDirty() const { return TransfDirty; }
+	void LookAt(const glm::vec3 inTarget);
 
 	template<typename T>
 	void ForEach_Children_Recursive(T inPredicate)

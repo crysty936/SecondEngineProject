@@ -10,7 +10,7 @@
 
 struct MeshNode : public DrawableObject
 {
-	//eastl::vector<Mesh3D> Meshes; // Not used right now
+	//eastl::vector<Mesh3D> Meshes; // Not used as the meshes are stored as Transform Children
 };
 
 class Model3D : public TransformObject , public IDrawableContainer

@@ -291,7 +291,7 @@ void OpenGLRenderer::AddRenderLoadCommand(const RenderingLoadCommand& inCommand)
 	LoadQueueCondition.notify_one();
 }
 
-bool OpenGLRenderer::GetVAO(const eastl::string& inVAOId, OUT eastl::shared_ptr<VertexArrayObject>& outVAO)
+bool OpenGLRenderer::GetOrCreateVAO(const eastl::string& inVAOId, OUT eastl::shared_ptr<VertexArrayObject>& outVAO)
 {
 	ASSERT_MSG(inVAOId.size() != 0);
 	std::lock_guard<std::mutex> uniqueMutex(GetVAOMutex);

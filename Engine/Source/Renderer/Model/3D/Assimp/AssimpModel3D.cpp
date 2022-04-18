@@ -88,7 +88,6 @@ eastl::shared_ptr<MeshNode> AssimpModel3DLoader::LoadData(OUT eastl::vector<Rend
 	ProcessNode(*scene->mRootNode, *scene, newNode, outCommands);
 
 	return newNode;
-	//AddChild(newNode); // Cannot multithread this in straightforward way because I need to load transform matrices and add children with them
 }
 
 void AssimpModel3DLoader::ProcessNode(const aiNode & inNode, const aiScene & inScene, eastl::shared_ptr<MeshNode>& inCurrentNode, OUT eastl::vector<RenderCommand>& outCommands)
@@ -114,7 +113,6 @@ void AssimpModel3DLoader::ProcessNode(const aiNode & inNode, const aiScene & inS
 
 void AssimpModel3DLoader::ProcessMesh(const aiMesh& inMesh, const aiScene& inScene, eastl::shared_ptr<MeshNode>& inCurrentNode, OUT eastl::vector<RenderCommand>& outCommands)
 {
-	//
  	MaterialsManager& matManager = MaterialsManager::Get();
  	bool materialExists = false;
  	eastl::shared_ptr<RenderMaterial> thisMaterial = matManager.GetOrAddMaterial("Assimp_Material_Temp", materialExists);
@@ -138,10 +136,7 @@ void AssimpModel3DLoader::ProcessMesh(const aiMesh& inMesh, const aiScene& inSce
  
 	eastl::shared_ptr<VertexArrayObject> thisVAO = nullptr;
 	const eastl::string vaoName = inMesh.mName.C_Str();
-	const bool existingVAO = RHI->GetVAO(vaoName, thisVAO);
-	//eastl::shared_ptr<VertexArrayObject> thisVAO = eastl::make_shared<VertexArrayObject>();
-	//const bool existingVAO = false;
-
+	const bool existingVAO = RHI->GetOrCreateVAO(vaoName, thisVAO);
 
 	if (!existingVAO)
 	{
@@ -197,7 +192,6 @@ void AssimpModel3DLoader::ProcessMesh(const aiMesh& inMesh, const aiScene& inSce
 		VertexBuffer vbo = VertexBuffer{ ibo, layout };
 		int32_t verticesCount = static_cast<int32_t>(vertices.size());
 		vbo.SetVertices(vertices, GL_STATIC_DRAW);
-
 
 		thisVAO->VBuffer = vbo;
 	}

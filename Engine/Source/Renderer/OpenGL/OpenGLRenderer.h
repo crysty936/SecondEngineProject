@@ -66,9 +66,9 @@ public:
 	
 	//************************************
 	// Returns:   bool, true if the VAO was already present and is initialized, false otherwise
-	// Parameter: OUT eastl::shared_ptr<VertexArrayObject> & outVAO, newly created or cached existing VAO
+	// Parameter: eastl::shared_ptr<VertexArrayObject> & outVAO, newly created or cached existing VAO
 	//************************************
-	bool GetVAO(const eastl::string& inVAOId, OUT eastl::shared_ptr<VertexArrayObject>& outVAO);
+	bool GetOrCreateVAO(const eastl::string& inVAOId, OUT eastl::shared_ptr<VertexArrayObject>& outVAO);
 
 private:
 	struct GLFWwindow* CreateNewWindowHandle(const WindowProperties& inWindowProperties) const;

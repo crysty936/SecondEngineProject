@@ -12,7 +12,12 @@ void TransformObject::SetParent(TransformObjPtr& inParent)
 
 const Transform TransformObject::GetRelativeTransform() const
 {
-	return Transform{ Location, Rotation, Scale };
+	Transform newTransform;
+	newTransform.Translation = Location;
+	newTransform.Rotation = Rotation;
+	newTransform.Scale = Scale;
+
+	return newTransform;
 }
 
 const Transform& TransformObject::GetAbsoluteTransform() const
@@ -47,15 +52,14 @@ void TransformObject::Move(const glm::vec3 inMoveVector)
 
 void TransformObject::Rotate(const float inAmount, const glm::vec3 inAxis)
 {
-	const glm::quat additiveRotation = glm::angleAxis(glm::radians(inAmount), inAxis);
+	const float radians = glm::radians(inAmount);
+	const glm::quat additiveRotation = glm::angleAxis(radians, inAxis);
 	const glm::quat currentRotation(Rotation);
 
 	const glm::quat newRotation = currentRotation * additiveRotation;
-	const glm::vec3 newRotationAxis = glm::eulerAngles(newRotation);
+	const glm::vec3 newRotationEuler = glm::eulerAngles(newRotation);
 
-	SetRotation(newRotationAxis);
-
-	MakeTransfDirty();
+	SetRotation(newRotationEuler);
 }
 
 void TransformObject::SetRotation(const glm::vec3 inNewRotation)
@@ -82,6 +86,26 @@ void TransformObject::SetScale(const glm::vec3 inScale)
 {
 	Scale = inScale;
 	MakeTransfDirty();
+}
+
+void TransformObject::LookAt(const glm::vec3 inTarget)
+{
+	const glm::vec3 upVec(0, 1, 0);
+
+	const glm::vec3 z_axis = glm::normalize(inTarget- GetLocation());
+	const glm::vec3 x_axis = glm::normalize(glm::cross(upVec, z_axis));
+	const glm::vec3 y_axis = glm::normalize(glm::cross(z_axis, x_axis));
+
+	const glm::mat4 rotationMatrix(
+		glm::vec4(x_axis, 0),
+		glm::vec4(y_axis, 0),
+		glm::vec4(z_axis, 0),
+		glm::vec4(0, 0, 0, 1));
+
+	const glm::quat q = glm::quat_cast(rotationMatrix);
+	const glm::vec3 angles = glm::eulerAngles(q);
+
+	SetRotation(angles);
 }
 
 void TransformObject::MakeTransfDirty() const
