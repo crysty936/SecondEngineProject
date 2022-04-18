@@ -53,33 +53,85 @@ const uint32_t texureBaseNr = GL_TEXTURE0;
 // 
 // TriangleShape::~TriangleShape() = default;
 
-// eastl::shared_ptr<IDrawable> BasicShapes::CreateSquareObject(eastl::string inTexturePath)
-// {
+SquareShape::SquareShape() = default;
+SquareShape::~SquareShape() = default;
+
+void SquareShape::SetupDrawCommands()
+{
+	const eastl::string vaoName = "squareVAO";
+	eastl::shared_ptr<VertexArrayObject> thisVAO{ nullptr };
+	const bool existingVAO = RHI->GetOrCreateVAO(vaoName, thisVAO);
+
+	if (!existingVAO)
+	{
+		// TODO: Buffers creation should be delegated to the renderer
+		IndexBuffer ibo = IndexBuffer{};
+		int32_t indicesCount = BasicShapesData::GetSquareIndicesCount();
+		ibo.SetIndices(BasicShapesData::GetSquareIndices(), indicesCount, GL_STATIC_DRAW);
+
+		VertexBufferLayout layout = VertexBufferLayout{};
+		// Vertex points
+		layout.Push<float>(3);
+		// Vertex Tex Coords
+		layout.Push<float>(2);
+
+		VertexBuffer vbo = VertexBuffer{ ibo, layout };
+		int32_t verticesCount = BasicShapesData::GetSquareVerticesCount();
+		vbo.SetVertices(BasicShapesData::GetSquareVertices(), verticesCount, GL_STATIC_DRAW);
+
+		thisVAO->VBuffer = vbo;
+	}
+
+	MaterialsManager& matManager = MaterialsManager::Get();
+	bool materialExists = false;
+	eastl::shared_ptr<RenderMaterial> cubeMaterial = matManager.GetOrAddMaterial("square_material", materialExists);
+	eastl::string texturePath = "../Data/Textures/ExampleContainer.jpg";
+
+	if (!materialExists)
+	{
+		OpenGLTexture tex{ texturePath, texureBaseNr + 0 };
+		cubeMaterial->Textures.push_back(tex);
+		cubeMaterial->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/BasicProjectionVertexShader.glsl", "../Data/Shaders/BasicTexFragmentShader.glsl");
+	}
+
+	RenderCommand newCommand;
+	newCommand.Material = cubeMaterial;
+	newCommand.VAO = thisVAO;
+	newCommand.Parent = this_shared(this);
+	newCommand.DrawType = EDrawCallType::DrawElements;
+
+	RHI->AddCommand(newCommand);
+}
+
+eastl::shared_ptr<SquareShape> BasicShapes::CreateSquareObject(eastl::string inTexturePath)
+{
 // 	if (inTexturePath.empty())
 // 	{
 // 		inTexturePath = eastl::string("../Data/Textures/ExampleContainer.jpg");
 // 	}
-// 
-// 	eastl::shared_ptr<SimpleShapeDrawable> obj = eastl::make_shared<SquareShape>(inTexturePath);
-// 
-// 	return obj;
-// }
-// 
- eastl::shared_ptr<CubeShape> BasicShapes::CreateCubeObject()
- {
+
+	eastl::shared_ptr<SquareShape> obj = ObjectCreation::NewObject<SquareShape>();
+
+	return obj;
+}
+
+eastl::shared_ptr<CubeShape> BasicShapes::CreateCubeObject()
+{
 	eastl::shared_ptr<CubeShape> obj = ObjectCreation::NewObject<CubeShape>();
 
- 	return obj;
- }
+	return obj;
+}
 
 CubeShape::CubeShape() = default;
 CubeShape::~CubeShape() = default;
 
 void CubeShape::SetupDrawCommands()
 {
-	static eastl::shared_ptr<VertexArrayObject> thisVAO{ nullptr };
+	const eastl::string vaoName = "cubeVAO";
+	eastl::shared_ptr<VertexArrayObject> thisVAO{ nullptr };
+	const bool existingVAO = RHI->GetOrCreateVAO(vaoName, thisVAO);
 
-	if (!thisVAO)
+	if (!existingVAO)
 	{
 		// TODO: Buffers creation should be delegated to the renderer
 		IndexBuffer ibo = IndexBuffer{};
@@ -96,9 +148,7 @@ void CubeShape::SetupDrawCommands()
 		int32_t verticesCount = BasicShapesData::GetCubeVerticesCount();
 		vbo.SetVertices(BasicShapesData::GetCubeVertices(), verticesCount, GL_STATIC_DRAW);
 
-		thisVAO = eastl::make_shared<VertexArrayObject>();
 		thisVAO->VBuffer = vbo;
-		thisVAO->SetupState();
 	}
 
 	MaterialsManager& matManager = MaterialsManager::Get();
@@ -124,3 +174,4 @@ void CubeShape::SetupDrawCommands()
 
 	RHI->AddCommand(newCommand);
 }
+

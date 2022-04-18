@@ -9,12 +9,14 @@
 // 	virtual ~TriangleShape();
 // };
 // 
-// class SquareShape : public SimpleShapeDrawable
-// {
-// public:
-// 	SquareShape(const eastl::string& inTexturePath = {});
-// 	virtual ~SquareShape();
-// };
+ class SquareShape : public DrawableObject, public IDrawableContainer
+ {
+ public:
+ 	SquareShape();
+ 	virtual ~SquareShape();
+
+	void SetupDrawCommands() override;
+ };
 
 class CubeShape : public Model3D
 {
@@ -29,6 +31,6 @@ class BasicShapes
 {
 public:
 // 	static eastl::shared_ptr<class IDrawable> CreateTriangleObject(eastl::string inTexturePath = {});
-// 	static eastl::shared_ptr<class IDrawable> CreateSquareObject(eastl::string inTexturePath = {});
+ 	static eastl::shared_ptr<class SquareShape> CreateSquareObject(eastl::string inTexturePath = {});
 	static eastl::shared_ptr<class CubeShape> CreateCubeObject();
 };

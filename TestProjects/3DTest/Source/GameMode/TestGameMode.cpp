@@ -19,7 +19,7 @@ TestGameMode::TestGameMode()
 }
 
 TestGameMode::~TestGameMode() = default;
-eastl::shared_ptr<AssimpModel3D> shibaModel;
+
 void TestGameMode::Init()
 {
 	GameController = eastl::make_unique<Controller>();
@@ -98,39 +98,20 @@ void TestGameMode::Init()
 	// 	model->SetScale(glm::vec3(0.01f, 0.01f, 0.01f));
 
 
-	shibaModel = ObjectCreation::NewObject<AssimpModel3D>("../Data/Models/Shiba/scene.gltf");
-	//shibaModel->Move(glm::vec3(5.f, 5.f, 5.f));
-	//shibaModel->SetScale(glm::vec3(0.1f, 0.1f, 0.1f));
+	//eastl::shared_ptr<AssimpModel3D> shibaModel = ObjectCreation::NewObject<AssimpModel3D>("../Data/Models/Shiba/scene.gltf");
 
-
-// 	const glm::vec3 shibaLookAt = shibaModel->GetLocation() - GameCamera->GetLocation();
-// 	const glm::vec3 lookAtNormalized = glm::normalize(shibaLookAt);
-// 	GameCamera->SetRotation(lookAtNormalized);
-
-
-	glm::vec3 cameraPos;
-	if (TransformObjPtr parentShared = GameCamera->GetParent().lock())
 	{
-		// Move the camera parent
-		cameraPos = parentShared->GetLocation();
+		eastl::shared_ptr<SquareShape> square = BasicShapes::CreateSquareObject();
+		//centerObj->Move(glm::vec3(0.f, 30.f, 0.f));
 	}
+	
+
 }
 
 void TestGameMode::Tick(float inDeltaT)
 {
 	GameController->ExecuteCallbacks();
 
-	const glm::vec3 shibaLocation = shibaModel->GetLocation();
-
-
-	glm::vec3 cameraPos;
-	if (TransformObjPtr parentShared = GameCamera->GetParent().lock())
-	{
-		// Move the camera parent
-		cameraPos = parentShared->GetLocation();
-	}
-
-	shibaModel->LookAt(GameCamera->GetAbsoluteTransform().Translation);
 }
 
 void TestGameMode::MoveCameraLeft()
