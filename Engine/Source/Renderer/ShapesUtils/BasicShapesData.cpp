@@ -14,6 +14,18 @@ const uint32_t TriangleIndices[] =
 };
 // Triangle
 
+const float QuadVertices[] = {
+ 1.f,  1.f, 0.0f,  1.f, 1.f, // top right
+-1.f,  1.f, 0.0f,  0.f, 1.f,  // top left 
+ 1.f, -1.f, 0.0f,  1.f, 0.f, // bottom right
+-1.f, -1.f, 0.0f,  0.f, 0.f, // bottom left
+};
+
+const uint32_t QuadIndices[] = {
+	0, 1, 2,   // first triangle
+	1, 3, 2    // second triangle
+};
+
 // Square
 // CCW Vertices with secondary diagonal split drawing
 const float SquareVertices[] = {
@@ -156,6 +168,27 @@ int32_t BasicShapesData::GetSquareIndicesCount()
 {
 	return sizeof(SquareIndices) / sizeof(uint32_t);
 }
+
+const float* BasicShapesData::GetQuadVertices()
+{
+	return QuadVertices;
+}
+
+const uint32_t* BasicShapesData::GetQuadIndices()
+{
+	return QuadIndices;
+}
+
+int32_t BasicShapesData::GetQuadVerticesCount()
+{
+	return sizeof(QuadVertices) / sizeof(float);
+}
+
+int32_t BasicShapesData::GetQuadIndicesCount()
+{
+	return sizeof(QuadIndices) / sizeof(uint32_t);
+}
+
 
 const float* BasicShapesData::GetCubeVertices()
 {

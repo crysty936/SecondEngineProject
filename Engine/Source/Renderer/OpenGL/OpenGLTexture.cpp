@@ -1,6 +1,7 @@
 #include "OpenGLTexture.h"
 #include "Utils/ImageLoading.h"
 #include "GLFW/glfw3.h"
+#include "OpenGLRenderer.h"
 
 OpenGLTexture::OpenGLTexture(const eastl::string& inTexturePath, int32_t inTexNr)
 	: TexPath{inTexturePath}, TexNr{ inTexNr }
@@ -8,7 +9,19 @@ OpenGLTexture::OpenGLTexture(const eastl::string& inTexturePath, int32_t inTexNr
 	Init(inTexturePath);
 }
 
-OpenGLTexture::OpenGLTexture() = default;
+// Create an texture buffer
+OpenGLTexture::OpenGLTexture()
+{
+	glGenTextures(1, &TexHandle);
+	glBindTexture(GL_TEXTURE_2D, TexHandle);
+
+	const WindowProperties& windowProps = RHI->GetMainWindow().GetProperties();
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, windowProps.Width, windowProps.Height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
 OpenGLTexture::~OpenGLTexture() = default;
 
 void OpenGLTexture::Init(const eastl::string & inTexturePath)
@@ -22,11 +35,10 @@ void OpenGLTexture::Init(const eastl::string & inTexturePath)
 
 	NrChannels = data.NrChannels;
 
-	uint32_t handle;
-	glGenTextures(1, &handle);
+	glGenTextures(1, &TexHandle);
 
 	glActiveTexture(TexNr);
-	glBindTexture(GL_TEXTURE_2D, handle);
+	glBindTexture(GL_TEXTURE_2D, TexHandle);
 
 	GLenum imageFormat = 0;
 	switch (data.NrChannels)
@@ -55,8 +67,6 @@ void OpenGLTexture::Init(const eastl::string & inTexturePath)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	TexHandle = handle;
 
 	ImageLoading::FreeImageData(data.RawData);
 

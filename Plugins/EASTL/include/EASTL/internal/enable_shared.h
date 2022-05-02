@@ -45,19 +45,20 @@ namespace eastl
 		shared_ptr<const T> shared_from_this() const
 			{ return shared_ptr<const T>(mWeakPtr); }
 
-		template<typename T2>
-		shared_ptr<T2> this_shared(T2* inThis)
-		{
-			shared_ptr<T> baseShared = shared_ptr<T>(mWeakPtr);
-
-			return eastl::static_pointer_cast<T2>(baseShared);
-		}
-
 		weak_ptr<T> weak_from_this()
 			{ return mWeakPtr; }
 
 		weak_ptr<const T> weak_from_this() const
 			{ return mWeakPtr; }
+
+	protected:
+		template<typename TCurrent>
+		shared_ptr<TCurrent> this_shared(TCurrent* inThis)
+		{
+			shared_ptr<T> baseShared = shared_ptr<T>(mWeakPtr);
+
+			return eastl::static_pointer_cast<TCurrent>(baseShared);
+		}
 
 	public: // This is public because the alternative fails on some compilers that we need to support.
 		mutable weak_ptr<T> mWeakPtr;

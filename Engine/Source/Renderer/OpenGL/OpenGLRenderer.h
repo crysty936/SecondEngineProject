@@ -80,7 +80,12 @@ private:
 	eastl::vector<RenderCommand> Commands;
 	EDrawMode DrawMode{ EDrawMode::NORMAL };
 	eastl::queue<RenderingLoadCommand> LoadQueue;
-	eastl::unordered_map<eastl::string, eastl::shared_ptr<VertexArrayObject>> VAOs;
+	eastl::unordered_map<eastl::string, eastl::shared_ptr<class VertexArrayObject>> VAOs;
+
+	uint32_t FrameBufferHandle;
+	eastl::unique_ptr<class OpenGLTexture> FrameBufferTex;
+	eastl::unique_ptr<class VertexArrayObject> MainQuadVAO;
+	eastl::unique_ptr<class OpenGLShader> MainQuadShader;
 };
 
 extern GLFWwindow* LoadingThreadContext;

@@ -92,6 +92,7 @@ OpenGLRenderer::OpenGLRenderer(const WindowProperties& inDefaultWindowProperties
 	constexpr glm::vec4 clearColor(0.3f, 0.5f, 1.f, 0.4f);
 	glClearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w);
 
+	// Set the default uniforms
 	SetupBaseUniforms();
 
 	// Create the loading thread
@@ -100,9 +101,67 @@ OpenGLRenderer::OpenGLRenderer(const WindowProperties& inDefaultWindowProperties
 
 OpenGLRenderer::~OpenGLRenderer() = default;
 
-void OpenGLRenderer::Init(const WindowProperties& inDefaultWindowProperties)
+void OpenGLRenderer::Init(const WindowProperties & inDefaultWindowProperties)
 {
 	RHI = new OpenGLRenderer{ inDefaultWindowProperties };
+
+	// Setup secondary framebuffer
+
+	// Create the frame buffer
+	glGenFramebuffers(1, &RHI->FrameBufferHandle);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, RHI->FrameBufferHandle);
+
+	// Create the texture which will be used as output for the frame buffer
+	RHI->FrameBufferTex = eastl::make_unique<OpenGLTexture>();
+
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, RHI->FrameBufferTex->TexHandle, 0);
+
+	const WindowProperties& windowProps = RHI->MainWindow->GetProperties();
+
+	// Create a stencil and depth render buffer object for the frame buffer
+	uint32_t rbo; // render buffer object
+	glGenRenderbuffers(1, &rbo);
+	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, windowProps.Width, windowProps.Height);
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+	// Attach the rbo to the framebuffer
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+	{
+		__debugbreak();
+	}
+
+	// Bind the default frame buffer
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	// Create the Quad used to draw the framebuffer
+	// TODO: Create a specialized class for the Quad
+
+	RHI->MainQuadVAO = eastl::make_unique<VertexArrayObject>();
+
+	IndexBuffer ibo = IndexBuffer{};
+	int32_t indicesCount = BasicShapesData::GetQuadIndicesCount();
+	ibo.SetIndices(BasicShapesData::GetQuadIndices(), indicesCount, GL_STATIC_DRAW);
+
+	VertexBufferLayout layout = VertexBufferLayout{};
+	// Vertex points
+	layout.Push<float>(3);
+	// Vertex Tex Coords
+	layout.Push<float>(2);
+
+	VertexBuffer vbo = VertexBuffer{ ibo, layout };
+	int32_t verticesCount = BasicShapesData::GetQuadVerticesCount();
+	vbo.SetVertices(BasicShapesData::GetQuadVertices(), verticesCount, GL_STATIC_DRAW);
+
+	RHI->MainQuadVAO->VBuffer = vbo;
+
+	RHI->MainQuadVAO->SetupState();
+
+	RHI->MainQuadShader = eastl::make_unique<OpenGLShader>();
+	*(RHI->MainQuadShader) = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/QuadTexVertexShader.glsl", "../Data/Shaders/QuadTexFragmentShader.glsl");
 }
 
 void OpenGLRenderer::Terminate()
@@ -110,18 +169,39 @@ void OpenGLRenderer::Terminate()
 	RHI->MainWindow.reset();
 	glfwTerminate();
 
+	glDeleteBuffers(1, &RHI->FrameBufferHandle);
+
+
 	ASSERT_MSG(RHI);
 	delete RHI;
 }
 
 void OpenGLRenderer::Draw()
 {
+	// First draw in the secondary frame buffer
+	glBindFramebuffer(GL_FRAMEBUFFER, FrameBufferHandle);
+
 	SceneManager& sceneMan = SceneManager::Get();
 	Scene& currentScene = sceneMan.GetCurrentScene();
 
 	UpdateUniforms();
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	glEnable(GL_DEPTH_TEST);
 	DrawCommands();
-	constexpr glm::mat4 identity = glm::mat4(1.f);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	glDisable(GL_DEPTH_TEST);
+
+	MainQuadShader->Bind();
+	MainQuadVAO->Bind();
+	glBindTexture(GL_TEXTURE_2D, FrameBufferTex->TexHandle);
+	glDrawElements(GL_TRIANGLES, BasicShapesData::GetQuadIndicesCount(), GL_UNSIGNED_INT, nullptr);
+
+
+	MainQuadVAO->Unbind();
+	MainQuadShader->UnBind();
 
 	CheckShouldCloseWindow(*MainWindow);
 	glfwSwapBuffers(MainWindow->GetHandle());
@@ -141,11 +221,9 @@ void OpenGLRenderer::UpdateUniforms()
 
 void OpenGLRenderer::DrawCommands()
 {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
 	RenderCommandsMutex.lock();
 
-	for(const RenderCommand& renderCommand : Commands)
+	for (const RenderCommand& renderCommand : Commands)
 	{
 		const bool parentValid = !renderCommand.Parent.expired();
 		if (!ENSURE(parentValid))
@@ -216,7 +294,7 @@ void OpenGLRenderer::DrawCommand(const RenderCommand & inCommand)
 	material->Shader.UnBind();
 }
 
-eastl::shared_ptr<RenderMaterial> OpenGLRenderer::GetMaterial(const RenderCommand& inCommand) const
+eastl::shared_ptr<RenderMaterial> OpenGLRenderer::GetMaterial(const RenderCommand & inCommand) const
 {
 	switch (DrawMode)
 	{
@@ -255,7 +333,7 @@ eastl::shared_ptr<RenderMaterial> OpenGLRenderer::GetMaterial(const RenderComman
 	return { nullptr };
 }
 
-eastl::unique_ptr<OpenGLWindow> OpenGLRenderer::CreateWindow(const WindowProperties& inWindowProperties) const
+eastl::unique_ptr<OpenGLWindow> OpenGLRenderer::CreateWindow(const WindowProperties & inWindowProperties) const
 {
 	GLFWwindow* newHandle = CreateNewWindowHandle(inWindowProperties);
 	eastl::unique_ptr<OpenGLWindow> newWindow = eastl::make_unique<OpenGLWindow>(newHandle);
@@ -273,7 +351,7 @@ void OpenGLRenderer::SetVSyncEnabled(const bool inEnabled)
 	glfwSwapInterval(inEnabled);
 }
 
-void OpenGLRenderer::AddCommand(const RenderCommand& inCommand)
+void OpenGLRenderer::AddCommand(const RenderCommand & inCommand)
 {
 	std::lock_guard<std::mutex> lock(RenderCommandsMutex);
 	Commands.push_back(inCommand);
@@ -285,7 +363,7 @@ void OpenGLRenderer::AddCommands(eastl::vector<RenderCommand> inCommands)
 	Commands.insert(Commands.end(), inCommands.begin(), inCommands.end());
 }
 
-void OpenGLRenderer::AddRenderLoadCommand(const RenderingLoadCommand& inCommand)
+void OpenGLRenderer::AddRenderLoadCommand(const RenderingLoadCommand & inCommand)
 {
 	std::unique_lock<std::mutex> lock{ LoadQueueMutex };
 
@@ -293,23 +371,23 @@ void OpenGLRenderer::AddRenderLoadCommand(const RenderingLoadCommand& inCommand)
 	LoadQueueCondition.notify_one();
 }
 
-bool OpenGLRenderer::GetOrCreateVAO(const eastl::string& inVAOId, OUT eastl::shared_ptr<VertexArrayObject>& outVAO)
+bool OpenGLRenderer::GetOrCreateVAO(const eastl::string & inVAOId, OUT eastl::shared_ptr<VertexArrayObject>&outVAO)
 {
 	ASSERT_MSG(!inVAOId.empty());
 	std::lock_guard<std::mutex> uniqueMutex(GetVAOMutex);
 	//GetVAOMutex.lock(); // TODO: Why does this not work?
 
- 	using iterator = const eastl::unordered_map<eastl::string, eastl::shared_ptr<VertexArrayObject>>::iterator;
- 	const iterator& vaoIter = VAOs.find(inVAOId);
- 	const bool materialExists = vaoIter != VAOs.end();
+	using iterator = const eastl::unordered_map<eastl::string, eastl::shared_ptr<VertexArrayObject>>::iterator;
+	const iterator& vaoIter = VAOs.find(inVAOId);
+	const bool materialExists = vaoIter != VAOs.end();
 
-	if(materialExists)
+	if (materialExists)
 	{
 		outVAO = (*vaoIter).second;
-		
+
 		return true;
 	}
- 
+
 	eastl::shared_ptr<VertexArrayObject> newVAO = eastl::make_shared<VertexArrayObject>();
 	VAOs[inVAOId] = newVAO;
 	outVAO = newVAO;
