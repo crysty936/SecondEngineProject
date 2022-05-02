@@ -86,6 +86,8 @@ OpenGLRenderer::OpenGLRenderer(const WindowProperties& inDefaultWindowProperties
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
 
+	glEnable(GL_CULL_FACE);
+
 	glDebugMessageCallback(OpenGLUtils::GLDebugCallback, nullptr);
 	constexpr glm::vec4 clearColor(0.3f, 0.5f, 1.f, 0.4f);
 	glClearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w);
@@ -293,7 +295,7 @@ void OpenGLRenderer::AddRenderLoadCommand(const RenderingLoadCommand& inCommand)
 
 bool OpenGLRenderer::GetOrCreateVAO(const eastl::string& inVAOId, OUT eastl::shared_ptr<VertexArrayObject>& outVAO)
 {
-	ASSERT_MSG(inVAOId.size() != 0);
+	ASSERT_MSG(!inVAOId.empty());
 	std::lock_guard<std::mutex> uniqueMutex(GetVAOMutex);
 	//GetVAOMutex.lock(); // TODO: Why does this not work?
 

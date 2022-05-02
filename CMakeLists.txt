@@ -1,4 +1,4 @@
-# run cmake .. in the build folder
+# run "cmake .." in the build folder
 
 cmake_minimum_required(VERSION 3.10)
 

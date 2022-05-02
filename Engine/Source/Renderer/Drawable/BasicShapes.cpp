@@ -85,7 +85,7 @@ void SquareShape::SetupDrawCommands()
 	MaterialsManager& matManager = MaterialsManager::Get();
 	bool materialExists = false;
 	eastl::shared_ptr<RenderMaterial> cubeMaterial = matManager.GetOrAddMaterial("square_material", materialExists);
-	eastl::string texturePath = "../Data/Textures/ExampleContainer.jpg";
+	eastl::string texturePath = "../Data/Textures/openGLExampleTransparentWindow.png";
 
 	if (!materialExists)
 	{

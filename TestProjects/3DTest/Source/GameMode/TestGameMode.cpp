@@ -90,19 +90,28 @@ void TestGameMode::Init()
 	}
 	{
 		eastl::shared_ptr<CubeShape> centerObj = BasicShapes::CreateCubeObject();
-		centerObj->Move(glm::vec3(0.f, 30.f, 0.f));
+		centerObj->Move(glm::vec3(0.f, 0.f, -5.f));
 	}
 
-	// 	eastl::shared_ptr<AssimpModel3D> model = ObjectCreation::NewObject<AssimpModel3D>("../Data/Models/Backpack/scene.gltf");
-	// 	model->Move(glm::vec3(5.f, 5.f, 5.f));
-	// 	model->SetScale(glm::vec3(0.01f, 0.01f, 0.01f));
+	 	eastl::shared_ptr<AssimpModel3D> model = ObjectCreation::NewObject<AssimpModel3D>("../Data/Models/Backpack/scene.gltf");
+	 	model->Move(glm::vec3(5.f, 5.f, 5.f));
+	 	model->SetScale(glm::vec3(0.01f, 0.01f, 0.01f));
 
 
 	//eastl::shared_ptr<AssimpModel3D> shibaModel = ObjectCreation::NewObject<AssimpModel3D>("../Data/Models/Shiba/scene.gltf");
 
 	{
+		eastl::shared_ptr<SquareShape> square = BasicShapes::CreateSquareObject(); 
+		// This can be placed last to get correct draw order but this way it plainly represents the 
+		// problem with drawing transparent objects out of order
+		// Basic Draw Order for transparency should be :
+		// 1. Opaque Objects
+		// 2. Transparent objects drawn in reverse order in relation to the distance from the camera (farthest away is drawn first so that it is included in next one's pass)
+	}
+
+	{
 		eastl::shared_ptr<SquareShape> square = BasicShapes::CreateSquareObject();
-		//centerObj->Move(glm::vec3(0.f, 30.f, 0.f));
+		square->Move(glm::vec3(0.f, 0.f, -3.f));
 	}
 	
 

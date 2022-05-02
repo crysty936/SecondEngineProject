@@ -15,63 +15,95 @@ const uint32_t TriangleIndices[] =
 // Triangle
 
 // Square
+// CCW Vertices with secondary diagonal split drawing
 const float SquareVertices[] = {
  0.5f,  0.5f, 0.0f,  1.f, 1.f, // top right
+-0.5f,  0.5f, 0.0f,  0.f, 1.f,  // top left 
  0.5f, -0.5f, 0.0f,  1.f, 0.f, // bottom right
 -0.5f, -0.5f, 0.0f,  0.f, 0.f, // bottom left
--0.5f,  0.5f, 0.0f,  0.f, 1.f  // top left 
 };
 
 const uint32_t SquareIndices[] = {
-	0, 1, 3,   // first triangle
-	1, 2, 3    // second triangle
+	0, 1, 2,   // first triangle
+	1, 3, 2    // second triangle
 };
+
+// CCW Vertices with main diagonal split drawing
+// const float SquareVertices[] = {
+//  0.5f,  0.5f, 0.0f,  1.f, 1.f, // top right
+// -0.5f, -0.5f, 0.0f,  0.f, 0.f, // bottom left
+//  0.5f, -0.5f, 0.0f,  1.f, 0.f, // bottom right
+// -0.5f,  0.5f, 0.0f,  0.f, 1.f  // top left 
+// };
+// 
+// const uint32_t SquareIndices[] = {
+// 	0, 1, 2,   // first triangle
+// 	1, 0, 3    // second triangle
+// };
+
+
+// CW Vertices with CCW Indexes
+// const float SquareVertices[] = {
+//  0.5f,  0.5f, 0.0f,  1.f, 1.f, // top right
+//  0.5f, -0.5f, 0.0f,  1.f, 0.f, // bottom right
+// -0.5f, -0.5f, 0.0f,  0.f, 0.f, // bottom left
+// -0.5f,  0.5f, 0.0f,  0.f, 1.f  // top left 
+// };
+
+// const uint32_t SquareIndices[] = {
+// 	3, 1, 0,   // first triangle
+// 	3, 2, 1    // second triangle
+//};
 // Square
 
 // Cube
 
+// CCW Cube vertices
+// The vertices are defined as if you would be looking at the cube straight on, for example, the front and back are reversed,
+// the side vertices are defined all on the left plane, with the x stuck to -0.5, is if that plane is perpendicular to the camera and so on
 const float CubeVertices[] = {
-	-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-	 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-	-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-
-	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-	 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-	 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-	 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-	-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-
-	-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-	-0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-	-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-	 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-	 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-	 0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-	 0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-	 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-	 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-
-	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-	-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+    // Back face
+    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f, // bottom-left
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f, // top-right
+     0.5f, -0.5f, -0.5f,  1.0f, 0.0f, // bottom-right         
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f, // top-right
+    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f, // bottom-left
+    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f, // top-left
+    // Front face
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f, // bottom-left
+     0.5f, -0.5f,  0.5f,  1.0f, 0.0f, // bottom-right
+     0.5f,  0.5f,  0.5f,  1.0f, 1.0f, // top-right
+     0.5f,  0.5f,  0.5f,  1.0f, 1.0f, // top-right
+    -0.5f,  0.5f,  0.5f,  0.0f, 1.0f, // top-left
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f, // bottom-left
+    // Left face
+    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f, // top-right
+    -0.5f,  0.5f, -0.5f,  1.0f, 1.0f, // top-left
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f, // bottom-left
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f, // bottom-left
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f, // bottom-right
+    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f, // top-right
+    // Right face
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f, // top-left
+     0.5f, -0.5f, -0.5f,  0.0f, 1.0f, // bottom-right
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f, // top-right         
+     0.5f, -0.5f, -0.5f,  0.0f, 1.0f, // bottom-right
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f, // top-left
+     0.5f, -0.5f,  0.5f,  0.0f, 0.0f, // bottom-left     
+    // Bottom face
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f, // top-right
+     0.5f, -0.5f, -0.5f,  1.0f, 1.0f, // top-left
+     0.5f, -0.5f,  0.5f,  1.0f, 0.0f, // bottom-left
+     0.5f, -0.5f,  0.5f,  1.0f, 0.0f, // bottom-left
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f, // bottom-right
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f, // top-right
+    // Top face
+    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f, // top-left
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f, // bottom-right
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f, // top-right     
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f, // bottom-right
+    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f, // top-left
+    -0.5f,  0.5f,  0.5f,  0.0f, 0.0f  // bottom-left  
 };
 
 // TODO: Add the indices of the cube to get rid of Draw Arrays
