@@ -23,5 +23,5 @@ Instructions:
 4. Open up the solution and set the 3DTest as the start-up project and run.
 
 Requirements:
-Visual Studio - at least version 2019 with C++ Module
-CMake
+- Visual Studio - at least version 2019 with C++ Module
+- CMake
