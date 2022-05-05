@@ -6,7 +6,8 @@ Features:
 - Custom pure C++ Unreal-like delegates implemented using templates.
 - Timers system.
 
-## Libs:
+## 
+Libs:
 - GLFW
 - Glad
 - EASTL
