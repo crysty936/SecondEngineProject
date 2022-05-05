@@ -2,13 +2,12 @@
 A framework I am developing to learn and experiment with Graphics and Engine Architecture.
 
 Features:
-Multithreaded renderer architecture - Command driven renderer, loading assets is done on a different thread, complete separation in plan.
+- Multithreaded renderer architecture - Command driven renderer, loading assets is done on a different thread, complete separation in plan.
+- Custom pure C++ Unreal-like delegates implemented using templates.
+- Timers system.
 
-Custom pure C++ Unreal-like delegates implemented using templates.
-
-Timers system.
-
-## Libs:
+## 
+Libs:
 - GLFW
 - Glad
 - EASTL
@@ -25,3 +24,4 @@ Instructions:
 Requirements:
 - Visual Studio - at least version 2019 with C++ Module
 - CMake
+- Python
