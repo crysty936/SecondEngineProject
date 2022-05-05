@@ -25,3 +25,4 @@ Instructions:
 Requirements:
 - Visual Studio - at least version 2019 with C++ Module
 - CMake
+- Python
