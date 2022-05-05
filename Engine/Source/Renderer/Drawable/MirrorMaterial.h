@@ -3,12 +3,13 @@
 #include "EASTL/string.h"
 #include "Renderer/OpenGL/OpenGLShader.h"
 #include "Renderer/OpenGL/OpenGLTexture.h"
+#include "Renderer/Material/RenderMaterial.h"
 
-class RenderMaterial
+class MirrorMaterial : public RenderMaterial
 {
 public:
-	RenderMaterial();
-	~RenderMaterial();
+	MirrorMaterial();
+	~MirrorMaterial();
 
 	virtual void SetUniforms(const eastl::unordered_map<eastl::string, struct SelfRegisteringUniform>& inUniformsCache);
 

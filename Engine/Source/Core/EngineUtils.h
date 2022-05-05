@@ -18,6 +18,13 @@ __debugbreak();}											\
  return true;												\
   }())														\
 
+#define ASSERT(x)											\
+ {															\
+ if(!(x))													\
+ {	LOG_ERROR("Assertion failed");							\
+	__debugbreak();}										\
+ }															\
+
  #define ENSURE(x)											\
    (!!x) && ([x](){											\
    if(!(x))													\

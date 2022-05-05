@@ -18,6 +18,8 @@
 #include "Renderer/Material/RenderMaterial.h"
 #include "Buffer/VertexArrayObject.h"
 #include "Renderer/Material/MaterialsManager.h"
+#include "Renderer/Drawable/MirrorQuad.h"
+#include "Core/ObjectCreation.h"
 
 OpenGLRenderer* RHI = nullptr;
 static std::mutex RenderCommandsMutex;
@@ -129,10 +131,7 @@ void OpenGLRenderer::Init(const WindowProperties & inDefaultWindowProperties)
 	// Attach the rbo to the framebuffer
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
 
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-	{
-		__debugbreak();
-	}
+	ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 
 	// Bind the default frame buffer
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -162,6 +161,8 @@ void OpenGLRenderer::Init(const WindowProperties & inDefaultWindowProperties)
 
 	RHI->MainQuadShader = eastl::make_unique<OpenGLShader>();
 	*(RHI->MainQuadShader) = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/QuadTexVertexShader.glsl", "../Data/Shaders/QuadTexFragmentShader.glsl");
+	//RHI->MirrorEntity = ObjectCreation::NewObject<MirrorQuad>();
+	RHI->MirrorEntity = eastl::make_shared<class MirrorQuad>();
 }
 
 void OpenGLRenderer::Terminate()
@@ -178,30 +179,36 @@ void OpenGLRenderer::Terminate()
 
 void OpenGLRenderer::Draw()
 {
-	// First draw in the secondary frame buffer
-	glBindFramebuffer(GL_FRAMEBUFFER, FrameBufferHandle);
+// 	// First draw in the secondary frame buffer for the mirror
+// 	glBindFramebuffer(GL_FRAMEBUFFER, FrameBufferHandle);
+// 
+// 	// Set uniforms to quad values
+// 	const glm::mat4 projection = glm::perspective(glm::radians(45.0f), 1.f, 0.1f, 1000.0f);
+// 	UniformsCache["projection"] = projection;
+// 
+// 	const glm::mat4 inverse = glm::inverse(MirrorEntity->GetAbsoluteTransform().GetMatrix());
+// 	UniformsCache["view"] = inverse;
+// 
+ 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+// 	glEnable(GL_DEPTH_TEST);
+// 	DrawCommands();
 
-	SceneManager& sceneMan = SceneManager::Get();
-	Scene& currentScene = sceneMan.GetCurrentScene();
-
+	//SetupBaseUniforms();
 	UpdateUniforms();
 
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-	glEnable(GL_DEPTH_TEST);
+	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	//glDisable(GL_DEPTH_TEST);
+// 	MainQuadShader->Bind();
+// 	MainQuadVAO->Bind();
+	//glBindTexture(GL_TEXTURE_2D, FrameBufferTex->TexHandle);
+	//glDrawElements(GL_TRIANGLES, BasicShapesData::GetQuadIndicesCount(), GL_UNSIGNED_INT, nullptr);
+
+// 	MainQuadVAO->Unbind();
+// 	MainQuadShader->UnBind();
+
+
 	DrawCommands();
 
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	glDisable(GL_DEPTH_TEST);
-
-	MainQuadShader->Bind();
-	MainQuadVAO->Bind();
-	glBindTexture(GL_TEXTURE_2D, FrameBufferTex->TexHandle);
-	glDrawElements(GL_TRIANGLES, BasicShapesData::GetQuadIndicesCount(), GL_UNSIGNED_INT, nullptr);
-
-
-	MainQuadVAO->Unbind();
-	MainQuadShader->UnBind();
 
 	CheckShouldCloseWindow(*MainWindow);
 	glfwSwapBuffers(MainWindow->GetHandle());

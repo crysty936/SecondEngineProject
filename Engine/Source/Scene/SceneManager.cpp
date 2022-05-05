@@ -21,7 +21,7 @@ void SceneManager::LoadScene()
 	Instance->CurrentScene = eastl::make_unique<class Scene>();
 	Instance->CurrentScene->CurrentCamera = eastl::make_shared<Camera>();
 
-	// !Trying to copy the gameplay tactic to see if it works
+	// !Trying to copy the gameplay engine tactic to see if it works
 	EntityPtr CameraParent = eastl::make_shared<Entity>();
 	CameraParent->AddChild(Instance->CurrentScene->CurrentCamera);
 	Instance->CurrentScene->AddObject(CameraParent);

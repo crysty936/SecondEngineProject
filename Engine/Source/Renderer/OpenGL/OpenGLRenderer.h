@@ -70,6 +70,9 @@ public:
 	//************************************
 	bool GetOrCreateVAO(const eastl::string& inVAOId, OUT eastl::shared_ptr<VertexArrayObject>& outVAO);
 
+	eastl::unique_ptr<RenderCommand> MirrorDrawCommand;
+
+
 private:
 	struct GLFWwindow* CreateNewWindowHandle(const WindowProperties& inWindowProperties) const;
 	void CheckShouldCloseWindow(const OpenGLWindow& inWindow);
@@ -86,6 +89,7 @@ private:
 	eastl::unique_ptr<class OpenGLTexture> FrameBufferTex;
 	eastl::unique_ptr<class VertexArrayObject> MainQuadVAO;
 	eastl::unique_ptr<class OpenGLShader> MainQuadShader;
+	eastl::shared_ptr<class MirrorQuad> MirrorEntity;
 };
 
 extern GLFWwindow* LoadingThreadContext;
