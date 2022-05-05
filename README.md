@@ -19,5 +19,5 @@ Timers system.
 Instructions:
 1. Go into one of the Test Projects(Only 3DTest is working at the moment - Flappy Test is based on an older engine version).
 2. Create a "Build" or any name directory for the Solution.
-3. Run CMD into the directory with "cmake ..".
+3. CMD into the new directory and run "cmake ..".
 4. Open up the solution and set the 3DTest as the start-up project and run.
