@@ -113,6 +113,20 @@ void TestGameMode::Init()
 		eastl::shared_ptr<SquareShape> square = BasicShapes::CreateSquareObject();
 		square->Move(glm::vec3(0.f, 0.f, -3.f));
 	}
+
+	// Really slow because each mesh is individual and no batching
+	for (int32_t i = 0; i < 5; ++i)
+	{
+		for (int32_t j = 0; j < 15; j++)
+		{
+			eastl::shared_ptr<AssimpModel3D> model = ObjectCreation::NewObject<AssimpModel3D>("../Data/Models/Backpack/scene.gltf");
+			model->Move(glm::vec3(5.f * j, 5.f * i, 5.f));
+			model->SetScale(glm::vec3(0.01f, 0.01f, 0.01f));
+		}
+	}
+
+
+
 	
 
 }
