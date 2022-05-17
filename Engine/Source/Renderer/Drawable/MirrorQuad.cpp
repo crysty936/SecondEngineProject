@@ -25,8 +25,8 @@ void MirrorQuad::SetupDrawCommands()
 	{
 		// TODO: Buffers creation should be delegated to the renderer
 		IndexBuffer ibo = IndexBuffer{};
-		int32_t indicesCount = BasicShapesData::GetSquareIndicesCount();
-		ibo.SetIndices(BasicShapesData::GetSquareIndices(), indicesCount, GL_STATIC_DRAW);
+		int32_t indicesCount = BasicShapesData::GetQuadIndicesCount();
+		ibo.SetIndices(BasicShapesData::GetQuadIndices(), indicesCount, GL_STATIC_DRAW);
 
 		VertexBufferLayout layout = VertexBufferLayout{};
 		// Vertex points
@@ -35,8 +35,8 @@ void MirrorQuad::SetupDrawCommands()
 		layout.Push<float>(2);
 
 		VertexBuffer vbo = VertexBuffer{ ibo, layout };
-		int32_t verticesCount = BasicShapesData::GetSquareVerticesCount();
-		vbo.SetVertices(BasicShapesData::GetSquareVertices(), verticesCount, GL_STATIC_DRAW);
+		int32_t verticesCount = BasicShapesData::GetQuadVerticesCount();
+		vbo.SetVertices(BasicShapesData::GetQuadVertices(), verticesCount, GL_STATIC_DRAW);
 
 		thisVAO->VBuffer = vbo;
 	}
@@ -50,7 +50,7 @@ void MirrorQuad::SetupDrawCommands()
 	{
 		//OpenGLTexture tex{ texturePath, texureBaseNr + 0 };
 		//cubeMaterial->Textures.push_back(tex);
-		cubeMaterial->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/QuadTexVertexShader.glsl", "../Data/Shaders/QuadTexFragmentShader.glsl");
+		cubeMaterial->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/BasicProjectionVertexShader.glsl", "../Data/Shaders/QuadTexFragmentShader.glsl");
 	}
 
 	RenderCommand newCommand;
@@ -59,9 +59,9 @@ void MirrorQuad::SetupDrawCommands()
 	newCommand.Parent = this_shared(this);
 	newCommand.DrawType = EDrawCallType::DrawElements;
 
-	//RHI->AddCommand(newCommand);
+	RHI->AddMirrorCommand(newCommand);
 
-	RHI->MirrorDrawCommand = eastl::make_unique<RenderCommand>();
-	*(RHI->MirrorDrawCommand) = newCommand;
+// 	RHI->MirrorDrawCommand = eastl::make_unique<RenderCommand>();
+// 	*(RHI->MirrorDrawCommand) = newCommand;
 
 }

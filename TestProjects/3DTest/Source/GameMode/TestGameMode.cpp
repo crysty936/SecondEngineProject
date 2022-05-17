@@ -9,6 +9,7 @@
 #include "Renderer/Model/3D/Assimp/AssimpModel3D.h"
 #include "Renderer/OpenGL/OpenGLRenderer.h"
 #include "Core/ObjectCreation.h"
+#include "Renderer/Drawable/MirrorQuad.h"
 
 TestGameMode GameMode = {};
 
@@ -115,20 +116,25 @@ void TestGameMode::Init()
 	}
 
 	// Really slow because each mesh is individual and no batching
-	for (int32_t i = 0; i < 5; ++i)
+// 	for (int32_t i = 0; i < 5; ++i)
+// 	{
+// 		for (int32_t j = 0; j < 15; j++)
+// 		{
+// 			eastl::shared_ptr<AssimpModel3D> model = ObjectCreation::NewObject<AssimpModel3D>("../Data/Models/Backpack/scene.gltf");
+// 			model->Move(glm::vec3(5.f * j, 5.f * i, 5.f));
+// 			model->SetScale(glm::vec3(0.01f, 0.01f, 0.01f));
+// 		}
+// 	}
+// 
+
+	eastl::shared_ptr<MirrorQuad> mirrorObj = ObjectCreation::NewObject<MirrorQuad>();
+
+	mirrorObj->Move(glm::vec3(0.0f, 0.0f, -10.f));
+
 	{
-		for (int32_t j = 0; j < 15; j++)
-		{
-			eastl::shared_ptr<AssimpModel3D> model = ObjectCreation::NewObject<AssimpModel3D>("../Data/Models/Backpack/scene.gltf");
-			model->Move(glm::vec3(5.f * j, 5.f * i, 5.f));
-			model->SetScale(glm::vec3(0.01f, 0.01f, 0.01f));
-		}
+		eastl::shared_ptr<CubeShape> representedInMirrorCube = BasicShapes::CreateCubeObject();
+		representedInMirrorCube->Move(glm::vec3(0.f, 0.f, -15.f));
 	}
-
-
-
-	
-
 }
 
 void TestGameMode::Tick(float inDeltaT)

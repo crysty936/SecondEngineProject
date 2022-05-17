@@ -21,7 +21,7 @@ namespace OpenGLUtils
 		case GL_DEBUG_SEVERITY_HIGH:
 		{
 			LOG_ERROR("OpenGL Critical Error: %s", inMessage);
-			ASSERT_MSG(0);
+			ASSERT(0);
 			break;
 		}
 

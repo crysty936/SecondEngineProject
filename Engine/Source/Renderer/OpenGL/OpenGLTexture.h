@@ -23,6 +23,8 @@ public:
 	 
 	void DeleteTexture();
 
+	bool operator==(const OpenGLTexture& inOther);
+
 public:
 	eastl::string TexPath{};
 	uint32_t TexHandle{0};

@@ -48,9 +48,10 @@ public:
 	static void Terminate();
 	void Draw();
 
+	void DrawMirrorStuff();
 	void SetupBaseUniforms();
 	void UpdateUniforms();
-	void DrawCommands();
+	void DrawCommands(const eastl::vector<RenderCommand>& inCommands);
 	void DrawCommand(const RenderCommand& inCommand);
 	eastl::shared_ptr<RenderMaterial> GetMaterial(const RenderCommand& inCommand) const;
 	eastl::unique_ptr<OpenGLWindow> CreateWindow(const WindowProperties& inWindowProperties) const;
@@ -70,8 +71,8 @@ public:
 	//************************************
 	bool GetOrCreateVAO(const eastl::string& inVAOId, OUT eastl::shared_ptr<VertexArrayObject>& outVAO);
 
-	eastl::unique_ptr<RenderCommand> MirrorDrawCommand;
-
+	void AddMirrorCommand(const RenderCommand& inCommand);
+	eastl::vector<RenderCommand> MirrorCommands;
 
 private:
 	struct GLFWwindow* CreateNewWindowHandle(const WindowProperties& inWindowProperties) const;
@@ -80,16 +81,16 @@ private:
 private:
 	eastl::unique_ptr<class OpenGLWindow> MainWindow;
 	eastl::unordered_map<eastl::string, SelfRegisteringUniform> UniformsCache;
-	eastl::vector<RenderCommand> Commands;
+	eastl::vector<RenderCommand> MainCommands;
 	EDrawMode DrawMode{ EDrawMode::NORMAL };
 	eastl::queue<RenderingLoadCommand> LoadQueue;
 	eastl::unordered_map<eastl::string, eastl::shared_ptr<class VertexArrayObject>> VAOs;
 
+
+	eastl::unique_ptr<class VertexArrayObject> MainQuadVAO = nullptr;
+	eastl::unique_ptr<class OpenGLShader> MainQuadShader = nullptr;
+	eastl::unique_ptr<class OpenGLTexture> FrameBufferTex = nullptr;
 	uint32_t FrameBufferHandle;
-	eastl::unique_ptr<class OpenGLTexture> FrameBufferTex;
-	eastl::unique_ptr<class VertexArrayObject> MainQuadVAO;
-	eastl::unique_ptr<class OpenGLShader> MainQuadShader;
-	eastl::shared_ptr<class MirrorQuad> MirrorEntity;
 };
 
 extern GLFWwindow* LoadingThreadContext;

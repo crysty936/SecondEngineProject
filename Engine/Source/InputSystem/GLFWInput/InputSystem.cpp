@@ -65,7 +65,7 @@ void InputSystem::Init()
 
 void InputSystem::Terminate()
 {
-	ASSERT_MSG(Instance);
+	ASSERT(Instance);
 
 	delete(Instance);
 }

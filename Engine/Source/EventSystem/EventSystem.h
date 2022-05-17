@@ -159,7 +159,7 @@ private:
  class MulticastDelegate
  {
  	using RetType = void;
- 	using delegateType = Delegate<RetType, inParamTypes...>;
+ 	using DelegateType = Delegate<RetType, inParamTypes...>;
 
 	template<bool isConst, typename inObjType>
 	using MemberFunc = typename MemberFuncPtrType<isConst, inObjType, RetType, inParamTypes...>::Type;
@@ -182,7 +182,7 @@ private:
 
 	void BindStatic(FreeFunctionType inFunc)
 	{
-		delegateType del;
+		DelegateType del;
 
 		new(del) FreeFuncContainerType(inFunc);
 
@@ -192,7 +192,7 @@ private:
 	template<typename inObjType>
 	void BindRaw(inObjType* inObj, MemberFunc<false, inObjType> inMemberFunction)
 	{
-		delegateType del;
+		DelegateType del;
 
 		new(del) MemberFuncContainerType<false, inObjType>(inObj, inMemberFunction);
 
@@ -202,7 +202,7 @@ private:
  	template<typename inObjType>
  	void BindRaw(const inObjType* inObj, MemberFunc<true, inObjType> inMemberFunction)
  	{
- 		delegateType del;
+ 		DelegateType del;
  
  		new(del) MemberFuncContainerType<true, inObjType>(inObj, inMemberFunction);
  
@@ -211,7 +211,7 @@ private:
 
  	void Invoke(inParamTypes... inParams)
  	{
-  		for (const delegateType& del : Delegates)
+  		for (const DelegateType& del : Delegates)
   		{
   			del.Execute(std::forward<inParamTypes>(inParams)...);
   		}
@@ -229,5 +229,5 @@ private:
 	}
 
  private:
- 	eastl::vector<delegateType> Delegates{};
+ 	eastl::vector<DelegateType> Delegates{};
  };

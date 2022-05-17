@@ -17,7 +17,7 @@ struct LayoutProperties
 		{
 		case GL_FLOAT:			return sizeof(float);
 		case GL_UNSIGNED_INT:	return sizeof(unsigned int);
-		default:				ASSERT_MSG(0);
+		default:				ASSERT(0);
 		}
 
 		return 0;

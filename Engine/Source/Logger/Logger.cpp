@@ -13,7 +13,7 @@ Logger::Logger()
 {
 	static bool bLoggerExisting = false;
 
-    ASSERT_MSG(!bLoggerExisting);
+    ASSERT(!bLoggerExisting);
 
 	bLoggerExisting = true;
 
@@ -44,7 +44,7 @@ void Logger::Print(const char* inFormat, Severity inSeverity, ...)
   	va_end(argumentList);
   
     // Means our allocated buffer is not enough, the log to be printed is too big
-    ASSERT_MSG(result != -1);
+    ASSERT(result != -1);
 
     switch (inSeverity)
     {

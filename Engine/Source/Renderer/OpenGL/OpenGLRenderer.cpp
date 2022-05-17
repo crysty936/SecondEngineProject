@@ -55,7 +55,7 @@ OpenGLRenderer::OpenGLRenderer(const WindowProperties& inDefaultWindowProperties
 {
 	const bool glfwSuccess = glfwInit() == GLFW_TRUE;
 
-	ASSERT_MSG(glfwSuccess);
+	ASSERT(glfwSuccess);
 
 	glfwSetErrorCallback(OpenGLUtils::GLFWErrorCallback);
 
@@ -69,7 +69,7 @@ OpenGLRenderer::OpenGLRenderer(const WindowProperties& inDefaultWindowProperties
 	GLFWwindow* mainWindowHandle = MainWindow->GetHandle();
 	glfwMakeContextCurrent(mainWindowHandle);
 	glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
-	GLFWwindow* loadingThreadContext = glfwCreateWindow(640, 480, "Loading Thread Window", NULL, mainWindowHandle);
+	GLFWwindow* loadingThreadContext = glfwCreateWindow(640, 480, "Loading Thread Window", nullptr, mainWindowHandle);
 
 	const bool gladSuccess = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress) == GLFW_TRUE;
 	glfwSetInputMode(mainWindowHandle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -116,7 +116,6 @@ void OpenGLRenderer::Init(const WindowProperties & inDefaultWindowProperties)
 
 	// Create the texture which will be used as output for the frame buffer
 	RHI->FrameBufferTex = eastl::make_unique<OpenGLTexture>();
-
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, RHI->FrameBufferTex->TexHandle, 0);
 
 	const WindowProperties& windowProps = RHI->MainWindow->GetProperties();
@@ -136,9 +135,6 @@ void OpenGLRenderer::Init(const WindowProperties & inDefaultWindowProperties)
 	// Bind the default frame buffer
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	// Create the Quad used to draw the framebuffer
-	// TODO: Create a specialized class for the Quad
-
 	RHI->MainQuadVAO = eastl::make_unique<VertexArrayObject>();
 
 	IndexBuffer ibo = IndexBuffer{};
@@ -155,14 +151,13 @@ void OpenGLRenderer::Init(const WindowProperties & inDefaultWindowProperties)
 	int32_t verticesCount = BasicShapesData::GetQuadVerticesCount();
 	vbo.SetVertices(BasicShapesData::GetQuadVertices(), verticesCount, GL_STATIC_DRAW);
 
+
 	RHI->MainQuadVAO->VBuffer = vbo;
 
 	RHI->MainQuadVAO->SetupState();
 
 	RHI->MainQuadShader = eastl::make_unique<OpenGLShader>();
 	*(RHI->MainQuadShader) = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/QuadTexVertexShader.glsl", "../Data/Shaders/QuadTexFragmentShader.glsl");
-	//RHI->MirrorEntity = ObjectCreation::NewObject<MirrorQuad>();
-	RHI->MirrorEntity = eastl::make_shared<class MirrorQuad>();
 }
 
 void OpenGLRenderer::Terminate()
@@ -173,50 +168,74 @@ void OpenGLRenderer::Terminate()
 	glDeleteBuffers(1, &RHI->FrameBufferHandle);
 
 
-	ASSERT_MSG(RHI);
+	ASSERT(RHI);
 	delete RHI;
 }
 
 void OpenGLRenderer::Draw()
 {
-// 	// First draw in the secondary frame buffer for the mirror
-// 	glBindFramebuffer(GL_FRAMEBUFFER, FrameBufferHandle);
-// 
-// 	// Set uniforms to quad values
-// 	const glm::mat4 projection = glm::perspective(glm::radians(45.0f), 1.f, 0.1f, 1000.0f);
-// 	UniformsCache["projection"] = projection;
-// 
-// 	const glm::mat4 inverse = glm::inverse(MirrorEntity->GetAbsoluteTransform().GetMatrix());
-// 	UniformsCache["view"] = inverse;
-// 
+ 	//DrawMirrorStuff();
+ 	glBindFramebuffer(GL_FRAMEBUFFER, FrameBufferHandle);
+ 	UpdateUniforms();
  	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-// 	glEnable(GL_DEPTH_TEST);
-// 	DrawCommands();
+ 	glEnable(GL_DEPTH_TEST);
+ 	DrawCommands(MainCommands);
+ 
+	for (const RenderCommand& mirrorCommand : MirrorCommands)
+	{
+		mirrorCommand.Material->Textures.push_back(*FrameBufferTex);
+	}
 
-	//SetupBaseUniforms();
-	UpdateUniforms();
+ 	//SetupBaseUniforms();
+ 
+ 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+ 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+ 
+ 	//glDisable(GL_DEPTH_TEST);
+	DrawCommands(MainCommands);
+ 	DrawCommands(MirrorCommands);
+// 
+//     MainQuadShader->Bind();
+//     MainQuadVAO->Bind();
+//     glBindTexture(GL_TEXTURE_2D, FrameBufferTex->TexHandle);
+//     glDrawElements(GL_TRIANGLES, BasicShapesData::GetQuadIndicesCount(), GL_UNSIGNED_INT, nullptr);
+//     
+//     MainQuadVAO->Unbind();
+//     MainQuadShader->UnBind();
 
-	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	//glDisable(GL_DEPTH_TEST);
-// 	MainQuadShader->Bind();
-// 	MainQuadVAO->Bind();
-	//glBindTexture(GL_TEXTURE_2D, FrameBufferTex->TexHandle);
-	//glDrawElements(GL_TRIANGLES, BasicShapesData::GetQuadIndicesCount(), GL_UNSIGNED_INT, nullptr);
+ 	CheckShouldCloseWindow(*MainWindow);
+ 	glfwSwapBuffers(MainWindow->GetHandle());
+}
 
-// 	MainQuadVAO->Unbind();
-// 	MainQuadShader->UnBind();
+void OpenGLRenderer::DrawMirrorStuff()
+{
+	// First draw in the secondary frame buffer for the mirror
+	glBindFramebuffer(GL_FRAMEBUFFER, FrameBufferHandle);
 
+	for (const RenderCommand& mirrorCommand : MirrorCommands)
+	{
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-	DrawCommands();
+// 		OpenGLTexture tex;
+// 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex.TexHandle, 0);
 
+//  		const glm::mat4 projection = glm::perspective(glm::radians(45.0f), 1.f, 0.1f, 1000.0f);
+//  		UniformsCache["projection"] = projection;
+//  
+//  		const eastl::shared_ptr<const DrawableObject> parent = mirrorCommand.Parent.lock();
+//  
+//  		const glm::mat4 inverse = glm::inverse(parent->GetAbsoluteTransform().GetMatrix());
+//  		UniformsCache["view"] = inverse;
 
-	CheckShouldCloseWindow(*MainWindow);
-	glfwSwapBuffers(MainWindow->GetHandle());
+		DrawCommands(MainCommands);
+
+		mirrorCommand.Material->Textures.push_back(*FrameBufferTex);
+	}
 }
 
 void OpenGLRenderer::SetupBaseUniforms()
 {
-	const glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)MainWindow->GetProperties().Width / (float)MainWindow->GetProperties().Height, 0.1f, 1000.0f);
+	const glm::mat4 projection = glm::perspective(glm::radians(45.0f), static_cast<float>(MainWindow->GetProperties().Width) / static_cast<float>(MainWindow->GetProperties().Height), 0.1f, 1000.0f);
 	UniformsCache["projection"] = projection;
 }
 
@@ -226,11 +245,11 @@ void OpenGLRenderer::UpdateUniforms()
 	UniformsCache["view"] = view;
 }
 
-void OpenGLRenderer::DrawCommands()
+void OpenGLRenderer::DrawCommands(const eastl::vector<RenderCommand>& inCommands)
 {
 	RenderCommandsMutex.lock();
 
-	for (const RenderCommand& renderCommand : Commands)
+	for (const RenderCommand& renderCommand : inCommands)
 	{
 		const bool parentValid = !renderCommand.Parent.expired();
 		if (!ENSURE(parentValid))
@@ -358,16 +377,22 @@ void OpenGLRenderer::SetVSyncEnabled(const bool inEnabled)
 	glfwSwapInterval(inEnabled);
 }
 
+void OpenGLRenderer::AddMirrorCommand(const RenderCommand& inCommand)
+{
+	std::lock_guard<std::mutex> lock(RenderCommandsMutex);
+	MirrorCommands.push_back(inCommand);
+}
+
 void OpenGLRenderer::AddCommand(const RenderCommand & inCommand)
 {
 	std::lock_guard<std::mutex> lock(RenderCommandsMutex);
-	Commands.push_back(inCommand);
+	MainCommands.push_back(inCommand);
 }
 
 void OpenGLRenderer::AddCommands(eastl::vector<RenderCommand> inCommands)
 {
 	std::lock_guard<std::mutex> lock(RenderCommandsMutex);
-	Commands.insert(Commands.end(), inCommands.begin(), inCommands.end());
+	MainCommands.insert(MainCommands.end(), inCommands.begin(), inCommands.end());
 }
 
 void OpenGLRenderer::AddRenderLoadCommand(const RenderingLoadCommand & inCommand)
@@ -380,7 +405,7 @@ void OpenGLRenderer::AddRenderLoadCommand(const RenderingLoadCommand & inCommand
 
 bool OpenGLRenderer::GetOrCreateVAO(const eastl::string & inVAOId, OUT eastl::shared_ptr<VertexArrayObject>&outVAO)
 {
-	ASSERT_MSG(!inVAOId.empty());
+	ASSERT(!inVAOId.empty());
 	std::lock_guard<std::mutex> uniqueMutex(GetVAOMutex);
 	//GetVAOMutex.lock(); // TODO: Why does this not work?
 

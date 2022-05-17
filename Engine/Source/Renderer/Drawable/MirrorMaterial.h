@@ -12,9 +12,4 @@ public:
 	~MirrorMaterial();
 
 	virtual void SetUniforms(const eastl::unordered_map<eastl::string, struct SelfRegisteringUniform>& inUniformsCache);
-
-public:
-	eastl::vector<eastl::string> RequiredUniforms;
-	OpenGLShader Shader;
-	eastl::vector<OpenGLTexture> Textures;
 };

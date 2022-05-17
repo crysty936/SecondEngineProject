@@ -5,7 +5,7 @@ GameModeBase* GameModeBase::GameMode = nullptr;
 
 GameModeBase::GameModeBase()
 {
-	ASSERT_MSG(!GameMode);
+	ASSERT(!GameMode);
 
 	GameMode = this;
 }

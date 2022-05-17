@@ -762,7 +762,9 @@ namespace eastl
 		///    int x = *ptr;
 		reference_type operator*() const EA_NOEXCEPT
 		{
-			return *mpValue;
+			// Begin: Lib Modification
+			return *get();
+			// End: LibModification
 		}
 
 		/// operator->
@@ -803,6 +805,11 @@ namespace eastl
 		///    pX->DoSomething();
 		element_type* get() const EA_NOEXCEPT
 		{
+			// Begin: Lib Modification
+			// Assert to catch this sooner and not return a useless value
+			EASTL_ASSERT(mpValue);
+			// End: LibModification
+
 			return mpValue;
 		}
 

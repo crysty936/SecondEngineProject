@@ -9,17 +9,24 @@ OpenGLTexture::OpenGLTexture(const eastl::string& inTexturePath, int32_t inTexNr
 	Init(inTexturePath);
 }
 
-// Create an texture buffer
+// Create a texture buffer
 OpenGLTexture::OpenGLTexture()
 {
+	TexNr = GL_TEXTURE0;
 	glGenTextures(1, &TexHandle);
 	glBindTexture(GL_TEXTURE_2D, TexHandle);
 
 	const WindowProperties& windowProps = RHI->GetMainWindow().GetProperties();
 
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, windowProps.Width, windowProps.Height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+	
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	// Clamp setting
+ 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+ 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 OpenGLTexture::~OpenGLTexture() = default;
@@ -81,7 +88,7 @@ void OpenGLTexture::Bind() const
 // 
 // 	}
 
-	ASSERT_MSG(TexNr != 0);
+	ASSERT(TexNr != 0);
 
 	glActiveTexture(TexNr);
 	glBindTexture(GL_TEXTURE_2D, TexHandle);
@@ -101,4 +108,9 @@ void OpenGLTexture::Unbind() const
 void OpenGLTexture::DeleteTexture()
 {
 	glDeleteTextures(1, &TexHandle);
+}
+
+bool OpenGLTexture::operator==(const OpenGLTexture& inOther)
+{
+	return inOther.TexHandle == this->TexHandle;
 }

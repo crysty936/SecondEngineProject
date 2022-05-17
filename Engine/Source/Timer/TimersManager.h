@@ -9,7 +9,7 @@ class TimersManager
 public:
 	static void Init();
 	static void Terminate();
-	static inline TimersManager& Get() { ASSERT_MSG(Instance); return *Instance; }
+	static inline TimersManager& Get() { ASSERT(Instance); return *Instance; }
 
 public:
 	void AddTimer(eastl::shared_ptr<TimerBase> inTimer);

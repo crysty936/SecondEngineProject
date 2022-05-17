@@ -42,7 +42,7 @@ void VertexArrayObject::SetupState() const
 
 void VertexArrayObject::Bind() const
 {
-	ASSERT_MSG(Handle != 0);
+	ASSERT(Handle != 0);
 
 	glBindVertexArray(Handle);
 }
