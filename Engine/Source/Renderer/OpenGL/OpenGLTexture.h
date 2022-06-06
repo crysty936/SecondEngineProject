@@ -2,18 +2,27 @@
 #include "EASTL/string.h"
 #include <stdint.h>
 
-enum class TextureType
+enum class TextureType : uint8_t
 {
 	Diffuse,
 	Specular
 };
 
+/**
+ * Texture wrapper class for OpenGl functionality
+ * Creates and initializes texture in constructor and deletes in destructor
+ * Textures should always be moved unless purposely cached!
+ */
 class OpenGLTexture
 {
 public:
-	OpenGLTexture(const eastl::string& inTexturePath, int32_t inTexNr);
 	OpenGLTexture();
 	~OpenGLTexture();
+	OpenGLTexture(const eastl::string& inTexturePath, int32_t inTexNr);
+	OpenGLTexture(const OpenGLTexture& inOther) = default;
+	OpenGLTexture(OpenGLTexture&& inOther);
+	OpenGLTexture& operator=(const OpenGLTexture& inOther) = default;
+	OpenGLTexture& operator=(OpenGLTexture&& inOther) = default;
 
 	// Lazy initialization
 	void Init(const eastl::string& inTexturePath);

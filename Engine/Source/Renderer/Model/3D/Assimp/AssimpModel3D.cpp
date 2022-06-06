@@ -230,13 +230,13 @@ eastl::vector<OpenGLTexture> AssimpModel3DLoader::LoadMaterialTextures(const aiM
 			LoadedTextures.push_back(tex);
 		}
 
-		textures.push_back(tex);
+		textures.push_back(std::move(tex));
 	}
 
 	return textures;
 }
 
-bool AssimpModel3DLoader::IsTextureLoaded(const eastl::string & inTexPath, OUT OpenGLTexture & outTex)
+bool AssimpModel3DLoader::IsTextureLoaded(const eastl::string & inTexPath, OUT OpenGLTexture& outTex)
 {
 	for (const OpenGLTexture& loadedTexture : LoadedTextures)
 	{

@@ -66,6 +66,8 @@ void Logger::Print(const char* inFormat, Severity inSeverity, ...)
     }
 
     std::cout << stackArray << std::endl;
+
+	WindowsPlatform::SetCLITextColor(CLITextColor::White);
 }
 
 Logger Logger::Instance;

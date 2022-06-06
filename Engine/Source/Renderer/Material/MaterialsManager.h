@@ -18,7 +18,7 @@ public:
 
 public:
 	// TODO: This should preferrably be removed, materials should only be added by the Asset Manager at startup once deserialization is done
-	eastl::shared_ptr<class RenderMaterial> GetOrAddMaterial(const eastl::string inMaterialID, OUT bool& outAlreadyExists);
+	eastl::shared_ptr<class RenderMaterial> GetOrAddMaterial(const eastl::string& inMaterialID, OUT bool& outAlreadyExists);
 
 private:
 	eastl::unordered_map<eastl::string, eastl::shared_ptr<class RenderMaterial>> LoadedMaterials{};

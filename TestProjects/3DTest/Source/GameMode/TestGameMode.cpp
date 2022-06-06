@@ -78,9 +78,13 @@ void TestGameMode::Init()
 		parentShared->Move(glm::vec3(0.f, 0.f, 10.f));
 	}
 
-	// 	{
-	// 		eastl::shared_ptr<CubeShape> centerObj = BasicShapes::CreateCubeObject();
-	// 	}
+	// Ground
+ 	{
+ 	 	eastl::shared_ptr<CubeShape> centerObj = BasicShapes::CreateCubeObject();
+ 		centerObj->Move(glm::vec3(0.f, -2.f, 0.f));
+ 		centerObj->SetScale(glm::vec3(100.f, 0.5f, 100.f));
+ 
+ 	}
 	{
 		eastl::shared_ptr<CubeShape> centerObj = BasicShapes::CreateCubeObject();
 		centerObj->Move(glm::vec3(0.f, 10.f, 0.f));
@@ -126,11 +130,16 @@ void TestGameMode::Init()
 // 		}
 // 	}
 // 
+	{
+		eastl::shared_ptr<MirrorQuad> mirrorObj = ObjectCreation::NewObject<MirrorQuad>();
 
-	eastl::shared_ptr<MirrorQuad> mirrorObj = ObjectCreation::NewObject<MirrorQuad>();
-
-	mirrorObj->Move(glm::vec3(0.0f, 0.0f, -10.f));
-
+		mirrorObj->Move(glm::vec3(0.0f, 0.0f, -10.f));
+	}
+ 	{
+ 		eastl::shared_ptr<MirrorQuad> mirrorObj = ObjectCreation::NewObject<MirrorQuad>();
+ 
+ 		mirrorObj->Move(glm::vec3(5.0f, 0.0f, -20.f));
+ 	}
 	{
 		eastl::shared_ptr<CubeShape> representedInMirrorCube = BasicShapes::CreateCubeObject();
 		representedInMirrorCube->Move(glm::vec3(0.f, 0.f, -15.f));

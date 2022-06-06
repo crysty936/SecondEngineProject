@@ -45,7 +45,7 @@ eastl::shared_ptr<RenderMaterial>& MaterialsManager::GetMaterial(const eastl::st
 	return foundMaterial;
 }
 
-eastl::shared_ptr<RenderMaterial> MaterialsManager::GetOrAddMaterial(const eastl::string inMaterialID, OUT bool& outAlreadyExists)
+eastl::shared_ptr<RenderMaterial> MaterialsManager::GetOrAddMaterial(const eastl::string& inMaterialID, OUT bool& outAlreadyExists)
 {
 	std::lock_guard<std::mutex> lock(MaterialsMutex);
 

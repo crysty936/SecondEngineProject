@@ -90,7 +90,7 @@ void SquareShape::SetupDrawCommands()
 	if (!materialExists)
 	{
 		OpenGLTexture tex{ texturePath, texureBaseNr + 0 };
-		cubeMaterial->Textures.push_back(tex);
+		cubeMaterial->Textures.push_back(std::move(tex));
 		cubeMaterial->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/BasicProjectionVertexShader.glsl", "../Data/Shaders/BasicTexFragmentShader.glsl");
 	}
 
@@ -159,7 +159,7 @@ void CubeShape::SetupDrawCommands()
 	if (!materialExists)
 	{
 		OpenGLTexture tex{ texturePath, texureBaseNr + 0 };
-		cubeMaterial->Textures.push_back(tex);
+		cubeMaterial->Textures.push_back(std::move(tex));
 		cubeMaterial->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/BasicProjectionVertexShader.glsl", "../Data/Shaders/BasicTexFragmentShader.glsl");
 	}
 

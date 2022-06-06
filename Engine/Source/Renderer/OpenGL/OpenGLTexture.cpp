@@ -9,6 +9,11 @@ OpenGLTexture::OpenGLTexture(const eastl::string& inTexturePath, int32_t inTexNr
 	Init(inTexturePath);
 }
 
+OpenGLTexture::~OpenGLTexture()
+{
+	DeleteTexture();
+}
+
 // Create a texture buffer
 OpenGLTexture::OpenGLTexture()
 {
@@ -29,7 +34,14 @@ OpenGLTexture::OpenGLTexture()
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
-OpenGLTexture::~OpenGLTexture() = default;
+
+  OpenGLTexture::OpenGLTexture(OpenGLTexture&& inOther)
+  	: TexHandle{inOther.TexHandle}, NrChannels{inOther.NrChannels}, TexPath{std::move(inOther.TexPath)}, TexNr{inOther.TexNr}, TexType{inOther.TexType}
+  {
+	  inOther.TexHandle = -1;
+	  inOther.NrChannels = -1;
+	  inOther.TexNr = -1;
+  }
 
 void OpenGLTexture::Init(const eastl::string & inTexturePath)
 {
@@ -107,7 +119,10 @@ void OpenGLTexture::Unbind() const
 
 void OpenGLTexture::DeleteTexture()
 {
-	glDeleteTextures(1, &TexHandle);
+	if (TexHandle != -1)
+	{
+		glDeleteTextures(1, &TexHandle);
+	}
 }
 
 bool OpenGLTexture::operator==(const OpenGLTexture& inOther)

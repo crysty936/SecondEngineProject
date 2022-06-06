@@ -53,8 +53,6 @@ target_include_directories(SecondEngineProject PUBLIC
 # Stop it from creating unnecessary Project
 set(CMAKE_SUPPRESS_REGENERATION true)
 
-
-
 # GTest done so that it can be used with lib and .exe by creating a copy of the original project, without the main
 
 # Build with MDd

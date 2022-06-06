@@ -27,6 +27,8 @@ static std::mutex LoadQueueMutex;
 static std::mutex GetVAOMutex;
 static std::condition_variable LoadQueueCondition;
 
+constexpr glm::vec4 ClearColor(0.3f, 0.5f, 1.f, 0.4f);
+
 void LoaderFunc(GLFWwindow* inLoadingThreadContext)
 {
 	while (Engine->IsRunning())
@@ -64,12 +66,11 @@ OpenGLRenderer::OpenGLRenderer(const WindowProperties& inDefaultWindowProperties
 	// Create new Window for data holding
 	MainWindow = CreateWindow(inDefaultWindowProperties);
 
-
 	// Set Context
 	GLFWwindow* mainWindowHandle = MainWindow->GetHandle();
 	glfwMakeContextCurrent(mainWindowHandle);
 	glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
-	GLFWwindow* loadingThreadContext = glfwCreateWindow(640, 480, "Loading Thread Window", nullptr, mainWindowHandle);
+	GLFWwindow* loadingThreadContext = glfwCreateWindow(1, 1, "Loading Thread Window", nullptr, mainWindowHandle);
 
 	const bool gladSuccess = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress) == GLFW_TRUE;
 	glfwSetInputMode(mainWindowHandle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -91,8 +92,7 @@ OpenGLRenderer::OpenGLRenderer(const WindowProperties& inDefaultWindowProperties
 	glEnable(GL_CULL_FACE);
 
 	glDebugMessageCallback(OpenGLUtils::GLDebugCallback, nullptr);
-	constexpr glm::vec4 clearColor(0.3f, 0.5f, 1.f, 0.4f);
-	glClearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w);
+	glClearColor(ClearColor.x, ClearColor.y, ClearColor.z, ClearColor.w);
 
 	// Set the default uniforms
 	SetupBaseUniforms();
@@ -114,16 +114,13 @@ void OpenGLRenderer::Init(const WindowProperties & inDefaultWindowProperties)
 
 	glBindFramebuffer(GL_FRAMEBUFFER, RHI->FrameBufferHandle);
 
-	// Create the texture which will be used as output for the frame buffer
-	RHI->FrameBufferTex = eastl::make_unique<OpenGLTexture>();
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, RHI->FrameBufferTex->TexHandle, 0);
-
 	const WindowProperties& windowProps = RHI->MainWindow->GetProperties();
 
 	// Create a stencil and depth render buffer object for the frame buffer
 	uint32_t rbo; // render buffer object
 	glGenRenderbuffers(1, &rbo);
 	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+	glClearColor(ClearColor.x, ClearColor.y, ClearColor.z, ClearColor.w);
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, windowProps.Width, windowProps.Height);
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
@@ -134,30 +131,6 @@ void OpenGLRenderer::Init(const WindowProperties & inDefaultWindowProperties)
 
 	// Bind the default frame buffer
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	RHI->MainQuadVAO = eastl::make_unique<VertexArrayObject>();
-
-	IndexBuffer ibo = IndexBuffer{};
-	int32_t indicesCount = BasicShapesData::GetQuadIndicesCount();
-	ibo.SetIndices(BasicShapesData::GetQuadIndices(), indicesCount, GL_STATIC_DRAW);
-
-	VertexBufferLayout layout = VertexBufferLayout{};
-	// Vertex points
-	layout.Push<float>(3);
-	// Vertex Tex Coords
-	layout.Push<float>(2);
-
-	VertexBuffer vbo = VertexBuffer{ ibo, layout };
-	int32_t verticesCount = BasicShapesData::GetQuadVerticesCount();
-	vbo.SetVertices(BasicShapesData::GetQuadVertices(), verticesCount, GL_STATIC_DRAW);
-
-
-	RHI->MainQuadVAO->VBuffer = vbo;
-
-	RHI->MainQuadVAO->SetupState();
-
-	RHI->MainQuadShader = eastl::make_unique<OpenGLShader>();
-	*(RHI->MainQuadShader) = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/QuadTexVertexShader.glsl", "../Data/Shaders/QuadTexFragmentShader.glsl");
 }
 
 void OpenGLRenderer::Terminate()
@@ -174,34 +147,15 @@ void OpenGLRenderer::Terminate()
 
 void OpenGLRenderer::Draw()
 {
- 	//DrawMirrorStuff();
- 	glBindFramebuffer(GL_FRAMEBUFFER, FrameBufferHandle);
- 	UpdateUniforms();
- 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
- 	glEnable(GL_DEPTH_TEST);
- 	DrawCommands(MainCommands);
- 
-	for (const RenderCommand& mirrorCommand : MirrorCommands)
-	{
-		mirrorCommand.Material->Textures.push_back(*FrameBufferTex);
-	}
+ 	DrawMirrorStuff();
 
- 	//SetupBaseUniforms();
- 
  	glBindFramebuffer(GL_FRAMEBUFFER, 0);
  	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+ 	SetupBaseUniforms();
+ 	UpdateUniforms();
  
- 	//glDisable(GL_DEPTH_TEST);
 	DrawCommands(MainCommands);
  	DrawCommands(MirrorCommands);
-// 
-//     MainQuadShader->Bind();
-//     MainQuadVAO->Bind();
-//     glBindTexture(GL_TEXTURE_2D, FrameBufferTex->TexHandle);
-//     glDrawElements(GL_TRIANGLES, BasicShapesData::GetQuadIndicesCount(), GL_UNSIGNED_INT, nullptr);
-//     
-//     MainQuadVAO->Unbind();
-//     MainQuadShader->UnBind();
 
  	CheckShouldCloseWindow(*MainWindow);
  	glfwSwapBuffers(MainWindow->GetHandle());
@@ -214,22 +168,34 @@ void OpenGLRenderer::DrawMirrorStuff()
 
 	for (const RenderCommand& mirrorCommand : MirrorCommands)
 	{
+		// Clear the FBO
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+		//const OpenGLTexture& tex = mirrorCommand.Material->Textures[0];
+		OpenGLTexture tex;
+		// Attach the texture to the FBO
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex.TexHandle, 0);
+		// Set the color in the texture to ClearColor
+		glClearTexImage(tex.TexHandle, 0, GL_RGBA, GL_FLOAT, &ClearColor);
 
-// 		OpenGLTexture tex;
-// 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex.TexHandle, 0);
-
-//  		const glm::mat4 projection = glm::perspective(glm::radians(45.0f), 1.f, 0.1f, 1000.0f);
-//  		UniformsCache["projection"] = projection;
-//  
-//  		const eastl::shared_ptr<const DrawableObject> parent = mirrorCommand.Parent.lock();
-//  
-//  		const glm::mat4 inverse = glm::inverse(parent->GetAbsoluteTransform().GetMatrix());
-//  		UniformsCache["view"] = inverse;
+		// Set the mirror projection and view uniforms
+ 		const glm::mat4 projection = glm::perspective(glm::radians(45.0f), 1.f, 0.1f, 1000.0f);
+ 		UniformsCache["projection"] = projection;
+ 
+ 		const eastl::shared_ptr<const DrawableObject> parent = mirrorCommand.Parent.lock();
+ 		const glm::mat4 inverse = glm::inverse(parent->GetAbsoluteTransform().GetMatrix());
+ 		UniformsCache["view"] = inverse;
 
 		DrawCommands(MainCommands);
 
-		mirrorCommand.Material->Textures.push_back(*FrameBufferTex);
+		if (!mirrorCommand.Material->Textures.empty())
+		{
+			mirrorCommand.Material->Textures.pop_back();
+		}
+
+		mirrorCommand.Material->Textures.push_back(std::move(tex));
+
+		// Detach the current texture from the buffer
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0);
 	}
 }
 

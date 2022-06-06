@@ -1,19 +1,20 @@
 #pragma once
 #include "Logger/Logger.h"
+#include <stdlib.h>
 
 
 #ifndef NDEBUG
-#define ASSERT_MSG(x, inMessage, ...)									\
+#define ASSERT_MSG(x, inMessage, ...)						\
  {															\
  if(!(x))													\
- {LOG_ERROR(inMessage, __VA_ARGS__);			\
-__debugbreak();}											\
+ {LOG_ERROR(inMessage, __VA_ARGS__);						\
+__debugbreak(); exit(-1);}									\
  }
 
-#define ENSURE_MSG(x, inMessage, ...)									\
+#define ENSURE_MSG(x, inMessage, ...)						\
   (!!x) && ([x](){											\
   if(!(x))													\
-  {LOG_ERROR(inMessage, __VA_ARGS__);			\
+  {LOG_ERROR(inMessage, __VA_ARGS__);						\
  __debugbreak();}											\
  return true;												\
   }())														\
@@ -21,8 +22,8 @@ __debugbreak();}											\
 #define ASSERT(x)											\
  {															\
  if(!(x))													\
- {	LOG_ERROR("Assertion failed");							\
-	__debugbreak();}										\
+ {															\
+	__debugbreak(); exit(-1);}								\
  }															\
 
  #define ENSURE(x)											\
