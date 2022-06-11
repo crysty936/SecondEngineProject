@@ -90,6 +90,6 @@ gtest_discover_tests(EngineTests)
 
 
 # Group Plugins in a separate folder
-set_target_properties(	glfw glad EASTL assimp gtest gtest_main EngineTests
+set_target_properties(	glfw glad EASTL assimp gtest gtest_main EngineTests EAStdC EAAssert EAThread
 						PROPERTIES
 						FOLDER "Plugins")		  

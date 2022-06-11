@@ -60,7 +60,13 @@ if (NOT TARGET EABase)
     add_subdirectory(test/packages/EABase)
 endif()
 
-add_subdirectory(test/packages/EAStdC)
 target_link_libraries(EASTL EABase)
-target_link_libraries(EASTL EAStdC)
 
+# Additional includes necessary for different functionalities
+add_subdirectory(test/packages/EAStdC)
+add_subdirectory(test/packages/EAAssert)
+add_subdirectory(test/packages/EAThread)
+
+target_link_libraries(EASTL EAStdC)
+target_link_libraries(EASTL EAAssert)
+target_link_libraries(EASTL EAThread)

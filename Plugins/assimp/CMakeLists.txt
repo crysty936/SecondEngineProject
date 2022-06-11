@@ -473,7 +473,6 @@ ENDIF()
 # Search for external dependencies, and build them from source if not found
 # Search for zlib
 IF(ASSIMP_HUNTER_ENABLED)
-  message(WARNING "Enters Hunter Enabled")
   hunter_add_package(ZLIB)
   find_package(ZLIB CONFIG REQUIRED)
 
@@ -482,7 +481,6 @@ IF(ASSIMP_HUNTER_ENABLED)
   set(ZLIB_LIBRARIES ZLIB::zlib)
   set(ASSIMP_BUILD_MINIZIP TRUE)
 ELSE()
-message(WARNING "Enters Else Hunter Enabled")
   # If the zlib is already found outside, add an export in case assimpTargets can't find it.
   IF( ZLIB_FOUND )
   message(WARNING "ZLib found")
@@ -491,7 +489,6 @@ message(WARNING "Enters Else Hunter Enabled")
   ENDIF()
 
   IF ( NOT ASSIMP_BUILD_ZLIB )
-   message(WARNING "Enters finding zlib")
     FIND_PACKAGE(ZLIB)
   ENDIF()
 

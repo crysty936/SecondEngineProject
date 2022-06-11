@@ -14,8 +14,7 @@
 TestGameMode GameMode = {};
 
 TestGameMode::TestGameMode()
-	:
-	GameModeBase()
+	: GameModeBase()
 {
 }
 
