@@ -1,10 +1,11 @@
 #version 330 core 
+#extension GL_ARB_separate_shader_objects : enable
 layout(location = 0) out vec4 FragColor;
-in vec2 outTexCoords;
+layout(location = 0) in vec2 TexCoords;
 
 uniform sampler2D tex1;
 
 void main()
 {
-	FragColor = texture(tex1, outTexCoords);
+	FragColor = texture(tex1, TexCoords);
 }

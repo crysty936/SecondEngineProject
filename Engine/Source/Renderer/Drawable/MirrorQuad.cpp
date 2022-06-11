@@ -1,12 +1,11 @@
 #include "Renderer/Drawable/MirrorQuad.h"
-#include "Renderer/ShapesUtils/BasicShapesData.h"
+#include "Renderer/Drawable/ShapesUtils/BasicShapesData.h"
 #include "Renderer/OpenGL/Buffer/IndexBuffer.h"
 #include "Renderer/OpenGL/Buffer/VertexBufferLayout.h"
 #include "Renderer/OpenGL/Buffer/VertexBuffer.h"
 #include "Renderer/OpenGL/Buffer/VertexArrayObject.h"
 #include "Renderer/OpenGL/OpenGLShader.h"
 #include "Renderer/OpenGL/OpenGLTexture.h"
-#include "Renderer/Model/3D/Mesh3D.h"
 #include "Renderer/Material/MaterialsManager.h"
 #include "Renderer/OpenGL/RenderCommand.h"
 #include "Renderer/OpenGL/OpenGLRenderer.h"
@@ -40,15 +39,10 @@ void MirrorQuad::SetupDrawCommands()
 
 		thisVAO->VBuffer = vbo;
 	}
-
-	//const int32_t foo = 0b10000000000010000000000000000000;
-	//const int32_t bar = foo >> 10;
-
-
 	// Mirrors have to have unique materials
 	static int mirrorNr = 0;
-	//const eastl::string mirrorMaterialName(eastl::string::CtorSprintf{}, "mirror_material_%d", ++mirrorNr);
-	const eastl::string mirrorMaterialName("test");
+	const eastl::string mirrorMaterialName(eastl::string::CtorSprintf{}, "mirror_material_%d", ++mirrorNr);
+	//const eastl::string mirrorMaterialName("test");
 
 	MaterialsManager& matManager = MaterialsManager::Get();
 	bool materialExists = false;

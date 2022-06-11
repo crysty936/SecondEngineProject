@@ -147,7 +147,7 @@ void OpenGLRenderer::Terminate()
 
 void OpenGLRenderer::Draw()
 {
- 	DrawMirrorStuff();
+ 	//DrawMirrorStuff();
 
  	glBindFramebuffer(GL_FRAMEBUFFER, 0);
  	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -165,7 +165,7 @@ void OpenGLRenderer::DrawMirrorStuff()
 {
 	// First draw in the secondary frame buffer for the mirror
 	glBindFramebuffer(GL_FRAMEBUFFER, FrameBufferHandle);
-
+	
 	for (const RenderCommand& mirrorCommand : MirrorCommands)
 	{
 		// Clear the FBO
@@ -182,6 +182,7 @@ void OpenGLRenderer::DrawMirrorStuff()
  		UniformsCache["projection"] = projection;
  
  		const eastl::shared_ptr<const DrawableObject> parent = mirrorCommand.Parent.lock();
+		Transform parentTransform = parent->GetAbsoluteTransform();
  		const glm::mat4 inverse = glm::inverse(parent->GetAbsoluteTransform().GetMatrix());
  		UniformsCache["view"] = inverse;
 

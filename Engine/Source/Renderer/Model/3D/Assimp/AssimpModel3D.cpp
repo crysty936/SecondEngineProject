@@ -8,6 +8,11 @@
 #include "Renderer/OpenGL/OpenGLRenderer.h"
 #include "GLFW/glfw3.h"
 #include "Renderer/OpenGL/OpenGLUtils.h"
+#include "Renderer/RenderingPrimitives.h"
+#include "Renderer/OpenGL/Buffer/IndexBuffer.h"
+#include "Renderer/OpenGL/Buffer/VertexBufferLayout.h"
+#include "Renderer/OpenGL/Buffer/VertexBuffer.h"
+#include "Renderer/OpenGL/Buffer/VertexArrayObject.h"
 
 AssimpModel3D::AssimpModel3D(const eastl::string& inPath)
 	: ModelPath{ inPath }

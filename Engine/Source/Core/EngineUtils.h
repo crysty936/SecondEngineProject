@@ -35,9 +35,10 @@ __debugbreak(); exit(-1);}									\
    }())														\
 
 #else
-#define ASSERT_MSG(x, ...) (!!(x))
-#define ENSURE_MSG(x, ...) (!!(x))
-#define ENSURE(x) (!!(x))
+#define ASSERT_MSG(x, ...)	(!!(x))
+#define ASSERT(x, ...)		(!!(x))
+#define ENSURE_MSG(x, ...)	(!!(x))
+#define ENSURE(x)			(!!(x))
 #endif
 
 #define OUT

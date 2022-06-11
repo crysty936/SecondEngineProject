@@ -1,7 +1,6 @@
 #pragma once
 #include "EASTL/shared_ptr.h"
 #include "Renderer/Material/RenderMaterial.h"
-#include "Mesh3D.h"
 #include "Entity/TransformObject.h"
 #include "Renderer/Drawable/Drawable.h"
 

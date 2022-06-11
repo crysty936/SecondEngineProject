@@ -2,7 +2,7 @@
 #include "Camera/Camera.h"
 #include "Scene/SceneManager.h"
 #include "Scene/Scene.h"
-#include "Renderer/Drawable/BasicShapes.h"
+#include "Renderer/Drawable/ShapesUtils/BasicShapes.h"
 #include "Controller/Controller.h"
 #include "glm/common.hpp"
 #include <stdlib.h>
@@ -19,6 +19,9 @@ TestGameMode::TestGameMode()
 }
 
 TestGameMode::~TestGameMode() = default;
+
+eastl::shared_ptr<MirrorQuad> mirrorObj1;
+eastl::shared_ptr<MirrorQuad> mirrorObj2;
 
 void TestGameMode::Init()
 {
@@ -77,8 +80,8 @@ void TestGameMode::Init()
 		parentShared->Move(glm::vec3(0.f, 0.f, 10.f));
 	}
 
-	// Ground
  	{
+		// Ground
  	 	eastl::shared_ptr<CubeShape> centerObj = BasicShapes::CreateCubeObject();
  		centerObj->Move(glm::vec3(0.f, -2.f, 0.f));
  		centerObj->SetScale(glm::vec3(100.f, 0.5f, 100.f));
@@ -118,36 +121,41 @@ void TestGameMode::Init()
 		square->Move(glm::vec3(0.f, 0.f, -3.f));
 	}
 
-	// Really slow because each mesh is individual and no batching
-// 	for (int32_t i = 0; i < 5; ++i)
-// 	{
-// 		for (int32_t j = 0; j < 15; j++)
-// 		{
-// 			eastl::shared_ptr<AssimpModel3D> model = ObjectCreation::NewObject<AssimpModel3D>("../Data/Models/Backpack/scene.gltf");
-// 			model->Move(glm::vec3(5.f * j, 5.f * i, 5.f));
-// 			model->SetScale(glm::vec3(0.01f, 0.01f, 0.01f));
-// 		}
-// 	}
-// 
-	{
-		eastl::shared_ptr<MirrorQuad> mirrorObj = ObjectCreation::NewObject<MirrorQuad>();
+	// Really slow because no batching or camera culling or lods
+	//for (int32_t i = 0; i < 5; ++i)
+	//{
+	//	for (int32_t j = 0; j < 15; j++)
+	//	{
+	//		eastl::shared_ptr<AssimpModel3D> model = ObjectCreation::NewObject<AssimpModel3D>("../Data/Models/Backpack/scene.gltf");
+	//		model->Move(glm::vec3(5.f * j, 5.f * i, 5.f));
+	//		model->SetScale(glm::vec3(0.01f, 0.01f, 0.01f));
+	//	}
+	//}
 
-		mirrorObj->Move(glm::vec3(0.0f, 0.0f, -10.f));
+	eastl::shared_ptr<AssimpModel3D> model = ObjectCreation::NewObject<AssimpModel3D>("../Data/Models/Backpack/scene.gltf");
+	model->Move(glm::vec3(5.f, 5.f, 5.f));
+	model->SetScale(glm::vec3(0.01f, 0.01f, 0.01f));
+	{
+		mirrorObj1 = ObjectCreation::NewObject<MirrorQuad>();
+
+		mirrorObj1->Move(glm::vec3(0.0f, 0.0f, -10.f));
 	}
  	{
- 		eastl::shared_ptr<MirrorQuad> mirrorObj = ObjectCreation::NewObject<MirrorQuad>();
+ 		mirrorObj2 = ObjectCreation::NewObject<MirrorQuad>();
  
- 		mirrorObj->Move(glm::vec3(5.0f, 0.0f, -20.f));
+ 		mirrorObj2->Move(glm::vec3(5.0f, 0.0f, -20.f));
  	}
-	{
-		eastl::shared_ptr<CubeShape> representedInMirrorCube = BasicShapes::CreateCubeObject();
-		representedInMirrorCube->Move(glm::vec3(0.f, 0.f, -15.f));
-	}
 }
+
+
 
 void TestGameMode::Tick(float inDeltaT)
 {
 	GameController->ExecuteCallbacks();
+
+	
+	mirrorObj1->LookAt(GameCamera->GetAbsoluteTransform().Translation);
+	mirrorObj2->LookAt(GameCamera->GetAbsoluteTransform().Translation);
 
 }
 
