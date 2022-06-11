@@ -709,8 +709,10 @@ namespace eastl
 				try
 				{
 			#endif
-					for(; first != last; ++first, ++currentDest)
+					for (; first != last; ++first, ++currentDest) 
+					{
 						::new((void*)eastl::addressof(*currentDest)) value_type(eastl::move(*first)); // If value_type has a move constructor then it will be used here.
+					}
 			#if EASTL_EXCEPTIONS_ENABLED
 				}
 				catch(...)

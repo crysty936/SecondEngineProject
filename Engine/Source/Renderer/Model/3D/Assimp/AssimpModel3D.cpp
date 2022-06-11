@@ -38,7 +38,7 @@ class AssimpModel3DLoader
 {
 protected:
 	AssimpModel3DLoader(const eastl::string& inPath);
-	~AssimpModel3DLoader() = default;
+	~AssimpModel3DLoader();
 
 private:
 	eastl::shared_ptr<MeshNode> LoadData(OUT eastl::vector<RenderCommand>& outCommands);
@@ -72,6 +72,17 @@ void AssimpModel3D::LoadModelToRoot(const eastl::string inPath, TransformObjPtr 
 AssimpModel3DLoader::AssimpModel3DLoader(const eastl::string & inPath)
 	: ModelPath{ inPath }
 {}
+
+AssimpModel3DLoader::~AssimpModel3DLoader()
+{
+	// TODO: Hack, LoadedTextures array is used for caching and but at the end when it's destoyred, it should not take the
+	// textures with it
+
+	for (auto& tex : LoadedTextures)
+	{
+		tex.TexHandle = -1;
+	}
+}
 
 eastl::shared_ptr<MeshNode> AssimpModel3DLoader::LoadData(OUT eastl::vector<RenderCommand>& outCommands)
 {
@@ -128,14 +139,14 @@ void AssimpModel3DLoader::ProcessMesh(const aiMesh& inMesh, const aiScene& inSce
 		if (inMesh.mMaterialIndex >= 0)
 		{
 			aiMaterial* Material = inScene.mMaterials[inMesh.mMaterialIndex];
-			eastl::vector<OpenGLTexture> DiffuseMaps = LoadMaterialTextures(*Material, aiTextureType_DIFFUSE, TextureType::Diffuse);
-			textures.insert(textures.end(), DiffuseMaps.begin(), DiffuseMaps.end());
+			eastl::vector<OpenGLTexture> diffuseMaps = LoadMaterialTextures(*Material, aiTextureType_DIFFUSE, TextureType::Diffuse);
+			thisMaterial->Textures.insert(thisMaterial->Textures.end(), eastl::make_move_iterator(diffuseMaps.begin()), eastl::make_move_iterator(diffuseMaps.end()));
 
 			// 		std::vector<Texture> SpecularMaps = LoadMaterialTextures(Material, aiTextureType_SPECULAR, TextureType::Specular);
 			// 		Textures.insert(Textures.end(), SpecularMaps.begin(), SpecularMaps.end());
 		}
 
- 		thisMaterial->Textures = textures;
+ 		//thisMaterial->Textures = std::move(textures);
  		thisMaterial->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/BasicProjectionVertexShader.glsl", "../Data/Shaders/BasicTexFragmentShader.glsl");
  	}
  

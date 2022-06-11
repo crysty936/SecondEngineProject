@@ -11,7 +11,6 @@
 #include "glm/ext/matrix_float4x4.hpp"
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/trigonometric.hpp"
-#include "Renderer/ShapesUtils/BasicShapesData.h"
 #include "Entity/Entity.h"
 #include "Renderer/Drawable/Drawable.h"
 #include "EASTL/shared_ptr.h"
