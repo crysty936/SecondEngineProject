@@ -106,7 +106,7 @@ void TestGameMode::Init()
 
 
 	//eastl::shared_ptr<AssimpModel3D> shibaModel = ObjectCreation::NewObject<AssimpModel3D>("../Data/Models/Shiba/scene.gltf");
-
+		
 	{
 		eastl::shared_ptr<SquareShape> square = BasicShapes::CreateSquareObject(); 
 		// This can be placed last to get correct draw order but this way it plainly represents the 

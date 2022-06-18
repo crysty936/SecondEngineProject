@@ -146,7 +146,7 @@ void OpenGLRenderer::Terminate()
 
 void OpenGLRenderer::Draw()
 {
- 	//DrawMirrorStuff();
+ 	DrawMirrorStuff();
 
  	glBindFramebuffer(GL_FRAMEBUFFER, 0);
  	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -182,7 +182,8 @@ void OpenGLRenderer::DrawMirrorStuff()
  
  		const eastl::shared_ptr<const DrawableObject> parent = mirrorCommand.Parent.lock();
 		Transform parentTransform = parent->GetAbsoluteTransform();
- 		const glm::mat4 inverse = glm::inverse(parent->GetAbsoluteTransform().GetMatrix());
+		parentTransform.Scale = glm::vec3(1.f, 1.f, -1.f);
+ 		const glm::mat4 inverse = glm::inverse(parentTransform.GetMatrix());
  		UniformsCache["view"] = inverse;
 
 		DrawCommands(MainCommands);

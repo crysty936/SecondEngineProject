@@ -121,6 +121,7 @@ void OpenGLTexture::DeleteTexture()
 {
 	if (TexHandle != -1)
 	{
+		LOG_WARNING("Texture is being deleted, take care that this is intended.");
 		glDeleteTextures(1, &TexHandle);
 	}
 }

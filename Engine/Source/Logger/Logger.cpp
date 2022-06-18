@@ -9,13 +9,15 @@
 #include "Core/WindowsPlatform.h"
 // Fmt logger is a good source for this
 
+Logger Logger::Instance;
+
 Logger::Logger()
 {
-	static bool bLoggerExisting = false;
+	static bool bLoggerExists = false;
 
-    ASSERT(!bLoggerExisting);
+    ASSERT(!bLoggerExists);
 
-	bLoggerExisting = true;
+	bLoggerExists = true;
 
 //     Typed format test
 //     int32_t t1 = 1;
@@ -69,5 +71,3 @@ void Logger::Print(const char* inFormat, Severity inSeverity, ...)
 
 	WindowsPlatform::SetCLITextColor(CLITextColor::White);
 }
-
-Logger Logger::Instance;
