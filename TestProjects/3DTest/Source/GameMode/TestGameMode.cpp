@@ -79,9 +79,9 @@ void TestGameMode::Init()
 
  	{
 		// Ground
-//  	 	eastl::shared_ptr<CubeShape> centerObj = BasicShapes::CreateCubeObject();
-//  		centerObj->Move(glm::vec3(0.f, -2.f, 0.f));
-//  		centerObj->SetScale(glm::vec3(100.f, 0.5f, 100.f));
+  	 	eastl::shared_ptr<CubeShape> centerObj = BasicShapes::CreateCubeObject();
+  		centerObj->Move(glm::vec3(0.f, -2.f, 0.f));
+  		centerObj->SetScale(glm::vec3(100.f, 0.5f, 100.f));
  
  	}
 	{
@@ -118,6 +118,12 @@ void TestGameMode::Init()
 		square->Move(glm::vec3(0.f, 0.f, -3.f));
 	}
 
+	{
+		eastl::shared_ptr<SquareShape> square = BasicShapes::CreateSquareObject();
+		square->Move(glm::vec3(0.f, 0.f, -3.f));
+	}
+
+
 	// Really slow because no batching or camera culling or lods
 	//for (int32_t i = 0; i < 5; ++i)
 	//{
@@ -129,6 +135,11 @@ void TestGameMode::Init()
 	//	}
 	//}
 
+	{
+		eastl::shared_ptr<MirrorQuad> test = ObjectCreation::NewObject<MirrorQuad>();
+
+		test->Move(glm::vec3(0.0f, 0.0f, -10.f));
+	}
 	eastl::shared_ptr<AssimpModel3D> model = ObjectCreation::NewObject<AssimpModel3D>("../Data/Models/Backpack/scene.gltf");
 	model->Move(glm::vec3(5.f, 5.f, 5.f));
 	model->SetScale(glm::vec3(0.01f, 0.01f, 0.01f));

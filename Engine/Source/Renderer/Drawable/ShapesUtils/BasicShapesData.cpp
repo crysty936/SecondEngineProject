@@ -140,48 +140,51 @@ int32_t BasicShapesData::GetSquareIndicesCount()
 // The vertices are defined as if you would be looking at the cube straight on, for example, the front and back are reversed,
 // the side vertices are defined all on the left plane, with the x stuck to -0.5, is if that plane is perpendicular to the camera and so on
 const float CubeVertices[] = {
+	
+	// Vertices			 // Normal			  //Tex Coords
+
     // Back face
-    -1.f, -1.f, -1.f,  0.0f, 0.0f, // bottom-left
-     1.f,  1.f, -1.f,  1.0f, 1.0f, // top-right
-     1.f, -1.f, -1.f,  1.0f, 0.0f, // bottom-right         
-     1.f,  1.f, -1.f,  1.0f, 1.0f, // top-right
-    -1.f, -1.f, -1.f,  0.0f, 0.0f, // bottom-left
-    -1.f,  1.f, -1.f,  0.0f, 1.0f, // top-left
-    // Front face
-    -1.f, -1.f,  1.f,  0.0f, 0.0f, // bottom-left
-     1.f, -1.f,  1.f,  1.0f, 0.0f, // bottom-right
-     1.f,  1.f,  1.f,  1.0f, 1.0f, // top-right
-     1.f,  1.f,  1.f,  1.0f, 1.0f, // top-right
-    -1.f,  1.f,  1.f,  0.0f, 1.0f, // top-left
-    -1.f, -1.f,  1.f,  0.0f, 0.0f, // bottom-left
-    // Left face
-    -1.f,  1.f,  1.f,  1.0f, 0.0f, // top-right
-    -1.f,  1.f, -1.f,  1.0f, 1.0f, // top-left
-    -1.f, -1.f, -1.f,  0.0f, 1.0f, // bottom-left
-    -1.f, -1.f, -1.f,  0.0f, 1.0f, // bottom-left
-    -1.f, -1.f,  1.f,  0.0f, 0.0f, // bottom-right
-    -1.f,  1.f,  1.f,  1.0f, 0.0f, // top-right
-    // Right face
-     1.f,  1.f,  1.f,  1.0f, 0.0f, // top-left
-     1.f, -1.f, -1.f,  0.0f, 1.0f, // bottom-right
-     1.f,  1.f, -1.f,  1.0f, 1.0f, // top-right         
-     1.f, -1.f, -1.f,  0.0f, 1.0f, // bottom-right
-     1.f,  1.f,  1.f,  1.0f, 0.0f, // top-left
-     1.f, -1.f,  1.f,  0.0f, 0.0f, // bottom-left     
-    // Bottom face
-    -1.f, -1.f, -1.f,  0.0f, 1.0f, // top-right
-     1.f, -1.f, -1.f,  1.0f, 1.0f, // top-left
-     1.f, -1.f,  1.f,  1.0f, 0.0f, // bottom-left
-     1.f, -1.f,  1.f,  1.0f, 0.0f, // bottom-left
-    -1.f, -1.f,  1.f,  0.0f, 0.0f, // bottom-right
-    -1.f, -1.f, -1.f,  0.0f, 1.0f, // top-right
-    // Top face
-    -1.f,  1.f, -1.f,  0.0f, 1.0f, // top-left
-     1.f,  1.f,  1.f,  1.0f, 0.0f, // bottom-right
-     1.f,  1.f, -1.f,  1.0f, 1.0f, // top-right     
-     1.f,  1.f,  1.f,  1.0f, 0.0f, // bottom-right
-    -1.f,  1.f, -1.f,  0.0f, 1.0f, // top-left
-    -1.f,  1.f,  1.f,  0.0f, 0.0f  // bottom-left  
+	-1.f, -1.f, -1.f,    0.0f,  0.0f, -1.0f,  0.0f, 0.0f, // bottom-left
+	 1.f,  1.f, -1.f,    0.0f,  0.0f, -1.0f,  1.0f, 1.0f, // top-right
+	 1.f, -1.f, -1.f,    0.0f,  0.0f, -1.0f,  1.0f, 0.0f, // bottom-right         
+	 1.f,  1.f, -1.f,    0.0f,  0.0f, -1.0f,  1.0f, 1.0f, // top-right
+	-1.f, -1.f, -1.f,    0.0f,  0.0f, -1.0f,  0.0f, 0.0f, // bottom-left
+	-1.f,  1.f, -1.f,    0.0f,  0.0f, -1.0f,  0.0f, 1.0f, // top-left
+	// Front face
+	-1.f, -1.f,  1.f,    0.0f,  0.0f, 1.0f,   0.0f, 0.0f, // bottom-left
+	 1.f, -1.f,  1.f,    0.0f,  0.0f, 1.0f,   1.0f, 0.0f, // bottom-right
+	 1.f,  1.f,  1.f,    0.0f,  0.0f, 1.0f,   1.0f, 1.0f, // top-right
+	 1.f,  1.f,  1.f,    0.0f,  0.0f, 1.0f,   1.0f, 1.0f, // top-right
+	-1.f,  1.f,  1.f,    0.0f,  0.0f, 1.0f,   0.0f, 1.0f, // top-left
+	-1.f, -1.f,  1.f,    0.0f,  0.0f, 1.0f,   0.0f, 0.0f, // bottom-left
+	// Left face	   						
+	-1.f,  1.f,  1.f,   -1.0f,  0.0f,  0.0f,  1.0f, 0.0f, // top-right
+	-1.f,  1.f, -1.f,   -1.0f,  0.0f,  0.0f,  1.0f, 1.0f, // top-left
+	-1.f, -1.f, -1.f,   -1.0f,  0.0f,  0.0f,  0.0f, 1.0f, // bottom-left
+	-1.f, -1.f, -1.f,   -1.0f,  0.0f,  0.0f,  0.0f, 1.0f, // bottom-left
+	-1.f, -1.f,  1.f,   -1.0f,  0.0f,  0.0f,  0.0f, 0.0f, // bottom-right
+	-1.f,  1.f,  1.f,   -1.0f,  0.0f,  0.0f,  1.0f, 0.0f, // top-right
+	// Right face	   						
+	 1.f,  1.f,  1.f,    1.0f,  0.0f,  0.0f,  1.0f, 0.0f, // top-left
+	 1.f, -1.f, -1.f,    1.0f,  0.0f,  0.0f,  0.0f, 1.0f, // bottom-right
+	 1.f,  1.f, -1.f,    1.0f,  0.0f,  0.0f,  1.0f, 1.0f, // top-right         
+	 1.f, -1.f, -1.f,    1.0f,  0.0f,  0.0f,  0.0f, 1.0f, // bottom-right
+	 1.f,  1.f,  1.f,    1.0f,  0.0f,  0.0f,  1.0f, 0.0f, // top-left
+	 1.f, -1.f,  1.f,    1.0f,  0.0f,  0.0f,  0.0f, 0.0f, // bottom-left     
+	// Bottom face	   						
+	-1.f, -1.f, -1.f,    0.0f, -1.0f,  0.0f,  0.0f, 1.0f, // top-right
+	 1.f, -1.f, -1.f,    0.0f, -1.0f,  0.0f,  1.0f, 1.0f, // top-left
+	 1.f, -1.f,  1.f,    0.0f, -1.0f,  0.0f,  1.0f, 0.0f, // bottom-left
+	 1.f, -1.f,  1.f,    0.0f, -1.0f,  0.0f,  1.0f, 0.0f, // bottom-left
+	-1.f, -1.f,  1.f,    0.0f, -1.0f,  0.0f,  0.0f, 0.0f, // bottom-right
+	-1.f, -1.f, -1.f,    0.0f, -1.0f,  0.0f,  0.0f, 1.0f, // top-right
+	// Top face		   						
+	-1.f,  1.f, -1.f,    0.0f,  1.0f,  0.0f,  0.0f, 1.0f, // top-left
+	 1.f,  1.f,  1.f,    0.0f,  1.0f,  0.0f,  1.0f, 0.0f, // bottom-right
+	 1.f,  1.f, -1.f,    0.0f,  1.0f,  0.0f,  1.0f, 1.0f, // top-right     
+	 1.f,  1.f,  1.f,    0.0f,  1.0f,  0.0f,  1.0f, 0.0f, // bottom-right
+	-1.f,  1.f, -1.f,    0.0f,  1.0f,  0.0f,  0.0f, 1.0f, // top-left
+	-1.f,  1.f,  1.f,    0.0f,  1.0f,  0.0f,  0.0f, 0.0f  // bottom-left  
 };
 
 // TODO: Add the indices of the cube to get rid of Draw Arrays

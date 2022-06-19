@@ -138,7 +138,7 @@ void AssimpModel3DLoader::ProcessMesh(const aiMesh& inMesh, const aiScene& inSce
 		}
 
  		//thisMaterial->Textures = std::move(textures);
- 		thisMaterial->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/BasicProjectionVertexShader.glsl", "../Data/Shaders/BasicTexFragmentShader.glsl");
+ 		thisMaterial->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/WithNormalProjectionVertexShader.glsl", "../Data/Shaders/LightingTexFragmentShader.glsl");
  	}
  
 	eastl::shared_ptr<VertexArrayObject> thisVAO = nullptr;
@@ -156,7 +156,7 @@ void AssimpModel3DLoader::ProcessMesh(const aiMesh& inMesh, const aiScene& inSce
 			aiVector3D aiVertex = inMesh.mVertices[i];
 			aiVector3D aiNormal = inMesh.mNormals[i];
 			vert.Position = glm::vec3(aiVertex.x, aiVertex.y, aiVertex.z);
-			//vert.Normal = glm::vec3(aiNormal.x, aiNormal.y, aiNormal.z);
+			vert.Normal = glm::vec3(aiNormal.x, aiNormal.y, aiNormal.z);
 
 			if (inMesh.mTextureCoords[0])
 			{
@@ -192,6 +192,8 @@ void AssimpModel3DLoader::ProcessMesh(const aiMesh& inMesh, const aiScene& inSce
 
 		VertexBufferLayout layout = VertexBufferLayout{};
 		// Vertex points
+		layout.Push<float>(3);
+		// Normals
 		layout.Push<float>(3);
 		// Vertex Tex Coords
 		layout.Push<float>(2);

@@ -33,23 +33,25 @@ enum class EDrawMode : uint8_t
 {
 	NORMAL,
 	DEPTH,
+	DEPTH_VISUALIZE,
 	OUTLINE
 };
 
 class OpenGLRenderer
 {
 private:
-	OpenGLRenderer(const WindowProperties& inDefaultWindowProperties);
+	OpenGLRenderer(const WindowProperties& inMainWindowProperties);
 	virtual ~OpenGLRenderer();
 
 public:
 	// Will create the base window and return the context for it
-	static void Init(const WindowProperties& inDefaultWindowProperties = {});
+	static void Init(const WindowProperties& inMainWindowProperties = {});
 	static void Terminate();
 	void Draw();
 
 	void DrawSkybox();
 	void DrawMirrorStuff();
+	void DrawShadowMap();
 	void SetupBaseUniforms();
 	void UpdateUniforms();
 	void DrawCommands(const eastl::vector<RenderCommand>& inCommands);
@@ -75,6 +77,8 @@ public:
 	inline void SetSkyboxCommand(RenderCommand inSkyboxCommand) { MainSkyboxCommand = inSkyboxCommand; }
 
 private:
+	void SetViewportSize(const int32_t inWidth, const int32_t inHeight);
+	void SetViewportSizeToMain();
 	struct GLFWwindow* CreateNewWindowHandle(const WindowProperties& inWindowProperties) const;
 	void CheckShouldCloseWindow(const OpenGLWindow& inWindow);
 
@@ -87,6 +91,8 @@ private:
 	eastl::queue<RenderingLoadCommand> LoadQueue;
 	eastl::unordered_map<eastl::string, eastl::shared_ptr<class VertexArrayObject>> VAOs;
 	uint32_t AuxiliarFrameBuffer;
+	uint32_t ShadowMapBuffer;
+	eastl::shared_ptr<class OpenGLDepthMap> ShadowBufferTex;
 	RenderCommand MainSkyboxCommand;
 };
 

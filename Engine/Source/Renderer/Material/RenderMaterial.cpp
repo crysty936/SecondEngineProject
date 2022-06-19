@@ -1,5 +1,6 @@
 #include "RenderMaterial.h"
 #include "Renderer/SelfRegisteringUniform/SelfRegisteringUniform.h"
+#include "Core/EngineUtils.h"
 
 RenderMaterial::RenderMaterial() = default;
 RenderMaterial::~RenderMaterial() = default;
@@ -42,6 +43,7 @@ void RenderMaterial::SetUniforms(const eastl::unordered_map<eastl::string, SelfR
 
 		if (iter == inUniformsCache.end())
 		{
+			ASSERT(false);
 			continue;
 		}
 

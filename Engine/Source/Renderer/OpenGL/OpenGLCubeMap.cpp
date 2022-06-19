@@ -24,11 +24,10 @@ void OpenGLCubeMap::Init(const eastl::vector<eastl::string>& inTexturePaths, con
 {
 	glGenTextures(1, &TexHandle);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, TexHandle);
-	const int32_t size = inTexturePaths.size();
-	for (int32_t i = size - 1; i>=0; --i)
+
+	for (int32_t i = 0; i < inTexturePaths.size(); ++i)
 	{
 		constexpr bool flipped = false;
-		stbi_set_flip_vertically_on_load(false);
 
 		ImageData data = ImageLoading::LoadImageData(inTexturePaths[i].data(), flipped);
 

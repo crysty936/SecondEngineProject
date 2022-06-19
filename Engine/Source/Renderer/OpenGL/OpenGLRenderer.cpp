@@ -19,6 +19,9 @@
 #include "Renderer/Material/MaterialsManager.h"
 #include "Renderer/Drawable/MirrorQuad.h"
 #include "Core/ObjectCreation.h"
+#include "OpenGLDepthMap.h"
+#include "OpenGLRenderTexture.h"
+#include "../Drawable/DepthMaterial.h"
 
 OpenGLRenderer* RHI = nullptr;
 static std::mutex RenderCommandsMutex;
@@ -52,7 +55,7 @@ void LoaderFunc(GLFWwindow* inLoadingThreadContext)
 	}
 }
 
-OpenGLRenderer::OpenGLRenderer(const WindowProperties& inDefaultWindowProperties)
+OpenGLRenderer::OpenGLRenderer(const WindowProperties& inMainWindowProperties)
 {
 	const bool glfwSuccess = glfwInit() == GLFW_TRUE;
 
@@ -63,7 +66,7 @@ OpenGLRenderer::OpenGLRenderer(const WindowProperties& inDefaultWindowProperties
 	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
 
 	// Create new Window for data holding
-	MainWindow = CreateWindow(inDefaultWindowProperties);
+	MainWindow = CreateWindow(inMainWindowProperties);
 
 	// Set Context
 	GLFWwindow* mainWindowHandle = MainWindow->GetHandle();
@@ -74,7 +77,7 @@ OpenGLRenderer::OpenGLRenderer(const WindowProperties& inDefaultWindowProperties
 	const bool gladSuccess = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress) == GLFW_TRUE;
 	glfwSetInputMode(mainWindowHandle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-	glViewport(0, 0, inDefaultWindowProperties.Width, inDefaultWindowProperties.Height);
+	SetViewportSizeToMain();
 
 	glEnable(GL_DEBUG_OUTPUT);
 	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
@@ -102,9 +105,9 @@ OpenGLRenderer::OpenGLRenderer(const WindowProperties& inDefaultWindowProperties
 
 OpenGLRenderer::~OpenGLRenderer() = default;
 
-void OpenGLRenderer::Init(const WindowProperties & inDefaultWindowProperties)
+void OpenGLRenderer::Init(const WindowProperties & inMainWindowProperties)
 {
-	RHI = new OpenGLRenderer{ inDefaultWindowProperties };
+	RHI = new OpenGLRenderer{ inMainWindowProperties };
 
 	// Setup secondary framebuffer
 
@@ -127,6 +130,19 @@ void OpenGLRenderer::Init(const WindowProperties & inDefaultWindowProperties)
 
 	ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 
+	// Create the shadow map framebuffer
+	glGenFramebuffers(1, &RHI->ShadowMapBuffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, RHI->ShadowMapBuffer);
+
+	RHI->ShadowBufferTex = eastl::make_shared<OpenGLDepthMap>();
+	RHI->ShadowBufferTex->Init();
+
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, RHI->ShadowBufferTex->TexHandle, 0);
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+
+	ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
+
 	// Bind the default frame buffer
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
@@ -145,16 +161,26 @@ void OpenGLRenderer::Terminate()
 
 void OpenGLRenderer::Draw()
 {
+	for (const RenderCommand& mirrorCommand : MirrorCommands)
+	{
+		if (mirrorCommand.Material->Textures.empty())
+		{
+			mirrorCommand.Material->Textures.push_back(ShadowBufferTex);
+		}
+	}
+
  	//DrawMirrorStuff();
  	//SetupBaseUniforms();
+
+	DrawShadowMap();
 
  	glBindFramebuffer(GL_FRAMEBUFFER, 0);
  	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
  	UpdateUniforms();
  
-	DrawSkybox();
+	//DrawSkybox();
  	DrawCommands(MainCommands);
-//  DrawCommands(MirrorCommands);
+	DrawCommands(MirrorCommands);
 
  	CheckShouldCloseWindow(*MainWindow);
  	glfwSwapBuffers(MainWindow->GetHandle());
@@ -187,7 +213,8 @@ void OpenGLRenderer::DrawMirrorStuff()
 		// Clear the FBO
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 		//const OpenGLTexture& tex = mirrorCommand.Material->Textures[0];
-		eastl::shared_ptr<OpenGLTexture> tex = eastl::make_shared<OpenGLTexture>();
+		eastl::shared_ptr<OpenGLRenderTexture> tex = eastl::make_shared<OpenGLRenderTexture>();
+		tex->Init();
 		// Attach the texture to the FBO
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex->TexHandle, 0);
 		// Set the color in the texture to ClearColor
@@ -212,11 +239,42 @@ void OpenGLRenderer::DrawMirrorStuff()
 			mirrorCommand.Material->Textures.pop_back();
 		}
 
-		mirrorCommand.Material->Textures.push_back(std::move(tex));
-
 		// Detach the current texture from the buffer
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0);
+
+		mirrorCommand.Material->Textures.push_back(std::move(tex));
 	}
+}
+
+void OpenGLRenderer::DrawShadowMap()
+{
+	SetDrawMode(EDrawMode::DEPTH);
+
+	SetViewportSize(1024, 1024);
+	
+	glBindFramebuffer(GL_FRAMEBUFFER, ShadowMapBuffer);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+	const float near_plane = 1.0f;
+	const float far_plane = 50.5f;
+	const glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+
+  	const glm::mat4 lightView = glm::lookAt(glm::vec3(-2.0f, 4.0f, -1.0f),
+  		glm::vec3(0.0f, 0.0f, 0.0f),
+  		glm::vec3(0.0f, 1.0f, 0.0f));
+
+	//const glm::mat4 lightView = UniformsCache["view"].Value.Value4fv;
+
+	const glm::mat4 lightSpaceMatrix = lightProjection * lightView;
+	UniformsCache["lightSpaceMatrix"] = lightView;
+
+	DrawCommands(MainCommands);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	SetViewportSizeToMain();
+
+	SetDrawMode(EDrawMode::NORMAL);
 }
 
 void OpenGLRenderer::SetupBaseUniforms()
@@ -315,11 +373,24 @@ eastl::shared_ptr<RenderMaterial> OpenGLRenderer::GetMaterial(const RenderComman
 	{
 		MaterialsManager& matManager = MaterialsManager::Get();
 		bool materialExists = false;
-		eastl::shared_ptr<RenderMaterial> depthMaterial = matManager.GetOrAddMaterial("depth_material", materialExists);
+		eastl::shared_ptr<RenderMaterial> depthMaterial = matManager.GetOrAddMaterial<DepthMaterial>("depth_material", materialExists);
 
 		if (!materialExists)
 		{
-			depthMaterial->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/BasicProjectionVertexShader.glsl", "../Data/Shaders/DepthFragmentShader.glsl");
+			depthMaterial->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/BasicDepthVertexShader.glsl", "../Data/Shaders/BasicDepthFragmentShader.glsl");
+		}
+
+		return depthMaterial;
+	}
+	case EDrawMode::DEPTH_VISUALIZE:
+	{
+		MaterialsManager& matManager = MaterialsManager::Get();
+		bool materialExists = false;
+		eastl::shared_ptr<RenderMaterial> depthMaterial = matManager.GetOrAddMaterial("visualize_depth_material", materialExists);
+
+		if (!materialExists)
+		{
+			depthMaterial->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/BasicProjectionVertexShader.glsl", "../Data/Shaders/VisualizeDepthFragmentShader.glsl");
 		}
 
 		return depthMaterial;
@@ -410,6 +481,17 @@ bool OpenGLRenderer::GetOrCreateVAO(const eastl::string & inVAOId, OUT eastl::sh
 	//GetVAOMutex.unlock();
 
 	return false;
+}
+
+void OpenGLRenderer::SetViewportSize(const int32_t inWidth, const int32_t inHeight)
+{
+	glViewport(0, 0, inWidth, inHeight);
+}
+
+void OpenGLRenderer::SetViewportSizeToMain()
+{
+	const WindowProperties& props = MainWindow->GetProperties();
+	SetViewportSize(props.Width, props.Height);
 }
 
 GLFWwindow* OpenGLRenderer::CreateNewWindowHandle(const WindowProperties & inWindowProperties) const

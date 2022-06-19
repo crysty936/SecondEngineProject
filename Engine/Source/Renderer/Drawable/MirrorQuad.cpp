@@ -16,7 +16,7 @@ MirrorQuad::~MirrorQuad() = default;
 
 void MirrorQuad::SetupDrawCommands()
 {
-	const eastl::string vaoName = "squareVAO";
+	const eastl::string vaoName = "mirrorVAO";
 	eastl::shared_ptr<VertexArrayObject> thisVAO{ nullptr };
 	const bool existingVAO = RHI->GetOrCreateVAO(vaoName, thisVAO);
 

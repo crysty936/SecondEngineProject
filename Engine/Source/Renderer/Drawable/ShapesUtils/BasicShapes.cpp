@@ -141,6 +141,8 @@ void CubeShape::SetupDrawCommands()
 		VertexBufferLayout layout = VertexBufferLayout{};
 		// Vertex points
 		layout.Push<float>(3);
+		// Normals
+		layout.Push<float>(3);
 		// Vertex Tex Coords
 		layout.Push<float>(2);
 
@@ -161,7 +163,7 @@ void CubeShape::SetupDrawCommands()
 		eastl::shared_ptr<OpenGLTexture> tex = eastl::make_shared<OpenGLTexture>();
 		tex->Init(texturePath);
 		cubeMaterial->Textures.push_back(std::move(tex));
-		cubeMaterial->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/BasicProjectionVertexShader.glsl", "../Data/Shaders/BasicTexFragmentShader.glsl");
+		cubeMaterial->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/WithNormalProjectionVertexShader.glsl", "../Data/Shaders/LightingTexFragmentShader.glsl");
 	}
 
 	eastl::shared_ptr<MeshNode> cubeNode = eastl::make_shared<MeshNode>();

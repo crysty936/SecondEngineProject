@@ -1,6 +1,7 @@
 #pragma once
 #include "Logger/Logger.h"
 #include <stdlib.h>
+#include <stdio.h>
 
 
 #ifndef NDEBUG
@@ -8,7 +9,7 @@
  {															\
  if(!(x))													\
  {LOG_ERROR(inMessage, __VA_ARGS__);						\
-__debugbreak(); exit(-1);}									\
+__debugbreak(); getc(stdin);}									\
  }
 
 #define ENSURE_MSG(x, inMessage, ...)						\
@@ -23,7 +24,7 @@ __debugbreak(); exit(-1);}									\
  {															\
  if(!(x))													\
  {															\
-	__debugbreak(); exit(-1);}								\
+	__debugbreak(); getc(stdin);}								\
  }															\
 
  #define ENSURE(x)											\
