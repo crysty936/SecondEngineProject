@@ -1,6 +1,7 @@
 #pragma once
 #include "EASTL/string.h"
 #include <stdint.h>
+#include "glad/glad.h"
 
 enum class TextureType : uint8_t
 {
@@ -17,17 +18,16 @@ class OpenGLTexture
 {
 public:
 	OpenGLTexture();
-	~OpenGLTexture();
-	OpenGLTexture(const eastl::string& inTexturePath, int32_t inTexNr);
+	virtual ~OpenGLTexture();
 	OpenGLTexture(const OpenGLTexture& inOther) = default;
 	OpenGLTexture(OpenGLTexture&& inOther);
 	OpenGLTexture& operator=(const OpenGLTexture& inOther) = default;
 	OpenGLTexture& operator=(OpenGLTexture&& inOther) = default;
 
 	// Lazy initialization
-	void Init(const eastl::string& inTexturePath);
+	void Init(const eastl::string& inTexturePath, const int32_t inTexNr = GL_TEXTURE0);
 
-	void Bind() const;
+	virtual void Bind() const;
 	void Unbind() const;
 	 
 	void DeleteTexture();

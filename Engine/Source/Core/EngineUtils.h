@@ -12,7 +12,7 @@ __debugbreak(); exit(-1);}									\
  }
 
 #define ENSURE_MSG(x, inMessage, ...)						\
-  (!!x) && ([x](){											\
+  (!!x) && ([&, x](){											\
   if(!(x))													\
   {LOG_ERROR(inMessage, __VA_ARGS__);						\
  __debugbreak();}											\

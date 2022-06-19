@@ -11,5 +11,5 @@ public:
 	MirrorMaterial();
 	~MirrorMaterial();
 
-	virtual void SetUniforms(const eastl::unordered_map<eastl::string, struct SelfRegisteringUniform>& inUniformsCache);
+	void SetUniforms(const eastl::unordered_map<eastl::string, struct SelfRegisteringUniform>& inUniformsCache) override;
 };

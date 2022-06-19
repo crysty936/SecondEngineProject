@@ -1,8 +1,13 @@
 #include "MaterialsManager.h"
 #include "RenderMaterial.h"
 #include "Core/EngineUtils.h"
+#include <shared_mutex>
 
-static std::mutex MaterialsMutex;
+using Lock = std::shared_mutex;
+using WriteLock = std::unique_lock<Lock>;
+using ReadLock = std::shared_lock<Lock>;
+
+static Lock MaterialsMutex;
 
 MaterialsManager* MaterialsManager::Instance = nullptr;
 
@@ -45,23 +50,26 @@ eastl::shared_ptr<RenderMaterial>& MaterialsManager::GetMaterial(const eastl::st
 	return foundMaterial;
 }
 
-eastl::shared_ptr<RenderMaterial> MaterialsManager::GetOrAddMaterial(const eastl::string& inMaterialID, OUT bool& outAlreadyExists)
+eastl::shared_ptr<RenderMaterial> MaterialsManager::FindMaterial(const eastl::string& inMaterialID)
 {
-	std::lock_guard<std::mutex> lock(MaterialsMutex);
+	ReadLock lock(MaterialsMutex);
 
 	using materialsIterator = const eastl::unordered_map<eastl::string, eastl::shared_ptr<RenderMaterial>>::iterator;
 	const materialsIterator& iter = LoadedMaterials.find(inMaterialID);
-	outAlreadyExists = iter != LoadedMaterials.end();
+	const bool materialExists = iter != LoadedMaterials.end();
 
-	if (!outAlreadyExists)
+	if (!materialExists)
 	{
-		eastl::shared_ptr<RenderMaterial> returnMaterial = eastl::make_shared<RenderMaterial>();
-		LoadedMaterials.emplace(inMaterialID, returnMaterial);
-	
-		return returnMaterial;
+		return nullptr;
 	}
 
-	eastl::shared_ptr<RenderMaterial>& foundMaterial = (*iter).second;
-
-	return foundMaterial;
+	return (*iter).second;
 }
+
+void MaterialsManager::AddMaterial(const eastl::string& inMatId, eastl::shared_ptr<class RenderMaterial> inNewMat)
+{
+	WriteLock lock(MaterialsMutex);
+
+	LoadedMaterials.emplace(inMatId, inNewMat);
+}
+

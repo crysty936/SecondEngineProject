@@ -3,12 +3,6 @@
 #include "GLFW/glfw3.h"
 #include "OpenGLRenderer.h"
 
-OpenGLTexture::OpenGLTexture(const eastl::string& inTexturePath, int32_t inTexNr)
-	: TexPath{inTexturePath}, TexNr{ inTexNr }
-{
-	Init(inTexturePath);
-}
-
 OpenGLTexture::~OpenGLTexture()
 {
 	DeleteTexture();
@@ -18,21 +12,6 @@ OpenGLTexture::~OpenGLTexture()
 OpenGLTexture::OpenGLTexture()
 {
 	TexNr = GL_TEXTURE0;
-	glGenTextures(1, &TexHandle);
-	glBindTexture(GL_TEXTURE_2D, TexHandle);
-
-	const WindowProperties& windowProps = RHI->GetMainWindow().GetProperties();
-
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, windowProps.Width, windowProps.Height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
-	
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	// Clamp setting
- 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
- 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-
-	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
   OpenGLTexture::OpenGLTexture(OpenGLTexture&& inOther)
@@ -43,8 +22,16 @@ OpenGLTexture::OpenGLTexture()
 	  inOther.TexNr = -1;
   }
 
-void OpenGLTexture::Init(const eastl::string & inTexturePath)
+void OpenGLTexture::Init(const eastl::string& inTexturePath, const int32_t inTexNr)
 {
+	glGenTextures(1, &TexHandle);
+	glBindTexture(GL_TEXTURE_2D, TexHandle);
+
+	const WindowProperties& windowProps = RHI->GetMainWindow().GetProperties();
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, windowProps.Width, windowProps.Height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+
+	TexNr = inTexNr;
 	ImageData data = ImageLoading::LoadImageData(inTexturePath.data());
 
 	if (!data.RawData)

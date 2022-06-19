@@ -12,7 +12,7 @@ struct SelfRegisteringUniform
 
 	void Register(const eastl::string& inThisName, const class OpenGLShader& inShader) const;
 
-private:
+public:
 	enum class UniformType
 	{
 		Uniform1f,
@@ -27,8 +27,8 @@ private:
 		UniformContainer(const glm::mat4 inValue) : Value4fv{inValue}{}
 		//UniformContainer(const uint32_t inTextureHandle) : TextureHandle{inTextureHandle}{}
 
-		float Value1f;
 		glm::mat4 Value4fv;
+		float Value1f;
 		//uint32_t TextureHandle;
 	}Value;
 

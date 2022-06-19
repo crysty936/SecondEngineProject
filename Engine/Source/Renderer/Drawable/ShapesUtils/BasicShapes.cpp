@@ -6,12 +6,12 @@
 #include "Renderer/OpenGL/Buffer/VertexArrayObject.h"
 #include "Renderer/OpenGL/OpenGLShader.h"
 #include "Renderer/OpenGL/OpenGLTexture.h"
+#include "Renderer/OpenGL/OpenGLCubeMap.h"
 #include "Renderer/Material/MaterialsManager.h"
 #include "Renderer/OpenGL/RenderCommand.h"
 #include "Renderer/OpenGL/OpenGLRenderer.h"
 #include "Core/ObjectCreation.h"
-
-const uint32_t texureBaseNr = GL_TEXTURE0;
+#include "Renderer/Drawable/SkyboxMaterial.h"
 
 // eastl::shared_ptr<IDrawable> BasicShapes::CreateTriangleObject(eastl::string inTexturePath)
 // {
@@ -84,11 +84,12 @@ void SquareShape::SetupDrawCommands()
 	MaterialsManager& matManager = MaterialsManager::Get();
 	bool materialExists = false;
 	eastl::shared_ptr<RenderMaterial> cubeMaterial = matManager.GetOrAddMaterial("square_material", materialExists);
-	eastl::string texturePath = "../Data/Textures/openGLExampleTransparentWindow.png";
 
 	if (!materialExists)
 	{
-		OpenGLTexture tex{ texturePath, texureBaseNr + 0 };
+		eastl::string texturePath = "../Data/Textures/openGLExampleTransparentWindow.png";
+		OpenGLTexture tex;
+		tex.Init(texturePath);
 		cubeMaterial->Textures.push_back(std::move(tex));
 		cubeMaterial->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/BasicProjectionVertexShader.glsl", "../Data/Shaders/BasicTexFragmentShader.glsl");
 	}
@@ -153,11 +154,12 @@ void CubeShape::SetupDrawCommands()
 	MaterialsManager& matManager = MaterialsManager::Get();
 	bool materialExists = false;
 	eastl::shared_ptr<RenderMaterial> cubeMaterial = matManager.GetOrAddMaterial("cube_material", materialExists);
-	eastl::string texturePath = "../Data/Textures/ExampleContainer.jpg";
 
 	if (!materialExists)
 	{
-		OpenGLTexture tex{ texturePath, texureBaseNr + 0 };
+		eastl::string texturePath = "../Data/Textures/ExampleContainer.jpg";
+		OpenGLTexture tex;
+		tex.Init(texturePath);
 		cubeMaterial->Textures.push_back(std::move(tex));
 		cubeMaterial->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/BasicProjectionVertexShader.glsl", "../Data/Shaders/BasicTexFragmentShader.glsl");
 	}
@@ -174,3 +176,61 @@ void CubeShape::SetupDrawCommands()
 	RHI->AddCommand(newCommand);
 }
 
+Skybox::Skybox() = default;
+Skybox::~Skybox() = default;
+
+void Skybox::SetupDrawCommands()
+{
+	const eastl::string vaoName = "skyboxVAO";
+	eastl::shared_ptr<VertexArrayObject> thisVAO{ nullptr };
+	const bool existingVAO = RHI->GetOrCreateVAO(vaoName, thisVAO);
+
+	if (!existingVAO)
+	{
+		// TODO: Buffers creation should be delegated to the renderer
+		IndexBuffer ibo = IndexBuffer{};
+		ibo.IndicesCount = BasicShapesData::GetSkyboxIndicesCount();
+		VertexBufferLayout layout = VertexBufferLayout{};
+		// Vertex points
+		layout.Push<float>(3);
+
+		VertexBuffer vbo = VertexBuffer{ ibo, layout };
+		int32_t verticesCount = BasicShapesData::GetSkyboxVerticesCount();
+		vbo.SetVertices(BasicShapesData::GetSkyboxVertices(), verticesCount, GL_STATIC_DRAW);
+
+		thisVAO->VBuffer = vbo;
+	}
+
+	MaterialsManager& matManager = MaterialsManager::Get();
+	bool materialExists = false;
+	eastl::shared_ptr<RenderMaterial> thisMaterial = matManager.GetOrAddMaterial<SkyboxMaterial>("skybox_material", materialExists);
+
+	if (!materialExists)
+	{
+		eastl::vector<eastl::string> textures
+		{
+			"../Data/Textures/skybox/right.jpg",
+			"../Data/Textures/skybox/left.jpg",
+			"../Data/Textures/skybox/top.jpg",
+			"../Data/Textures/skybox/bottom.jpg",
+			"../Data/Textures/skybox/front.jpg",
+			"../Data/Textures/skybox/back.jpg",
+		};
+
+		OpenGLCubeMap tex;
+		tex.Init(textures);
+		thisMaterial->Textures.push_back(std::move(tex));
+		thisMaterial->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/SkyboxVertexShader.glsl", "../Data/Shaders/SkyboxFragmentShader.glsl");
+	}
+
+	eastl::shared_ptr<MeshNode> thisNode = eastl::make_shared<MeshNode>();
+	AddChild(thisNode);
+
+	RenderCommand newCommand;
+	newCommand.Material = thisMaterial;
+	newCommand.VAO = thisVAO;
+	newCommand.Parent = thisNode;
+	newCommand.DrawType = EDrawCallType::DrawArrays;
+
+	RHI->SetSkyboxCommand(newCommand);
+}

@@ -34,3 +34,12 @@ public:
  	static eastl::shared_ptr<class SquareShape> CreateSquareObject(eastl::string inTexturePath = {});
 	static eastl::shared_ptr<class CubeShape> CreateCubeObject();
 };
+
+class Skybox : public Model3D
+{
+public:
+	Skybox();
+	virtual ~Skybox();
+
+	virtual void SetupDrawCommands() override;
+};

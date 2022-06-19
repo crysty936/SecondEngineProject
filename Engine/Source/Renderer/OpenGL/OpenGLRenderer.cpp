@@ -109,9 +109,8 @@ void OpenGLRenderer::Init(const WindowProperties & inDefaultWindowProperties)
 	// Setup secondary framebuffer
 
 	// Create the frame buffer
-	glGenFramebuffers(1, &RHI->FrameBufferHandle);
-
-	glBindFramebuffer(GL_FRAMEBUFFER, RHI->FrameBufferHandle);
+	glGenFramebuffers(1, &RHI->AuxiliarFrameBuffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, RHI->AuxiliarFrameBuffer);
 
 	const WindowProperties& windowProps = RHI->MainWindow->GetProperties();
 
@@ -137,7 +136,7 @@ void OpenGLRenderer::Terminate()
 	RHI->MainWindow.reset();
 	glfwTerminate();
 
-	glDeleteBuffers(1, &RHI->FrameBufferHandle);
+	glDeleteBuffers(1, &RHI->AuxiliarFrameBuffer);
 
 
 	ASSERT(RHI);
@@ -146,24 +145,36 @@ void OpenGLRenderer::Terminate()
 
 void OpenGLRenderer::Draw()
 {
- 	DrawMirrorStuff();
+ 	//DrawMirrorStuff();
+ 	//SetupBaseUniforms();
 
  	glBindFramebuffer(GL_FRAMEBUFFER, 0);
  	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
- 	SetupBaseUniforms();
  	UpdateUniforms();
  
-	DrawCommands(MainCommands);
- 	DrawCommands(MirrorCommands);
+	DrawSkybox();
+// 	DrawCommands(MainCommands);
+//  	DrawCommands(MirrorCommands);
 
  	CheckShouldCloseWindow(*MainWindow);
  	glfwSwapBuffers(MainWindow->GetHandle());
 }
 
+void OpenGLRenderer::DrawSkybox()
+{
+	if (!MainSkyboxCommand.Parent.lock())
+	{
+		return;
+	}
+	glDepthFunc(GL_LEQUAL);
+	DrawCommands({ MainSkyboxCommand });
+	glDepthFunc(GL_LESS);
+}
+
 void OpenGLRenderer::DrawMirrorStuff()
 {
 	// First draw in the secondary frame buffer for the mirror
-	glBindFramebuffer(GL_FRAMEBUFFER, FrameBufferHandle);
+	glBindFramebuffer(GL_FRAMEBUFFER, AuxiliarFrameBuffer);
 	
 	for (const RenderCommand& mirrorCommand : MirrorCommands)
 	{
@@ -186,7 +197,9 @@ void OpenGLRenderer::DrawMirrorStuff()
  		const glm::mat4 inverse = glm::inverse(parentTransform.GetMatrix());
  		UniformsCache["view"] = inverse;
 
+		RenderCommandsMutex.lock();
 		DrawCommands(MainCommands);
+		RenderCommandsMutex.unlock();
 
 		if (!mirrorCommand.Material->Textures.empty())
 		{
@@ -214,8 +227,6 @@ void OpenGLRenderer::UpdateUniforms()
 
 void OpenGLRenderer::DrawCommands(const eastl::vector<RenderCommand>& inCommands)
 {
-	RenderCommandsMutex.lock();
-
 	for (const RenderCommand& renderCommand : inCommands)
 	{
 		const bool parentValid = !renderCommand.Parent.expired();
@@ -226,8 +237,6 @@ void OpenGLRenderer::DrawCommands(const eastl::vector<RenderCommand>& inCommands
 
 		DrawCommand(renderCommand);
 	}
-
-	RenderCommandsMutex.unlock();
 }
 
 void OpenGLRenderer::DrawCommand(const RenderCommand & inCommand)
@@ -251,6 +260,7 @@ void OpenGLRenderer::DrawCommand(const RenderCommand & inCommand)
 	}
 
 	material->Shader.Bind();
+	material->ResetUniforms();
 
 	UniformsCache["model"] = parent->GetModelMatrix();
 

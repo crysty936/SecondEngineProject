@@ -20,9 +20,6 @@ TestGameMode::TestGameMode()
 
 TestGameMode::~TestGameMode() = default;
 
-eastl::shared_ptr<MirrorQuad> mirrorObj1;
-eastl::shared_ptr<MirrorQuad> mirrorObj2;
-
 void TestGameMode::Init()
 {
 	GameController = eastl::make_unique<Controller>();
@@ -82,9 +79,9 @@ void TestGameMode::Init()
 
  	{
 		// Ground
- 	 	eastl::shared_ptr<CubeShape> centerObj = BasicShapes::CreateCubeObject();
- 		centerObj->Move(glm::vec3(0.f, -2.f, 0.f));
- 		centerObj->SetScale(glm::vec3(100.f, 0.5f, 100.f));
+//  	 	eastl::shared_ptr<CubeShape> centerObj = BasicShapes::CreateCubeObject();
+//  		centerObj->Move(glm::vec3(0.f, -2.f, 0.f));
+//  		centerObj->SetScale(glm::vec3(100.f, 0.5f, 100.f));
  
  	}
 	{
@@ -135,28 +132,13 @@ void TestGameMode::Init()
 	eastl::shared_ptr<AssimpModel3D> model = ObjectCreation::NewObject<AssimpModel3D>("../Data/Models/Backpack/scene.gltf");
 	model->Move(glm::vec3(5.f, 5.f, 5.f));
 	model->SetScale(glm::vec3(0.01f, 0.01f, 0.01f));
-	{
-		mirrorObj1 = ObjectCreation::NewObject<MirrorQuad>();
 
-		mirrorObj1->Move(glm::vec3(0.0f, 0.0f, -10.f));
-	}
- 	{
- 		mirrorObj2 = ObjectCreation::NewObject<MirrorQuad>();
- 
- 		mirrorObj2->Move(glm::vec3(5.0f, 0.0f, -20.f));
- 	}
+	eastl::shared_ptr<Skybox> skybox = ObjectCreation::NewObject<Skybox>();
 }
-
-
 
 void TestGameMode::Tick(float inDeltaT)
 {
 	GameController->ExecuteCallbacks();
-
-	
-	mirrorObj1->LookAt(GameCamera->GetAbsoluteTransform().Translation);
-	mirrorObj2->LookAt(GameCamera->GetAbsoluteTransform().Translation);
-
 }
 
 void TestGameMode::MoveCameraLeft()

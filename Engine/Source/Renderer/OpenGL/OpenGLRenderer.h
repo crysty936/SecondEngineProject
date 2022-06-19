@@ -48,6 +48,7 @@ public:
 	static void Terminate();
 	void Draw();
 
+	void DrawSkybox();
 	void DrawMirrorStuff();
 	void SetupBaseUniforms();
 	void UpdateUniforms();
@@ -64,15 +65,14 @@ public:
 	inline void SetDrawMode(const EDrawMode inDrawMode) { DrawMode = inDrawMode; }
 	void AddRenderLoadCommand(const RenderingLoadCommand& inCommand);
 	inline eastl::queue<RenderingLoadCommand>& GetLoadQueue() { return LoadQueue; }
-	
+
 	//************************************
 	// Returns:   bool, true if the VAO was already present and is initialized, false otherwise
 	// Parameter: eastl::shared_ptr<VertexArrayObject> & outVAO, newly created or cached existing VAO
 	//************************************
 	bool GetOrCreateVAO(const eastl::string& inVAOId, OUT eastl::shared_ptr<VertexArrayObject>& outVAO);
-
 	void AddMirrorCommand(const RenderCommand& inCommand);
-	eastl::vector<RenderCommand> MirrorCommands;
+	inline void SetSkyboxCommand(RenderCommand inSkyboxCommand) { MainSkyboxCommand = inSkyboxCommand; }
 
 private:
 	struct GLFWwindow* CreateNewWindowHandle(const WindowProperties& inWindowProperties) const;
@@ -82,10 +82,12 @@ private:
 	eastl::unique_ptr<class OpenGLWindow> MainWindow;
 	eastl::unordered_map<eastl::string, SelfRegisteringUniform> UniformsCache;
 	eastl::vector<RenderCommand> MainCommands;
+	eastl::vector<RenderCommand> MirrorCommands;
 	EDrawMode DrawMode{ EDrawMode::NORMAL };
 	eastl::queue<RenderingLoadCommand> LoadQueue;
 	eastl::unordered_map<eastl::string, eastl::shared_ptr<class VertexArrayObject>> VAOs;
-	uint32_t FrameBufferHandle;
+	uint32_t AuxiliarFrameBuffer;
+	RenderCommand MainSkyboxCommand;
 };
 
 extern GLFWwindow* LoadingThreadContext;
