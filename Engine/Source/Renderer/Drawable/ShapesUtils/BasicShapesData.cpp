@@ -217,7 +217,7 @@ int32_t BasicShapesData::GetCubeIndicesCount()
 // ~Cube
 
 // Skybox
-float SkyboxVertices[] = {
+constexpr float SkyboxVertices[] = {
 	// positions          
 	-1.0f,  1.0f, -1.0f,
 	-1.0f, -1.0f, -1.0f,
@@ -277,7 +277,7 @@ int32_t BasicShapesData::GetSkyboxIndicesCount()
 	return 36;
 
 	// TODO: Add the indices of the cube to get rid of Draw Arrays
-	return sizeof(CubeIndices) / sizeof(uint32_t);
+	return sizeof(SkyboxVertices) / sizeof(uint32_t);
 }
 // ~Skybox
 

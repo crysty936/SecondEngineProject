@@ -3,6 +3,7 @@
 #include "EASTL/string.h"
 #include "Renderer/OpenGL/OpenGLShader.h"
 #include "Renderer/OpenGL/OpenGLTexture.h"
+#include "EASTL/shared_ptr.h"
 
 struct UniformWithFlag
 {
@@ -27,5 +28,5 @@ public:
 public:
 	eastl::vector<UniformWithFlag> RequiredUniforms;
 	OpenGLShader Shader;
-	eastl::vector<OpenGLTexture> Textures;
+	eastl::vector<eastl::shared_ptr<class OpenGLTexture>> Textures;
 };

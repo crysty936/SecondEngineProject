@@ -88,8 +88,8 @@ void SquareShape::SetupDrawCommands()
 	if (!materialExists)
 	{
 		eastl::string texturePath = "../Data/Textures/openGLExampleTransparentWindow.png";
-		OpenGLTexture tex;
-		tex.Init(texturePath);
+		eastl::shared_ptr<OpenGLTexture> tex = eastl::make_shared<OpenGLTexture>();
+		tex->Init(texturePath);
 		cubeMaterial->Textures.push_back(std::move(tex));
 		cubeMaterial->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/BasicProjectionVertexShader.glsl", "../Data/Shaders/BasicTexFragmentShader.glsl");
 	}
@@ -158,8 +158,8 @@ void CubeShape::SetupDrawCommands()
 	if (!materialExists)
 	{
 		eastl::string texturePath = "../Data/Textures/ExampleContainer.jpg";
-		OpenGLTexture tex;
-		tex.Init(texturePath);
+		eastl::shared_ptr<OpenGLTexture> tex = eastl::make_shared<OpenGLTexture>();
+		tex->Init(texturePath);
 		cubeMaterial->Textures.push_back(std::move(tex));
 		cubeMaterial->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/BasicProjectionVertexShader.glsl", "../Data/Shaders/BasicTexFragmentShader.glsl");
 	}
@@ -217,8 +217,8 @@ void Skybox::SetupDrawCommands()
 			"../Data/Textures/skybox/back.jpg",
 		};
 
-		OpenGLCubeMap tex;
-		tex.Init(textures);
+		eastl::shared_ptr<OpenGLCubeMap> tex = eastl::make_shared<OpenGLCubeMap>();
+		tex->Init(textures);
 		thisMaterial->Textures.push_back(std::move(tex));
 		thisMaterial->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/SkyboxVertexShader.glsl", "../Data/Shaders/SkyboxFragmentShader.glsl");
 	}

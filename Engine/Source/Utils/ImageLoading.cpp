@@ -3,10 +3,16 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 #include "Core/EngineUtils.h"
+#include <mutex>
 
-ImageData ImageLoading::LoadImageData(const char* inTexurePath)
+// TODO: Handle multiple threads with stbi
+// At the moment, flip vertically flag is making multithreading on this impossible
+static std::mutex stbiMutex;
+
+ImageData ImageLoading::LoadImageData(const char* inTexurePath, const bool inFlipped)
 {
-	stbi_set_flip_vertically_on_load(true);
+	std::lock_guard<std::mutex> lock(stbiMutex);
+	stbi_set_flip_vertically_on_load(inFlipped);
 
 	unsigned char* rawData = nullptr;
 	int32_t width, height, nrChannels;
@@ -17,6 +23,7 @@ ImageData ImageLoading::LoadImageData(const char* inTexurePath)
 	if (!ENSURE_MSG(rawData, "Image %s Loading Failed", inTexurePath))
 	{
 		ASSERT(false);
+
 		return {};
 	}
 

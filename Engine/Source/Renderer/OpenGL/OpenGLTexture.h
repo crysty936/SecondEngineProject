@@ -28,7 +28,7 @@ public:
 	void Init(const eastl::string& inTexturePath, const int32_t inTexNr = GL_TEXTURE0);
 
 	virtual void Bind() const;
-	void Unbind() const;
+	virtual void Unbind() const;
 	 
 	void DeleteTexture();
 

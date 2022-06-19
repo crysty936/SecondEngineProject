@@ -7,18 +7,30 @@ OpenGLCubeMap::~OpenGLCubeMap() = default;
 
 void OpenGLCubeMap::Bind() const
 {
-	ASSERT(TexNr != 0);
+	ASSERT(TexNr == GL_TEXTURE0);
+	ASSERT(TexHandle != 0);
 
 	glActiveTexture(TexNr);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, TexHandle);
 }
 
+void OpenGLCubeMap::Unbind() const
+{
+	glActiveTexture(TexNr);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+}
+
 void OpenGLCubeMap::Init(const eastl::vector<eastl::string>& inTexturePaths, const int32_t inTexNr)
 {
+	glGenTextures(1, &TexHandle);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, TexHandle);
-	for (uint32_t i = 0; i < inTexturePaths.size(); i++)
+	const int32_t size = inTexturePaths.size();
+	for (int32_t i = size - 1; i>=0; --i)
 	{
-		ImageData data = ImageLoading::LoadImageData(inTexturePaths[i].data());
+		constexpr bool flipped = false;
+		stbi_set_flip_vertically_on_load(false);
+
+		ImageData data = ImageLoading::LoadImageData(inTexturePaths[i].data(), flipped);
 
 		if (!data.RawData)
 		{
@@ -27,7 +39,6 @@ void OpenGLCubeMap::Init(const eastl::vector<eastl::string>& inTexturePaths, con
 
 		NrChannels = data.NrChannels;
 
-		glActiveTexture(TexNr);
 		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, data.Width, data.Height, 0, GL_RGB, GL_UNSIGNED_BYTE, data.RawData);
 	}
 

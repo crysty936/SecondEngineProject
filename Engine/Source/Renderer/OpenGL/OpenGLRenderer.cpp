@@ -153,8 +153,8 @@ void OpenGLRenderer::Draw()
  	UpdateUniforms();
  
 	DrawSkybox();
-// 	DrawCommands(MainCommands);
-//  	DrawCommands(MirrorCommands);
+ 	DrawCommands(MainCommands);
+//  DrawCommands(MirrorCommands);
 
  	CheckShouldCloseWindow(*MainWindow);
  	glfwSwapBuffers(MainWindow->GetHandle());
@@ -166,8 +166,14 @@ void OpenGLRenderer::DrawSkybox()
 	{
 		return;
 	}
+
+	if (!MainSkyboxCommand.VAO->bReadyForDraw)
+	{
+		MainSkyboxCommand.VAO->SetupState();
+	}
+
 	glDepthFunc(GL_LEQUAL);
-	DrawCommands({ MainSkyboxCommand });
+	DrawCommand(MainSkyboxCommand);
 	glDepthFunc(GL_LESS);
 }
 
@@ -181,11 +187,11 @@ void OpenGLRenderer::DrawMirrorStuff()
 		// Clear the FBO
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 		//const OpenGLTexture& tex = mirrorCommand.Material->Textures[0];
-		OpenGLTexture tex;
+		eastl::shared_ptr<OpenGLTexture> tex = eastl::make_shared<OpenGLTexture>();
 		// Attach the texture to the FBO
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex.TexHandle, 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex->TexHandle, 0);
 		// Set the color in the texture to ClearColor
-		glClearTexImage(tex.TexHandle, 0, GL_RGBA, GL_FLOAT, &ClearColor);
+		glClearTexImage(tex->TexHandle, 0, GL_RGBA, GL_FLOAT, &ClearColor);
 
 		// Set the mirror projection and view uniforms
  		const glm::mat4 projection = glm::perspective(glm::radians(45.0f), 1.f, 0.1f, 1000.0f);
@@ -229,18 +235,18 @@ void OpenGLRenderer::DrawCommands(const eastl::vector<RenderCommand>& inCommands
 {
 	for (const RenderCommand& renderCommand : inCommands)
 	{
-		const bool parentValid = !renderCommand.Parent.expired();
-		if (!ENSURE(parentValid))
-		{
-			continue;
-		}
-
 		DrawCommand(renderCommand);
 	}
 }
 
 void OpenGLRenderer::DrawCommand(const RenderCommand & inCommand)
 {
+	const bool parentValid = !inCommand.Parent.expired();
+	if (!ENSURE(parentValid))
+	{
+		return;
+	}
+
 	const eastl::shared_ptr<const DrawableObject> parent = inCommand.Parent.lock();
 	const eastl::shared_ptr<RenderMaterial> material = GetMaterial(inCommand);
 	const eastl::shared_ptr<VertexArrayObject>& vao = inCommand.VAO;
@@ -264,9 +270,9 @@ void OpenGLRenderer::DrawCommand(const RenderCommand & inCommand)
 
 	UniformsCache["model"] = parent->GetModelMatrix();
 
-	for (const OpenGLTexture& tex : material->Textures)
+	for (const eastl::shared_ptr<OpenGLTexture>& tex : material->Textures)
 	{
-		tex.Bind();
+		tex->Bind();
 	}
 
 	const uint32_t indicesCount = vao->VBuffer.GetIndicesCount();
@@ -289,9 +295,9 @@ void OpenGLRenderer::DrawCommand(const RenderCommand & inCommand)
 
 	vao->Unbind();
 
-	for (const OpenGLTexture& tex : material->Textures)
+	for (const eastl::shared_ptr<OpenGLTexture>& tex : material->Textures)
 	{
-		tex.Unbind();
+		tex->Unbind();
 	}
 
 	material->Shader.UnBind();

@@ -7,7 +7,8 @@ public:
 	OpenGLCubeMap();
 	virtual ~OpenGLCubeMap();
 
-	virtual void Bind() const override;
+	void Bind() const override;
+	void Unbind() const override;
 
 public:
 	void Init(const eastl::vector<eastl::string>& inTexturePaths, const int32_t inTexNr = GL_TEXTURE0);
