@@ -1,19 +1,18 @@
 #pragma once
 #include "Logger/Logger.h"
 #include <stdlib.h>
-#include <stdio.h>
-
+#include <iostream>
 
 #ifndef NDEBUG
 #define ASSERT_MSG(x, inMessage, ...)						\
  {															\
  if(!(x))													\
  {LOG_ERROR(inMessage, __VA_ARGS__);						\
-__debugbreak(); getc(stdin);}									\
+__debugbreak(); std::cin.get();}							\
  }
 
 #define ENSURE_MSG(x, inMessage, ...)						\
-  (!!x) && ([&, x](){											\
+  (!!x) && ([&, x](){										\
   if(!(x))													\
   {LOG_ERROR(inMessage, __VA_ARGS__);						\
  __debugbreak();}											\
@@ -24,7 +23,7 @@ __debugbreak(); getc(stdin);}									\
  {															\
  if(!(x))													\
  {															\
-	__debugbreak(); getc(stdin);}								\
+	__debugbreak(); std::cin.get();}						\
  }															\
 
  #define ENSURE(x)											\

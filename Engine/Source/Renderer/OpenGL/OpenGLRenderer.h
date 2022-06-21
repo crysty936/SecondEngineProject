@@ -12,6 +12,7 @@
 #include "EventSystem/EventSystem.h"
 #include "EASTL/queue.h"
 #include "Core/EngineUtils.h"
+#include "Entity/TransformObject.h"
 
 /**
  * TODO: A Renderer should be made and that should call whatever RHI is present.
@@ -97,3 +98,5 @@ private:
 };
 
 extern GLFWwindow* LoadingThreadContext;
+extern const uint32_t SHADOW_WIDTH;
+extern const uint32_t SHADOW_HEIGHT;

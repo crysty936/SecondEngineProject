@@ -4,9 +4,9 @@
 class OpenGLRenderTexture : public OpenGLTexture
 {
 public:
-	OpenGLRenderTexture();
+	OpenGLRenderTexture(const eastl::string& inTexName);
 	virtual ~OpenGLRenderTexture();
 
 public:
-	void Init(const int32_t inTexNr = GL_TEXTURE0);
+	void Init();
 };

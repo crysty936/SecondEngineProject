@@ -4,9 +4,9 @@
 class OpenGLDepthMap : public OpenGLTexture
 {
 public:
-	OpenGLDepthMap();
+	OpenGLDepthMap(const eastl::string& inTexName);
 	virtual ~OpenGLDepthMap();
 
 public:
-	void Init(const int32_t inTexNr = GL_TEXTURE0);
+	void Init();
 };

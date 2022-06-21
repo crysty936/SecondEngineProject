@@ -4,25 +4,25 @@
 #include "OpenGLRenderer.h"
 #include "Window/WindowProperties.h"
 
-OpenGLRenderTexture::OpenGLRenderTexture() = default;
+OpenGLRenderTexture::OpenGLRenderTexture(const eastl::string& inTexName)
+	: OpenGLTexture(inTexName, GL_TEXTURE_2D) {}
 OpenGLRenderTexture::~OpenGLRenderTexture() = default;
 
-void OpenGLRenderTexture::Init(const int32_t inTexNr)
+void OpenGLRenderTexture::Init()
 {
-	TexNr = GL_TEXTURE0;
 	glGenTextures(1, &TexHandle);
-	glBindTexture(GL_TEXTURE_2D, TexHandle);
+	glBindTexture(GLTexType, TexHandle);
 
 	const WindowProperties& windowProps = RHI->GetMainWindow().GetProperties();
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, windowProps.Width, windowProps.Height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+	glTexImage2D(GLTexType, 0, GL_RGB, windowProps.Width, windowProps.Height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GLTexType, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GLTexType, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GLTexType, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GLTexType, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
-	glBindTexture(GL_TEXTURE_2D, 0);
+	glBindTexture(GLTexType, 0);
 }
 

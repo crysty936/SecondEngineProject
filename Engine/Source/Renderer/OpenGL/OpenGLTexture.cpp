@@ -2,36 +2,26 @@
 #include "Utils/ImageLoading.h"
 #include "GLFW/glfw3.h"
 #include "OpenGLRenderer.h"
+#include "OpenGLShader.h"
+
+// Create a texture buffer
+OpenGLTexture::OpenGLTexture(const eastl::string& inTexName, const uint32_t inGlTexType)
+	: TexName{ inTexName }, GLTexType{ inGlTexType }{}
 
 OpenGLTexture::~OpenGLTexture()
 {
 	DeleteTexture();
 }
 
-// Create a texture buffer
-OpenGLTexture::OpenGLTexture()
-{
-	TexNr = GL_TEXTURE0;
-}
-
-  OpenGLTexture::OpenGLTexture(OpenGLTexture&& inOther)
-  	: TexHandle{inOther.TexHandle}, NrChannels{inOther.NrChannels}, TexPath{std::move(inOther.TexPath)}, TexNr{inOther.TexNr}, TexType{inOther.TexType}
-  {
-	  inOther.TexHandle = -1;
-	  inOther.NrChannels = -1;
-	  inOther.TexNr = -1;
-  }
-
-void OpenGLTexture::Init(const eastl::string& inTexturePath, const int32_t inTexNr)
+void OpenGLTexture::Init(const eastl::string& inTexturePath)
 {
 	glGenTextures(1, &TexHandle);
-	glBindTexture(GL_TEXTURE_2D, TexHandle);
+	glBindTexture(GLTexType, TexHandle);
 
 	const WindowProperties& windowProps = RHI->GetMainWindow().GetProperties();
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, windowProps.Width, windowProps.Height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+	glTexImage2D(GLTexType, 0, GL_RGB, windowProps.Width, windowProps.Height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
 
-	TexNr = inTexNr;
 	ImageData data = ImageLoading::LoadImageData(inTexturePath.data());
 
 	if (!data.RawData)
@@ -43,8 +33,7 @@ void OpenGLTexture::Init(const eastl::string& inTexturePath, const int32_t inTex
 
 	glGenTextures(1, &TexHandle);
 
-	glActiveTexture(TexNr);
-	glBindTexture(GL_TEXTURE_2D, TexHandle);
+	glBindTexture(GLTexType, TexHandle);
 
 	GLenum imageFormat = 0;
 	switch (data.NrChannels)
@@ -66,38 +55,39 @@ void OpenGLTexture::Init(const eastl::string& inTexturePath, const int32_t inTex
 	}
 	}
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, data.Width, data.Height, 0, imageFormat, GL_UNSIGNED_BYTE, data.RawData);
+	glTexImage2D(GLTexType, 0, GL_RGBA8, data.Width, data.Height, 0, imageFormat, GL_UNSIGNED_BYTE, data.RawData);
 	glGenerateMipmap(GL_TEXTURE_2D);
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GLTexType, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GLTexType, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GLTexType, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GLTexType, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	ImageLoading::FreeImageData(data.RawData);
 
-	glBindTexture(GL_TEXTURE_2D, 0);
+	glBindTexture(GLTexType, 0);
 }
 
-void OpenGLTexture::Bind() const
+void OpenGLTexture::Bind(const uint32_t inTexNr) const
 {
+	// TODO: Make the textures be just uniforms that self register, with the others instead of binding the separately
+
 // 	if (NrChannels == 4)
 // 	{
 // 		glEnable(GL_BLEND);
 // 
 // 	}
 
-	ASSERT(TexNr != 0);
 	ASSERT(TexHandle != 0);
 
-	glActiveTexture(TexNr);
-	glBindTexture(GL_TEXTURE_2D, TexHandle);
+	glActiveTexture(GL_TEXTURE0 + inTexNr);
+	glBindTexture(GLTexType, TexHandle);
 }
 
-void OpenGLTexture::Unbind() const
+void OpenGLTexture::Unbind(const uint32_t inTexNr) const
 {
-	glActiveTexture(TexNr);
-	glBindTexture(GL_TEXTURE_2D, 0);
+	glActiveTexture(GL_TEXTURE0 + inTexNr);
+	glBindTexture(GLTexType, 0);
 // 
 // 	if (NrChannels == 4)
 // 	{

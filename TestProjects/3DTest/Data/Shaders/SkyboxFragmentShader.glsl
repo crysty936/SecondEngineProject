@@ -3,11 +3,11 @@
 layout(location = 0) in vec3 inTexCoords;
 layout(location = 0) out vec4 FragColor;
 
-uniform samplerCube cubeMap;
+uniform samplerCube CubeMap;
 
 void main()
 {
-	vec4 color = texture(cubeMap, inTexCoords);
+	vec4 color = texture(CubeMap, inTexCoords);
 
 	FragColor = color;
 }

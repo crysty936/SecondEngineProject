@@ -12,6 +12,7 @@
 #include "Renderer/OpenGL/OpenGLRenderer.h"
 #include "Core/ObjectCreation.h"
 #include "Renderer/Drawable/SkyboxMaterial.h"
+#include "Renderer/Drawable/WithShadowMaterial.h"
 
 // eastl::shared_ptr<IDrawable> BasicShapes::CreateTriangleObject(eastl::string inTexturePath)
 // {
@@ -88,7 +89,7 @@ void SquareShape::SetupDrawCommands()
 	if (!materialExists)
 	{
 		eastl::string texturePath = "../Data/Textures/openGLExampleTransparentWindow.png";
-		eastl::shared_ptr<OpenGLTexture> tex = eastl::make_shared<OpenGLTexture>();
+		eastl::shared_ptr<OpenGLTexture> tex = eastl::make_shared<OpenGLTexture>("DiffuseMap");
 		tex->Init(texturePath);
 		cubeMaterial->Textures.push_back(std::move(tex));
 		cubeMaterial->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/BasicProjectionVertexShader.glsl", "../Data/Shaders/BasicTexFragmentShader.glsl");
@@ -155,12 +156,12 @@ void CubeShape::SetupDrawCommands()
 
 	MaterialsManager& matManager = MaterialsManager::Get();
 	bool materialExists = false;
-	eastl::shared_ptr<RenderMaterial> cubeMaterial = matManager.GetOrAddMaterial("cube_material", materialExists);
+	eastl::shared_ptr<RenderMaterial> cubeMaterial = matManager.GetOrAddMaterial<WithShadowMaterial>("cube_material", materialExists);
 
 	if (!materialExists)
 	{
-		eastl::string texturePath = "../Data/Textures/ExampleContainer.jpg";
-		eastl::shared_ptr<OpenGLTexture> tex = eastl::make_shared<OpenGLTexture>();
+		eastl::string texturePath = "../Data/Textures/MinecraftGrass.jpg";
+		eastl::shared_ptr<OpenGLTexture> tex = eastl::make_shared<OpenGLTexture>("DiffuseMap");
 		tex->Init(texturePath);
 		cubeMaterial->Textures.push_back(std::move(tex));
 		cubeMaterial->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/WithNormalProjectionVertexShader.glsl", "../Data/Shaders/LightingTexFragmentShader.glsl");
@@ -219,7 +220,7 @@ void Skybox::SetupDrawCommands()
 			"../Data/Textures/skybox/back.jpg",
 		};
 
-		eastl::shared_ptr<OpenGLCubeMap> tex = eastl::make_shared<OpenGLCubeMap>();
+		eastl::shared_ptr<OpenGLCubeMap> tex = eastl::make_shared<OpenGLCubeMap>("CubeMap");
 		tex->Init(textures);
 		thisMaterial->Textures.push_back(std::move(tex));
 		thisMaterial->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/SkyboxVertexShader.glsl", "../Data/Shaders/SkyboxFragmentShader.glsl");
@@ -235,4 +236,56 @@ void Skybox::SetupDrawCommands()
 	newCommand.DrawType = EDrawCallType::DrawArrays;
 
 	RHI->SetSkyboxCommand(newCommand);
+}
+
+LightSource::LightSource() = default;
+LightSource::~LightSource() = default;
+
+void LightSource::SetupDrawCommands()
+{
+	const eastl::string vaoName = "lightSourceVAO";
+	eastl::shared_ptr<VertexArrayObject> thisVAO{ nullptr };
+	const bool existingVAO = RHI->GetOrCreateVAO(vaoName, thisVAO);
+
+	if (!existingVAO)
+	{
+		// TODO: Buffers creation should be delegated to the renderer
+		IndexBuffer ibo = IndexBuffer{};
+		int32_t indicesCount = BasicShapesData::GetCubeIndicesCount();
+		ibo.SetIndices(BasicShapesData::GetCubeIndices(), indicesCount, GL_STATIC_DRAW);
+
+		VertexBufferLayout layout = VertexBufferLayout{};
+		// Vertex points
+		layout.Push<float>(3);
+		// Normals
+		layout.Push<float>(3);
+		// Vertex Tex Coords
+		layout.Push<float>(2);
+
+		VertexBuffer vbo = VertexBuffer{ ibo, layout };
+		int32_t verticesCount = BasicShapesData::GetCubeVerticesCount();
+		vbo.SetVertices(BasicShapesData::GetCubeVertices(), verticesCount, GL_STATIC_DRAW);
+
+		thisVAO->VBuffer = vbo;
+	}
+
+	MaterialsManager& matManager = MaterialsManager::Get();
+	bool materialExists = false;
+	eastl::shared_ptr<RenderMaterial> cubeMaterial = matManager.GetOrAddMaterial<RenderMaterial>("light_source_material", materialExists);
+
+	if (!materialExists)
+	{
+		cubeMaterial->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/WithNormalProjectionVertexShader.glsl", "../Data/Shaders/LightSourceFragmentShader.glsl");
+	}
+
+	eastl::shared_ptr<MeshNode> cubeNode = eastl::make_shared<MeshNode>();
+	AddChild(cubeNode);
+
+	RenderCommand newCommand;
+	newCommand.Material = cubeMaterial;
+	newCommand.VAO = thisVAO;
+	newCommand.Parent = cubeNode;
+	newCommand.DrawType = EDrawCallType::DrawArrays;
+
+	RHI->AddCommand(newCommand);
 }

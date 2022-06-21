@@ -43,3 +43,12 @@ public:
 
 	virtual void SetupDrawCommands() override;
 };
+
+class LightSource : public Model3D
+{
+public:
+	LightSource();
+	virtual ~LightSource();
+
+	virtual void SetupDrawCommands() override;
+};

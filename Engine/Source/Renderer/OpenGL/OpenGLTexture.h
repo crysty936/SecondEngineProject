@@ -17,7 +17,7 @@ enum class TextureType : uint8_t
 class OpenGLTexture
 {
 public:
-	OpenGLTexture();
+	OpenGLTexture(const eastl::string& inTexName, const uint32_t inGlTexType = GL_TEXTURE_2D);
 	virtual ~OpenGLTexture();
 	OpenGLTexture(const OpenGLTexture& inOther) = default;
 	OpenGLTexture(OpenGLTexture&& inOther);
@@ -25,19 +25,20 @@ public:
 	OpenGLTexture& operator=(OpenGLTexture&& inOther) = default;
 
 	// Lazy initialization
-	void Init(const eastl::string& inTexturePath, const int32_t inTexNr = GL_TEXTURE0);
+	void Init(const eastl::string& inTexturePath);
 
-	virtual void Bind() const;
-	virtual void Unbind() const;
+	void Bind(const uint32_t inTexNr) const;
+	void Unbind(const uint32_t inTexNr) const;
 	 
 	void DeleteTexture();
 
 	bool operator==(const OpenGLTexture& inOther);
 
 public:
-	eastl::string TexPath{};
-	uint32_t TexHandle{0};
-	int32_t TexNr{0};
-	int32_t NrChannels{0};
+	uint32_t GLTexType = GL_TEXTURE_2D;
+	eastl::string TexName;
+	eastl::string TexPath;
+	uint32_t TexHandle = 0;
+	int32_t NrChannels = 0;
 	TextureType TexType{TextureType::Diffuse};
 };

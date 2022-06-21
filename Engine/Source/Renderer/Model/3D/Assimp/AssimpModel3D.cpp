@@ -227,8 +227,7 @@ eastl::vector<eastl::shared_ptr<OpenGLTexture>> AssimpModel3DLoader::LoadMateria
 	{
 		aiString Str;
 		inMat.GetTexture(inAssimpTexType, i, &Str);
-		eastl::shared_ptr<OpenGLTexture> tex = eastl::make_shared<OpenGLTexture>();
-		tex->TexNr = texureBaseNr + i;
+		eastl::shared_ptr<OpenGLTexture> tex = eastl::make_shared<OpenGLTexture>("DiffuseMap");
 
 		if (!IsTextureLoaded(Str.C_Str(), tex))
 		{

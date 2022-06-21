@@ -23,11 +23,16 @@
 #include "OpenGLRenderTexture.h"
 #include "../Drawable/DepthMaterial.h"
 
+const uint32_t SHADOW_WIDTH = 1024;
+const uint32_t SHADOW_HEIGHT = 1024;
+
 OpenGLRenderer* RHI = nullptr;
 static std::mutex RenderCommandsMutex;
 static std::mutex LoadQueueMutex;
 static std::mutex GetVAOMutex;
 static std::condition_variable LoadQueueCondition;
+
+const glm::vec3 lightPos(-10.0f, 10.0f, -1.0f);
 
 constexpr glm::vec4 ClearColor(0.3f, 0.5f, 1.f, 0.4f);
 
@@ -116,7 +121,6 @@ void OpenGLRenderer::Init(const WindowProperties & inMainWindowProperties)
 	glBindFramebuffer(GL_FRAMEBUFFER, RHI->AuxiliarFrameBuffer);
 
 	const WindowProperties& windowProps = RHI->MainWindow->GetProperties();
-
 	// Create a stencil and depth render buffer object for the frame buffer
 	uint32_t rbo; // render buffer object
 	glGenRenderbuffers(1, &rbo);
@@ -134,12 +138,13 @@ void OpenGLRenderer::Init(const WindowProperties & inMainWindowProperties)
 	glGenFramebuffers(1, &RHI->ShadowMapBuffer);
 	glBindFramebuffer(GL_FRAMEBUFFER, RHI->ShadowMapBuffer);
 
-	RHI->ShadowBufferTex = eastl::make_shared<OpenGLDepthMap>();
+	RHI->ShadowBufferTex = eastl::make_shared<OpenGLDepthMap>("ShadowMap");
 	RHI->ShadowBufferTex->Init();
 
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, RHI->ShadowBufferTex->TexHandle, 0);
-	glDrawBuffer(GL_NONE);
-	glReadBuffer(GL_NONE);
+
+ 	glDrawBuffer(GL_NONE);
+ 	glReadBuffer(GL_NONE);
 
 	ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 
@@ -161,6 +166,7 @@ void OpenGLRenderer::Terminate()
 
 void OpenGLRenderer::Draw()
 {
+	//
 	for (const RenderCommand& mirrorCommand : MirrorCommands)
 	{
 		if (mirrorCommand.Material->Textures.empty())
@@ -168,18 +174,21 @@ void OpenGLRenderer::Draw()
 			mirrorCommand.Material->Textures.push_back(ShadowBufferTex);
 		}
 	}
-
+	//
  	//DrawMirrorStuff();
- 	//SetupBaseUniforms();
 
 	DrawShadowMap();
+ 	SetupBaseUniforms();
+	UpdateUniforms();
 
  	glBindFramebuffer(GL_FRAMEBUFFER, 0);
  	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
- 	UpdateUniforms();
  
-	//DrawSkybox();
- 	DrawCommands(MainCommands);
+	DrawSkybox();
+	RenderCommandsMutex.lock();
+	DrawCommands(MainCommands);
+	RenderCommandsMutex.unlock();
+
 	DrawCommands(MirrorCommands);
 
  	CheckShouldCloseWindow(*MainWindow);
@@ -207,28 +216,29 @@ void OpenGLRenderer::DrawMirrorStuff()
 {
 	// First draw in the secondary frame buffer for the mirror
 	glBindFramebuffer(GL_FRAMEBUFFER, AuxiliarFrameBuffer);
-	
+
 	for (const RenderCommand& mirrorCommand : MirrorCommands)
 	{
 		// Clear the FBO
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 		//const OpenGLTexture& tex = mirrorCommand.Material->Textures[0];
-		eastl::shared_ptr<OpenGLRenderTexture> tex = eastl::make_shared<OpenGLRenderTexture>();
+		eastl::shared_ptr<OpenGLRenderTexture> tex = eastl::make_shared<OpenGLRenderTexture>("QuadTexture");
 		tex->Init();
+
 		// Attach the texture to the FBO
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex->TexHandle, 0);
 		// Set the color in the texture to ClearColor
 		glClearTexImage(tex->TexHandle, 0, GL_RGBA, GL_FLOAT, &ClearColor);
 
 		// Set the mirror projection and view uniforms
- 		const glm::mat4 projection = glm::perspective(glm::radians(45.0f), 1.f, 0.1f, 1000.0f);
- 		UniformsCache["projection"] = projection;
- 
- 		const eastl::shared_ptr<const DrawableObject> parent = mirrorCommand.Parent.lock();
+		const glm::mat4 projection = glm::perspective(glm::radians(45.0f), 1.f, 0.1f, 1000.0f);
+		UniformsCache["projection"] = projection;
+
+		const eastl::shared_ptr<const DrawableObject> parent = mirrorCommand.Parent.lock();
 		Transform parentTransform = parent->GetAbsoluteTransform();
 		parentTransform.Scale = glm::vec3(1.f, 1.f, -1.f);
- 		const glm::mat4 inverse = glm::inverse(parentTransform.GetMatrix());
- 		UniformsCache["view"] = inverse;
+		const glm::mat4 inverse = glm::inverse(parentTransform.GetMatrix());
+		UniformsCache["view"] = inverse;
 
 		RenderCommandsMutex.lock();
 		DrawCommands(MainCommands);
@@ -248,32 +258,31 @@ void OpenGLRenderer::DrawMirrorStuff()
 
 void OpenGLRenderer::DrawShadowMap()
 {
-	SetDrawMode(EDrawMode::DEPTH);
-
-	SetViewportSize(1024, 1024);
-	
 	glBindFramebuffer(GL_FRAMEBUFFER, ShadowMapBuffer);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-	const float near_plane = 1.0f;
-	const float far_plane = 50.5f;
+	SetDrawMode(EDrawMode::DEPTH);
+	SetViewportSize(SHADOW_WIDTH, SHADOW_HEIGHT);
+	
+	//const glm::vec3 lightLoc = LightSource->GetAbsoluteTransform().Translation;
+	//const glm::mat4 lightView = UniformsCache["view"].Value.Value4fv;
+	const glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	const float near_plane = 1.f;
+	const float far_plane = 20.f;
 	const glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
 
-  	const glm::mat4 lightView = glm::lookAt(glm::vec3(-2.0f, 4.0f, -1.0f),
-  		glm::vec3(0.0f, 0.0f, 0.0f),
-  		glm::vec3(0.0f, 1.0f, 0.0f));
-
-	//const glm::mat4 lightView = UniformsCache["view"].Value.Value4fv;
+	//UniformsCache["projection"] = lightProjection;
 
 	const glm::mat4 lightSpaceMatrix = lightProjection * lightView;
-	UniformsCache["lightSpaceMatrix"] = lightView;
+	UniformsCache["lightSpaceMatrix"] = lightSpaceMatrix;
 
+	RenderCommandsMutex.lock();
 	DrawCommands(MainCommands);
+	RenderCommandsMutex.unlock();
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	SetViewportSizeToMain();
-
 	SetDrawMode(EDrawMode::NORMAL);
 }
 
@@ -328,10 +337,18 @@ void OpenGLRenderer::DrawCommand(const RenderCommand & inCommand)
 
 	UniformsCache["model"] = parent->GetModelMatrix();
 
-	for (const eastl::shared_ptr<OpenGLTexture>& tex : material->Textures)
+	int32_t i = 0;
+	for (i = 0; i < material->Textures.size(); ++i)
 	{
-		tex->Bind();
+		eastl::shared_ptr<OpenGLTexture>& tex = material->Textures[i];
+		tex->Bind(i);
 	}
+
+	//
+	ShadowBufferTex->Bind(i);
+	//
+	RHI->UniformsCache["ShadowMap"] = uint32_t(i);
+	RHI->UniformsCache["LightPos"] = lightPos;
 
 	const uint32_t indicesCount = vao->VBuffer.GetIndicesCount();
 	vao->Bind();
@@ -353,10 +370,15 @@ void OpenGLRenderer::DrawCommand(const RenderCommand & inCommand)
 
 	vao->Unbind();
 
-	for (const eastl::shared_ptr<OpenGLTexture>& tex : material->Textures)
+	for (i = 0; i < material->Textures.size(); ++i)
 	{
-		tex->Unbind();
+		eastl::shared_ptr<OpenGLTexture>& tex = material->Textures[i];
+		tex->Unbind(i);
 	}
+
+	//
+	ShadowBufferTex->Unbind(i);
+	//
 
 	material->Shader.UnBind();
 }
