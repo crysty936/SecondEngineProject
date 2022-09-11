@@ -35,21 +35,6 @@ MaterialsManager& MaterialsManager::Get()
 	return *Instance;
 }
 
-eastl::shared_ptr<RenderMaterial>& MaterialsManager::GetMaterial(const eastl::string& inMaterialID)
-{
-	using materialsIterator = const eastl::unordered_map<eastl::string, eastl::shared_ptr<RenderMaterial>>::iterator;
-	const materialsIterator& iter = LoadedMaterials.find(inMaterialID);
-	const bool materialExists = iter != LoadedMaterials.end();
-
-	ASSERT(materialExists);
-
-	// TODO: If material does not exist, return placeholder material
-
-	eastl::shared_ptr<RenderMaterial>& foundMaterial = (*iter).second;
-
-	return foundMaterial;
-}
-
 eastl::shared_ptr<RenderMaterial> MaterialsManager::FindMaterial(const eastl::string& inMaterialID)
 {
 	ReadLock lock(MaterialsMutex);

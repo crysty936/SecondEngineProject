@@ -92,31 +92,55 @@ void OpenGLShader::UnBind()
 
 void OpenGLShader::SetUniformValue4f(const eastl::string & UniformName, float v1, float v2, float v3, float v4) const
 {
-	glUniform4f(GetUniformLocation(UniformName), v1, v2, v3, v4);
+	const int32_t uniformLocation = GetUniformLocation(UniformName);
+	if (uniformLocation != -1)
+	{
+		glUniform4f(GetUniformLocation(UniformName), v1, v2, v3, v4);
+	}
 }
 void OpenGLShader::SetUniformValue3f(const eastl::string & UniformName, float v1, float v2, float v3) const
 {
-	glUniform3f(GetUniformLocation(UniformName), v1, v2, v3);
+	const int32_t uniformLocation = GetUniformLocation(UniformName);
+	if (uniformLocation != -1)
+	{
+		glUniform3f(GetUniformLocation(UniformName), v1, v2, v3);
+	}
 }
 
 void OpenGLShader::SetUniformValue1f(const eastl::string & UniformName, float v1) const
 {
-	glUniform1f(GetUniformLocation(UniformName), v1);
+	const int32_t uniformLocation = GetUniformLocation(UniformName);
+	if (uniformLocation != -1)
+	{
+		glUniform1f(GetUniformLocation(UniformName), v1);
+	}
 }
 
 void OpenGLShader::SetUniformValue1i(const eastl::string & UniformName, int v1) const
 {
-	glUniform1i(GetUniformLocation(UniformName), v1);
+	const int32_t uniformLocation = GetUniformLocation(UniformName);
+	if (uniformLocation != -1)
+	{
+		glUniform1i(GetUniformLocation(UniformName), v1);
+	}
 }
 
 void OpenGLShader::SetUniformValue4fv(const eastl::string & UniformName, glm::mat4 matrix) const
 {
-	glUniformMatrix4fv(GetUniformLocation(UniformName), 1, GL_FALSE, glm::value_ptr(matrix));
+	const int32_t uniformLocation = GetUniformLocation(UniformName);
+	if (uniformLocation != -1)
+	{
+		glUniformMatrix4fv(GetUniformLocation(UniformName), 1, GL_FALSE, glm::value_ptr(matrix));
+	}
 }
 
 void OpenGLShader::SetUniformValue3fv(const eastl::string & UniformName, glm::vec3 vec) const
 {
-	glUniform3fv(GetUniformLocation(UniformName), 1, glm::value_ptr(vec));
+	const int32_t uniformLocation = GetUniformLocation(UniformName);
+	if (uniformLocation != -1)
+	{
+		glUniform3fv(GetUniformLocation(UniformName), 1, glm::value_ptr(vec));
+	}
 }
 
 int OpenGLShader::GetUniformLocation(const eastl::string & UniformName) const
@@ -128,7 +152,10 @@ int OpenGLShader::GetUniformLocation(const eastl::string & UniformName) const
 	if (uniformLocation != -1)
 		UniformLocations[UniformName] = uniformLocation;
 
-	ASSERT_MSG(uniformLocation != -1, "Uniform location could not be found for: %s!", UniformName.data());
+	if (uniformLocation == -1)
+	{
+		LOG_WARNING("Uniform location could not be found for: %s!", UniformName.data());
+	}
 
 	return uniformLocation;
 }

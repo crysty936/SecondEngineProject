@@ -23,8 +23,8 @@
 #include "OpenGLRenderTexture.h"
 #include "../Drawable/DepthMaterial.h"
 
-const uint32_t SHADOW_WIDTH = 1024;
-const uint32_t SHADOW_HEIGHT = 1024;
+const uint32_t SHADOW_WIDTH = 4096;
+const uint32_t SHADOW_HEIGHT = 4096;
 
 OpenGLRenderer* RHI = nullptr;
 static std::mutex RenderCommandsMutex;
@@ -175,6 +175,8 @@ void OpenGLRenderer::Draw()
 		}
 	}
 	//
+	UpdateUniforms();
+
  	//DrawMirrorStuff();
 
 	DrawShadowMap();
@@ -258,6 +260,8 @@ void OpenGLRenderer::DrawMirrorStuff()
 
 void OpenGLRenderer::DrawShadowMap()
 {
+	// Cull front face to solve Peter Panning
+	//glCullFace(GL_FRONT);
 	glBindFramebuffer(GL_FRAMEBUFFER, ShadowMapBuffer);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
@@ -265,7 +269,6 @@ void OpenGLRenderer::DrawShadowMap()
 	SetViewportSize(SHADOW_WIDTH, SHADOW_HEIGHT);
 	
 	//const glm::vec3 lightLoc = LightSource->GetAbsoluteTransform().Translation;
-	//const glm::mat4 lightView = UniformsCache["view"].Value.Value4fv;
 	const glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	const float near_plane = 1.f;
 	const float far_plane = 20.f;
@@ -274,6 +277,7 @@ void OpenGLRenderer::DrawShadowMap()
 	//UniformsCache["projection"] = lightProjection;
 
 	const glm::mat4 lightSpaceMatrix = lightProjection * lightView;
+
 	UniformsCache["lightSpaceMatrix"] = lightSpaceMatrix;
 
 	RenderCommandsMutex.lock();
@@ -284,6 +288,9 @@ void OpenGLRenderer::DrawShadowMap()
 
 	SetViewportSizeToMain();
 	SetDrawMode(EDrawMode::NORMAL);
+
+	// Reset to default
+	//glCullFace(GL_BACK);
 }
 
 void OpenGLRenderer::SetupBaseUniforms()

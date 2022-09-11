@@ -14,7 +14,6 @@ public:
 	static void Init();
 	static void Terminate();
 	static MaterialsManager& Get();
-	eastl::shared_ptr<class RenderMaterial>& GetMaterial(const eastl::string& inMaterialID);
 
 public:
 	// TODO: This should preferrably be removed, materials should only be added by the Asset Manager at startup once deserialization is done
