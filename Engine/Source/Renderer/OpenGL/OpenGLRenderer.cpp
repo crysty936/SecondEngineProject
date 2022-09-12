@@ -167,18 +167,7 @@ void OpenGLRenderer::Terminate()
 
 void OpenGLRenderer::Draw()
 {
-	//
-	for (const RenderCommand& mirrorCommand : MirrorCommands)
-	{
-		if (mirrorCommand.Material->Textures.empty())
-		{
-			mirrorCommand.Material->Textures.push_back(ShadowBufferTex);
-		}
-	}
-	//
 	UpdateUniforms();
-
- 	//DrawMirrorStuff();
 
 	//DrawShadowMap();
 
@@ -192,8 +181,6 @@ void OpenGLRenderer::Draw()
 	RenderCommandsMutex.lock();
 	DrawCommands(MainCommands);
 	RenderCommandsMutex.unlock();
-
-	DrawCommands(MirrorCommands);
 
  	CheckShouldCloseWindow(*MainWindow);
  	glfwSwapBuffers(MainWindow->GetHandle());
@@ -214,50 +201,6 @@ void OpenGLRenderer::DrawSkybox()
 	glDepthFunc(GL_LEQUAL);
 	DrawCommand(MainSkyboxCommand);
 	glDepthFunc(GL_LESS);
-}
-
-void OpenGLRenderer::DrawMirrorStuff()
-{
-	// First draw in the secondary frame buffer for the mirror
-	glBindFramebuffer(GL_FRAMEBUFFER, AuxiliarFrameBuffer);
-
-	for (const RenderCommand& mirrorCommand : MirrorCommands)
-	{
-		// Clear the FBO
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-		//const OpenGLTexture& tex = mirrorCommand.Material->Textures[0];
-		eastl::shared_ptr<OpenGLRenderTexture> tex = eastl::make_shared<OpenGLRenderTexture>("QuadTexture");
-		tex->Init();
-
-		// Attach the texture to the FBO
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex->TexHandle, 0);
-		// Set the color in the texture to ClearColor
-		glClearTexImage(tex->TexHandle, 0, GL_RGBA, GL_FLOAT, &ClearColor);
-
-		// Set the mirror projection and view uniforms
-		const glm::mat4 projection = glm::perspective(glm::radians(45.0f), 1.f, 0.1f, 1000.0f);
-		UniformsCache["projection"] = projection;
-
-		const eastl::shared_ptr<const DrawableObject> parent = mirrorCommand.Parent.lock();
-		Transform parentTransform = parent->GetAbsoluteTransform();
-		parentTransform.Scale = glm::vec3(1.f, 1.f, -1.f);
-		const glm::mat4 inverse = glm::inverse(parentTransform.GetMatrix());
-		UniformsCache["view"] = inverse;
-
-		RenderCommandsMutex.lock();
-		DrawCommands(MainCommands);
-		RenderCommandsMutex.unlock();
-
-		if (!mirrorCommand.Material->Textures.empty())
-		{
-			mirrorCommand.Material->Textures.pop_back();
-		}
-
-		// Detach the current texture from the buffer
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0);
-
-		mirrorCommand.Material->Textures.push_back(std::move(tex));
-	}
 }
 
 void OpenGLRenderer::DrawShadowMap()
@@ -456,8 +399,8 @@ void OpenGLRenderer::SetVSyncEnabled(const bool inEnabled)
 
 void OpenGLRenderer::AddMirrorCommand(const RenderCommand& inCommand)
 {
-	std::lock_guard<std::mutex> lock(RenderCommandsMutex);
-	MirrorCommands.push_back(inCommand);
+// 	std::lock_guard<std::mutex> lock(RenderCommandsMutex);
+// 	MirrorCommands.push_back(inCommand);
 }
 
 void OpenGLRenderer::AddCommand(const RenderCommand & inCommand)

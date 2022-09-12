@@ -51,7 +51,6 @@ public:
 	void Draw();
 
 	void DrawSkybox();
-	void DrawMirrorStuff();
 	void DrawShadowMap();
 	void SetupBaseUniforms();
 	void UpdateUniforms();
@@ -85,7 +84,6 @@ private:
 	eastl::unique_ptr<class OpenGLWindow> MainWindow;
 	eastl::unordered_map<eastl::string, SelfRegisteringUniform> UniformsCache;
 	eastl::vector<RenderCommand> MainCommands;
-	eastl::vector<RenderCommand> MirrorCommands;
 	EDrawMode DrawMode{ EDrawMode::NORMAL };
 	eastl::queue<RenderingLoadCommand> LoadQueue;
 	eastl::unordered_map<eastl::string, eastl::shared_ptr<class VertexArrayObject>> VAOs;
