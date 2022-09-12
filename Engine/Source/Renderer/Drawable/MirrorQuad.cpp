@@ -42,7 +42,6 @@ void MirrorQuad::SetupDrawCommands()
 	// Mirrors have to have unique materials
 	static int mirrorNr = 0;
 	const eastl::string mirrorMaterialName(eastl::string::CtorSprintf{}, "mirror_material_%d", ++mirrorNr);
-	//const eastl::string mirrorMaterialName("test");
 
 	MaterialsManager& matManager = MaterialsManager::Get();
 	bool materialExists = false;

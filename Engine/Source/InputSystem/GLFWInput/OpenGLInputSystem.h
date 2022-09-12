@@ -2,7 +2,7 @@
 #include "EventSystem/EventSystem.h"
 #include "GLFW/glfw3.h"
 #include "Core/EngineUtils.h"
-#include "InputSystem/GLFWInput/WindowsInputKeys.h"
+#include "InputSystem/WindowsInputKeys.h"
 #include "InputSystem/InputEventType.h"
 #include "Entity/Entity.h"
 
@@ -10,11 +10,11 @@ using KeyDelegate = MulticastDelegate<KeyCode, InputEventType>;
 using MousePosDelegate = MulticastDelegate<float, float>;
 using MouseScrollDelegate = MulticastDelegate<float>;
 
-class InputSystem
+class OpenGLInputSystem
 {
 private:
-	InputSystem();
-	~InputSystem();
+	OpenGLInputSystem();
+	~OpenGLInputSystem();
 
 public:
 	static void Init();
@@ -22,7 +22,7 @@ public:
 	void PollEvents();
 
 public:
-	static inline InputSystem& Get() { ASSERT(Instance); return *Instance; }
+	static inline OpenGLInputSystem& Get() { ASSERT(Instance); return *Instance; }
 
 	/** Callbacks for others to tie into */
 	inline KeyDelegate& OnKeyInput() { return OnKeyInputDelegate; }
@@ -36,7 +36,7 @@ private:
 	static void MouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 
 private:
-	static InputSystem* Instance;
+	static OpenGLInputSystem* Instance;
 
 private:
 	KeyDelegate OnKeyInputDelegate;

@@ -12,7 +12,7 @@ enum class TextureType : uint8_t
 /**
  * Texture wrapper class for OpenGl functionality
  * Creates and initializes texture in constructor and deletes in destructor
- * Textures should always be moved unless purposely cached!
+ * Textures should always be moved unless intentionally cached!
  */
 class OpenGLTexture
 {

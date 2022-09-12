@@ -4,7 +4,7 @@
 #include "Logger/Logger.h"
 #include "Renderer/OpenGL/OpenGLRenderer.h"
 #include "Window/OpenGLWindow.h"
-#include "InputSystem/GLFWInput/InputSystem.h"
+#include "InputSystem/GLFWInput/OpenGLInputSystem.h"
 #include "Scene/SceneManager.h"
 #include "Scene/Scene.h"
 #include "Entity/Entity.h"
@@ -41,7 +41,7 @@ void EngineCore::Init()
 
 	// Init all engine subsystems
 	OpenGLRenderer::Init();
-	InputSystem::Init();
+	OpenGLInputSystem::Init();
 	SceneManager::Init();
 	TimersManager::Init();
 	MaterialsManager::Init();
@@ -59,7 +59,7 @@ void EngineCore::Terminate()
 	TimersManager::Terminate();
 	SceneManager::Terminate();
 	OpenGLRenderer::Terminate();
-	InputSystem::Terminate();
+	OpenGLInputSystem::Terminate();
 
 	ASSERT(Engine);
 	delete Engine;
@@ -92,7 +92,7 @@ void EngineCore::Run()
 		//Logger::GetLogger().Log("Delta time: %lf", CurrentDeltaT);
 		lastTime = currentTime;
 
-		InputSystem::Get().PollEvents();
+		OpenGLInputSystem::Get().PollEvents();
 		//Call tickableObjects: Camera, etc
 
 		// Tick Timers

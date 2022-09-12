@@ -14,44 +14,58 @@
 #include "Renderer/Drawable/SkyboxMaterial.h"
 #include "Renderer/Drawable/WithShadowMaterial.h"
 
-// eastl::shared_ptr<IDrawable> BasicShapes::CreateTriangleObject(eastl::string inTexturePath)
-// {
-// 	if (inTexturePath.empty())
-// 	{
-// 		inTexturePath = eastl::string("../Data/Textures/ExampleContainer.jpg");
-// 	}
-// 
-// 	eastl::shared_ptr<SimpleShapeDrawable> obj = eastl::make_shared<TriangleShape>(inTexturePath);
-// 
-// 	return obj;
-// }
-// 
-// TriangleShape::TriangleShape(const eastl::string& inTexturePath)
-// {
-// 	IndexBuffer ibo = IndexBuffer{};
-// 	int32_t indicesCount = BasicShapesData::GetTriangleIndicesCount();
-// 	ibo.SetIndices(BasicShapesData::GetTriangleIndices(), indicesCount, GL_STATIC_DRAW);
-// 
-// 	VertexBufferLayout layout = VertexBufferLayout{};
-// 	// Vertex points
-// 	layout.Push<float>(3);
-// 	// Vertex Tex Coords
-// 	layout.Push<float>(2);
-// 
-// 	VertexBuffer vbo = VertexBuffer{ ibo, layout };
-// 	int32_t verticesCount = BasicShapesData::GetTriangleVerticesCount();
-// 	vbo.SetVertices(BasicShapesData::GetTriangleVertices(), verticesCount, GL_STATIC_DRAW);
-// 
-// 	ObjectVAO.VBuffer = vbo;
-// 	ObjectVAO.SetupState();
-// 
-// 	Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/BasicProjectionVertexShader.glsl", "../Data/Shaders/BasicTexFragmentShader.glsl");
-// 
-// 	OpenGLTexture tex{ inTexturePath, texureBaseNr + 0 };
-// 	AddTexture(tex);
-// }
-// 
-// TriangleShape::~TriangleShape() = default;
+
+TriangleShape::TriangleShape() = default;
+TriangleShape::~TriangleShape() = default;
+
+void TriangleShape::SetupDrawCommands()
+{
+	const eastl::string vaoName = "triangleVAO";
+	eastl::shared_ptr<VertexArrayObject> thisVAO{ nullptr };
+	const bool existingVAO = RHI->GetOrCreateVAO(vaoName, thisVAO);
+
+	if (!existingVAO)
+	{
+		// TODO: Buffers creation should be delegated to the renderer
+		IndexBuffer ibo = IndexBuffer{};
+		int32_t indicesCount = BasicShapesData::GetTriangleIndicesCount();
+		ibo.SetIndices(BasicShapesData::GetTriangleIndices(), indicesCount, GL_STATIC_DRAW);
+
+		VertexBufferLayout layout = VertexBufferLayout{};
+		// Vertex points
+		layout.Push<float>(3);
+		// Vertex Tex Coords
+		layout.Push<float>(2);
+
+		VertexBuffer vbo = VertexBuffer{ ibo, layout };
+		int32_t verticesCount = BasicShapesData::GetTriangleVerticesCount();
+		vbo.SetVertices(BasicShapesData::GetTriangleVertices(), verticesCount, GL_STATIC_DRAW);
+
+		thisVAO->VBuffer = vbo;
+	}
+
+	MaterialsManager& matManager = MaterialsManager::Get();
+	bool materialExists = false;
+	eastl::shared_ptr<RenderMaterial> cubeMaterial = matManager.GetOrAddMaterial("square_material", materialExists);
+
+	if (!materialExists)
+	{
+		//eastl::string texturePath = "../Data/Textures/openGLExampleTransparentWindow.png";
+		//eastl::shared_ptr<OpenGLTexture> tex = eastl::make_shared<OpenGLTexture>("DiffuseMap");
+		//tex->Init(texturePath);
+		//cubeMaterial->Textures.push_back(std::move(tex));
+		cubeMaterial->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/BasicProjectionVertexShader.glsl", "../Data/Shaders/FragmentShader_ColorBasedOnPosition.glsl");
+	}
+
+	RenderCommand newCommand;
+	newCommand.Material = cubeMaterial;
+	newCommand.VAO = thisVAO;
+	newCommand.Parent = this_shared(this);
+	newCommand.DrawType = EDrawCallType::DrawElements;
+
+	RHI->AddCommand(newCommand);
+}
+
 
 SquareShape::SquareShape() = default;
 SquareShape::~SquareShape() = default;
@@ -88,10 +102,10 @@ void SquareShape::SetupDrawCommands()
 
 	if (!materialExists)
 	{
-		eastl::string texturePath = "../Data/Textures/openGLExampleTransparentWindow.png";
-		eastl::shared_ptr<OpenGLTexture> tex = eastl::make_shared<OpenGLTexture>("DiffuseMap");
-		tex->Init(texturePath);
-		cubeMaterial->Textures.push_back(std::move(tex));
+		//eastl::string texturePath = "../Data/Textures/openGLExampleTransparentWindow.png";
+		//eastl::shared_ptr<OpenGLTexture> tex = eastl::make_shared<OpenGLTexture>("DiffuseMap");
+		//tex->Init(texturePath);
+		//cubeMaterial->Textures.push_back(std::move(tex));
 		cubeMaterial->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/BasicProjectionVertexShader.glsl", "../Data/Shaders/BasicTexFragmentShader.glsl");
 	}
 

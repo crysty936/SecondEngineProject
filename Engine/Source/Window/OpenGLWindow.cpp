@@ -24,15 +24,6 @@ OpenGLWindow::~OpenGLWindow()
 	RHI->DestroyWindow(WindowHandle);
 }
 
-
-void OpenGLWindow::Open()
-{
-	LOG_INFO("Creating Window %s (%d, %d).", Properties.Title, Properties.Width, Properties.Height);
-
-
-
-}
-
 void OpenGLWindow::SetVSyncEnabled(const bool inEnabled)
 {
 	Properties.VSyncEnabled = inEnabled;

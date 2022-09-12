@@ -2,13 +2,15 @@
 #include "EASTL/shared_ptr.h"
 #include "Renderer/Model/3D/Model3D.h"
 
-// class TriangleShape : public SimpleShapeDrawable
-// {
-// public:
-// 	TriangleShape(const eastl::string& inTexturePath = {});
-// 	virtual ~TriangleShape();
-// };
-// 
+class TriangleShape : public DrawableObject, public IDrawableContainer
+{
+public:
+	TriangleShape();
+	virtual ~TriangleShape();
+
+	void SetupDrawCommands() override;
+};
+
  class SquareShape : public DrawableObject, public IDrawableContainer
  {
  public:

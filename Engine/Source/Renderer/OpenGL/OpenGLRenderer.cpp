@@ -66,12 +66,13 @@ OpenGLRenderer::OpenGLRenderer(const WindowProperties& inMainWindowProperties)
 
 	ASSERT(glfwSuccess);
 
-	glfwSetErrorCallback(OpenGLUtils::GLFWErrorCallback);
+	//glfwSetErrorCallback(OpenGLUtils::GLFWErrorCallback);
 
 	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
 
 	// Create new Window for data holding
-	MainWindow = CreateWindow(inMainWindowProperties);
+	GLFWwindow* newWindowHandle = glfwCreateWindow(inMainWindowProperties.Width, inMainWindowProperties.Height, inMainWindowProperties.Title.data(), nullptr, nullptr);
+	MainWindow = eastl::make_unique<OpenGLWindow>(newWindowHandle, inMainWindowProperties);
 
 	// Set Context
 	GLFWwindow* mainWindowHandle = MainWindow->GetHandle();
@@ -179,7 +180,8 @@ void OpenGLRenderer::Draw()
 
  	//DrawMirrorStuff();
 
-	DrawShadowMap();
+	//DrawShadowMap();
+
  	SetupBaseUniforms();
 	UpdateUniforms();
 
@@ -442,14 +444,6 @@ eastl::shared_ptr<RenderMaterial> OpenGLRenderer::GetMaterial(const RenderComman
 	return { nullptr };
 }
 
-eastl::unique_ptr<OpenGLWindow> OpenGLRenderer::CreateWindow(const WindowProperties & inWindowProperties) const
-{
-	GLFWwindow* newHandle = CreateNewWindowHandle(inWindowProperties);
-	eastl::unique_ptr<OpenGLWindow> newWindow = eastl::make_unique<OpenGLWindow>(newHandle);
-
-	return newWindow;
-}
-
 void OpenGLRenderer::DestroyWindow(GLFWwindow * inWindowHandle) const
 {
 	glfwDestroyWindow(inWindowHandle);
@@ -521,13 +515,6 @@ void OpenGLRenderer::SetViewportSizeToMain()
 {
 	const WindowProperties& props = MainWindow->GetProperties();
 	SetViewportSize(props.Width, props.Height);
-}
-
-GLFWwindow* OpenGLRenderer::CreateNewWindowHandle(const WindowProperties & inWindowProperties) const
-{
-	GLFWwindow* newWindowHandle = glfwCreateWindow(inWindowProperties.Width, inWindowProperties.Height, inWindowProperties.Title.data(), nullptr, nullptr);
-
-	return newWindowHandle;
 }
 
 void OpenGLRenderer::CheckShouldCloseWindow(const OpenGLWindow & inWindow)

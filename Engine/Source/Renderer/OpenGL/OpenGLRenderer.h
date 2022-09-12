@@ -58,7 +58,6 @@ public:
 	void DrawCommands(const eastl::vector<RenderCommand>& inCommands);
 	void DrawCommand(const RenderCommand& inCommand);
 	eastl::shared_ptr<RenderMaterial> GetMaterial(const RenderCommand& inCommand) const;
-	eastl::unique_ptr<OpenGLWindow> CreateWindow(const WindowProperties& inWindowProperties) const;
 	void DestroyWindow(GLFWwindow* inWindowHandle) const;
 	void SetVSyncEnabled(const bool inEnabled);
 	inline class OpenGLWindow& GetMainWindow() { return *MainWindow; }
@@ -80,7 +79,6 @@ public:
 private:
 	void SetViewportSize(const int32_t inWidth, const int32_t inHeight);
 	void SetViewportSizeToMain();
-	struct GLFWwindow* CreateNewWindowHandle(const WindowProperties& inWindowProperties) const;
 	void CheckShouldCloseWindow(const OpenGLWindow& inWindow);
 
 private:

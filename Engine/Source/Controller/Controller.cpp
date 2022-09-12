@@ -3,9 +3,9 @@
 
 Controller::Controller()
 {
-	InputSystem::Get().OnKeyInput().BindRaw(this, &Controller::OnKeyInputReceived);
-	InputSystem::Get().OnMouseMoved().BindRaw(this, &Controller::OnMouseMoveInputReceived);
-	InputSystem::Get().OnMouseScroll().BindRaw(this, &Controller::OnMouseScrollInputReceived);
+	OpenGLInputSystem::Get().OnKeyInput().BindRaw(this, &Controller::OnKeyInputReceived);
+	OpenGLInputSystem::Get().OnMouseMoved().BindRaw(this, &Controller::OnMouseMoveInputReceived);
+	OpenGLInputSystem::Get().OnMouseScroll().BindRaw(this, &Controller::OnMouseScrollInputReceived);
 }
 
 Controller::~Controller() = default;

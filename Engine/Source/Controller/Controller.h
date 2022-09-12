@@ -1,8 +1,8 @@
 #pragma once
 
-#include "InputSystem/GLFWInput/InputSystem.h"
+#include "InputSystem/GLFWInput/OpenGLInputSystem.h"
 #include "EASTL/unordered_map.h"
-#include "InputSystem/GLFWInput/WindowsInputKeys.h"
+#include "InputSystem/WindowsInputKeys.h"
 #include "InputSystem/InputEventType.h"
 #include "EventSystem/EventSystem.h"
 
