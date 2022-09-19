@@ -3,9 +3,9 @@
 
 Controller::Controller()
 {
-	OpenGLInputSystem::Get().OnKeyInput().BindRaw(this, &Controller::OnKeyInputReceived);
-	OpenGLInputSystem::Get().OnMouseMoved().BindRaw(this, &Controller::OnMouseMoveInputReceived);
-	OpenGLInputSystem::Get().OnMouseScroll().BindRaw(this, &Controller::OnMouseScrollInputReceived);
+	InputSystem::Get().OnKeyInput().BindRaw(this, &Controller::OnKeyInputReceived);
+	InputSystem::Get().OnMouseMoved().BindRaw(this, &Controller::OnMouseMoveInputReceived);
+	InputSystem::Get().OnMouseScroll().BindRaw(this, &Controller::OnMouseScrollInputReceived);
 }
 
 Controller::~Controller() = default;
@@ -48,12 +48,12 @@ void Controller::ExecuteCallbacks()
 	}
 }
 
-void Controller::OnKeyInputReceived(KeyCode inKeyCode, InputEventType inEventType)
+void Controller::OnKeyInputReceived(EInputKey inKeyCode, InputEventType inEventType)
 {
-	if (inKeyCode == KeyCode::Escape)
-	{
-		StopEngineRunning();
-	}
+ 	if (inKeyCode == EInputKey::Escape)
+ 	{
+ 		StopEngine();
+ 	}
 
 	// 	switch (inEventType)
 	// 	{

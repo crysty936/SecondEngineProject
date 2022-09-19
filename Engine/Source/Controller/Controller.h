@@ -1,8 +1,8 @@
 #pragma once
 
-#include "InputSystem/GLFWInput/OpenGLInputSystem.h"
+#include "InputSystem/GLFWInput/InputSystem.h"
 #include "EASTL/unordered_map.h"
-#include "InputSystem/WindowsInputKeys.h"
+#include "InputSystem/InputKeys.h"
 #include "InputSystem/InputEventType.h"
 #include "EventSystem/EventSystem.h"
 
@@ -11,7 +11,7 @@ using KeyActionDelegate = Delegate<void>;
 struct OnKeyAction
 {
 	KeyActionDelegate Del{};
-	KeyCode RequiredKey{};
+	EInputKey RequiredKey{};
 	bool Once{ false };
 };
 
@@ -27,12 +27,12 @@ public:
 	inline MousePosDelegate& OnMouseMoved() { return OnMouseMovedDelegate; }
 
 private:
-	void OnKeyInputReceived(KeyCode inKeyCode, InputEventType inEventType);
+	void OnKeyInputReceived(EInputKey inKeyCode, InputEventType inEventType);
 	void OnMouseMoveInputReceived(const float inNewYaw, const float inNewPitch);
 	void OnMouseScrollInputReceived(const float inNewY);
 
 private:
-	eastl::unordered_map<KeyCode, InputEventType> KeyStates{};
+	eastl::unordered_map<EInputKey, InputEventType> KeyStates{};
 	eastl::vector<OnKeyAction> KeyListeners{};
 	MousePosDelegate OnMouseMovedDelegate{};
 	MouseScrollDelegate OnMouseScrollDelegate{};

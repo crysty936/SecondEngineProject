@@ -4,7 +4,7 @@
 #include "Logger/Logger.h"
 #include "Renderer/OpenGL/OpenGLRenderer.h"
 #include "Window/OpenGLWindow.h"
-#include "InputSystem/GLFWInput/OpenGLInputSystem.h"
+#include "InputSystem/GLFWInput/InputSystem.h"
 #include "Scene/SceneManager.h"
 #include "Scene/Scene.h"
 #include "Entity/Entity.h"
@@ -16,7 +16,7 @@ constexpr float IdealFrameRate = 60.f;
 constexpr float IdealFrameTime = 1.0f / IdealFrameRate;
 bool bIsRunning = true;
 
-void StopEngineRunning()
+void StopEngine()
 {
 	bIsRunning = false;
 }
@@ -41,7 +41,9 @@ void EngineCore::Init()
 
 	// Init all engine subsystems
 	OpenGLRenderer::Init();
-	OpenGLInputSystem::Init();
+#if WITH_GLFW
+	InputSystem::Init();
+#endif
 	SceneManager::Init();
 	TimersManager::Init();
 	MaterialsManager::Init();
@@ -59,7 +61,9 @@ void EngineCore::Terminate()
 	TimersManager::Terminate();
 	SceneManager::Terminate();
 	OpenGLRenderer::Terminate();
-	OpenGLInputSystem::Terminate();
+#if WITH_GLFW
+	InputSystem::Terminate();
+#endif
 
 	ASSERT(Engine);
 	delete Engine;
@@ -92,7 +96,9 @@ void EngineCore::Run()
 		//Logger::GetLogger().Log("Delta time: %lf", CurrentDeltaT);
 		lastTime = currentTime;
 
-		OpenGLInputSystem::Get().PollEvents();
+#if WITH_GLFW
+		InputSystem::Get().PollEvents();
+#endif
 		//Call tickableObjects: Camera, etc
 
 		// Tick Timers

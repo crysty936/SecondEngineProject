@@ -1,17 +1,17 @@
-#include "InputSystem/GLFWInput/OpenGLInputSystem.h"
+#include "InputSystem/GLFWInput/InputSystem.h"
 #include "Window/OpenGLWindow.h"
 #include "Renderer/OpenGL/OpenGLRenderer.h"
 
-OpenGLInputSystem* OpenGLInputSystem::Instance;
+InputSystem* InputSystem::Instance;
 
-OpenGLInputSystem::OpenGLInputSystem() = default;
-OpenGLInputSystem::~OpenGLInputSystem() = default;
+InputSystem::InputSystem() = default;
+InputSystem::~InputSystem() = default;
 
-void OpenGLInputSystem::GLFWKeyCallback(GLFWwindow*, int32_t inKeycode, int32_t inScanCode, int32_t inAction, int32_t inMods)
+void InputSystem::GLFWKeyCallback(GLFWwindow*, int32_t inKeycode, int32_t inScanCode, int32_t inAction, int32_t inMods)
 {
-	OpenGLInputSystem& instance = OpenGLInputSystem::Get();
+	InputSystem& instance = InputSystem::Get();
 
-	const KeyCode code = static_cast<KeyCode>(inKeycode);
+	const EInputKey code = static_cast<EInputKey>(inKeycode);
 
 	InputEventType actionType = InputEventType::None;
 
@@ -33,7 +33,7 @@ void OpenGLInputSystem::GLFWKeyCallback(GLFWwindow*, int32_t inKeycode, int32_t 
 	instance.OnKeyInputDelegate.Invoke(code, actionType);
 }
 
-void OpenGLInputSystem::MousePosChangedCallback(GLFWwindow*, const double inNewYaw, const double inNewPitch)
+void InputSystem::MousePosChangedCallback(GLFWwindow*, const double inNewYaw, const double inNewPitch)
 {
 	const float yawFloat = static_cast<float>(inNewYaw);
 	const float pitchFloat = static_cast<float>(inNewPitch);
@@ -41,41 +41,41 @@ void OpenGLInputSystem::MousePosChangedCallback(GLFWwindow*, const double inNewY
 	Instance->OnMouseMovedDelegate.Invoke(yawFloat, pitchFloat);
 }
 
-void OpenGLInputSystem::MouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
+void InputSystem::MouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 {
 	const float yFloat = static_cast<float>(yoffset);
 
 	Instance->OnMouseScrollDelegate.Invoke(yFloat);
 }
 
-void OpenGLInputSystem::Init()
+void InputSystem::Init()
 {
-	Instance = new OpenGLInputSystem{};
+	Instance = new InputSystem{};
 	
 	OpenGLWindow& mainWindow = RHI->GetMainWindow();
 
  	glfwSetKeyCallback(mainWindow.GetHandle(), &GLFWKeyCallback);
 
- 	Instance->OnKeyInputDelegate.BindRaw(Instance, &OpenGLInputSystem::OnKeyPressedLog);
+ 	Instance->OnKeyInputDelegate.BindRaw(Instance, &InputSystem::OnKeyPressedLog);
 
 	glfwSetCursorPosCallback(mainWindow.GetHandle(), &MousePosChangedCallback);
 
 	glfwSetScrollCallback(mainWindow.GetHandle(), &MouseScrollCallback);
 }
 
-void OpenGLInputSystem::Terminate()
+void InputSystem::Terminate()
 {
 	ASSERT(Instance);
 
 	delete(Instance);
 }
 
-void OpenGLInputSystem::PollEvents()
+void InputSystem::PollEvents()
 {
 	glfwPollEvents();
 }
 
-void OpenGLInputSystem::OnKeyPressedLog(KeyCode inKeyCode, InputEventType inEventType)
+void InputSystem::OnKeyPressedLog(EInputKey inKeyCode, InputEventType inEventType)
 {
-	//LOG_INFO("Key input received for key %d with action: %s", static_cast<int32_t>(inKeyCode), ToString(inEventType));
+	LOG_INFO("Key input received for key %d with action: %s", static_cast<int32_t>(inKeyCode), ToString(inEventType));
 }

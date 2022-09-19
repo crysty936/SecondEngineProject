@@ -1,8 +1,11 @@
 #pragma once
 #include <iostream>
 
-enum class KeyCode : uint16_t
+// Currently using glfw keycodes and converting from Windows to these
+
+enum class EInputKey : int16_t
 {
+	None = 0,
 	// From glfw3.h
 	Space = 32,
 	Apostrophe = 39, /* ' */
@@ -136,8 +139,17 @@ enum class KeyCode : uint16_t
 	Menu = 348
 };
 
-inline std::ostream& operator<<(std::ostream& os, KeyCode keyCode)
+inline std::ostream& operator<<(std::ostream& os, EInputKey keyCode)
 {
 	os << static_cast<int32_t>(keyCode);
 	return os;
 }
+
+// template <typename T>
+// constexpr auto operator+(T e) noexcept
+// -> std::enable_if_t<std::is_enum<T>::value, std::underlying_type_t<T>>
+// {
+// 	return static_cast<std::underlying_type_t<T>>(e);
+// }
+
+inline constexpr unsigned operator+ (const EInputKey inKey) { return static_cast<uint16_t>(inKey); }

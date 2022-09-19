@@ -21,9 +21,9 @@ TestGameMode::~TestGameMode() = default;
 
 void TestGameMode::Init()
 {
-	GameController = eastl::make_unique<Controller>();
+	//GameController = eastl::make_unique<Controller>();
 
-	TransformObjPtr triangle = ObjectCreation::NewObject<TriangleShape>();
+	triangle = ObjectCreation::NewObject<TriangleShape>();
 	triangle->Move(glm::vec3(0.f, 0.f, -2.f));
 
 // 	{
@@ -72,7 +72,8 @@ void TestGameMode::Init()
 
  void TestGameMode::Tick(float inDeltaT)
  {
- 	GameController->ExecuteCallbacks();
+ 	//GameController->ExecuteCallbacks();
+	 triangle->Rotate(inDeltaT, glm::vec3(0.f, 0.f, 1.f));
  }
 
 // void TestGameMode::MoveCameraLeft()

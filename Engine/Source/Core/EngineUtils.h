@@ -8,7 +8,7 @@
  {															\
  if(!(x))													\
  {LOG_ERROR(inMessage, __VA_ARGS__);						\
-__debugbreak(); std::cin.get();}							\
+__debugbreak();}											\
  }
 
 #define ENSURE_MSG(x, inMessage, ...)						\
@@ -23,7 +23,7 @@ __debugbreak(); std::cin.get();}							\
  {															\
  if(!(x))													\
  {															\
-	__debugbreak(); std::cin.get();}						\
+	__debugbreak();}										\
  }															\
 
  #define ENSURE(x)											\

@@ -1,5 +1,6 @@
 #pragma once
 #include <stdint.h>
+#include "InputSystem/InputKeys.h"
 
 enum class CLITextColor
 {
@@ -15,4 +16,5 @@ namespace WindowsPlatform
 	double GetTime();
 	void Sleep(uint32_t inMilliseconds);
 	void SetCLITextColor(CLITextColor inColor);
+	EInputKey WindowsKeyToInternal(const int16_t inWindowsKey);
 }
