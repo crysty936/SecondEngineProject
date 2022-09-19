@@ -1,6 +1,6 @@
 #pragma once
 
-#include "InputSystem/GLFWInput/InputSystem.h"
+#include "InputSystem/InputSystem.h"
 #include "EASTL/unordered_map.h"
 #include "InputSystem/InputKeys.h"
 #include "InputSystem/InputEventType.h"

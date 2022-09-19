@@ -57,7 +57,6 @@ public:
 	void DrawCommands(const eastl::vector<RenderCommand>& inCommands);
 	void DrawCommand(const RenderCommand& inCommand);
 	eastl::shared_ptr<RenderMaterial> GetMaterial(const RenderCommand& inCommand) const;
-	void DestroyWindow(GLFWwindow* inWindowHandle) const;
 	void SetVSyncEnabled(const bool inEnabled);
 	inline class OpenGLWindow& GetMainWindow() { return *MainWindow; }
 	static void LoadTexture();
@@ -80,6 +79,7 @@ private:
 	void SetViewportSizeToMain();
 	void CheckShouldCloseWindow(const OpenGLWindow& inWindow);
 
+	eastl::unique_ptr<class WindowsWindow> NewWindow;
 private:
 	eastl::unique_ptr<class OpenGLWindow> MainWindow;
 	eastl::unordered_map<eastl::string, SelfRegisteringUniform> UniformsCache;

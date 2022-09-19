@@ -4,7 +4,7 @@
 #include "Logger/Logger.h"
 #include "Renderer/OpenGL/OpenGLRenderer.h"
 #include "Window/OpenGLWindow.h"
-#include "InputSystem/GLFWInput/InputSystem.h"
+#include "InputSystem/InputSystem.h"
 #include "Scene/SceneManager.h"
 #include "Scene/Scene.h"
 #include "Entity/Entity.h"
@@ -40,10 +40,8 @@ void EngineCore::Init()
 	Engine->CurrentGameMode = GameModeBase::Get();
 
 	// Init all engine subsystems
-	OpenGLRenderer::Init();
-#if WITH_GLFW
 	InputSystem::Init();
-#endif
+	OpenGLRenderer::Init();
 	SceneManager::Init();
 	TimersManager::Init();
 	MaterialsManager::Init();
@@ -61,9 +59,7 @@ void EngineCore::Terminate()
 	TimersManager::Terminate();
 	SceneManager::Terminate();
 	OpenGLRenderer::Terminate();
-#if WITH_GLFW
 	InputSystem::Terminate();
-#endif
 
 	ASSERT(Engine);
 	delete Engine;
@@ -96,9 +92,7 @@ void EngineCore::Run()
 		//Logger::GetLogger().Log("Delta time: %lf", CurrentDeltaT);
 		lastTime = currentTime;
 
-#if WITH_GLFW
 		InputSystem::Get().PollEvents();
-#endif
 		//Call tickableObjects: Camera, etc
 
 		// Tick Timers

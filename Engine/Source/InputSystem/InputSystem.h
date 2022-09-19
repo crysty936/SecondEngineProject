@@ -5,6 +5,7 @@
 #include "InputSystem/InputKeys.h"
 #include "InputSystem/InputEventType.h"
 #include "Entity/Entity.h"
+#include "CursorMode.h"
 
 using KeyDelegate = MulticastDelegate<EInputKey, InputEventType>;
 using MousePosDelegate = MulticastDelegate<float, float>;
@@ -28,6 +29,10 @@ public:
 	inline KeyDelegate& OnKeyInput() { return OnKeyInputDelegate; }
 	inline MousePosDelegate& OnMouseMoved() { return OnMouseMovedDelegate; }
 	inline MouseScrollDelegate& OnMouseScroll() { return OnMouseScrollDelegate; }
+
+	bool OngoingFrameAction = false;
+	bool CursorsTracked = false;
+	ECursorMode CurrentCursorMode;
 
 private:
 	void OnKeyPressedLog(EInputKey inKeyCode, InputEventType inEventType);

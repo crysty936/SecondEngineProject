@@ -1,6 +1,7 @@
-#include "InputSystem/GLFWInput/InputSystem.h"
+#include "InputSystem/InputSystem.h"
 #include "Window/OpenGLWindow.h"
 #include "Renderer/OpenGL/OpenGLRenderer.h"
+#include "Core/WindowsPlatform.h"
 
 InputSystem* InputSystem::Instance;
 
@@ -52,15 +53,20 @@ void InputSystem::Init()
 {
 	Instance = new InputSystem{};
 	
+
+#if WITH_GLFW
 	OpenGLWindow& mainWindow = RHI->GetMainWindow();
 
  	glfwSetKeyCallback(mainWindow.GetHandle(), &GLFWKeyCallback);
-
  	Instance->OnKeyInputDelegate.BindRaw(Instance, &InputSystem::OnKeyPressedLog);
-
 	glfwSetCursorPosCallback(mainWindow.GetHandle(), &MousePosChangedCallback);
-
 	glfwSetScrollCallback(mainWindow.GetHandle(), &MouseScrollCallback);
+
+#else
+
+
+#endif
+
 }
 
 void InputSystem::Terminate()
@@ -72,7 +78,13 @@ void InputSystem::Terminate()
 
 void InputSystem::PollEvents()
 {
+
+#if WITH_GLFW
 	glfwPollEvents();
+#else
+	WindowsPlatform::PoolMessages();
+#endif
+
 }
 
 void InputSystem::OnKeyPressedLog(EInputKey inKeyCode, InputEventType inEventType)
