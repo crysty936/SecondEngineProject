@@ -20,8 +20,8 @@ private:
 	float CurrentDeltaT;
 
 	// TODO 
-	// Engine holds ownership over gamemode for now, it should be abstracted into Scene later on so that
-	// each scene has the possibility of a different GameMode
+	// Engine holds ownership over GameMode for now, it should be abstracted into Scene later on so that
+	// each scene can have its own GameMode
 	class GameModeBase* CurrentGameMode = nullptr;
 };
 

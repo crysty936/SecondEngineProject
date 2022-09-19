@@ -14,9 +14,14 @@
 
 // Window should be just the data holder and renderer should do all logic
 
-WindowsWindow::WindowsWindow(const WindowProperties& inProperties /*= {}*/)
+WindowsWindow::WindowsWindow(const bool Init, const WindowProperties& inProperties /*= {}*/)
 	: Properties{ inProperties }
 {
+	if (!Init)
+	{
+		return;
+	}
+
 	WindowHandle = WindowsPlatform::CreateWindowsWindow(inProperties.Width, inProperties.Height);
 
 	ShowWindow(reinterpret_cast<HWND>(WindowHandle), SW_SHOW);
@@ -45,8 +50,4 @@ void WindowsWindow::SetVSyncEnabled(const bool inEnabled)
 	RHI->SetVSyncEnabled(inEnabled);
 }
 
-void WindowsWindow::SetCursorMode(const ECursorMode inMode)
-{
-	WindowsPlatform::SetCursorMode(WindowHandle, inMode);
-}
 

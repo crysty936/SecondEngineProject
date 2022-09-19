@@ -1,9 +1,39 @@
 #pragma once
 
 #ifndef NDEBUG
+
 #define LOG_INFO(x, ...)	{Logger::Get().Print(x, Severity::Info,		__VA_ARGS__);}
 #define LOG_WARNING(x, ...)	{Logger::Get().Print(x, Severity::Warning,	__VA_ARGS__);}
 #define LOG_ERROR(x, ...)	{Logger::Get().Print(x, Severity::Error,	__VA_ARGS__);}
+
+#define LOG_ONCE_INFO(inMessage, ...)						\
+  (([&](){										\
+static bool bExecuted = false;								\
+  if(!bExecuted)									\
+  {															\
+bExecuted = true;											\
+LOG_INFO(inMessage, __VA_ARGS__);}							\
+  }()))														\
+
+
+#define LOG_ONCE_WARNING(inMessage, ...)						\
+  (([&](){										\
+static bool bExecuted = false;								\
+  if(!bExecuted)									\
+  {															\
+bExecuted = true;											\
+LOG_WARNING(inMessage, __VA_ARGS__);}							\
+  }()))														\
+
+#define LOG_ONCE_ERROR(inMessage, ...)						\
+  (([&](){										\
+static bool bExecuted = false;								\
+  if(!bExecuted)									\
+  {															\
+bExecuted = true;											\
+LOG_ERROR(inMessage, __VA_ARGS__);}							\
+  }()))														\
+
 #else
 #define LOG_INFO(x, ...)
 #define LOG_WARNING(x, ...)

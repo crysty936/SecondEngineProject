@@ -491,7 +491,7 @@ static void releaseMonitor(_GLFWwindow* window)
 
 void log(const char* text)
 {
-	printf("Entered %s \n", text);
+	//printf("Entered %s \n", text);
 }
 
 #define LOG_MACRO(text) log(#text)

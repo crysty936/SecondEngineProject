@@ -31,14 +31,22 @@ public:
 	inline MousePosDelegate& OnMouseMoved() { return OnMouseMovedDelegate; }
 	inline MouseScrollDelegate& OnMouseScroll() { return OnMouseScrollDelegate; }
 
+	void SetCursorMode(void* inWindowHandle, const ECursorMode inMode);
+
+	void RegisterCallbacksGLFW(class OpenGLWindow& inWindow);
+
 	bool OngoingFrameAction = false;
 	bool CursorsTracked = false;
-	ECursorMode CurrentCursorMode;
+	ECursorMode CurrentCursorMode = ECursorMode::Enabled;
+	glm::vec<2, int> CurrentCursorPos = {};
+	glm::vec<2, int> LastCursorPos = {};
 
 private:
 	void OnKeyPressedLog(EInputKey inKeyCode, InputEventType inEventType);
 	static void KeyCallback(EInputKey inKey, InputEventType inAction);
+	static void GLFWKeyCallback(GLFWwindow*, int32_t inKeycode, int32_t inScanCode, int32_t inAction, int32_t inMods);
 	static void MousePosChangedCallback(const double inNewYaw, const double inNewPitch);
+	static void MousePosChangedCallbackOpenGL(GLFWwindow*, const double inNewYaw, const double inNewPitch);
 	static void MouseScrollCallback(double xoffset, double yoffset);
 
 private:

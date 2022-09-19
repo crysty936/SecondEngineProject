@@ -6,6 +6,9 @@
 #include "InputSystem/InputSystem.h"
 #include "Renderer/OpenGL/OpenGLRenderer.h"
 #include "Window/WindowsWindow.h"
+#include <atlbase.h>
+#include <atlwin.h>
+#include "EASTL/string.h"
 
 // Wrapper over Windows.h functionality
 namespace WindowsPlatform
@@ -238,9 +241,7 @@ namespace WindowsPlatform
 		return inWindowHandle == GetActiveWindow();
 	}
 
-	glm::vec<2, long> CursorPos = {};
-
-	void GetCursorPos(HWND inWindowHandle, OUT glm::vec<2, long>& outPos)
+	void GetCursorPos(HWND inWindowHandle, OUT glm::vec<2, int>& outPos)
 	{
 		POINT pos;
 
@@ -253,11 +254,13 @@ namespace WindowsPlatform
 		}
 	}
 
-	void SetCursorPos(HWND inWindowHandle, const glm::vec<2, long>& inPos)
+	void SetCursorPos(HWND inWindowHandle, const glm::vec<2, int>& inPos)
 	{
 		POINT pos = { inPos.x, inPos.y };
 
 		// Store the new position so it can be recognized later
+		InputSystem::Get().LastCursorPos.x = pos.x;
+		InputSystem::Get().LastCursorPos.y = pos.y;
 	// 	window->win32.lastCursorPosX = pos.x;
 	// 	window->win32.lastCursorPosY = pos.y;
 
@@ -267,7 +270,7 @@ namespace WindowsPlatform
 
 	void DisableCursor(HWND inWindowHandle)
 	{
-		GetCursorPos(inWindowHandle, CursorPos);
+		GetCursorPos(inWindowHandle, InputSystem::Get().CurrentCursorPos);
 		SetCursor(NULL);
 
 		RECT area;
@@ -287,7 +290,7 @@ namespace WindowsPlatform
 	{
 		UpdateClipRect(nullptr);
 
-		SetCursorPos(inWindowHandle, CursorPos);
+		SetCursorPos(inWindowHandle, InputSystem::Get().CurrentCursorPos);
 		SetCursor(nullptr);
 	}
 
@@ -306,6 +309,10 @@ namespace WindowsPlatform
 			//updateCursorImage(window);
 	}
 
+	void SetWindowsWindowText(const eastl::string& inText)
+	{
+		SetWindowText(reinterpret_cast<HWND>(RHI->GetMainWindow().GetHandle()), inText.c_str());
+	}
 	// Message Loop
 
 	void PoolMessages()
@@ -647,8 +654,8 @@ namespace WindowsPlatform
 		{
 			//LOG_WINMSG(WM_MOUSEMOVE);
 
-			//             const int x = GET_X_LPARAM(lParam);
-//             const int y = GET_Y_LPARAM(lParam);
+			const int x = GET_X_LPARAM(lParam);
+			const int y = GET_Y_LPARAM(lParam);
 // 
 			if (!InputSystem::Get().CursorsTracked)
 			{
@@ -663,21 +670,20 @@ namespace WindowsPlatform
 				InputSystem::Get().CursorsTracked = true;
 				//_glfwInputCursorEnter(window, GLFW_TRUE);
 			}
-			// 
-			//             if (window->cursorMode == GLFW_CURSOR_DISABLED)
-			//             {
-			//                 const int dx = x - window->win32.lastCursorPosX;
-			//                 const int dy = y - window->win32.lastCursorPosY;
-			// 
-			//                 if (_glfw.win32.disabledCursorWindow != window)
-			//                     break;
-			//                 if (window->rawMouseMotion)
-			//                     break;
-			// 
-			//                 _glfwInputCursorPos(window,
-			//                                     window->virtualCursorPosX + dx,
-			//                                     window->virtualCursorPosY + dy);
-			//             }
+
+			const InputSystem& inputSys = InputSystem::Get();
+			const ECursorMode cursorMode = inputSys.CurrentCursorMode;
+			if (cursorMode == ECursorMode::Disabled)
+			{
+				const int dx = x - InputSystem::Get().LastCursorPos.x;
+				const int dy = y - InputSystem::Get().LastCursorPos.y;
+
+				InputForwarder::ForwardMouseMove(dx, dy);
+
+// 				_glfwInputCursorPos(window,
+// 					window->virtualCursorPosX + dx,
+// 					window->virtualCursorPosY + dy);
+			}
 			//             else
 			//                 _glfwInputCursorPos(window, x, y);
 			// 
@@ -1116,4 +1122,10 @@ namespace WindowsPlatform
 	{
 		InputSystem::KeyCallback(inKey, inAction);
 	}
+
+	void InputForwarder::ForwardMouseMove(double inNewYaw, double inNewPitch)
+	{
+		InputSystem::MousePosChangedCallback(inNewYaw, inNewPitch);
+	}
+
 }

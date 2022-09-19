@@ -3,6 +3,7 @@
 #include "InputSystem/InputKeys.h"
 #include "InputSystem/CursorMode.h"
 #include "InputSystem/InputEventType.h"
+#include "EASTL/string.h"
 
 enum class CLITextColor
 {
@@ -22,15 +23,13 @@ namespace WindowsPlatform
 	void PoolMessages();
 	void* CreateWindowsWindow(const int32_t desiredWidth, const int32_t desiredHeight);
 	void SetCursorMode(void* inWindowHandle, const ECursorMode inMode);
+	void SetWindowsWindowText(const eastl::string& inText);
 
 	class InputForwarder
 	{
 	public:
 		static void ForwardKey(const EInputKey inKey, const InputEventType inAction);
-
-
-
-
+		static void ForwardMouseMove(double inNewYaw, double inNewPitch);
 	};
 
 }

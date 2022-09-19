@@ -152,9 +152,10 @@ int OpenGLShader::GetUniformLocation(const eastl::string & UniformName) const
 	if (uniformLocation != -1)
 		UniformLocations[UniformName] = uniformLocation;
 
+	//ENSURE_MSG(uniformLocation != -1, "Uniform location could not be found for: %s!", UniformName.data());
 	if (uniformLocation == -1)
 	{
-		LOG_WARNING("Uniform location could not be found for: %s!", UniformName.data());
+		LOG_ONCE_WARNING("Uniform location could not be found for: %s!", UniformName.data());
 	}
 
 	return uniformLocation;

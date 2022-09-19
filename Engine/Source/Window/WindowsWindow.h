@@ -7,7 +7,7 @@
 class WindowsWindow
 {
 public:
-	WindowsWindow(const WindowProperties& inProperties = {});
+	WindowsWindow(const bool Init = true, const WindowProperties& inProperties = {});
 	~WindowsWindow();
 
 	void OnKeyInput(const EInputKey inKey, const InputEventType inType);
@@ -16,7 +16,6 @@ public:
 	const WindowProperties& GetProperties() const { return Properties; }
 	bool ShouldClose() const { return CloseRequested; }
 	void RequestClose() { CloseRequested = true; }
-	void SetCursorMode(const ECursorMode inMode);
 
 private:
 	void* WindowHandle;

@@ -4,35 +4,40 @@
 #include <iostream>
 
 #ifndef NDEBUG
+
 #define ASSERT_MSG(x, inMessage, ...)						\
- {															\
- if(!(x))													\
- {LOG_ERROR(inMessage, __VA_ARGS__);						\
-__debugbreak();}											\
- }
+  ((!!(x)) || ([&](){										\
+LOG_ERROR(inMessage, __VA_ARGS__);							\
+ __debugbreak();											\
+ return false;												\
+  }()))		
 
 #define ENSURE_MSG(x, inMessage, ...)						\
-  (!!x) && ([&, x](){										\
-  if(!(x))													\
-  {LOG_ERROR(inMessage, __VA_ARGS__);						\
+  ((!!(x)) || ([&](){										\
+static bool bExecuted = false;								\
+  if(!bExecuted)									\
+  {															\
+bExecuted = true;											\
+LOG_ERROR(inMessage, __VA_ARGS__);							\
  __debugbreak();}											\
- return true;												\
-  }())														\
+ return false;												\
+  }()))														\
 
-#define ASSERT(x)											\
- {															\
- if(!(x))													\
- {															\
-	__debugbreak();}										\
- }															\
+#define ASSERT(x, ...)						\
+  ((!!(x)) || ([&](){										\
+ __debugbreak();											\
+ return false;												\
+  }()))															\
 
- #define ENSURE(x)											\
-   (!!x) && ([x](){											\
-   if(!(x))													\
-   {														\
-  __debugbreak();}											\
-  return true;												\
-   }())														\
+#define ENSURE(x)											\
+  ((!!(x)) || ([](){										\
+static bool bExecuted = false;								\
+  if(!bExecuted)									\
+  {															\
+bExecuted = true;											\
+ __debugbreak();}											\
+ return false;												\
+  }()))														\
 
 #else
 #define ASSERT_MSG(x, ...)	(!!(x))
@@ -40,5 +45,7 @@ __debugbreak();}											\
 #define ENSURE_MSG(x, ...)	(!!(x))
 #define ENSURE(x)			(!!(x))
 #endif
+
+
 
 #define OUT

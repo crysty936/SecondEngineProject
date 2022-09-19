@@ -27,6 +27,7 @@
 #include <windows.h>
 #include "InputSystem/InputEventType.h"
 #include "Window/WindowsWindow.h"
+#include "InputSystem/InputSystem.h"
 
 #if !WITH_GLFW
 
@@ -238,17 +239,18 @@ void LoaderFunc(GLFWwindow* inLoadingThreadContext)
 OpenGLRenderer::OpenGLRenderer(const WindowProperties& inMainWindowProperties)
 {
 #if !WITH_GLFW
-	NewWindow = eastl::make_unique<WindowsWindow>();
+	CurrentWindow = eastl::make_unique<WindowsWindow>();
 	openglInstance = LoadLibraryA("opengl32.dll");
 	ASSERT(openglInstance);
- 	gldc = GetDC(reinterpret_cast<HWND>(NewWindow->GetHandle()));
+ 	gldc = GetDC(reinterpret_cast<HWND>(CurrentWindow->GetHandle()));
  	HGLRC glrc = init_opengl(gldc);
  
 	const bool gladSuccess = gladLoadGLLoader((GLADloadproc)getProcAddressGLWindows) == 1;
 	ASSERT(gladSuccess);
-	MainWindow = eastl::make_unique<OpenGLWindow>(nullptr, inMainWindowProperties);
+	GLWindow = eastl::make_unique<OpenGLWindow>(nullptr, inMainWindowProperties);
 #else
-  	const bool glfwSuccess = glfwInit() == GLFW_TRUE;
+	CurrentWindow = eastl::make_unique<WindowsWindow>(false);
+	const bool glfwSuccess = glfwInit() == GLFW_TRUE;
   	ASSERT(glfwSuccess);
 	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
   	// Create new Window for data holding
@@ -258,12 +260,13 @@ OpenGLRenderer::OpenGLRenderer(const WindowProperties& inMainWindowProperties)
   	const bool gladSuccess = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress) == GLFW_TRUE;
 	ASSERT(gladSuccess);
 	glfwSetInputMode(newWindowHandle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-	MainWindow = eastl::make_unique<OpenGLWindow>(newWindowHandle, inMainWindowProperties);
+	GLWindow = eastl::make_unique<OpenGLWindow>(newWindowHandle, inMainWindowProperties);
+	InputSystem::Get().RegisterCallbacksGLFW(*GLWindow);
 #endif
 
 
 #if !WITH_GLFW
-	NewWindow->SetCursorMode(ECursorMode::Disabled);
+	InputSystem::Get().SetCursorMode(CurrentWindow->GetHandle(), ECursorMode::Disabled);
 #endif
  
 	SetViewportSizeToMain();
@@ -304,7 +307,7 @@ void OpenGLRenderer::Init(const WindowProperties & inMainWindowProperties)
 	glGenFramebuffers(1, &RHI->AuxiliarFrameBuffer);
 	glBindFramebuffer(GL_FRAMEBUFFER, RHI->AuxiliarFrameBuffer);
 
-	const WindowProperties& windowProps = RHI->MainWindow->GetProperties();
+	const WindowProperties& windowProps = RHI->GLWindow->GetProperties();
 	// Create a stencil and depth render buffer object for the frame buffer
 	uint32_t rbo; // render buffer object
 	glGenRenderbuffers(1, &rbo);
@@ -338,7 +341,7 @@ void OpenGLRenderer::Init(const WindowProperties & inMainWindowProperties)
 
 void OpenGLRenderer::Terminate()
 {
-	RHI->MainWindow.reset();
+	RHI->GLWindow.reset();
 
 #if WITH_GLFW
 	glfwTerminate();
@@ -354,7 +357,7 @@ void OpenGLRenderer::Draw()
 {
 	UpdateUniforms();
 
-	//DrawShadowMap();
+	DrawShadowMap();
 
 	SetupBaseUniforms();
 	UpdateUniforms();
@@ -367,14 +370,14 @@ void OpenGLRenderer::Draw()
 	DrawCommands(MainCommands);
 	RenderCommandsMutex.unlock();
 
-	CheckShouldCloseWindow(*NewWindow);
+	CheckShouldCloseWindow(*CurrentWindow);
 
 
 #if !WITH_GLFW
 	SwapBuffers(gldc);
 
 #else
-	glfwSwapBuffers(MainWindow->GetHandle());
+	glfwSwapBuffers(GLWindow->GetHandle());
 #endif
 
 }
@@ -433,7 +436,7 @@ void OpenGLRenderer::DrawShadowMap()
 
 void OpenGLRenderer::SetupBaseUniforms()
 {
-	const glm::mat4 projection = glm::perspective(glm::radians(45.0f), static_cast<float>(MainWindow->GetProperties().Width) / static_cast<float>(MainWindow->GetProperties().Height), 0.1f, 1000.0f);
+	const glm::mat4 projection = glm::perspective(glm::radians(45.0f), static_cast<float>(GLWindow->GetProperties().Width) / static_cast<float>(GLWindow->GetProperties().Height), 0.1f, 1000.0f);
 	UniformsCache["projection"] = projection;
 }
 
@@ -644,7 +647,7 @@ void OpenGLRenderer::SetViewportSize(const int32_t inWidth, const int32_t inHeig
 
 void OpenGLRenderer::SetViewportSizeToMain()
 {
-	const WindowProperties& props = MainWindow->GetProperties();
+	const WindowProperties& props = GLWindow->GetProperties();
 	SetViewportSize(props.Width, props.Height);
 }
 

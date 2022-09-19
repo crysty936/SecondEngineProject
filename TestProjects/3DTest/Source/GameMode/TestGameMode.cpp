@@ -27,14 +27,14 @@ void TestGameMode::Init()
 	// Debug
 	{
 		KeyActionDelegate cameraMovementDelegate = KeyActionDelegate::CreateRaw(this, &TestGameMode::MoveCameraLeft);
-		KeyCode createFloorKey = KeyCode::A;
+		EInputKey createFloorKey = EInputKey::A;
 		OnKeyAction createFloorAction = { cameraMovementDelegate, createFloorKey, false };
 		GameController->AddListener(createFloorAction);
 	}
 
 	{
 		KeyActionDelegate cameraMovementDelegate = KeyActionDelegate::CreateRaw(this, &TestGameMode::MoveCameraRight);
-		KeyCode createFloorKey = KeyCode::D;
+		EInputKey createFloorKey = EInputKey::D;
 		OnKeyAction createFloorAction = { cameraMovementDelegate, createFloorKey, false };
 
 		GameController->AddListener(createFloorAction);
@@ -42,14 +42,14 @@ void TestGameMode::Init()
 
 	{
 		KeyActionDelegate cameraMovementDelegate = KeyActionDelegate::CreateRaw(this, &TestGameMode::MoveCameraUp);
-		KeyCode createFloorKey = KeyCode::W;
+		EInputKey createFloorKey = EInputKey::W;
 		OnKeyAction createFloorAction = { cameraMovementDelegate, createFloorKey, false };
 		GameController->AddListener(createFloorAction);
 	}
 
 	{
 		KeyActionDelegate cameraMovementDelegate = KeyActionDelegate::CreateRaw(this, &TestGameMode::MoveCameraDown);
-		KeyCode createFloorKey = KeyCode::S;
+		EInputKey createFloorKey = EInputKey::S;
 		OnKeyAction createFloorAction = { cameraMovementDelegate, createFloorKey, false };
 
 		GameController->AddListener(createFloorAction);
@@ -57,7 +57,7 @@ void TestGameMode::Init()
 
 	{
 		KeyActionDelegate cameraMovementDelegate = KeyActionDelegate::CreateRaw(this, &TestGameMode::OnChangeDrawMode);
-		KeyCode createFloorKey = KeyCode::F;
+		EInputKey createFloorKey = EInputKey::F;
 		OnKeyAction createFloorAction = { cameraMovementDelegate, createFloorKey, true };
 
 		GameController->AddListener(createFloorAction);
