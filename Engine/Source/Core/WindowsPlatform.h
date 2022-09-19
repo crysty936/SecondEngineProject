@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include "InputSystem/InputKeys.h"
 #include "InputSystem/CursorMode.h"
+#include "InputSystem/InputEventType.h"
 
 enum class CLITextColor
 {
@@ -21,4 +22,15 @@ namespace WindowsPlatform
 	void PoolMessages();
 	void* CreateWindowsWindow(const int32_t desiredWidth, const int32_t desiredHeight);
 	void SetCursorMode(void* inWindowHandle, const ECursorMode inMode);
+
+	class InputForwarder
+	{
+	public:
+		static void ForwardKey(const EInputKey inKey, const InputEventType inAction);
+
+
+
+
+	};
+
 }

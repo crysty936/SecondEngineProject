@@ -4,6 +4,8 @@
 #include "Logger/Logger.h"
 #include "InputSystem/InputEventType.h"
 #include "InputSystem/InputSystem.h"
+#include "Renderer/OpenGL/OpenGLRenderer.h"
+#include "Window/WindowsWindow.h"
 
 // Wrapper over Windows.h functionality
 namespace WindowsPlatform
@@ -440,8 +442,7 @@ namespace WindowsPlatform
 		case WM_CLOSE:
 		{
 			LOG_WINMSG(WM_CLOSE);
-			// TODO send input to InputSystem
-			//RHI->GetMainWindow().RequestClose();
+			RHI->GetMainWindow().RequestClose();
 
 			return 0;
 		}
@@ -502,7 +503,6 @@ namespace WindowsPlatform
 		case WM_KEYUP:
 		case WM_SYSKEYUP:
 		{
-			break;
 			LOG_WINMSG(WM_KEYDOWN - WM_SYSKEYDOWN - WM_KEYUP - WM_SYSKEYUP);
 			int32_t scancode = 0;
 			EInputKey key = EInputKey::None;
@@ -578,10 +578,9 @@ namespace WindowsPlatform
 				//_glfwInputKey(window, key, scancode, GLFW_PRESS, mods);
 				//_glfwInputKey(window, key, scancode, GLFW_RELEASE, mods);
 			}
-			//else
+			else
 			{
-				// TODO send input to InputSystem
-				//_glfwInputKey(window, key, scancode, action, mods);
+				InputForwarder::ForwardKey(key, action);
 			}
 
 			break;
@@ -1111,5 +1110,10 @@ namespace WindowsPlatform
 		SetPropW(newWindow, L"WindowProp", (void*)1);
 
 		return newWindow;
+	}
+
+	void InputForwarder::ForwardKey(const EInputKey inKey, const InputEventType inAction)
+	{
+		InputSystem::KeyCallback(inKey, inAction);
 	}
 }

@@ -58,7 +58,7 @@ public:
 	void DrawCommand(const RenderCommand& inCommand);
 	eastl::shared_ptr<RenderMaterial> GetMaterial(const RenderCommand& inCommand) const;
 	void SetVSyncEnabled(const bool inEnabled);
-	inline class OpenGLWindow& GetMainWindow() { return *MainWindow; }
+	inline class WindowsWindow& GetMainWindow() { return *NewWindow; }
 	static void LoadTexture();
 	void AddCommand(const RenderCommand& inCommand);
 	void AddCommands(eastl::vector<RenderCommand> inCommands);
@@ -77,7 +77,7 @@ public:
 private:
 	void SetViewportSize(const int32_t inWidth, const int32_t inHeight);
 	void SetViewportSizeToMain();
-	void CheckShouldCloseWindow(const OpenGLWindow& inWindow);
+	void CheckShouldCloseWindow(const class WindowsWindow& inWindow);
 
 	eastl::unique_ptr<class WindowsWindow> NewWindow;
 private:

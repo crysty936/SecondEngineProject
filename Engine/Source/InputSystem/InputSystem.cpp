@@ -1,6 +1,5 @@
 #include "InputSystem/InputSystem.h"
 #include "Window/OpenGLWindow.h"
-#include "Renderer/OpenGL/OpenGLRenderer.h"
 #include "Core/WindowsPlatform.h"
 
 InputSystem* InputSystem::Instance;
@@ -8,33 +7,14 @@ InputSystem* InputSystem::Instance;
 InputSystem::InputSystem() = default;
 InputSystem::~InputSystem() = default;
 
-void InputSystem::GLFWKeyCallback(GLFWwindow*, int32_t inKeycode, int32_t inScanCode, int32_t inAction, int32_t inMods)
+void InputSystem::KeyCallback(EInputKey inKey, InputEventType inAction)
 {
 	InputSystem& instance = InputSystem::Get();
 
-	const EInputKey code = static_cast<EInputKey>(inKeycode);
-
-	InputEventType actionType = InputEventType::None;
-
-	switch (inAction)
-	{
-	case GLFW_PRESS:
-		actionType = InputEventType::InputPress;
-		break;
-	case GLFW_RELEASE:
-		actionType = InputEventType::InputRelease;
-		break;
-	case GLFW_REPEAT:
-		actionType = InputEventType::InputRepeat;
-		break;
-	default:
-		break;
-	}
-
-	instance.OnKeyInputDelegate.Invoke(code, actionType);
+	instance.OnKeyInputDelegate.Invoke(inKey, inAction);
 }
 
-void InputSystem::MousePosChangedCallback(GLFWwindow*, const double inNewYaw, const double inNewPitch)
+void InputSystem::MousePosChangedCallback(const double inNewYaw, const double inNewPitch)
 {
 	const float yawFloat = static_cast<float>(inNewYaw);
 	const float pitchFloat = static_cast<float>(inNewPitch);
@@ -42,7 +22,7 @@ void InputSystem::MousePosChangedCallback(GLFWwindow*, const double inNewYaw, co
 	Instance->OnMouseMovedDelegate.Invoke(yawFloat, pitchFloat);
 }
 
-void InputSystem::MouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
+void InputSystem::MouseScrollCallback(double xoffset, double yoffset)
 {
 	const float yFloat = static_cast<float>(yoffset);
 
@@ -57,10 +37,10 @@ void InputSystem::Init()
 #if WITH_GLFW
 	OpenGLWindow& mainWindow = RHI->GetMainWindow();
 
- 	glfwSetKeyCallback(mainWindow.GetHandle(), &GLFWKeyCallback);
- 	Instance->OnKeyInputDelegate.BindRaw(Instance, &InputSystem::OnKeyPressedLog);
-	glfwSetCursorPosCallback(mainWindow.GetHandle(), &MousePosChangedCallback);
-	glfwSetScrollCallback(mainWindow.GetHandle(), &MouseScrollCallback);
+//  	Instance->OnKeyInputDelegate.BindRaw(Instance, &InputSystem::OnKeyPressedLog);
+//  	glfwSetKeyCallback(mainWindow.GetHandle(), &GLFWKeyCallback);
+// 	glfwSetCursorPosCallback(mainWindow.GetHandle(), &MousePosChangedCallback);
+// 	glfwSetScrollCallback(mainWindow.GetHandle(), &MouseScrollCallback);
 
 #else
 

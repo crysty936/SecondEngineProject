@@ -346,7 +346,6 @@ void OpenGLRenderer::Terminate()
 
 	glDeleteBuffers(1, &RHI->AuxiliarFrameBuffer);
 
-
 	ASSERT(RHI);
 	delete RHI;
 }
@@ -368,7 +367,7 @@ void OpenGLRenderer::Draw()
 	DrawCommands(MainCommands);
 	RenderCommandsMutex.unlock();
 
-	CheckShouldCloseWindow(*MainWindow);
+	CheckShouldCloseWindow(*NewWindow);
 
 
 #if !WITH_GLFW
@@ -649,7 +648,7 @@ void OpenGLRenderer::SetViewportSizeToMain()
 	SetViewportSize(props.Width, props.Height);
 }
 
-void OpenGLRenderer::CheckShouldCloseWindow(const OpenGLWindow & inWindow)
+void OpenGLRenderer::CheckShouldCloseWindow(const WindowsWindow& inWindow)
 {
 #if !WITH_GLFW
 	if(inWindow.ShouldClose())
@@ -657,10 +656,10 @@ void OpenGLRenderer::CheckShouldCloseWindow(const OpenGLWindow & inWindow)
 		StopEngine();
 	}
 #else
-	if (glfwWindowShouldClose(inWindow.GetHandle()))
-	{
-		StopEngine();
-	}
+// 	if (glfwWindowShouldClose(inWindow.GetHandle()))
+// 	{
+// 		StopEngine();
+// 	}
 #endif
 
 }

@@ -3,6 +3,7 @@
 #include "Utils/ImageLoading.h"
 #include "OpenGLRenderer.h"
 #include "Window/WindowProperties.h"
+#include "Window/WindowsWindow.h"
 
 OpenGLRenderTexture::OpenGLRenderTexture(const eastl::string& inTexName)
 	: OpenGLTexture(inTexName, GL_TEXTURE_2D) {}

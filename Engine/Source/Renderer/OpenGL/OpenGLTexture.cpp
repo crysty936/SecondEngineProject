@@ -3,6 +3,7 @@
 #include "GLFW/glfw3.h"
 #include "OpenGLRenderer.h"
 #include "OpenGLShader.h"
+#include "Window/WindowsWindow.h"
 
 // Create a texture buffer
 OpenGLTexture::OpenGLTexture(const eastl::string& inTexName, const uint32_t inGlTexType)

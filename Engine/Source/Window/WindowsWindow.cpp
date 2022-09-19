@@ -3,6 +3,7 @@
 #include "Renderer/OpenGL/OpenGLRenderer.h"
 #include <windows.h>
 #include "Core/WindowsPlatform.h"
+#include "InputSystem/InputSystem.h"
 
 // Renderer should have the draw function adn get the window, while the window should contain it's context and other window related
 // properties. Renderer should take the context and create use it to switch buffers, etc.
@@ -20,12 +21,22 @@ WindowsWindow::WindowsWindow(const WindowProperties& inProperties /*= {}*/)
 
 	ShowWindow(reinterpret_cast<HWND>(WindowHandle), SW_SHOW);
 	UpdateWindow(reinterpret_cast<HWND>(WindowHandle));
+
+	InputSystem::Get().OnKeyInput().BindRaw(this, &WindowsWindow::OnKeyInput);
 }
 
 WindowsWindow::~WindowsWindow()
 {
 	RemovePropW(reinterpret_cast<HWND>(WindowHandle), L"WindowProp");
 	DestroyWindow(reinterpret_cast<HWND>(WindowHandle));
+}
+
+void WindowsWindow::OnKeyInput(const EInputKey inKey, const InputEventType inType)
+{
+	if (inKey == EInputKey::Escape)
+	{
+		CloseRequested = true;
+	}
 }
 
 void WindowsWindow::SetVSyncEnabled(const bool inEnabled)

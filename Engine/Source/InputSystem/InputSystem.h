@@ -6,6 +6,7 @@
 #include "InputSystem/InputEventType.h"
 #include "Entity/Entity.h"
 #include "CursorMode.h"
+#include "Core/WindowsPlatform.h"
 
 using KeyDelegate = MulticastDelegate<EInputKey, InputEventType>;
 using MousePosDelegate = MulticastDelegate<float, float>;
@@ -36,9 +37,9 @@ public:
 
 private:
 	void OnKeyPressedLog(EInputKey inKeyCode, InputEventType inEventType);
-	static void GLFWKeyCallback(GLFWwindow*, int32_t inKeycode, int32_t inScanCode, int32_t inAction, int32_t inMods);
-	static void MousePosChangedCallback(GLFWwindow*, const double inNewYaw, const double inNewPitch);
-	static void MouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
+	static void KeyCallback(EInputKey inKey, InputEventType inAction);
+	static void MousePosChangedCallback(const double inNewYaw, const double inNewPitch);
+	static void MouseScrollCallback(double xoffset, double yoffset);
 
 private:
 	static InputSystem* Instance;
@@ -48,4 +49,6 @@ private:
 	KeyDelegate OnKeyInputDelegate;
 	MousePosDelegate OnMouseMovedDelegate;
 	MouseScrollDelegate OnMouseScrollDelegate;
+
+	friend class WindowsPlatform::InputForwarder;
 };
