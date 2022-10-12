@@ -42,7 +42,7 @@ void TriangleShape::SetupDrawCommands()
 
 		VertexBuffer vbo = VertexBuffer{ ibo, layout };
 		int32_t verticesCount = BasicShapesData::GetTriangleVerticesCount();
-		vbo.SetVertices(BasicShapesData::GetTriangleVertices(), verticesCount, GL_STATIC_DRAW);
+		vbo.SetData(BasicShapesData::GetTriangleVertices(), verticesCount, GL_STATIC_DRAW);
 
 		thisVAO->VBuffer = vbo;
 	}
@@ -97,7 +97,7 @@ void SquareShape::SetupDrawCommands()
 
 		VertexBuffer vbo = VertexBuffer{ ibo, layout };
 		int32_t verticesCount = BasicShapesData::GetSquareVerticesCount();
-		vbo.SetVertices(BasicShapesData::GetSquareVertices(), verticesCount, GL_STATIC_DRAW);
+		vbo.SetData(BasicShapesData::GetSquareVertices(), verticesCount, GL_STATIC_DRAW);
 
 		thisVAO->VBuffer = vbo;
 	}
@@ -171,7 +171,7 @@ void CubeShape::SetupDrawCommands()
 
 		VertexBuffer vbo = VertexBuffer{ ibo, layout };
 		int32_t verticesCount = BasicShapesData::GetCubeVerticesCount();
-		vbo.SetVertices(BasicShapesData::GetCubeVertices(), verticesCount, GL_STATIC_DRAW);
+		vbo.SetData(BasicShapesData::GetCubeVertices(), verticesCount, GL_STATIC_DRAW);
 
 		thisVAO->VBuffer = vbo;
 	}
@@ -188,7 +188,8 @@ void CubeShape::SetupDrawCommands()
 		eastl::shared_ptr<OpenGLTexture> tex = eastl::make_shared<OpenGLTexture>("DiffuseMap");
 		tex->Init(texturePath);
 		cubeMaterial->Textures.push_back(std::move(tex));
-		cubeMaterial->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/WithNormalProjectionVertexShader.glsl", "../Data/Shaders/LightingTexFragmentShader.glsl");
+		cubeMaterial->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/BasicPerspVertexShader.glsl", "../Data/Shaders/BasicTexFragmentShader.glsl");
+		//cubeMaterial->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/WithNormalProjectionVertexShader.glsl", "../Data/Shaders/LightingTexFragmentShader.glsl");
 	}
 
 	eastl::shared_ptr<MeshNode> cubeNode = eastl::make_shared<MeshNode>();
@@ -227,7 +228,7 @@ void Skybox::SetupDrawCommands()
 
 		VertexBuffer vbo = VertexBuffer{ ibo, layout };
 		int32_t verticesCount = BasicShapesData::GetSkyboxVerticesCount();
-		vbo.SetVertices(BasicShapesData::GetSkyboxVertices(), verticesCount, GL_STATIC_DRAW);
+		vbo.SetData(BasicShapesData::GetSkyboxVertices(), verticesCount, GL_STATIC_DRAW);
 
 		thisVAO->VBuffer = vbo;
 	}
@@ -295,7 +296,7 @@ void LightSource::SetupDrawCommands()
 
 		VertexBuffer vbo = VertexBuffer{ ibo, layout };
 		int32_t verticesCount = BasicShapesData::GetCubeVerticesCount();
-		vbo.SetVertices(BasicShapesData::GetCubeVertices(), verticesCount, GL_STATIC_DRAW);
+		vbo.SetData(BasicShapesData::GetCubeVertices(), verticesCount, GL_STATIC_DRAW);
 
 		thisVAO->VBuffer = vbo;
 	}

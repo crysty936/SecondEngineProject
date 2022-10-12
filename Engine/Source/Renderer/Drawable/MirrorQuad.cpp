@@ -37,7 +37,7 @@ void MirrorQuad::SetupDrawCommands()
 
 		VertexBuffer vbo = VertexBuffer{ ibo, layout };
 		int32_t verticesCount = BasicShapesData::GetQuadVerticesCount();
-		vbo.SetVertices(BasicShapesData::GetQuadVertices(), verticesCount, GL_STATIC_DRAW);
+		vbo.SetData(BasicShapesData::GetQuadVertices(), verticesCount, GL_STATIC_DRAW);
 
 		thisVAO->VBuffer = vbo;
 	}

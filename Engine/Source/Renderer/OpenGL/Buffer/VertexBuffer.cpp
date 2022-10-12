@@ -27,7 +27,7 @@ void VertexBuffer::Unbind() const
 	Indices.Unbind();
 }
 
-void VertexBuffer::SetVertices(const float* inVertices, const int inCount, const uint32_t inBufferAccessType)
+void VertexBuffer::SetData(const float* inVertices, const int inCount, const uint32_t inBufferAccessType)
 {
 	Bind();
 	glNamedBufferData(Handle, sizeof(float) * inCount, inVertices, inBufferAccessType);

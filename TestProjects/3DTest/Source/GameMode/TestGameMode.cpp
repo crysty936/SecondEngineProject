@@ -79,9 +79,9 @@ void TestGameMode::Init()
 
  	{
 		// Ground
-  	 	eastl::shared_ptr<CubeShape> centerObj = BasicShapes::CreateCubeObject();
-  		centerObj->Move(glm::vec3(0.f, -2.f, 0.f));
-  		centerObj->SetScale(glm::vec3(100.f, 0.5f, 100.f));
+//   	 	eastl::shared_ptr<CubeShape> centerObj = BasicShapes::CreateCubeObject();
+//   		centerObj->Move(glm::vec3(0.f, -2.f, 0.f));
+//   		centerObj->SetScale(glm::vec3(100.f, 0.5f, 100.f));
  
  	}
 	{
