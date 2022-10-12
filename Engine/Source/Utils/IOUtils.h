@@ -1,5 +1,7 @@
 #pragma once
 #include "EASTL/string.h"
 
-
-bool TryFastReadFile(const eastl::string& inFilePath, eastl::string& outData);
+namespace IOUtils
+{
+	bool TryFastReadFile(const eastl::string& inFilePath, eastl::string& outData);
+}

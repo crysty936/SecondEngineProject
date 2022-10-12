@@ -84,10 +84,11 @@ void Camera::OnMousePosChanged(const float inNewYaw, const float inNewPitch)
 	const float pitchOffset = ((-1.f) * (inNewPitch - MouseLastPitch)) * MouseLookSensitivity;
 
 
-
 	MouseLastYaw = inNewYaw;
 	MouseLastPitch = inNewPitch;
 
+	LOG_INFO("Mouse yaw offset %f", yawOffset);
+	LOG_INFO("Mouse yaw %f", inNewYaw);
 // 	const float sensitivity = 0.1f;
 // 
 // 	Yaw += yawOffset * sensitivity;
@@ -165,9 +166,11 @@ glm::mat4 Camera::GetLookAt()
 //  	memcpy(glm::value_ptr(rotationMatrix), firstMatrixA, sizeof(glm::mat4));
 // 
 // 	// Translation Matrix
-// 	// Position is negated which makes it equivalent to
-// 	// the inverse of the translation matrix.
-// 	// T(v)^-1 == T(-v)
+// 	// Position is negated so that camera is at origin
+// 	// 
+// 	// Translation inverse is equal to T(-v) T(v)^-1 == T(-v)
+
+	// Also, inverse of a TranslationRotation matrix (X)^-1 = (T(t) * R)^-1 = R^t * T(-t), so R^-1 * T^-1, open parantheses mean inverse of operations and inverse of each
 // 	glm::vec3 translation = Model.Translation;
 // 	float SecondMatrixA[16] =
 // 	{
@@ -180,13 +183,25 @@ glm::mat4 Camera::GetLookAt()
 // 	glm::mat4 translationMatrix = glm::mat4(1.f);
 // 	memcpy(glm::value_ptr(translationMatrix), SecondMatrixA, sizeof(glm::mat4));
 // 	translationMatrix = glm::transpose(translationMatrix);
+
+	// 	float SecondMatrixA[16] =
+// 	{
+// 		1,		0,		0,		0,
+// 		0,		1,		0,		0,
+// 		0,		0,		1,		0,
+// 		-translation.x,,		-translation.y,		-translation.z,		1
+// 	};
 // 
+	// if this is made like, where the translation is supposed to be, then there's no need for transposing
+
 // 	// Combine to get TRS(without the scale)
 // 	// The order of multiplication is reversed because the matrices are
 // 	// inverted.
 // 	glm::mat4 lookAt = rotationMatrix * translationMatrix;
 
 	//return lookAt;
+
+	// This is not a look at! This is a view matrix(everything relative to camera)
 
 	const glm::mat4 inverse = glm::inverse(GetAbsoluteTransform().GetMatrix());
 

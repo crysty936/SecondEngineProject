@@ -5,7 +5,7 @@
         "commandLine": "",
         "environment": [
         ],
-        "executable": "D:\\dev\\SecondEngineProject\\TestProjects\\3DTest\\build\\Debug\\3DTest.exe",
+        "executable": "D:\\dev\\SecondEngineProject\\TestProjects\\TriangleTest\\build\\Debug\\TriangleTest.exe",
         "inject": false,
         "numQueuedFrames": 0,
         "options": {
@@ -22,6 +22,6 @@
             "verifyBufferAccess": false
         },
         "queuedFrameCap": 0,
-        "workingDir": "D:/dev/SecondEngineProject/TestProjects/3DTest/build"
+        "workingDir": "D:\\dev\\SecondEngineProject\\TestProjects\\TriangleTest\\build"
     }
 }

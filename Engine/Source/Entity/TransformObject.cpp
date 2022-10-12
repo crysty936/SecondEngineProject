@@ -60,6 +60,8 @@ void TransformObject::Rotate(const float inAmount, const glm::vec3 inAxis)
 	const glm::vec3 newRotationEuler = glm::eulerAngles(newRotation);
 
 	SetRotation(newRotationEuler);
+
+	glm::mat4 mat = GetAbsoluteTransform().GetMatrix();
 }
 
 void TransformObject::SetRotation(const glm::vec3 inNewRotation)

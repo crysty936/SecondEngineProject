@@ -13,14 +13,6 @@ public:
 public:
 	virtual void Init() override;
 	virtual void Tick(float inDeltat) override;
-
-// 	void MoveCameraLeft();
-// 	void MoveCameraRight();
-// 	void MoveCameraUp();
-// 	void MoveCameraDown();
-// 	void OnChangeDrawMode();
 private:
-	eastl::shared_ptr<class Camera> GameCamera = nullptr;
-	eastl::unique_ptr<class Controller> GameController = nullptr;
 	TransformObjPtr triangle;
 };

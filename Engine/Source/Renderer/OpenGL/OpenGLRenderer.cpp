@@ -25,7 +25,7 @@
 #include "Core/WindowsPlatform.h"
 
 #include <windows.h>
-#include "InputSystem/InputEventType.h"
+#include "InputSystem/InputType.h"
 #include "Window/WindowsWindow.h"
 #include "InputSystem/InputSystem.h"
 
@@ -74,7 +74,7 @@ static void init_opengl_extensions()
 	WNDCLASSW windowClass = {};
 	windowClass.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
 	windowClass.lpfnWndProc = DefWindowProc;
-	windowClass.hInstance = GetModuleHandle(0);
+	windowClass.hInstance = GetModuleHandleW(0);
 	windowClass.lpszClassName = L"Dummy_Window_Class";
 
 	if (!RegisterClassW(&windowClass)) {
@@ -99,6 +99,15 @@ static void init_opengl_extensions()
 		ASSERT_MSG(false, "Failed to create dummy OpenGL window.");
 	}
 
+	ShowWindow(dummyWindow, SW_HIDE);
+
+	MSG msg;
+	while (PeekMessageW(&msg, dummyWindow, 0, 0, PM_REMOVE))
+	{
+		TranslateMessage(&msg);
+		DispatchMessageW(&msg);
+	}
+	
 	HDC dummyDeviceContext = GetDC(dummyWindow);
 
 	PIXELFORMATDESCRIPTOR pfd;
@@ -202,7 +211,7 @@ static glProc getProcAddressGLWindows(const char* procname)
 const uint32_t SHADOW_WIDTH = 4096;
 const uint32_t SHADOW_HEIGHT = 4096;
 
-OpenGLRenderer* RHI = nullptr;
+OpenGLRenderer* OpenGLRenderer::GlobalRHI = nullptr;
 static std::mutex RenderCommandsMutex;
 static std::mutex LoadQueueMutex;
 static std::mutex GetVAOMutex;
@@ -216,7 +225,7 @@ void LoaderFunc(GLFWwindow* inLoadingThreadContext)
 {
 	while (Engine->IsRunning())
 	{
-		eastl::queue<RenderingLoadCommand>& loadQueue = RHI->GetLoadQueue();
+		eastl::queue<RenderingLoadCommand>& loadQueue = OpenGLRenderer::GetRHI().GetLoadQueue();
 		std::unique_lock<std::mutex> lock{ LoadQueueMutex };
 		LoadQueueCondition.wait(lock, [&] {return !loadQueue.empty(); });
 
@@ -260,10 +269,10 @@ OpenGLRenderer::OpenGLRenderer(const WindowProperties& inMainWindowProperties)
   	const bool gladSuccess = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress) == GLFW_TRUE;
 	ASSERT(gladSuccess);
 	glfwSetInputMode(newWindowHandle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetInputMode(newWindowHandle, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
 	GLWindow = eastl::make_unique<OpenGLWindow>(newWindowHandle, inMainWindowProperties);
 	InputSystem::Get().RegisterCallbacksGLFW(*GLWindow);
 #endif
-
 
 #if !WITH_GLFW
 	InputSystem::Get().SetCursorMode(CurrentWindow->GetHandle(), ECursorMode::Disabled);
@@ -291,6 +300,9 @@ OpenGLRenderer::OpenGLRenderer(const WindowProperties& inMainWindowProperties)
 	// Set the default uniforms
 	SetupBaseUniforms();
 
+	glFrontFace(GL_CCW);
+	glCullFace(GL_BACK);
+
 	// Create the loading thread
 	//std::thread(LoaderFunc, loadingThreadContext).detach();
 }
@@ -299,15 +311,15 @@ OpenGLRenderer::~OpenGLRenderer() = default;
 
 void OpenGLRenderer::Init(const WindowProperties & inMainWindowProperties)
 {
-	RHI = new OpenGLRenderer{ inMainWindowProperties };
+	GlobalRHI = new OpenGLRenderer{ inMainWindowProperties };
 
 	// Setup secondary framebuffer
 
 	// Create the frame buffer
-	glGenFramebuffers(1, &RHI->AuxiliarFrameBuffer);
-	glBindFramebuffer(GL_FRAMEBUFFER, RHI->AuxiliarFrameBuffer);
+	glGenFramebuffers(1, &GlobalRHI->AuxiliarFrameBuffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, GlobalRHI->AuxiliarFrameBuffer);
 
-	const WindowProperties& windowProps = RHI->GLWindow->GetProperties();
+	const WindowProperties& windowProps = GlobalRHI->GLWindow->GetProperties();
 	// Create a stencil and depth render buffer object for the frame buffer
 	uint32_t rbo; // render buffer object
 	glGenRenderbuffers(1, &rbo);
@@ -322,13 +334,13 @@ void OpenGLRenderer::Init(const WindowProperties & inMainWindowProperties)
 	ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 
 	// Create the shadow map framebuffer
-	glGenFramebuffers(1, &RHI->ShadowMapBuffer);
-	glBindFramebuffer(GL_FRAMEBUFFER, RHI->ShadowMapBuffer);
+	glGenFramebuffers(1, &GlobalRHI->ShadowMapBuffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, GlobalRHI->ShadowMapBuffer);
 
-	RHI->ShadowBufferTex = eastl::make_shared<OpenGLDepthMap>("ShadowMap");
-	RHI->ShadowBufferTex->Init();
+	GlobalRHI->ShadowBufferTex = eastl::make_shared<OpenGLDepthMap>("ShadowMap");
+	GlobalRHI->ShadowBufferTex->Init();
 
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, RHI->ShadowBufferTex->TexHandle, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, GlobalRHI->ShadowBufferTex->TexHandle, 0);
 
 	glDrawBuffer(GL_NONE);
 	glReadBuffer(GL_NONE);
@@ -341,23 +353,23 @@ void OpenGLRenderer::Init(const WindowProperties & inMainWindowProperties)
 
 void OpenGLRenderer::Terminate()
 {
-	RHI->GLWindow.reset();
+	GlobalRHI->GLWindow.reset();
 
 #if WITH_GLFW
 	glfwTerminate();
 #endif;
 
-	glDeleteBuffers(1, &RHI->AuxiliarFrameBuffer);
+	glDeleteBuffers(1, &GlobalRHI->AuxiliarFrameBuffer);
 
-	ASSERT(RHI);
-	delete RHI;
+	ASSERT(GlobalRHI);
+	delete GlobalRHI;
 }
 
 void OpenGLRenderer::Draw()
 {
 	UpdateUniforms();
 
-	DrawShadowMap();
+	//DrawShadowMap();
 
 	SetupBaseUniforms();
 	UpdateUniforms();
@@ -365,7 +377,7 @@ void OpenGLRenderer::Draw()
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-	DrawSkybox();
+	//DrawSkybox();
 	RenderCommandsMutex.lock();
 	DrawCommands(MainCommands);
 	RenderCommandsMutex.unlock();
@@ -495,8 +507,8 @@ void OpenGLRenderer::DrawCommand(const RenderCommand & inCommand)
 	//
 	ShadowBufferTex->Bind(i);
 	//
-	RHI->UniformsCache["ShadowMap"] = uint32_t(i);
-	RHI->UniformsCache["LightPos"] = lightPos;
+	GlobalRHI->UniformsCache["ShadowMap"] = uint32_t(i);
+	GlobalRHI->UniformsCache["LightPos"] = lightPos;
 
 	const uint32_t indicesCount = vao->VBuffer.GetIndicesCount();
 	vao->Bind();

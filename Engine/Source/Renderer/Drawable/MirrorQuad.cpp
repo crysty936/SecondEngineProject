@@ -18,7 +18,9 @@ void MirrorQuad::SetupDrawCommands()
 {
 	const eastl::string vaoName = "mirrorVAO";
 	eastl::shared_ptr<VertexArrayObject> thisVAO{ nullptr };
-	const bool existingVAO = RHI->GetOrCreateVAO(vaoName, thisVAO);
+	ASSERT(false); // Not working with Generic renderer
+	//const bool existingVAO = RHI->GetOrCreateVAO(vaoName, thisVAO); 
+	const bool existingVAO = false;
 
 	if (!existingVAO)
 	{
@@ -63,9 +65,6 @@ void MirrorQuad::SetupDrawCommands()
 	newCommand.Parent = this_shared(this);
 	newCommand.DrawType = EDrawCallType::DrawElements;
 
-	RHI->AddMirrorCommand(newCommand);
-
-// 	RHI->MirrorDrawCommand = eastl::make_unique<RenderCommand>();
-// 	*(RHI->MirrorDrawCommand) = newCommand;
+	//RHI->AddMirrorCommand(newCommand);
 
 }

@@ -36,7 +36,7 @@ WindowsWindow::~WindowsWindow()
 	DestroyWindow(reinterpret_cast<HWND>(WindowHandle));
 }
 
-void WindowsWindow::OnKeyInput(const EInputKey inKey, const InputEventType inType)
+void WindowsWindow::OnKeyInput(const EInputKey inKey, const EInputType inType)
 {
 	if (inKey == EInputKey::Escape)
 	{
@@ -47,7 +47,8 @@ void WindowsWindow::OnKeyInput(const EInputKey inKey, const InputEventType inTyp
 void WindowsWindow::SetVSyncEnabled(const bool inEnabled)
 {
 	Properties.VSyncEnabled = inEnabled;
-	RHI->SetVSyncEnabled(inEnabled);
+	ASSERT(FALSE); // Not working with generic renderer
+	//RHI->SetVSyncEnabled(inEnabled);
 }
 
 

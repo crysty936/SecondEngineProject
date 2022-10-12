@@ -3,12 +3,12 @@
 #include "GLFW/glfw3.h"
 #include "Core/EngineUtils.h"
 #include "InputSystem/InputKeys.h"
-#include "InputSystem/InputEventType.h"
+#include "InputSystem/InputType.h"
 #include "Entity/Entity.h"
 #include "CursorMode.h"
 #include "Core/WindowsPlatform.h"
 
-using KeyDelegate = MulticastDelegate<EInputKey, InputEventType>;
+using KeyDelegate = MulticastDelegate<EInputKey, EInputType>;
 using MousePosDelegate = MulticastDelegate<float, float>;
 using MouseScrollDelegate = MulticastDelegate<float>;
 
@@ -42,8 +42,8 @@ public:
 	glm::vec<2, int> LastCursorPos = {};
 
 private:
-	void OnKeyPressedLog(EInputKey inKeyCode, InputEventType inEventType);
-	static void KeyCallback(EInputKey inKey, InputEventType inAction);
+	void OnKeyPressedLog(EInputKey inKeyCode, EInputType inEventType);
+	static void KeyCallback(EInputKey inKey, EInputType inAction);
 	static void GLFWKeyCallback(GLFWwindow*, int32_t inKeycode, int32_t inScanCode, int32_t inAction, int32_t inMods);
 	static void MousePosChangedCallback(const double inNewYaw, const double inNewPitch);
 	static void MousePosChangedCallbackOpenGL(GLFWwindow*, const double inNewYaw, const double inNewPitch);

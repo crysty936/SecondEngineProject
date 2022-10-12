@@ -5,6 +5,8 @@
 
 #ifndef NDEBUG
 
+// We use the basic assumption that if x is true, then there's no need to validate the second condition
+
 #define ASSERT_MSG(x, inMessage, ...)						\
   ((!!(x)) || ([&](){										\
 LOG_ERROR(inMessage, __VA_ARGS__);							\

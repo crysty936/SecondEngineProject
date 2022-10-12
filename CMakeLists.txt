@@ -25,6 +25,11 @@ list(APPEND extra_libs EASTL)
 add_subdirectory(Plugins/assimp)
 list(APPEND extra_libs assimp)
 
+# Rendering API's libs
+list(APPEND extra_libs opengl32.lib)
+list(APPEND extra_libs d3d11.lib)
+list(APPEND extra_libs d3dcompiler.lib)
+
 # used to add all .cpp and .h files under source
 file(GLOB_RECURSE source_files CONFIGURE_DEPENDS "${CMAKE_CURRENT_LIST_DIR}/Engine/*.cpp" "${CMAKE_CURRENT_LIST_DIR}/Engine/*.h")
 

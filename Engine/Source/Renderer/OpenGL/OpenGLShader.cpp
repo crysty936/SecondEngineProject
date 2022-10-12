@@ -14,8 +14,8 @@ OpenGLShader OpenGLShader::ConstructShaderFromPath(const eastl::string& inVertex
 	eastl::string vertexShaderCode;
 	eastl::string fragmentShaderCode;
 
-	const bool vertexReadSuccess = TryFastReadFile(inVertexPath, vertexShaderCode);
-	const bool fragmentReadSuccess = TryFastReadFile(inFragmentPath, fragmentShaderCode);
+	const bool vertexReadSuccess = IOUtils::TryFastReadFile(inVertexPath, vertexShaderCode);
+	const bool fragmentReadSuccess = IOUtils::TryFastReadFile(inFragmentPath, fragmentShaderCode);
 
 	return ConstructShaderFromSource(vertexShaderCode, fragmentShaderCode);
 }
@@ -152,7 +152,6 @@ int OpenGLShader::GetUniformLocation(const eastl::string & UniformName) const
 	if (uniformLocation != -1)
 		UniformLocations[UniformName] = uniformLocation;
 
-	//ENSURE_MSG(uniformLocation != -1, "Uniform location could not be found for: %s!", UniformName.data());
 	if (uniformLocation == -1)
 	{
 		LOG_ONCE_WARNING("Uniform location could not be found for: %s!", UniformName.data());

@@ -19,7 +19,7 @@ void OpenGLTexture::Init(const eastl::string& inTexturePath)
 	glGenTextures(1, &TexHandle);
 	glBindTexture(GLTexType, TexHandle);
 
-	const WindowProperties& windowProps = RHI->GetMainWindow().GetProperties();
+	const WindowProperties& windowProps = OpenGLRenderer::GetRHI().GetMainWindow().GetProperties();
 
 	glTexImage2D(GLTexType, 0, GL_RGB, windowProps.Width, windowProps.Height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
 

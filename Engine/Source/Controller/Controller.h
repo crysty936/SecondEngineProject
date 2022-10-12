@@ -3,7 +3,7 @@
 #include "InputSystem/InputSystem.h"
 #include "EASTL/unordered_map.h"
 #include "InputSystem/InputKeys.h"
-#include "InputSystem/InputEventType.h"
+#include "InputSystem/InputType.h"
 #include "EventSystem/EventSystem.h"
 
 using KeyActionDelegate = Delegate<void>;
@@ -27,12 +27,12 @@ public:
 	inline MousePosDelegate& OnMouseMoved() { return OnMouseMovedDelegate; }
 
 private:
-	void OnKeyInputReceived(EInputKey inKeyCode, InputEventType inEventType);
+	void OnKeyInputReceived(EInputKey inKeyCode, EInputType inEventType);
 	void OnMouseMoveInputReceived(const float inNewYaw, const float inNewPitch);
 	void OnMouseScrollInputReceived(const float inNewY);
 
 private:
-	eastl::unordered_map<EInputKey, InputEventType> KeyStates{};
+	eastl::unordered_map<EInputKey, EInputType> KeyStates{};
 	eastl::vector<OnKeyAction> KeyListeners{};
 	MousePosDelegate OnMouseMovedDelegate{};
 	MouseScrollDelegate OnMouseScrollDelegate{};

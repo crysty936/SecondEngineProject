@@ -28,8 +28,6 @@ struct RenderingLoadCommand
 	eastl::shared_ptr<class TransformObject> Parent;
 };
 
-extern class OpenGLRenderer* RHI;
-
 enum class EDrawMode : uint8_t
 {
 	NORMAL,
@@ -59,7 +57,6 @@ public:
 	eastl::shared_ptr<RenderMaterial> GetMaterial(const RenderCommand& inCommand) const;
 	void SetVSyncEnabled(const bool inEnabled);
 	inline class WindowsWindow& GetMainWindow() { return *CurrentWindow; }
-	inline class OpenGLWindow& GetOpenGLWindow() { return *GLWindow; }
 	static void LoadTexture();
 	void AddCommand(const RenderCommand& inCommand);
 	void AddCommands(eastl::vector<RenderCommand> inCommands);
@@ -74,6 +71,11 @@ public:
 	bool GetOrCreateVAO(const eastl::string& inVAOId, OUT eastl::shared_ptr<VertexArrayObject>& outVAO);
 	void AddMirrorCommand(const RenderCommand& inCommand);
 	inline void SetSkyboxCommand(RenderCommand inSkyboxCommand) { MainSkyboxCommand = inSkyboxCommand; }
+
+	inline static OpenGLRenderer& GetRHI() { ASSERT(GlobalRHI); return *GlobalRHI; }
+
+private:
+	static OpenGLRenderer* GlobalRHI;
 
 private:
 	void SetViewportSize(const int32_t inWidth, const int32_t inHeight);

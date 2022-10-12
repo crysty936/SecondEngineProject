@@ -4,24 +4,27 @@
 #include "Logger/Logger.h"
 #include "Core/EngineUtils.h"
 
-bool TryFastReadFile(const eastl::string& inFilePath, eastl::string& outData)
+namespace IOUtils
 {
-	std::ifstream fileStream(inFilePath.data());
-
-	if (!fileStream.is_open())
+	bool TryFastReadFile(const eastl::string& inFilePath, eastl::string& outData)
 	{
-		LOG_ERROR("Failed to open file %s.", inFilePath.data());
+		std::ifstream fileStream(inFilePath.data());
 
-		ASSERT(false);
+		if (!fileStream.is_open())
+		{
+			LOG_ERROR("Failed to open file %s.", inFilePath.data());
 
-		return false;
+			ASSERT(false);
+
+			return false;
+		}
+
+		const uintmax_t size = std::filesystem::file_size(inFilePath.data());
+		outData.InitialiseToSize(size, '\0');
+		fileStream.read(outData.data(), size);
+
+		fileStream.close();
+
+		return true;
 	}
-	 
-	const uintmax_t size = std::filesystem::file_size(inFilePath.data());
-	outData.InitialiseToSize(size, '\0');
-	fileStream.read(outData.data(), size);
-
-	fileStream.close();
-
-	return true;
 }

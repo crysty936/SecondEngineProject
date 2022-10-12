@@ -22,8 +22,11 @@ void TriangleShape::SetupDrawCommands()
 {
 	const eastl::string vaoName = "triangleVAO";
 	eastl::shared_ptr<VertexArrayObject> thisVAO{ nullptr };
-	const bool existingVAO = RHI->GetOrCreateVAO(vaoName, thisVAO);
 
+	ASSERT(false); // Not working with Generic renderer
+	//const bool existingVAO = RHI->GetOrCreateVAO(vaoName, thisVAO); 
+
+	const bool existingVAO = false;
 	if (!existingVAO)
 	{
 		// TODO: Buffers creation should be delegated to the renderer
@@ -63,7 +66,8 @@ void TriangleShape::SetupDrawCommands()
 	newCommand.Parent = this_shared(this);
 	newCommand.DrawType = EDrawCallType::DrawElements;
 
-	RHI->AddCommand(newCommand);
+	ASSERT(false); // Not working with Generic renderer
+	//RHI->AddCommand(newCommand);
 }
 
 
@@ -74,7 +78,9 @@ void SquareShape::SetupDrawCommands()
 {
 	const eastl::string vaoName = "squareVAO";
 	eastl::shared_ptr<VertexArrayObject> thisVAO{ nullptr };
-	const bool existingVAO = RHI->GetOrCreateVAO(vaoName, thisVAO);
+	ASSERT(false); // Not working with Generic renderer
+	//const bool existingVAO = RHI->GetOrCreateVAO(vaoName, thisVAO); 
+	const bool existingVAO = false;
 
 	if (!existingVAO)
 	{
@@ -115,7 +121,8 @@ void SquareShape::SetupDrawCommands()
 	newCommand.Parent = this_shared(this);
 	newCommand.DrawType = EDrawCallType::DrawElements;
 
-	RHI->AddCommand(newCommand);
+	ASSERT(false); // Not working with Generic renderer
+	//RHI->AddCommand(newCommand);
 }
 
 eastl::shared_ptr<SquareShape> BasicShapes::CreateSquareObject(eastl::string inTexturePath)
@@ -144,8 +151,9 @@ void CubeShape::SetupDrawCommands()
 {
 	const eastl::string vaoName = "cubeVAO";
 	eastl::shared_ptr<VertexArrayObject> thisVAO{ nullptr };
-	const bool existingVAO = RHI->GetOrCreateVAO(vaoName, thisVAO);
 
+	//TODO: Make work with generic renderer
+	const bool existingVAO = OpenGLRenderer::GetRHI().GetOrCreateVAO(vaoName, thisVAO); 
 	if (!existingVAO)
 	{
 		// TODO: Buffers creation should be delegated to the renderer
@@ -170,7 +178,9 @@ void CubeShape::SetupDrawCommands()
 
 	MaterialsManager& matManager = MaterialsManager::Get();
 	bool materialExists = false;
-	eastl::shared_ptr<RenderMaterial> cubeMaterial = matManager.GetOrAddMaterial<WithShadowMaterial>("cube_material", materialExists);
+	//eastl::shared_ptr<RenderMaterial> cubeMaterial = matManager.GetOrAddMaterial<WithShadowMaterial>("cube_material", materialExists);
+	// TODO: Shadow disabled for now
+	eastl::shared_ptr<RenderMaterial> cubeMaterial = matManager.GetOrAddMaterial<RenderMaterial>("cube_material", materialExists);
 
 	if (!materialExists)
 	{
@@ -188,9 +198,10 @@ void CubeShape::SetupDrawCommands()
 	newCommand.Material = cubeMaterial;
 	newCommand.VAO = thisVAO;
 	newCommand.Parent = cubeNode;
-	newCommand.DrawType = EDrawCallType::DrawArrays;
+	newCommand.DrawType = EDrawCallType::DrawElements;
 
-	RHI->AddCommand(newCommand);
+	//TODO: Make work with generic renderer
+	OpenGLRenderer::GetRHI().AddCommand(newCommand);
 }
 
 Skybox::Skybox() = default;
@@ -200,7 +211,10 @@ void Skybox::SetupDrawCommands()
 {
 	const eastl::string vaoName = "skyboxVAO";
 	eastl::shared_ptr<VertexArrayObject> thisVAO{ nullptr };
-	const bool existingVAO = RHI->GetOrCreateVAO(vaoName, thisVAO);
+
+	ASSERT(false); // Not working with Generic renderer
+	//const bool existingVAO = RHI->GetOrCreateVAO(vaoName, thisVAO); 
+	const bool existingVAO = false;
 
 	if (!existingVAO)
 	{
@@ -249,7 +263,8 @@ void Skybox::SetupDrawCommands()
 	newCommand.Parent = thisNode;
 	newCommand.DrawType = EDrawCallType::DrawArrays;
 
-	RHI->SetSkyboxCommand(newCommand);
+	ASSERT(false); // Not working with Generic renderer
+	//RHI->SetSkyboxCommand(newCommand);
 }
 
 LightSource::LightSource() = default;
@@ -259,7 +274,9 @@ void LightSource::SetupDrawCommands()
 {
 	const eastl::string vaoName = "lightSourceVAO";
 	eastl::shared_ptr<VertexArrayObject> thisVAO{ nullptr };
-	const bool existingVAO = RHI->GetOrCreateVAO(vaoName, thisVAO);
+	ASSERT(false); // Not working with Generic renderer
+	//const bool existingVAO = RHI->GetOrCreateVAO(vaoName, thisVAO);
+	const bool existingVAO = false;
 
 	if (!existingVAO)
 	{
@@ -301,5 +318,6 @@ void LightSource::SetupDrawCommands()
 	newCommand.Parent = cubeNode;
 	newCommand.DrawType = EDrawCallType::DrawArrays;
 
-	RHI->AddCommand(newCommand);
+	ASSERT(false); // Not working with Generic renderer
+	//RHI->AddCommand(newCommand);
 }

@@ -31,7 +31,8 @@ void AssimpModel3D::SetupDrawCommands()
 	loadCommand.ModelPath = ModelPath;
 	loadCommand.Parent = thisShared;
 
-	RHI->AddRenderLoadCommand(loadCommand);
+	ASSERT(false); // Not working with Generic renderer
+	//RHI->AddRenderLoadCommand(loadCommand);
 }
 
 class AssimpModel3DLoader
@@ -64,7 +65,8 @@ void AssimpModel3D::LoadModelToRoot(const eastl::string inPath, TransformObjPtr 
 	eastl::vector<RenderCommand> resultingCommands;
 	eastl::shared_ptr<MeshNode> mesh = modelLoader.LoadData(resultingCommands);
 
-	RHI->AddCommands(resultingCommands);
+	ASSERT(false); // Not working with Generic renderer
+	//RHI->AddCommands(resultingCommands);
 
 	inParent->AddChild(mesh);
 }
@@ -143,7 +145,9 @@ void AssimpModel3DLoader::ProcessMesh(const aiMesh& inMesh, const aiScene& inSce
  
 	eastl::shared_ptr<VertexArrayObject> thisVAO = nullptr;
 	const eastl::string vaoName = inMesh.mName.C_Str();
-	const bool existingVAO = RHI->GetOrCreateVAO(vaoName, thisVAO);
+	ASSERT(false); // Not working with Generic renderer
+	//const bool existingVAO = RHI->GetOrCreateVAO(vaoName, thisVAO);
+	const bool existingVAO = false;
 
 	if (!existingVAO)
 	{

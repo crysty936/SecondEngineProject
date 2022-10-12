@@ -28,14 +28,14 @@ void Controller::ExecuteCallbacks()
 
 	for (const OnKeyAction& listener : KeyListeners)
 	{
-		if (KeyStates[listener.RequiredKey] == InputEventType::InputPress || KeyStates[listener.RequiredKey] == InputEventType::InputRepeat)
+		if (KeyStates[listener.RequiredKey] == EInputType::InputPress || KeyStates[listener.RequiredKey] == EInputType::InputRepeat)
 		{
 			if (listener.Once)
 			{
-				if (KeyStates[listener.RequiredKey] == InputEventType::InputPress)
+				if (KeyStates[listener.RequiredKey] == EInputType::InputPress)
 				{
 					// Declare it repeat until it's released
-					KeyStates[listener.RequiredKey] = InputEventType::InputRepeat;
+					KeyStates[listener.RequiredKey] = EInputType::InputRepeat;
 
 					listener.Del.Execute();
 				}
@@ -48,7 +48,7 @@ void Controller::ExecuteCallbacks()
 	}
 }
 
-void Controller::OnKeyInputReceived(EInputKey inKeyCode, InputEventType inEventType)
+void Controller::OnKeyInputReceived(EInputKey inKeyCode, EInputType inEventType)
 {
  	if (inKeyCode == EInputKey::Escape)
  	{

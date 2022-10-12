@@ -2,7 +2,6 @@
 #include "Core/WindowsPlatform.h"
 #include "GLFW/glfw3.h"
 #include "Logger/Logger.h"
-#include "Renderer/OpenGL/OpenGLRenderer.h"
 #include "Window/OpenGLWindow.h"
 #include "InputSystem/InputSystem.h"
 #include "Scene/SceneManager.h"
@@ -11,6 +10,7 @@
 #include "Core/GameModeBase.h"
 #include "Timer/TimersManager.h"
 #include "Renderer/Material/MaterialsManager.h"
+#include "Renderer/Renderer.h"
 
 constexpr float IdealFrameRate = 60.f;
 constexpr float IdealFrameTime = 1.0f / IdealFrameRate;
@@ -41,7 +41,7 @@ void EngineCore::Init()
 
 	// Init all engine subsystems
 	InputSystem::Init();
-	OpenGLRenderer::Init();
+	Renderer::Init();
 	SceneManager::Init();
 	TimersManager::Init();
 	MaterialsManager::Init();
@@ -58,7 +58,7 @@ void EngineCore::Terminate()
 	MaterialsManager::Terminate();
 	TimersManager::Terminate();
 	SceneManager::Terminate();
-	OpenGLRenderer::Terminate();
+	Renderer::Terminate();
 	InputSystem::Terminate();
 
 	ASSERT(Engine);
@@ -89,8 +89,8 @@ void EngineCore::Run()
 		}
 
 		CurrentDeltaT = static_cast<float>(currentTime - lastTime);
-		eastl::string text;
-		text.sprintf("Ms: %f", CurrentDeltaT);
+		eastl::wstring text;
+		text.sprintf(L"Ms: %f", CurrentDeltaT);
 		WindowsPlatform::SetWindowsWindowText(text);
 
 		//Logger::GetLogger().Log("Delta time: %lf", CurrentDeltaT);
@@ -105,7 +105,7 @@ void EngineCore::Run()
 		SceneManager::Get().GetCurrentScene().TickObjects(CurrentDeltaT);
 		CurrentGameMode->Tick(CurrentDeltaT);
 
-		RHI->Draw();
+		Renderer::Draw();
 	}
 
 	Terminate();

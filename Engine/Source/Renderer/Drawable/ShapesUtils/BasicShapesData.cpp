@@ -3,10 +3,11 @@
 // Triangle
 const float TriangleVertices[] =
 {
-	-0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
-	 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-	 0.0f,  0.5f, 0.0f, 0.5f, 1.f,
+	-0.5f, -0.5f, 0.0f, 
+	 0.5f, -0.5f, 0.0f, 
+	 0.0f,  0.5f, 0.0f
 };
+
 
 const uint32_t TriangleIndices[] =
 {
@@ -144,54 +145,38 @@ const float CubeVertices[] = {
 	// Vertices			 // Normal			  //Tex Coords
 
     // Back face
-	-1.f, -1.f, -1.f,    0.0f,  0.0f, -1.0f,  0.0f, 0.0f, // bottom-left
-	 1.f,  1.f, -1.f,    0.0f,  0.0f, -1.0f,  1.0f, 1.0f, // top-right
-	 1.f, -1.f, -1.f,    0.0f,  0.0f, -1.0f,  1.0f, 0.0f, // bottom-right         
-	 1.f,  1.f, -1.f,    0.0f,  0.0f, -1.0f,  1.0f, 1.0f, // top-right
-	-1.f, -1.f, -1.f,    0.0f,  0.0f, -1.0f,  0.0f, 0.0f, // bottom-left
-	-1.f,  1.f, -1.f,    0.0f,  0.0f, -1.0f,  0.0f, 1.0f, // top-left
+	 1.f,  1.f, -1.f,    0.0f,  0.0f, -1.0f,  1.0f, 1.0f, // top-right -z
+	-1.f,  1.f, -1.f,    0.0f,  0.0f, -1.0f,  0.0f, 1.0f, // top-left -z
+	 1.f, -1.f, -1.f,    0.0f,  0.0f, -1.0f,  1.0f, 0.0f, // bottom-right -z
+	-1.f, -1.f, -1.f,    0.0f,  0.0f, -1.0f,  0.0f, 0.0f, // bottom-left -z
+
 	// Front face
-	-1.f, -1.f,  1.f,    0.0f,  0.0f, 1.0f,   0.0f, 0.0f, // bottom-left
-	 1.f, -1.f,  1.f,    0.0f,  0.0f, 1.0f,   1.0f, 0.0f, // bottom-right
-	 1.f,  1.f,  1.f,    0.0f,  0.0f, 1.0f,   1.0f, 1.0f, // top-right
-	 1.f,  1.f,  1.f,    0.0f,  0.0f, 1.0f,   1.0f, 1.0f, // top-right
-	-1.f,  1.f,  1.f,    0.0f,  0.0f, 1.0f,   0.0f, 1.0f, // top-left
-	-1.f, -1.f,  1.f,    0.0f,  0.0f, 1.0f,   0.0f, 0.0f, // bottom-left
-	// Left face	   						
-	-1.f,  1.f,  1.f,   -1.0f,  0.0f,  0.0f,  1.0f, 0.0f, // top-right
-	-1.f,  1.f, -1.f,   -1.0f,  0.0f,  0.0f,  1.0f, 1.0f, // top-left
-	-1.f, -1.f, -1.f,   -1.0f,  0.0f,  0.0f,  0.0f, 1.0f, // bottom-left
-	-1.f, -1.f, -1.f,   -1.0f,  0.0f,  0.0f,  0.0f, 1.0f, // bottom-left
-	-1.f, -1.f,  1.f,   -1.0f,  0.0f,  0.0f,  0.0f, 0.0f, // bottom-right
-	-1.f,  1.f,  1.f,   -1.0f,  0.0f,  0.0f,  1.0f, 0.0f, // top-right
-	// Right face	   						
-	 1.f,  1.f,  1.f,    1.0f,  0.0f,  0.0f,  1.0f, 0.0f, // top-left
-	 1.f, -1.f, -1.f,    1.0f,  0.0f,  0.0f,  0.0f, 1.0f, // bottom-right
-	 1.f,  1.f, -1.f,    1.0f,  0.0f,  0.0f,  1.0f, 1.0f, // top-right         
-	 1.f, -1.f, -1.f,    1.0f,  0.0f,  0.0f,  0.0f, 1.0f, // bottom-right
-	 1.f,  1.f,  1.f,    1.0f,  0.0f,  0.0f,  1.0f, 0.0f, // top-left
-	 1.f, -1.f,  1.f,    1.0f,  0.0f,  0.0f,  0.0f, 0.0f, // bottom-left     
-	// Bottom face	   						
-	-1.f, -1.f, -1.f,    0.0f, -1.0f,  0.0f,  0.0f, 1.0f, // top-right
-	 1.f, -1.f, -1.f,    0.0f, -1.0f,  0.0f,  1.0f, 1.0f, // top-left
-	 1.f, -1.f,  1.f,    0.0f, -1.0f,  0.0f,  1.0f, 0.0f, // bottom-left
-	 1.f, -1.f,  1.f,    0.0f, -1.0f,  0.0f,  1.0f, 0.0f, // bottom-left
-	-1.f, -1.f,  1.f,    0.0f, -1.0f,  0.0f,  0.0f, 0.0f, // bottom-right
-	-1.f, -1.f, -1.f,    0.0f, -1.0f,  0.0f,  0.0f, 1.0f, // top-right
-	// Top face		   						
-	-1.f,  1.f, -1.f,    0.0f,  1.0f,  0.0f,  0.0f, 1.0f, // top-left
-	 1.f,  1.f,  1.f,    0.0f,  1.0f,  0.0f,  1.0f, 0.0f, // bottom-right
-	 1.f,  1.f, -1.f,    0.0f,  1.0f,  0.0f,  1.0f, 1.0f, // top-right     
-	 1.f,  1.f,  1.f,    0.0f,  1.0f,  0.0f,  1.0f, 0.0f, // bottom-right
-	-1.f,  1.f, -1.f,    0.0f,  1.0f,  0.0f,  0.0f, 1.0f, // top-left
-	-1.f,  1.f,  1.f,    0.0f,  1.0f,  0.0f,  0.0f, 0.0f  // bottom-left  
+	 1.f,  1.f,  1.f,    0.0f,  0.0f, 1.0f,   1.0f, 1.0f, // top-right +z
+	-1.f,  1.f,  1.f,    0.0f,  0.0f, 1.0f,   0.0f, 1.0f, // top-left +z
+	 1.f, -1.f,  1.f,    0.0f,  0.0f, 1.0f,   1.0f, 0.0f, // bottom-right +z
+	-1.f, -1.f,  1.f,    0.0f,  0.0f, 1.0f,   0.0f, 0.0f, // bottom-left +z
 };
 
-// TODO: Add the indices of the cube to get rid of Draw Arrays
-const uint32_t CubeIndices[] = {
-	0, 1, 2,
-	1, 2, 3
-    //...
+uint32_t CubeIndices[] =
+{
+  0, 1, 2, // -z
+  1, 3, 2,
+
+   5, 4, 7, // +z
+   4, 6, 7,
+// 
+//   4, 0, 3, // -x
+//   3, 7, 4,
+// 
+//   1, 5, 6, // +x
+//   6, 2, 1,
+// 
+//   0, 4, 5, // -y
+//   5, 1, 0,
+// 
+//   3, 2, 6,// +y
+//   6, 7, 3
+
 };
 
 const float* BasicShapesData::GetCubeVertices()

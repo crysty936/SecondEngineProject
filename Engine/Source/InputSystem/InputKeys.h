@@ -136,7 +136,8 @@ enum class EInputKey : int16_t
 	RightControl = 345,
 	RightAlt = 346,
 	RightSuper = 347,
-	Menu = 348
+	Menu = 348,
+	Count = 349
 };
 
 inline std::ostream& operator<<(std::ostream& os, EInputKey keyCode)

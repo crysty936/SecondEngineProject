@@ -27,6 +27,6 @@ OpenGLWindow::~OpenGLWindow()
 void OpenGLWindow::SetVSyncEnabled(const bool inEnabled)
 {
 	Properties.VSyncEnabled = inEnabled;
-	RHI->SetVSyncEnabled(inEnabled);
+	OpenGLRenderer::GetRHI().SetVSyncEnabled(inEnabled);
 }
 
