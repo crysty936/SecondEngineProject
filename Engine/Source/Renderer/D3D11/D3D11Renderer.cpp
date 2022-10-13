@@ -126,10 +126,9 @@ constexpr glm::vec4 ClearColor(0.3f, 0.5f, 1.f, 0.4f);
 	vp.TopLeftY = 0;
 	g_pImmediateContext->RSSetViewports(1, &vp);
 
-	g_pImmediateContext->IASetInputLayout(g_pVertexLayout);
 
+	// Create Vertex Shader
 	{
-		// Create Vertex Shader
 		eastl::string vsData;
 		bool readSuccess = IOUtils::TryFastReadFile("../Data/Shaders/UnchangedPositionVertexShader.hlsl", vsData);
 		ASSERT(readSuccess);
@@ -148,24 +147,10 @@ constexpr glm::vec4 ClearColor(0.3f, 0.5f, 1.f, 0.4f);
 
 		hr = g_pd3dDevice->CreateVertexShader(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), NULL, &g_pVertexShader);
 		ASSERT(!FAILED(hr));
-
-		D3D11_INPUT_ELEMENT_DESC layout[] =
-		{
-			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		};
-		UINT numElements = ARRAYSIZE(layout);
-
-		hr = g_pd3dDevice->CreateInputLayout(layout, numElements, vsBlob->GetBufferPointer(),
-			vsBlob->GetBufferSize(), &g_pVertexLayout);
-		ASSERT(!FAILED(hr));
-
-		vsBlob->Release();
-
-		g_pImmediateContext->IASetInputLayout(g_pVertexLayout);
 	}
 
+	// Create Pixel shader
 	{
-		// Create Pixel shader
 		eastl::string psData;
 		const bool psReadSuccess = IOUtils::TryFastReadFile("../Data/Shaders/FlatColorPixelShader.hlsl", psData);
 		ASSERT(psReadSuccess);
@@ -186,14 +171,25 @@ constexpr glm::vec4 ClearColor(0.3f, 0.5f, 1.f, 0.4f);
 
 		psBlob->Release();
 	}
-	// Create vertex buffer
-	glm::vec3 vertices[] =
-	{
-		glm::vec3(0.0f, 0.5f, 0.0f),
-		glm::vec3(0.5f, -0.5f, 0.0f),
-		glm::vec3(-0.5f, -0.5f, 0.0f),
-	};
 
+	// Create Vertex Buffer
+	{
+		D3D11_INPUT_ELEMENT_DESC layout[] =
+		{
+			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		};
+		UINT numElements = ARRAYSIZE(layout);
+
+		hr = g_pd3dDevice->CreateInputLayout(layout, numElements, vsBlob->GetBufferPointer(),
+			vsBlob->GetBufferSize(), &g_pVertexLayout);
+		ASSERT(!FAILED(hr));
+
+		vsBlob->Release();
+
+		g_pImmediateContext->IASetInputLayout(g_pVertexLayout);
+	}
+
+	// Create Index Buffer
 	{
 		D3D11_BUFFER_DESC bd = {};
 		bd.Usage = D3D11_USAGE_DEFAULT;
@@ -202,7 +198,6 @@ constexpr glm::vec4 ClearColor(0.3f, 0.5f, 1.f, 0.4f);
 		bd.CPUAccessFlags = 0;
 		D3D11_SUBRESOURCE_DATA InitData = {};
 		InitData.pSysMem = BasicShapesData::GetTriangleVertices();
-		//InitData.pSysMem = vertices;
 		hr = g_pd3dDevice->CreateBuffer(&bd, &InitData, &g_pVertexBuffer);
 	}
 
@@ -231,25 +226,25 @@ constexpr glm::vec4 ClearColor(0.3f, 0.5f, 1.f, 0.4f);
 	g_pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 
-//  	glEnable(GL_DEBUG_OUTPUT);
-//  	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-//  
-//  	glEnable(GL_DEPTH_TEST);
-//  	glDepthFunc(GL_LESS);
-//  
-//  	glEnable(GL_STENCIL_TEST);
-//  	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-//  
-//  	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-//  	glEnable(GL_BLEND);
-//  
-//  	glEnable(GL_CULL_FACE);
-//  
-//  	glDebugMessageCallback(OpenGLUtils::GLDebugCallback, nullptr);
-//  	glClearColor(ClearColor.x, ClearColor.y, ClearColor.z, ClearColor.w);
- 
- 	// Set the default uniforms
- 	//SetupBaseUniforms();
+	// Change Winding Order
+	{
+		D3D11_RASTERIZER_DESC rastDesc = {};
+		rastDesc.FillMode = D3D11_FILL_SOLID;
+		rastDesc.CullMode = D3D11_CULL_BACK;
+		rastDesc.FrontCounterClockwise = true; // Change winding order
+		rastDesc.DepthBias = 0;
+		rastDesc.SlopeScaledDepthBias = 0.0f;
+		rastDesc.DepthBiasClamp = 0.0f;
+		rastDesc.DepthClipEnable = true;
+		rastDesc.ScissorEnable = false;
+		rastDesc.MultisampleEnable = false;
+		rastDesc.AntialiasedLineEnable = false;
+
+		ID3D11RasterizerState* newState = nullptr;
+
+		g_pd3dDevice->CreateRasterizerState(&rastDesc, &newState);
+		g_pImmediateContext->RSSetState(newState);
+	}
  }
  
  D3D11Renderer::~D3D11Renderer() = default;

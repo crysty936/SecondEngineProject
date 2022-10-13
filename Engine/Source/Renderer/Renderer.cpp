@@ -1,8 +1,8 @@
 #include "Renderer.h"
 #include "Window/WindowsWindow.h"
 
-#define RENDERERGL 1
-#define RENDERERD3D11 0
+#define RENDERERGL 0
+#define RENDERERD3D11 1
 
 #if RENDERERGL
 #include "Renderer/OpenGL/OpenGLRenderer.h"
