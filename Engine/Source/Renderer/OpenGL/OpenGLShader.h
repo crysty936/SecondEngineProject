@@ -2,7 +2,6 @@
 #include "EASTL/unordered_map.h"
 #include "EASTL/string.h"
 #include <glm/gtc/matrix_transform.hpp>
-#include "glad/glad.h"
 
 class OpenGLShader
 {
@@ -34,7 +33,7 @@ public:
 
 private:
 	int GetUniformLocation(const eastl::string& UniformName) const;
-	uint32_t CreateShader(const eastl::string& Source, GLenum ShaderType);
+	uint32_t CreateShader(const eastl::string& Source, uint32_t ShaderType);
 
 private:
 	mutable eastl::unordered_map<eastl::string, int> UniformLocations;

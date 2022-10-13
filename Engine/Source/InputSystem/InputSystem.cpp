@@ -18,6 +18,8 @@ void InputSystem::KeyCallback(EInputKey inKey, EInputType inAction)
 	LOG_INFO("Key input received for key %d with action: %s", static_cast<int16_t>(inKey), ToString(inAction));
 }
 
+#if WITH_GLFW
+
 void InputSystem::GLFWKeyCallback(GLFWwindow*, int32_t inKeycode, int32_t inScanCode, int32_t inAction, int32_t inMods)
 {
 	InputSystem& instance = InputSystem::Get();
@@ -44,6 +46,12 @@ void InputSystem::GLFWKeyCallback(GLFWwindow*, int32_t inKeycode, int32_t inScan
 	KeyCallback(code, actionType);
 }
 
+void InputSystem::MousePosChangedCallbackOpenGL(GLFWwindow*, double inNewYaw, double inNewPitch)
+{
+	MousePosChangedCallback(inNewYaw, inNewPitch);
+}
+#endif
+
 void InputSystem::MousePosChangedCallback(const double inNewYaw, const double inNewPitch)
 {
 	const float yawFloat = static_cast<float>(inNewYaw);
@@ -51,11 +59,6 @@ void InputSystem::MousePosChangedCallback(const double inNewYaw, const double in
 
 	Instance->OnMouseMovedDelegate.Invoke(yawFloat, pitchFloat);
 	LOG_INFO("Mouse Pos Changed Callback with Yaw: %f and Pitch: %f", inNewYaw, inNewPitch);
-}
-
-void InputSystem::MousePosChangedCallbackOpenGL(GLFWwindow*, double inNewYaw, double inNewPitch)
-{
-	MousePosChangedCallback(inNewYaw, inNewPitch);
 }
 
 void InputSystem::MouseScrollCallback(double xoffset, double yoffset)

@@ -1,4 +1,5 @@
 #include "IndexBuffer.h"
+#include "glad/glad.h"
 
 IndexBuffer::IndexBuffer()
 	: IndicesCount{ 0 }
@@ -19,7 +20,7 @@ void IndexBuffer::Unbind() const
 	IsBound = false;
 }
 
-void IndexBuffer::SetIndices(const uint32_t* inIndices, const int32_t inCount, const GLenum inBufferAccessType)
+void IndexBuffer::SetIndices(const uint32_t* inIndices, const int32_t inCount, const uint32_t inBufferAccessType)
 {
 	Bind();
 	glNamedBufferData(Handle, sizeof(uint32_t) * inCount, inIndices, inBufferAccessType);

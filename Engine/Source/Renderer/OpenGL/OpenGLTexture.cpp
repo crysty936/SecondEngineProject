@@ -1,5 +1,6 @@
 #include "OpenGLTexture.h"
 #include "Utils/ImageLoading.h"
+#include "glad/glad.h"
 #include "GLFW/glfw3.h"
 #include "OpenGLRenderer.h"
 #include "OpenGLShader.h"
@@ -7,7 +8,10 @@
 
 // Create a texture buffer
 OpenGLTexture::OpenGLTexture(const eastl::string& inTexName, const uint32_t inGlTexType)
-	: TexName{ inTexName }, GLTexType{ inGlTexType }{}
+	: TexName{ inTexName }
+{
+	GLTexType = inGlTexType != 0 ? inGlTexType : GL_TEXTURE_2D;
+}
 
 OpenGLTexture::~OpenGLTexture()
 {

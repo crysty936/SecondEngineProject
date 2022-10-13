@@ -3,6 +3,7 @@
 #include "Utils/IOUtils.h"
 #include <glm/gtc/type_ptr.hpp>
 #include "Core/EngineUtils.h"
+#include "glad/glad.h"
 
 OpenGLShader OpenGLShader::ConstructShaderFromSource(const eastl::string& inVertexSource, const eastl::string& inFragmentSource)
 {
@@ -160,7 +161,7 @@ int OpenGLShader::GetUniformLocation(const eastl::string & UniformName) const
 	return uniformLocation;
 }
 
-uint32_t OpenGLShader::CreateShader(const eastl::string & Source, GLenum ShaderType)
+uint32_t OpenGLShader::CreateShader(const eastl::string & Source, uint32_t ShaderType)
 {
 	GLuint shaderHandle = glCreateShader(ShaderType);
 

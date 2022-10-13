@@ -1,6 +1,7 @@
 #pragma once
-#include "LayoutProperties.h"
 #include "EASTL/vector.h"
+#include "LayoutProperties.h"
+#include "glad/glad.h"
 
 class VertexBufferLayout
 {
@@ -29,6 +30,8 @@ public:
 		Properties.push_back({ GL_UNSIGNED_INT, Count, GL_FALSE });
 		Stride += Count * sizeof(uint32_t);
 	}
+
+	
 
 	inline const eastl::vector<LayoutProperties>& GetProperties() const { return Properties; }
 	inline const uint32_t GetStride() const { return Stride; }

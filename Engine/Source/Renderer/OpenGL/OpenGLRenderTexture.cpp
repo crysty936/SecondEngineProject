@@ -4,6 +4,7 @@
 #include "OpenGLRenderer.h"
 #include "Window/WindowProperties.h"
 #include "Window/WindowsWindow.h"
+#include "glad/glad.h"
 
 OpenGLRenderTexture::OpenGLRenderTexture(const eastl::string& inTexName)
 	: OpenGLTexture(inTexName, GL_TEXTURE_2D) {}

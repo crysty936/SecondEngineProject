@@ -1,7 +1,6 @@
 #pragma once
 
 #include <stdint.h>
-#include "glad/glad.h"
 #include "Core/EngineUtils.h"
 
 /**

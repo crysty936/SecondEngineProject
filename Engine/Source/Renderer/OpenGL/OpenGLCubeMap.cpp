@@ -1,14 +1,20 @@
 #include "OpenGLCubeMap.h"
 #include "stb_image.h"
 #include "Utils/ImageLoading.h"
+#include "glad/glad.h"
 
 OpenGLCubeMap::OpenGLCubeMap(const eastl::string& inTexName) 
 	: OpenGLTexture(inTexName, GL_TEXTURE_CUBE_MAP) {}
 
 OpenGLCubeMap::~OpenGLCubeMap() = default;
 
-void OpenGLCubeMap::Init(const eastl::vector<eastl::string>& inTexturePaths, const int32_t inTexNr)
+void OpenGLCubeMap::Init(const eastl::vector<eastl::string>& inTexturePaths, int32_t inTexNr)
 {
+	if (inTexNr == 0)
+	{
+		inTexNr = GL_TEXTURE0;
+	}
+
 	glGenTextures(1, &TexHandle);
 	glBindTexture(GLTexType, TexHandle);
 

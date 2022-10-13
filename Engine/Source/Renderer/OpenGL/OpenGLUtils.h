@@ -1,8 +1,7 @@
 #pragma once
 
-
 namespace OpenGLUtils
 {
 	void GLFWErrorCallback(int32_t inErrorType, const char* inErrorDesc);
-	void GLDebugCallback(GLenum inSource, GLenum inType, GLenum inId, GLenum inSeverity, GLsizei inLength, const GLchar* inMessage, const void* userParam);
+	void GLDebugCallback(uint32_t inSource, uint32_t inType, uint32_t inId, uint32_t inSeverity, int32_t inLength, const char* inMessage, const void* userParam);
 }

@@ -1,7 +1,6 @@
 #include <assert.h>
 #include "Renderer/OpenGL/OpenGLRenderer.h"
 #include "glad/glad.h"
-#include "GLFW/glfw3.h"
 #include "OpenGLUtils.h"
 #include "Core/EngineUtils.h"
 #include "Core/EngineCore.h"
@@ -28,6 +27,10 @@
 #include "InputSystem/InputType.h"
 #include "Window/WindowsWindow.h"
 #include "InputSystem/InputSystem.h"
+
+#if WITH_GLFW
+#include "GLFW/glfw3.h"
+#endif
 
 #if !WITH_GLFW
 
@@ -234,14 +237,15 @@ void LoaderFunc(GLFWwindow* inLoadingThreadContext)
 
 		lock.unlock();
 
-		glfwMakeContextCurrent(inLoadingThreadContext);
+		// TODO: Make work without glfw
+		//glfwMakeContextCurrent(inLoadingThreadContext);
 		glEnable(GL_DEBUG_OUTPUT);
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 		glDebugMessageCallback(OpenGLUtils::GLDebugCallback, nullptr);
 
 		newCommand.LoadDel.Execute(newCommand.ModelPath, newCommand.Parent);
 
-		glfwMakeContextCurrent(nullptr);
+		//glfwMakeContextCurrent(nullptr);
 	}
 }
 

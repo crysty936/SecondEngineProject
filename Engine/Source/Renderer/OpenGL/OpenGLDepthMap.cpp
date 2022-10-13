@@ -2,6 +2,7 @@
 #include "stb_image.h"
 #include "Utils/ImageLoading.h"
 #include "OpenGLRenderer.h"
+#include "glad/glad.h"
 
 OpenGLDepthMap::OpenGLDepthMap(const eastl::string& inTexName) 
 	: OpenGLTexture(inTexName, GL_TEXTURE_2D) {}

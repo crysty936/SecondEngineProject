@@ -8,5 +8,5 @@ public:
 	virtual ~OpenGLCubeMap();
 
 public:
-	void Init(const eastl::vector<eastl::string>& inTexturePaths, const int32_t inTexNr = GL_TEXTURE0);
+	void Init(const eastl::vector<eastl::string>& inTexturePaths, int32_t inTexNr = 0);
 };

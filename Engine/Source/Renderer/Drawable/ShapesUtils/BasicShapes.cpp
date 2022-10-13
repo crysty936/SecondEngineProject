@@ -13,6 +13,7 @@
 #include "Core/ObjectCreation.h"
 #include "Renderer/Drawable/SkyboxMaterial.h"
 #include "Renderer/Drawable/WithShadowMaterial.h"
+#include "glad/glad.h"
 
 
 TriangleShape::TriangleShape() = default;
