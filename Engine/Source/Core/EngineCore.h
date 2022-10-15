@@ -27,4 +27,4 @@ private:
 
 void StopEngine();
 
-extern EngineCore* Engine;
+inline EngineCore* Engine = nullptr;

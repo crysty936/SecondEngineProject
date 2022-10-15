@@ -75,7 +75,7 @@ public:
 	inline static OpenGLRenderer& GetRHI() { ASSERT(GlobalRHI); return *GlobalRHI; }
 
 private:
-	static OpenGLRenderer* GlobalRHI;
+	inline static OpenGLRenderer* GlobalRHI = nullptr;
 
 private:
 	void SetViewportSize(const int32_t inWidth, const int32_t inHeight);

@@ -214,7 +214,6 @@ static glProc getProcAddressGLWindows(const char* procname)
 const uint32_t SHADOW_WIDTH = 4096;
 const uint32_t SHADOW_HEIGHT = 4096;
 
-OpenGLRenderer* OpenGLRenderer::GlobalRHI = nullptr;
 static std::mutex RenderCommandsMutex;
 static std::mutex LoadQueueMutex;
 static std::mutex GetVAOMutex;

@@ -32,5 +32,7 @@ public:
 	inline static D3D11Renderer& GetRHI() { ASSERT(GlobalRHI); return *GlobalRHI; }
 
 private:
-	static D3D11Renderer* GlobalRHI;
+	inline static D3D11Renderer* GlobalRHI = nullptr;
 };
+
+

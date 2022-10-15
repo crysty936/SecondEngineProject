@@ -21,8 +21,6 @@ void StopEngine()
 	bIsRunning = false;
 }
 
-EngineCore* Engine = nullptr;
-
 EngineCore::EngineCore()
 	: CurrentDeltaT{ 0.f }
 {

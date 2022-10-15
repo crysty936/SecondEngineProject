@@ -1,9 +1,9 @@
- #include "Renderer/D3D11/D3D11Renderer.h"
- #include "Core/EngineUtils.h"
- #include "Core/EngineCore.h"
- #include "Scene/Scene.h"
- #include "Camera/Camera.h"
- #include "Scene/SceneManager.h"
+#include "Renderer/D3D11/D3D11Renderer.h"
+#include "Core/EngineUtils.h"
+#include "Core/EngineCore.h"
+#include "Scene/Scene.h"
+#include "Camera/Camera.h"
+#include "Scene/SceneManager.h"
 #include "Renderer/Drawable/ShapesUtils/BasicShapesData.h"
 
 // Windows stuff
@@ -16,9 +16,9 @@
 #include "Window/WindowsWindow.h"
 #include "InputSystem/InputSystem.h"
 #include "Utils/IOUtils.h"
-//#include "../Drawable/ShapesUtils/BasicShapes.h"
+#include "Renderer/Drawable/ShapesUtils/BasicShapes.h"
 
-D3D11Renderer* D3D11Renderer::GlobalRHI = nullptr;
+#include <directxmath.h>
 
 D3D_DRIVER_TYPE	g_driverType = D3D_DRIVER_TYPE_NULL;
 D3D_FEATURE_LEVEL g_featureLevel = D3D_FEATURE_LEVEL_11_0;
@@ -31,26 +31,56 @@ ID3D11PixelShader* g_pPixelShader = NULL;
 ID3D11InputLayout* g_pVertexLayout = NULL;
 ID3D11Buffer* g_pVertexBuffer = NULL;
 ID3D11Buffer* g_pIndexBuffer = NULL;
+ID3D11Buffer* g_pConstantBuffer = NULL;
 
 constexpr glm::vec4 ClearColor(0.3f, 0.5f, 1.f, 0.4f);
 
-//eastl::shared_ptr<TriangleShape> triangle = eastl::make_shared<TriangleShape>();
+eastl::shared_ptr<TriangleShape> triangle = eastl::make_shared<TriangleShape>();
 
- D3D11Renderer::D3D11Renderer(const WindowProperties& inMainWindowProperties)
- {
-  	CurrentWindow = eastl::make_unique<WindowsWindow>();
-//  	openglInstance = LoadLibraryA("opengl32.dll");
-//  	ASSERT(openglInstance);
-//   	gldc = GetDC(reinterpret_cast<HWND>(CurrentWindow->GetHandle()));
-//   	HGLRC glrc = init_opengl(gldc);
-//   
-//  	const bool gladSuccess = gladLoadGLLoader((GLADloadproc)getProcAddressGLWindows) == 1;
-//  	ASSERT(gladSuccess);
-//  	GLWindow = eastl::make_unique<OpenGLWindow>(nullptr, inMainWindowProperties);
- 
- 	    //SetViewportSizeToMain();
-  
- 	InputSystem::Get().SetCursorMode(CurrentWindow->GetHandle(), ECursorMode::Disabled);
+DirectX::XMMATRIX                g_World;
+DirectX::XMMATRIX                g_View;
+DirectX::XMMATRIX                g_Projection;
+
+struct ConstantBuffer
+{
+	// 	glm::mat4 mWorld;
+	// 	glm::mat4 mView;
+	// 	glm::mat4 mProjection;
+	DirectX::XMMATRIX mWorld;
+	DirectX::XMMATRIX mView;
+	DirectX::XMMATRIX mProjection;
+};
+
+// Works just for ortographic
+glm::mat4 mirrorMatrix = {
+	1.f, 0.f, 0.f, 0.f,
+	0.f, 1.f, 0.f, 0.f,
+	0.f, 0.f, -1.f, 0.f,
+	0.f, 0.f, 0.f, 1.f
+};
+
+glm::mat4 remapZMatrix = {
+	1.f, 0.f, 0.f, 0.f,
+	0.f, 1.f, 0.f, 0.f,
+	0.f, 0.f, 0.5f, 0.f,
+	0.f, 0.f, 0.5f, 1.f
+};
+
+D3D11Renderer::D3D11Renderer(const WindowProperties& inMainWindowProperties)
+{
+	CurrentWindow = eastl::make_unique<WindowsWindow>();
+	//  	openglInstance = LoadLibraryA("opengl32.dll");
+	//  	ASSERT(openglInstance);
+	//   	gldc = GetDC(reinterpret_cast<HWND>(CurrentWindow->GetHandle()));
+	//   	HGLRC glrc = init_opengl(gldc);
+	//   
+	//  	const bool gladSuccess = gladLoadGLLoader((GLADloadproc)getProcAddressGLWindows) == 1;
+	//  	ASSERT(gladSuccess);
+	//  	GLWindow = eastl::make_unique<OpenGLWindow>(nullptr, inMainWindowProperties);
+
+			//SetViewportSizeToMain();
+
+	InputSystem::Get().SetCursorMode(CurrentWindow->GetHandle(), ECursorMode::Disabled);
 
 
 	HRESULT hr = S_OK;
@@ -71,7 +101,7 @@ constexpr glm::vec4 ClearColor(0.3f, 0.5f, 1.f, 0.4f);
 		D3D_DRIVER_TYPE_WARP,
 		D3D_DRIVER_TYPE_REFERENCE,
 	};
- 
+
 	UINT numDriverTypes = ARRAYSIZE(driverTypes);
 
 	D3D_FEATURE_LEVEL featureLevels[] =
@@ -133,13 +163,13 @@ constexpr glm::vec4 ClearColor(0.3f, 0.5f, 1.f, 0.4f);
 	// Create Vertex Shader
 	{
 		eastl::string vsData;
-		bool readSuccess = IOUtils::TryFastReadFile("../Data/Shaders/UnchangedPositionVertexShader.hlsl", vsData);
+		bool readSuccess = IOUtils::TryFastReadFile("../Data/Shaders/ModelWorldPositionVertexShader.hlsl", vsData);
 		ASSERT(readSuccess);
 
 		ID3DBlob* vsBlob = NULL;
 		ID3DBlob* errBlob = NULL;
 
-		D3DCompile2(vsData.data(), vsData.size(), "../Data/Shaders/UnchangedPositionVertexShader.hlsl", nullptr, nullptr, "VS", "vs_5_0", D3DCOMPILE_DEBUG | D3DCOMPILE_DEBUG_NAME_FOR_SOURCE, 0, 0, nullptr, 0, &vsBlob, &errBlob);
+		D3DCompile2(vsData.data(), vsData.size(), "../Data/Shaders/ModelWorldPositionVertexShader.hlsl", nullptr, nullptr, "VS", "vs_5_0", D3DCOMPILE_DEBUG | D3DCOMPILE_DEBUG_NAME_FOR_SOURCE, 0, 0, nullptr, 0, &vsBlob, &errBlob);
 
 		if (!ENSURE(!errBlob))
 		{
@@ -213,11 +243,21 @@ constexpr glm::vec4 ClearColor(0.3f, 0.5f, 1.f, 0.4f);
 		D3D11_SUBRESOURCE_DATA InitData = {};
 		InitData.pSysMem = BasicShapesData::GetTriangleIndices();
 		hr = g_pd3dDevice->CreateBuffer(&ibd, &InitData, &g_pIndexBuffer);
+		ASSERT(!FAILED(hr));
+	}
 
+	{
+		D3D11_BUFFER_DESC bd = {};
+		// Create the constant buffer
+		bd.Usage = D3D11_USAGE_DEFAULT;
+		bd.ByteWidth = sizeof(ConstantBuffer);
+		bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+		bd.CPUAccessFlags = 0;
+		hr = g_pd3dDevice->CreateBuffer(&bd, NULL, &g_pConstantBuffer);
+		ASSERT(!FAILED(hr));
 	}
 
 
-	ASSERT(!FAILED(hr));
 
 	// Set vertex buffer
 	UINT stride = sizeof(glm::vec3);
@@ -248,39 +288,96 @@ constexpr glm::vec4 ClearColor(0.3f, 0.5f, 1.f, 0.4f);
 		g_pd3dDevice->CreateRasterizerState(&rastDesc, &newState);
 		g_pImmediateContext->RSSetState(newState);
 	}
- }
- 
- D3D11Renderer::~D3D11Renderer() = default;
 
- void D3D11Renderer::Init(const WindowProperties & inMainWindowProperties)
- {
- 	GlobalRHI = new D3D11Renderer{ inMainWindowProperties };
- 
- 
- }
- 
- void D3D11Renderer::Terminate()
- {
- 	ASSERT(GlobalRHI);
- 	delete GlobalRHI;
- }
- 
- void D3D11Renderer::Draw()
- {
-	 // Clear the back buffer 
-	 float ClearColor[4] = { 0.0f, 0.125f, 0.3f, 1.0f };
-	 g_pImmediateContext->ClearRenderTargetView(g_pRenderTargetView, ClearColor);
+}
 
-	 // Render the triangle
-	 g_pImmediateContext->VSSetShader(g_pVertexShader, NULL, 0);
-	 g_pImmediateContext->PSSetShader(g_pPixelShader, NULL, 0);
-	 g_pImmediateContext->DrawIndexed(3, 0, 0);
- 
- 	CheckShouldCloseWindow(*CurrentWindow);
- 
-	 // Present the information rendered to the back buffer to the front buffer (the screen)
-	 g_pSwapChain->Present(0, 0);
- }
+D3D11Renderer::~D3D11Renderer() = default;
+
+void D3D11Renderer::Init(const WindowProperties & inMainWindowProperties)
+{
+	GlobalRHI = new D3D11Renderer{ inMainWindowProperties };
+
+
+}
+
+void D3D11Renderer::Terminate()
+{
+	ASSERT(GlobalRHI);
+	delete GlobalRHI;
+}
+
+void D3D11Renderer::Draw()
+{
+	// Initialize the world matrix
+//g_World = DirectX::XMMatrixTranslation(1.f, 5.f, 20.f);
+//g_World = g_World * DirectX::XMMatrixRotationZ(DirectX::XMConvertToRadians(20.f));
+
+	glm::mat4 glmWorld = glm::identity<glm::mat4>();
+	//glm::mat4 glmWorld = glm::translate(glm::identity<glm::mat4>(), glm::vec3(2.f, 0.f, 10.f));
+	//glmWorld = glm::rotate(glmWorld, glm::radians(20.f), glm::vec3(0.f, 0.f, 1.f));
+		//triangle->Rotate(20.f, glm::vec3(0.f, 0.f, 1.f));
+
+		//triangle->Rotate(5.f, glm::vec3(0.f, 0.f, 1.f));
+
+		//glm::mat4 glmWorld = triangle->GetAbsoluteTransform().GetMatrix();
+	static float r = 0.f;
+	r += 5.f;
+
+	constexpr float offset = -0.26794919243f;
+
+	glmWorld = glm::translate(glmWorld, glm::vec3(0.f, offset, 0.f));
+	glmWorld = glm::rotate(glmWorld, glm::radians(r), glm::vec3(0.f, 0.f, 1.f));
+	glmWorld = glm::translate(glmWorld, glm::vec3(0.f, -offset, 0.f));
+
+	memcpy(&g_World, &glmWorld, sizeof(glmWorld));
+
+	glm::mat4 glmView = glm::translate(glm::identity<glm::mat4>(), glm::vec3(0.f, 0.f, -5.f));
+	glmView = glm::inverse(glmView);
+
+	// Initialize the view matrix
+// 	 DirectX::XMVECTOR Eye = DirectX::XMVectorSet(0.0f, 0.0f, -5.0f, 0.0f);
+// 	 DirectX::XMVECTOR At = DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
+// 	 DirectX::XMVECTOR Up = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+// 	 g_View = DirectX::XMMatrixLookAtLH(Eye, At, Up);
+	 //g_View = DirectX::XMMatrixInverse(nullptr, DirectX::XMMatrixTranslation(0.f, 0.f, -5.f));
+
+	 // Initialize the projection matrix
+	 //g_Projection = DirectX::XMMatrixPerspectiveFovLH(DirectX::XM_PIDIV2, width / (FLOAT)height, 0.1f, 1000.0f);
+
+
+	memcpy(&g_View, &glmView, sizeof(glmView));
+
+	glm::mat4 glmProjection = glm::perspectiveLH_ZO(glm::radians(90.0f), static_cast<float>(CurrentWindow->GetProperties().Width) / static_cast<float>(CurrentWindow->GetProperties().Height), 0.1f, 1000.0f);
+	//glm::mat4 glmProjection = glm::orthoLH_ZO(-2.f, 2.f, -2.f, 2.f, 0.1f, 1000.f);
+	memcpy(&g_Projection, &glmProjection, sizeof(glmProjection));
+
+
+	// Clear the back buffer 
+	float ClearColor[4] = { 0.0f, 0.125f, 0.3f, 1.0f };
+	g_pImmediateContext->ClearRenderTargetView(g_pRenderTargetView, ClearColor);
+
+
+	//
+	// Update variables
+	//
+	ConstantBuffer cb;
+	cb.mWorld = XMMatrixTranspose(g_World);
+	cb.mView = XMMatrixTranspose(g_View);
+	cb.mProjection = XMMatrixTranspose(g_Projection);
+	g_pImmediateContext->UpdateSubresource(g_pConstantBuffer, 0, NULL, &cb, 0, 0);
+
+
+	// Render the triangle
+	g_pImmediateContext->VSSetShader(g_pVertexShader, NULL, 0);
+	g_pImmediateContext->VSSetConstantBuffers(0, 1, &g_pConstantBuffer);
+	g_pImmediateContext->PSSetShader(g_pPixelShader, NULL, 0);
+	g_pImmediateContext->DrawIndexed(3, 0, 0);
+
+	CheckShouldCloseWindow(*CurrentWindow);
+
+	// Present the information rendered to the back buffer to the front buffer (the screen)
+	g_pSwapChain->Present(0, 0);
+}
 
 
 
@@ -299,13 +396,13 @@ constexpr glm::vec4 ClearColor(0.3f, 0.5f, 1.f, 0.4f);
 // }
 // 
 
- void D3D11Renderer::CheckShouldCloseWindow(const WindowsWindow& inWindow)
- {
- 	if(inWindow.ShouldClose())
- 	{
- 		StopEngine();
- 	}
- }
- 
+void D3D11Renderer::CheckShouldCloseWindow(const WindowsWindow & inWindow)
+{
+	if (inWindow.ShouldClose())
+	{
+		StopEngine();
+	}
+}
+
 
 
