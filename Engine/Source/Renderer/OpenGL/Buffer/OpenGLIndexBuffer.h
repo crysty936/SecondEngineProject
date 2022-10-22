@@ -2,11 +2,11 @@
 
 #include "BufferBase.h"
 
-class IndexBuffer : public BufferBase
+class OpenGLIndexBuffer : public BufferBase
 {
 public:
-	IndexBuffer();
-	virtual ~IndexBuffer();
+	OpenGLIndexBuffer();
+	virtual ~OpenGLIndexBuffer();
 
 	virtual void Bind() const override;
 	virtual void Unbind() const override;

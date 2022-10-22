@@ -163,13 +163,13 @@ D3D11Renderer::D3D11Renderer(const WindowProperties& inMainWindowProperties)
 	// Create Vertex Shader
 	{
 		eastl::string vsData;
-		bool readSuccess = IOUtils::TryFastReadFile("../Data/Shaders/ModelWorldPositionVertexShader.hlsl", vsData);
+		bool readSuccess = IOUtils::TryFastReadFile("../Data/Shaders/Direct3D11/ModelWorldPositionVertexShader.hlsl", vsData);
 		ASSERT(readSuccess);
 
 		ID3DBlob* vsBlob = NULL;
 		ID3DBlob* errBlob = NULL;
 
-		D3DCompile2(vsData.data(), vsData.size(), "../Data/Shaders/ModelWorldPositionVertexShader.hlsl", nullptr, nullptr, "VS", "vs_5_0", D3DCOMPILE_DEBUG | D3DCOMPILE_DEBUG_NAME_FOR_SOURCE, 0, 0, nullptr, 0, &vsBlob, &errBlob);
+		D3DCompile2(vsData.data(), vsData.size(), "../Data/Shaders/Direct3D11/ModelWorldPositionVertexShader.hlsl", nullptr, nullptr, "VS", "vs_5_0", D3DCOMPILE_DEBUG | D3DCOMPILE_DEBUG_NAME_FOR_SOURCE, 0, 0, nullptr, 0, &vsBlob, &errBlob);
 
 		if (!ENSURE(!errBlob))
 		{
@@ -186,6 +186,8 @@ D3D11Renderer::D3D11Renderer(const WindowProperties& inMainWindowProperties)
 			D3D11_INPUT_ELEMENT_DESC layout[] =
 			{
 				{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+				{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+				{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 			};
 			UINT numElements = ARRAYSIZE(layout);
 
@@ -202,13 +204,13 @@ D3D11Renderer::D3D11Renderer(const WindowProperties& inMainWindowProperties)
 	// Create Pixel shader
 	{
 		eastl::string psData;
-		const bool psReadSuccess = IOUtils::TryFastReadFile("../Data/Shaders/FlatColorPixelShader.hlsl", psData);
+		const bool psReadSuccess = IOUtils::TryFastReadFile("../Data/Shaders/Direct3D11/FlatColorPixelShader.hlsl", psData);
 		ASSERT(psReadSuccess);
 
 		ID3DBlob* psBlob = NULL;
 		ID3DBlob* psErrBlob = NULL;
 
-		D3DCompile2(psData.data(), psData.size(), "../Data/Shaders/FlatColorPixelShader.hlsl", nullptr, nullptr, "PS", "ps_5_0", D3DCOMPILE_DEBUG | D3DCOMPILE_DEBUG_NAME_FOR_SOURCE, 0, 0, nullptr, 0, &psBlob, &psErrBlob);
+		D3DCompile2(psData.data(), psData.size(), "../Data/Shaders/Direct3D11/FlatColorPixelShader.hlsl", nullptr, nullptr, "PS", "ps_5_0", D3DCOMPILE_DEBUG | D3DCOMPILE_DEBUG_NAME_FOR_SOURCE, 0, 0, nullptr, 0, &psBlob, &psErrBlob);
 
 		if (!ENSURE(!psErrBlob))
 		{
@@ -226,22 +228,23 @@ D3D11Renderer::D3D11Renderer(const WindowProperties& inMainWindowProperties)
 	{
 		D3D11_BUFFER_DESC bd = {};
 		bd.Usage = D3D11_USAGE_DEFAULT;
-		bd.ByteWidth = sizeof(glm::vec3) * 3;
+		bd.ByteWidth = sizeof(float) * BasicShapesData::GetCubeVerticesCount();
 		bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 		bd.CPUAccessFlags = 0;
 		D3D11_SUBRESOURCE_DATA InitData = {};
-		InitData.pSysMem = BasicShapesData::GetTriangleVertices();
+		InitData.pSysMem = BasicShapesData::GetCubeVertices();
 		hr = g_pd3dDevice->CreateBuffer(&bd, &InitData, &g_pVertexBuffer);
+		ASSERT(!FAILED(hr));
 	}
 
 	{
 		D3D11_BUFFER_DESC ibd = {};
 		ibd.Usage = D3D11_USAGE_DEFAULT;
-		ibd.ByteWidth = sizeof(uint32_t) * 3;
+		ibd.ByteWidth = sizeof(int32_t) * BasicShapesData::GetCubeIndicesCount();
 		ibd.BindFlags = D3D11_BIND_INDEX_BUFFER;
 		ibd.CPUAccessFlags = 0;
 		D3D11_SUBRESOURCE_DATA InitData = {};
-		InitData.pSysMem = BasicShapesData::GetTriangleIndices();
+		InitData.pSysMem = BasicShapesData::GetCubeIndices();
 		hr = g_pd3dDevice->CreateBuffer(&ibd, &InitData, &g_pIndexBuffer);
 		ASSERT(!FAILED(hr));
 	}
@@ -260,7 +263,7 @@ D3D11Renderer::D3D11Renderer(const WindowProperties& inMainWindowProperties)
 
 
 	// Set vertex buffer
-	UINT stride = sizeof(glm::vec3);
+	UINT stride = sizeof(glm::vec3) + sizeof(glm::vec3) + sizeof(glm::vec2);
 	UINT offset = 0;
 	g_pImmediateContext->IASetVertexBuffers(0, 1, &g_pVertexBuffer, &stride, &offset);
 	g_pImmediateContext->IASetIndexBuffer(g_pIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
@@ -312,22 +315,15 @@ void D3D11Renderer::Draw()
 //g_World = DirectX::XMMatrixTranslation(1.f, 5.f, 20.f);
 //g_World = g_World * DirectX::XMMatrixRotationZ(DirectX::XMConvertToRadians(20.f));
 
-	glm::mat4 glmWorld = glm::identity<glm::mat4>();
+	//glm::mat4 glmWorld = glm::identity<glm::mat4>();
 	//glm::mat4 glmWorld = glm::translate(glm::identity<glm::mat4>(), glm::vec3(2.f, 0.f, 10.f));
 	//glmWorld = glm::rotate(glmWorld, glm::radians(20.f), glm::vec3(0.f, 0.f, 1.f));
 		//triangle->Rotate(20.f, glm::vec3(0.f, 0.f, 1.f));
 
 		//triangle->Rotate(5.f, glm::vec3(0.f, 0.f, 1.f));
 
-		//glm::mat4 glmWorld = triangle->GetAbsoluteTransform().GetMatrix();
-	static float r = 0.f;
-	r += 5.f;
-
-	constexpr float offset = -0.26794919243f;
-
-	glmWorld = glm::translate(glmWorld, glm::vec3(0.f, offset, 0.f));
-	glmWorld = glm::rotate(glmWorld, glm::radians(r), glm::vec3(0.f, 0.f, 1.f));
-	glmWorld = glm::translate(glmWorld, glm::vec3(0.f, -offset, 0.f));
+	triangle->Rotate(5.f, glm::vec3(0.f, 1.f, 1.f));
+	glm::mat4 glmWorld = triangle->GetAbsoluteTransform().GetMatrix();
 
 	memcpy(&g_World, &glmWorld, sizeof(glmWorld));
 
@@ -371,7 +367,7 @@ void D3D11Renderer::Draw()
 	g_pImmediateContext->VSSetShader(g_pVertexShader, NULL, 0);
 	g_pImmediateContext->VSSetConstantBuffers(0, 1, &g_pConstantBuffer);
 	g_pImmediateContext->PSSetShader(g_pPixelShader, NULL, 0);
-	g_pImmediateContext->DrawIndexed(3, 0, 0);
+	g_pImmediateContext->DrawIndexed(BasicShapesData::GetCubeIndicesCount(), 0, 0);
 
 	CheckShouldCloseWindow(*CurrentWindow);
 

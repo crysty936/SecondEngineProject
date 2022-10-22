@@ -1,8 +1,8 @@
 #include "Renderer/Drawable/MirrorQuad.h"
 #include "Renderer/Drawable/ShapesUtils/BasicShapesData.h"
-#include "Renderer/OpenGL/Buffer/IndexBuffer.h"
-#include "Renderer/OpenGL/Buffer/VertexBufferLayout.h"
-#include "Renderer/OpenGL/Buffer/VertexBuffer.h"
+#include "Renderer/OpenGL/Buffer/OpenGLIndexBuffer.h"
+#include "Renderer/OpenGL/Buffer/OpenGLVertexBufferLayout.h"
+#include "Renderer/OpenGL/Buffer/OpenGLVertexBuffer.h"
 #include "Renderer/OpenGL/Buffer/VertexArrayObject.h"
 #include "Renderer/OpenGL/OpenGLShader.h"
 #include "Renderer/OpenGL/OpenGLTexture.h"
@@ -14,7 +14,7 @@
 MirrorQuad::MirrorQuad() = default;
 MirrorQuad::~MirrorQuad() = default;
 
-void MirrorQuad::SetupDrawCommands()
+void MirrorQuad::CreateProxy()
 {
 	const eastl::string vaoName = "mirrorVAO";
 	eastl::shared_ptr<VertexArrayObject> thisVAO{ nullptr };
@@ -25,17 +25,17 @@ void MirrorQuad::SetupDrawCommands()
 	if (!existingVAO)
 	{
 		// TODO: Buffers creation should be delegated to the renderer
-		IndexBuffer ibo = IndexBuffer{};
+		OpenGLIndexBuffer ibo = OpenGLIndexBuffer{};
 		int32_t indicesCount = BasicShapesData::GetQuadIndicesCount();
 		ibo.SetIndices(BasicShapesData::GetQuadIndices(), indicesCount, GL_STATIC_DRAW);
 
-		VertexBufferLayout layout = VertexBufferLayout{};
+		OpenGLVertexBufferLayout layout = OpenGLVertexBufferLayout{};
 		// Vertex points
 		layout.Push<float>(3);
 		// Vertex Tex Coords
 		layout.Push<float>(2);
 
-		VertexBuffer vbo = VertexBuffer{ ibo, layout };
+		OpenGLVertexBuffer vbo = OpenGLVertexBuffer{ ibo, layout };
 		int32_t verticesCount = BasicShapesData::GetQuadVerticesCount();
 		vbo.SetData(BasicShapesData::GetQuadVertices(), verticesCount, GL_STATIC_DRAW);
 

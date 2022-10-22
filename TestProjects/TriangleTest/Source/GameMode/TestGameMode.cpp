@@ -21,11 +21,11 @@ TestGameMode::~TestGameMode() = default;
 
 void TestGameMode::Init()
 {
-// 	triangle = ObjectCreation::NewObject<TriangleShape>();
-// 	triangle->Move(glm::vec3(0.f, 0.f, -2.f));
+ 	triangle = ObjectCreation::NewObject<TriangleShape>();
+ 	triangle->Move(glm::vec3(0.f, 0.f, -10.f));
 }
 
  void TestGameMode::Tick(float inDeltaT)
  {
-	 //triangle->Rotate(inDeltaT, glm::vec3(0.f, 0.f, 1.f));
+	 triangle->Rotate(inDeltaT, glm::vec3(0.f, 0.f, 1.f));
  }

@@ -19,7 +19,7 @@ public:
 		constexpr bool isDrawable = std::is_base_of<IDrawableContainer, T>();
 
 		using func = void(IDrawableContainer::*)();
-		constexpr func theFunc = &IDrawableContainer::SetupDrawCommands;
+		constexpr func theFunc = &IDrawableContainer::CreateProxy;
 
  		if (isDrawable)
  		{

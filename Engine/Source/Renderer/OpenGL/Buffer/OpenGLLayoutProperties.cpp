@@ -1,7 +1,7 @@
-#include "LayoutProperties.h"
+#include "OpenGLLayoutProperties.h"
 #include "glad/glad.h"
 
-uint32_t LayoutProperties::GetSizeOfType() const
+uint32_t OpenGLLayoutProperties::GetSizeOfType() const
 {
 	switch (Type)
 	{

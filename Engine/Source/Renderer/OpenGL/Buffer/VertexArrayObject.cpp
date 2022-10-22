@@ -1,5 +1,5 @@
 #include "VertexArrayObject.h"
-#include "VertexBufferLayout.h"
+#include "OpenGLVertexBufferLayout.h"
 #include "EASTL/vector.h"
 #include "glad/glad.h"
 
@@ -19,13 +19,13 @@ void VertexArrayObject::SetupState() const
 	Bind();
 	VBuffer.Bind();
 
-	const VertexBufferLayout& layout = VBuffer.GetLayout();
-	const eastl::vector<LayoutProperties>& props = layout.GetProperties();
+	const OpenGLVertexBufferLayout& layout = VBuffer.GetLayout();
+	const eastl::vector<OpenGLLayoutProperties>& props = layout.GetProperties();
 
 	size_t offset = 0;
 	for (int32_t i = 0; i < props.size(); i++)
 	{
-		const LayoutProperties& prop = props[i];
+		const OpenGLLayoutProperties& prop = props[i];
 
 		void* offsetPtr = reinterpret_cast<void*>(offset);
 		glVertexAttribPointer(i, prop.Count, prop.Type, prop.bNormalized, layout.GetStride(), offsetPtr);

@@ -6,11 +6,10 @@
 #include "Renderer/Material/MaterialsManager.h"
 #include "Renderer/OpenGL/RenderCommand.h"
 #include "Renderer/OpenGL/OpenGLRenderer.h"
-#include "Renderer/OpenGL/OpenGLUtils.h"
 #include "Renderer/RenderingPrimitives.h"
-#include "Renderer/OpenGL/Buffer/IndexBuffer.h"
-#include "Renderer/OpenGL/Buffer/VertexBufferLayout.h"
-#include "Renderer/OpenGL/Buffer/VertexBuffer.h"
+#include "Renderer/OpenGL/Buffer/OpenGLIndexBuffer.h"
+#include "Renderer/OpenGL/Buffer/OpenGLVertexBufferLayout.h"
+#include "Renderer/OpenGL/Buffer/OpenGLVertexBuffer.h"
 #include "Renderer/OpenGL/Buffer/VertexArrayObject.h"
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
@@ -23,7 +22,7 @@ AssimpModel3D::~AssimpModel3D() = default;
 
 void LoadTemp(const eastl::string inPath, TransformObjPtr inParent);
 
-void AssimpModel3D::SetupDrawCommands()
+void AssimpModel3D::CreateProxy()
 {
 	eastl::shared_ptr<AssimpModel3D> thisShared = this_shared(this);
 
@@ -191,11 +190,11 @@ void AssimpModel3DLoader::ProcessMesh(const aiMesh& inMesh, const aiScene& inSce
 			}
 		}
 
-		IndexBuffer ibo = IndexBuffer{};
+		OpenGLIndexBuffer ibo = OpenGLIndexBuffer{};
 		int32_t indicesCount = static_cast<int32_t>(indices.size());
 		ibo.SetIndices(indices.data(), indicesCount, GL_STATIC_DRAW);
 
-		VertexBufferLayout layout = VertexBufferLayout{};
+		OpenGLVertexBufferLayout layout = OpenGLVertexBufferLayout{};
 		// Vertex points
 		layout.Push<float>(3);
 		// Normals
@@ -203,7 +202,7 @@ void AssimpModel3DLoader::ProcessMesh(const aiMesh& inMesh, const aiScene& inSce
 		// Vertex Tex Coords
 		layout.Push<float>(2);
 
-		VertexBuffer vbo = VertexBuffer{ ibo, layout };
+		OpenGLVertexBuffer vbo = OpenGLVertexBuffer{ ibo, layout };
 		int32_t verticesCount = static_cast<int32_t>(vertices.size());
 		vbo.SetVertices(vertices, GL_STATIC_DRAW);
 

@@ -8,7 +8,7 @@ public:
 	TriangleShape();
 	virtual ~TriangleShape();
 
-	void SetupDrawCommands() override;
+	void CreateProxy() override;
 };
 
  class SquareShape : public DrawableObject, public IDrawableContainer
@@ -17,7 +17,7 @@ public:
  	SquareShape();
  	virtual ~SquareShape();
 
-	void SetupDrawCommands() override;
+	void CreateProxy() override;
  };
 
 class CubeShape : public Model3D
@@ -26,7 +26,7 @@ public:
 	CubeShape();
 	virtual ~CubeShape();
 
-	virtual void SetupDrawCommands() override;
+	virtual void CreateProxy() override;
 };
 
 class BasicShapes
@@ -43,7 +43,7 @@ public:
 	Skybox();
 	virtual ~Skybox();
 
-	virtual void SetupDrawCommands() override;
+	virtual void CreateProxy() override;
 };
 
 class LightSource : public Model3D
@@ -52,5 +52,5 @@ public:
 	LightSource();
 	virtual ~LightSource();
 
-	virtual void SetupDrawCommands() override;
+	virtual void CreateProxy() override;
 };

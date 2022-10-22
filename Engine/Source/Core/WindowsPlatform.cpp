@@ -318,7 +318,7 @@ namespace WindowsPlatform
 
 	void SetWindowsWindowText(const eastl::wstring& inText)
 	{
-		SetWindowTextW(reinterpret_cast<HWND>(Renderer::GetMainWindow().GetHandle()), inText.c_str());
+		SetWindowTextW(reinterpret_cast<HWND>(Renderer::RHI->GetMainWindow().GetHandle()), inText.c_str());
 	}
 	// Message Loop
 
@@ -457,7 +457,7 @@ namespace WindowsPlatform
  		case WM_CLOSE:
  		{
  			LOG_WINMSG(WM_CLOSE);
-            Renderer::GetMainWindow().RequestClose();
+            Renderer::RHI->GetMainWindow().RequestClose();
  
  			return 0;
  		}

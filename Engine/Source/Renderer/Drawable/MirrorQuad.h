@@ -8,5 +8,5 @@ public:
 	MirrorQuad();
 	virtual ~MirrorQuad();
 
-	void SetupDrawCommands() override;
+	void CreateProxy() override;
 };

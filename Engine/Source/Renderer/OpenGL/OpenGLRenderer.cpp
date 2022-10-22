@@ -1,7 +1,6 @@
 #include <assert.h>
 #include "Renderer/OpenGL/OpenGLRenderer.h"
 #include "glad/glad.h"
-#include "OpenGLUtils.h"
 #include "Core/EngineUtils.h"
 #include "Core/EngineCore.h"
 #include "Scene/Scene.h"
@@ -223,6 +222,38 @@ const glm::vec3 lightPos(-10.0f, 10.0f, -1.0f);
 
 constexpr glm::vec4 ClearColor(0.3f, 0.5f, 1.f, 0.4f);
 
+void GLDebugCallback(GLenum inSource, GLenum inType, GLenum inId, GLenum inSeverity, GLsizei inLength, const GLchar* inMessage, const void* userParam)
+{
+	switch (inSeverity)
+	{
+	case GL_DEBUG_SEVERITY_HIGH:
+	{
+		LOG_ERROR("OpenGL Critical Error: %s", inMessage);
+		ASSERT(0);
+		break;
+	}
+
+	case GL_DEBUG_SEVERITY_LOW:
+	{
+		LOG_WARNING("OpenGL Severity Low: %s", inMessage);
+		break;
+	}
+
+	case GL_DEBUG_SEVERITY_MEDIUM:
+	{
+		LOG_WARNING("OpenGL Severity Medium: %s", inMessage);
+
+		break;
+	}
+	case GL_DEBUG_SEVERITY_NOTIFICATION:
+	{
+		LOG_INFO("OpenGL Info: %s", inMessage);
+
+		break;
+	}
+	}
+}
+
 void LoaderFunc(GLFWwindow* inLoadingThreadContext)
 {
 	while (Engine->IsRunning())
@@ -240,7 +271,7 @@ void LoaderFunc(GLFWwindow* inLoadingThreadContext)
 		//glfwMakeContextCurrent(inLoadingThreadContext);
 		glEnable(GL_DEBUG_OUTPUT);
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-		glDebugMessageCallback(OpenGLUtils::GLDebugCallback, nullptr);
+		glDebugMessageCallback(GLDebugCallback, nullptr);
 
 		newCommand.LoadDel.Execute(newCommand.ModelPath, newCommand.Parent);
 
@@ -297,7 +328,7 @@ OpenGLRenderer::OpenGLRenderer(const WindowProperties& inMainWindowProperties)
 
 	glEnable(GL_CULL_FACE);
 
-	glDebugMessageCallback(OpenGLUtils::GLDebugCallback, nullptr);
+	glDebugMessageCallback(GLDebugCallback, nullptr);
 	glClearColor(ClearColor.x, ClearColor.y, ClearColor.z, ClearColor.w);
 
 	// Set the default uniforms
@@ -319,39 +350,40 @@ void OpenGLRenderer::Init(const WindowProperties & inMainWindowProperties)
 	// Setup secondary framebuffer
 
 	// Create the frame buffer
-	glGenFramebuffers(1, &GlobalRHI->AuxiliarFrameBuffer);
-	glBindFramebuffer(GL_FRAMEBUFFER, GlobalRHI->AuxiliarFrameBuffer);
+	//glGenFramebuffers(1, &GlobalRHI->AuxiliarFrameBuffer);
+	//glBindFramebuffer(GL_FRAMEBUFFER, GlobalRHI->AuxiliarFrameBuffer);
 
 	const WindowProperties& windowProps = GlobalRHI->GLWindow->GetProperties();
+
 	// Create a stencil and depth render buffer object for the frame buffer
-	uint32_t rbo; // render buffer object
-	glGenRenderbuffers(1, &rbo);
-	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-	glClearColor(ClearColor.x, ClearColor.y, ClearColor.z, ClearColor.w);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, windowProps.Width, windowProps.Height);
-	glBindRenderbuffer(GL_RENDERBUFFER, 0);
-
-	// Attach the rbo to the framebuffer
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
-
-	ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
-
-	// Create the shadow map framebuffer
-	glGenFramebuffers(1, &GlobalRHI->ShadowMapBuffer);
-	glBindFramebuffer(GL_FRAMEBUFFER, GlobalRHI->ShadowMapBuffer);
-
-	GlobalRHI->ShadowBufferTex = eastl::make_shared<OpenGLDepthMap>("ShadowMap");
-	GlobalRHI->ShadowBufferTex->Init();
-
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, GlobalRHI->ShadowBufferTex->TexHandle, 0);
-
-	glDrawBuffer(GL_NONE);
-	glReadBuffer(GL_NONE);
-
-	ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
+// 	uint32_t rbo; // render buffer object
+// 	glGenRenderbuffers(1, &rbo);
+// 	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+// 	glClearColor(ClearColor.x, ClearColor.y, ClearColor.z, ClearColor.w);
+// 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, windowProps.Width, windowProps.Height);
+// 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+// 
+// 	// Attach the rbo to the framebuffer
+// 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+// 
+// 	ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
+// 
+// 	// Create the shadow map framebuffer
+// 	glGenFramebuffers(1, &GlobalRHI->ShadowMapBuffer);
+// 	glBindFramebuffer(GL_FRAMEBUFFER, GlobalRHI->ShadowMapBuffer);
+// 
+// 	GlobalRHI->ShadowBufferTex = eastl::make_shared<OpenGLDepthMap>("ShadowMap");
+// 	GlobalRHI->ShadowBufferTex->Init();
+// 
+// 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, GlobalRHI->ShadowBufferTex->TexHandle, 0);
+// 
+// 	glDrawBuffer(GL_NONE);
+// 	glReadBuffer(GL_NONE);
+// 
+// 	ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 
 	// Bind the default frame buffer
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void OpenGLRenderer::Terminate()
@@ -507,11 +539,12 @@ void OpenGLRenderer::DrawCommand(const RenderCommand & inCommand)
 		tex->Bind(i);
 	}
 
+	// Shadows
 	//
-	ShadowBufferTex->Bind(i);
+	//ShadowBufferTex->Bind(i);
 	//
-	GlobalRHI->UniformsCache["ShadowMap"] = uint32_t(i);
-	GlobalRHI->UniformsCache["LightPos"] = lightPos;
+	//GlobalRHI->UniformsCache["ShadowMap"] = uint32_t(i);
+	//GlobalRHI->UniformsCache["LightPos"] = lightPos;
 
 	const uint32_t indicesCount = vao->VBuffer.GetIndicesCount();
 	vao->Bind();
@@ -539,8 +572,9 @@ void OpenGLRenderer::DrawCommand(const RenderCommand & inCommand)
 		tex->Unbind(i);
 	}
 
+	// Shadows
 	//
-	ShadowBufferTex->Unbind(i);
+	//ShadowBufferTex->Unbind(i);
 	//
 
 	material->Shader.UnBind();

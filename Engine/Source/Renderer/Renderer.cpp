@@ -1,8 +1,8 @@
 #include "Renderer.h"
 #include "Window/WindowsWindow.h"
 
-#define RENDERERGL 0
-#define RENDERERD3D11 1
+#define RENDERERGL 1
+#define RENDERERD3D11 0
 
 #if RENDERERGL
 #include "Renderer/OpenGL/OpenGLRenderer.h"
@@ -12,6 +12,7 @@
 
 void Renderer::Init()
 {
+	RHI = new Renderer();
 #if RENDERERGL
 	OpenGLRenderer::Init();
 #elif RENDERERD3D11
@@ -26,7 +27,6 @@ void Renderer::Terminate()
 #elif RENDERERD3D11
 	D3D11Renderer::Terminate();
 #endif
-
 }
 
 void Renderer::Draw()

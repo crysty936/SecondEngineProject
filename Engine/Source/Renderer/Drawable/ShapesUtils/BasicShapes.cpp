@@ -1,8 +1,8 @@
 #include "BasicShapes.h"
 #include "Renderer/Drawable/ShapesUtils/BasicShapesData.h"
-#include "Renderer/OpenGL/Buffer/IndexBuffer.h"
-#include "Renderer/OpenGL/Buffer/VertexBufferLayout.h"
-#include "Renderer/OpenGL/Buffer/VertexBuffer.h"
+#include "Renderer/OpenGL/Buffer/OpenGLIndexBuffer.h"
+#include "Renderer/OpenGL/Buffer/OpenGLVertexBufferLayout.h"
+#include "Renderer/OpenGL/Buffer/OpenGLVertexBuffer.h"
 #include "Renderer/OpenGL/Buffer/VertexArrayObject.h"
 #include "Renderer/OpenGL/OpenGLShader.h"
 #include "Renderer/OpenGL/OpenGLTexture.h"
@@ -19,29 +19,28 @@
 TriangleShape::TriangleShape() = default;
 TriangleShape::~TriangleShape() = default;
 
-void TriangleShape::SetupDrawCommands()
+void TriangleShape::CreateProxy()
 {
 	const eastl::string vaoName = "triangleVAO";
 	eastl::shared_ptr<VertexArrayObject> thisVAO{ nullptr };
 
-	ASSERT(false); // Not working with Generic renderer
-	//const bool existingVAO = RHI->GetOrCreateVAO(vaoName, thisVAO); 
+	const bool existingVAO = OpenGLRenderer::GetRHI().GetOrCreateVAO(vaoName, thisVAO); 
 
-	const bool existingVAO = false;
 	if (!existingVAO)
 	{
-		// TODO: Buffers creation should be delegated to the renderer
-		IndexBuffer ibo = IndexBuffer{};
+
+
+		OpenGLIndexBuffer ibo = OpenGLIndexBuffer{};
 		int32_t indicesCount = BasicShapesData::GetTriangleIndicesCount();
 		ibo.SetIndices(BasicShapesData::GetTriangleIndices(), indicesCount, GL_STATIC_DRAW);
 
-		VertexBufferLayout layout = VertexBufferLayout{};
+		OpenGLVertexBufferLayout layout = OpenGLVertexBufferLayout{};
 		// Vertex points
 		layout.Push<float>(3);
 		// Vertex Tex Coords
-		layout.Push<float>(2);
+		//layout.Push<float>(2);
 
-		VertexBuffer vbo = VertexBuffer{ ibo, layout };
+		OpenGLVertexBuffer vbo = OpenGLVertexBuffer{ ibo, layout };
 		int32_t verticesCount = BasicShapesData::GetTriangleVerticesCount();
 		vbo.SetData(BasicShapesData::GetTriangleVertices(), verticesCount, GL_STATIC_DRAW);
 
@@ -58,7 +57,7 @@ void TriangleShape::SetupDrawCommands()
 		//eastl::shared_ptr<OpenGLTexture> tex = eastl::make_shared<OpenGLTexture>("DiffuseMap");
 		//tex->Init(texturePath);
 		//cubeMaterial->Textures.push_back(std::move(tex));
-		cubeMaterial->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/BasicProjectionVertexShader.glsl", "../Data/Shaders/FragmentShader_ColorBasedOnPosition.glsl");
+		cubeMaterial->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/OpenGL/BasicProjectionVertexShader.glsl", "../Data/Shaders/OpenGL/FragmentShader_ColorBasedOnPosition.glsl");
 	}
 
 	RenderCommand newCommand;
@@ -67,15 +66,14 @@ void TriangleShape::SetupDrawCommands()
 	newCommand.Parent = this_shared(this);
 	newCommand.DrawType = EDrawCallType::DrawElements;
 
-	ASSERT(false); // Not working with Generic renderer
-	//RHI->AddCommand(newCommand);
+	OpenGLRenderer::GetRHI().AddCommand(newCommand);
 }
 
 
 SquareShape::SquareShape() = default;
 SquareShape::~SquareShape() = default;
 
-void SquareShape::SetupDrawCommands()
+void SquareShape::CreateProxy()
 {
 	const eastl::string vaoName = "squareVAO";
 	eastl::shared_ptr<VertexArrayObject> thisVAO{ nullptr };
@@ -86,17 +84,17 @@ void SquareShape::SetupDrawCommands()
 	if (!existingVAO)
 	{
 		// TODO: Buffers creation should be delegated to the renderer
-		IndexBuffer ibo = IndexBuffer{};
+		OpenGLIndexBuffer ibo = OpenGLIndexBuffer{};
 		int32_t indicesCount = BasicShapesData::GetSquareIndicesCount();
 		ibo.SetIndices(BasicShapesData::GetSquareIndices(), indicesCount, GL_STATIC_DRAW);
 
-		VertexBufferLayout layout = VertexBufferLayout{};
+		OpenGLVertexBufferLayout layout = OpenGLVertexBufferLayout{};
 		// Vertex points
 		layout.Push<float>(3);
 		// Vertex Tex Coords
 		layout.Push<float>(2);
 
-		VertexBuffer vbo = VertexBuffer{ ibo, layout };
+		OpenGLVertexBuffer vbo = OpenGLVertexBuffer{ ibo, layout };
 		int32_t verticesCount = BasicShapesData::GetSquareVerticesCount();
 		vbo.SetData(BasicShapesData::GetSquareVertices(), verticesCount, GL_STATIC_DRAW);
 
@@ -148,7 +146,7 @@ eastl::shared_ptr<CubeShape> BasicShapes::CreateCubeObject()
 CubeShape::CubeShape() = default;
 CubeShape::~CubeShape() = default;
 
-void CubeShape::SetupDrawCommands()
+void CubeShape::CreateProxy()
 {
 	const eastl::string vaoName = "cubeVAO";
 	eastl::shared_ptr<VertexArrayObject> thisVAO{ nullptr };
@@ -158,11 +156,11 @@ void CubeShape::SetupDrawCommands()
 	if (!existingVAO)
 	{
 		// TODO: Buffers creation should be delegated to the renderer
-		IndexBuffer ibo = IndexBuffer{};
+		OpenGLIndexBuffer ibo = OpenGLIndexBuffer{};
 		int32_t indicesCount = BasicShapesData::GetCubeIndicesCount();
 		ibo.SetIndices(BasicShapesData::GetCubeIndices(), indicesCount, GL_STATIC_DRAW);
 
-		VertexBufferLayout layout = VertexBufferLayout{};
+		OpenGLVertexBufferLayout layout = OpenGLVertexBufferLayout{};
 		// Vertex points
 		layout.Push<float>(3);
 		// Normals
@@ -170,7 +168,7 @@ void CubeShape::SetupDrawCommands()
 		// Vertex Tex Coords
 		layout.Push<float>(2);
 
-		VertexBuffer vbo = VertexBuffer{ ibo, layout };
+		OpenGLVertexBuffer vbo = OpenGLVertexBuffer{ ibo, layout };
 		int32_t verticesCount = BasicShapesData::GetCubeVerticesCount();
 		vbo.SetData(BasicShapesData::GetCubeVertices(), verticesCount, GL_STATIC_DRAW);
 
@@ -209,7 +207,7 @@ void CubeShape::SetupDrawCommands()
 Skybox::Skybox() = default;
 Skybox::~Skybox() = default;
 
-void Skybox::SetupDrawCommands()
+void Skybox::CreateProxy()
 {
 	const eastl::string vaoName = "skyboxVAO";
 	eastl::shared_ptr<VertexArrayObject> thisVAO{ nullptr };
@@ -221,13 +219,13 @@ void Skybox::SetupDrawCommands()
 	if (!existingVAO)
 	{
 		// TODO: Buffers creation should be delegated to the renderer
-		IndexBuffer ibo = IndexBuffer{};
+		OpenGLIndexBuffer ibo = OpenGLIndexBuffer{};
 		ibo.IndicesCount = BasicShapesData::GetSkyboxIndicesCount();
-		VertexBufferLayout layout = VertexBufferLayout{};
+		OpenGLVertexBufferLayout layout = OpenGLVertexBufferLayout{};
 		// Vertex points
 		layout.Push<float>(3);
 
-		VertexBuffer vbo = VertexBuffer{ ibo, layout };
+		OpenGLVertexBuffer vbo = OpenGLVertexBuffer{ ibo, layout };
 		int32_t verticesCount = BasicShapesData::GetSkyboxVerticesCount();
 		vbo.SetData(BasicShapesData::GetSkyboxVertices(), verticesCount, GL_STATIC_DRAW);
 
@@ -272,7 +270,7 @@ void Skybox::SetupDrawCommands()
 LightSource::LightSource() = default;
 LightSource::~LightSource() = default;
 
-void LightSource::SetupDrawCommands()
+void LightSource::CreateProxy()
 {
 	const eastl::string vaoName = "lightSourceVAO";
 	eastl::shared_ptr<VertexArrayObject> thisVAO{ nullptr };
@@ -283,11 +281,11 @@ void LightSource::SetupDrawCommands()
 	if (!existingVAO)
 	{
 		// TODO: Buffers creation should be delegated to the renderer
-		IndexBuffer ibo = IndexBuffer{};
+		OpenGLIndexBuffer ibo = OpenGLIndexBuffer{};
 		int32_t indicesCount = BasicShapesData::GetCubeIndicesCount();
 		ibo.SetIndices(BasicShapesData::GetCubeIndices(), indicesCount, GL_STATIC_DRAW);
 
-		VertexBufferLayout layout = VertexBufferLayout{};
+		OpenGLVertexBufferLayout layout = OpenGLVertexBufferLayout{};
 		// Vertex points
 		layout.Push<float>(3);
 		// Normals
@@ -295,7 +293,7 @@ void LightSource::SetupDrawCommands()
 		// Vertex Tex Coords
 		layout.Push<float>(2);
 
-		VertexBuffer vbo = VertexBuffer{ ibo, layout };
+		OpenGLVertexBuffer vbo = OpenGLVertexBuffer{ ibo, layout };
 		int32_t verticesCount = BasicShapesData::GetCubeVerticesCount();
 		vbo.SetData(BasicShapesData::GetCubeVertices(), verticesCount, GL_STATIC_DRAW);
 

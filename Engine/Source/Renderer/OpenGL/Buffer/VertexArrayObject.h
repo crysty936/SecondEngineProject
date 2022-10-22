@@ -1,5 +1,5 @@
 #pragma once
-#include "VertexBuffer.h"
+#include "OpenGLVertexBuffer.h"
 
 class VertexArrayObject
 {
@@ -12,7 +12,7 @@ public:
 	void Unbind() const;
 	void DeleteBuffers();
 
-	VertexBuffer VBuffer{};
+	OpenGLVertexBuffer VBuffer{};
 
 	mutable uint32_t Handle{ 0 };
 	mutable bool bReadyForDraw = false;

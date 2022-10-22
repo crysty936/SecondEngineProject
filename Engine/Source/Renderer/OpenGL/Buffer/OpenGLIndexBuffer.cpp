@@ -1,26 +1,26 @@
-#include "IndexBuffer.h"
+#include "OpenGLIndexBuffer.h"
 #include "glad/glad.h"
 
-IndexBuffer::IndexBuffer()
+OpenGLIndexBuffer::OpenGLIndexBuffer()
 	: IndicesCount{ 0 }
 {
 }
 
-IndexBuffer::~IndexBuffer() = default;
+OpenGLIndexBuffer::~OpenGLIndexBuffer() = default;
 
-void IndexBuffer::Bind() const
+void OpenGLIndexBuffer::Bind() const
 {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, Handle);
 	IsBound = true;
 }
 
-void IndexBuffer::Unbind() const
+void OpenGLIndexBuffer::Unbind() const
 {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	IsBound = false;
 }
 
-void IndexBuffer::SetIndices(const uint32_t* inIndices, const int32_t inCount, const uint32_t inBufferAccessType)
+void OpenGLIndexBuffer::SetIndices(const uint32_t* inIndices, const int32_t inCount, const uint32_t inBufferAccessType)
 {
 	Bind();
 	glNamedBufferData(Handle, sizeof(uint32_t) * inCount, inIndices, inBufferAccessType);

@@ -22,7 +22,7 @@ class IDrawableContainer
 public:
 	virtual ~IDrawableContainer() = default;
 
-	virtual void SetupDrawCommands() = 0;
+	virtual void CreateProxy() = 0;
 };
 
 

@@ -11,7 +11,7 @@ public:
 	AssimpModel3D(const eastl::string& inPath);
 	virtual ~AssimpModel3D();
 
-	virtual void SetupDrawCommands() override;
+	virtual void CreateProxy() override;
 
 	static void LoadModelToRoot(const eastl::string inPath, TransformObjPtr inParent);
 

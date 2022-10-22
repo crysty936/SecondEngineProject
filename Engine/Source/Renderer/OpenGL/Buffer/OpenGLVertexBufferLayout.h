@@ -1,13 +1,13 @@
 #pragma once
 #include "EASTL/vector.h"
-#include "LayoutProperties.h"
+#include "OpenGLLayoutProperties.h"
 #include "glad/glad.h"
 
-class VertexBufferLayout
+class OpenGLVertexBufferLayout
 {
 
 public:
-	VertexBufferLayout()
+	OpenGLVertexBufferLayout()
 		:Stride(0) {}
 
 
@@ -33,10 +33,10 @@ public:
 
 	
 
-	inline const eastl::vector<LayoutProperties>& GetProperties() const { return Properties; }
+	inline const eastl::vector<OpenGLLayoutProperties>& GetProperties() const { return Properties; }
 	inline const uint32_t GetStride() const { return Stride; }
 
 private:
-	eastl::vector<LayoutProperties> Properties;
+	eastl::vector<OpenGLLayoutProperties> Properties;
 	uint32_t Stride;
 };

@@ -103,7 +103,7 @@ void EngineCore::Run()
 		SceneManager::Get().GetCurrentScene().TickObjects(CurrentDeltaT);
 		CurrentGameMode->Tick(CurrentDeltaT);
 
-		Renderer::Draw();
+		Renderer::RHI->Draw();
 	}
 
 	Terminate();

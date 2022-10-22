@@ -6,9 +6,17 @@ cbuffer ConstantBuffer : register(b0)
 	matrix Projection;
 }
 
-float4 VS(float4 Pos : POSITION) : SV_POSITION
+struct VS_INPUT
 {
-	float4 output = mul(Pos, World);
+	float4 Pos : POSITION;
+	float3 Norm : NORMAL;
+	float2 Coord : TEXCOORD;
+};
+
+
+float4 VS(VS_INPUT input) : SV_POSITION
+{
+	float4 output = mul(input.Pos, World);
 	output = mul(output, View);
 	output = mul(output, Projection);
 

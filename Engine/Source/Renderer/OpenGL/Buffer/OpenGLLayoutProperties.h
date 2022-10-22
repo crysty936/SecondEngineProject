@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include "Core/EngineUtils.h"
 
-struct LayoutProperties
+struct OpenGLLayoutProperties
 {
 	/** Float or UInt */
 	uint32_t Type;
