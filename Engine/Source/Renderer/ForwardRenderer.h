@@ -1,15 +1,12 @@
 #pragma once
 #include "EASTL/shared_ptr.h"
 
-class Renderer
+class ForwardRenderer
 {
 public:
 	static void Init();
 	static void Terminate();
 	void Draw();
-	class WindowsWindow& GetMainWindow();
 
-
-
-	inline static Renderer* RHI = nullptr;
+	inline static ForwardRenderer* Instance = nullptr;
 };

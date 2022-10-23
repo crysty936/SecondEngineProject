@@ -15,4 +15,5 @@ public:
 	virtual void Tick(float inDeltat) override;
 private:
 	TransformObjPtr triangle;
+	TransformObjPtr triangle2;
 };

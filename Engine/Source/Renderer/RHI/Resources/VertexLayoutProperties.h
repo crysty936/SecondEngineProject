@@ -1,11 +1,18 @@
 #pragma once
+
 #include <stdint.h>
 #include "Core/EngineUtils.h"
 
-struct OpenGLLayoutProperties
+enum class VertexPropertyType : uint32_t
+{
+	UInt,
+	Float
+};
+
+struct VertexLayoutProperties
 {
 	/** Float or UInt */
-	uint32_t Type;
+	VertexPropertyType Type;
 	/** 3 for Basic Vector */
 	uint32_t Count;
 	uint32_t bNormalized;

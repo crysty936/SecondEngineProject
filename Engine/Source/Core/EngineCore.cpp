@@ -10,16 +10,13 @@
 #include "Core/GameModeBase.h"
 #include "Timer/TimersManager.h"
 #include "Renderer/Material/MaterialsManager.h"
-#include "Renderer/Renderer.h"
+#include "Renderer/ForwardRenderer.h"
+#include "Window/WindowsWindow.h"
+#include "Renderer/RHI/RHIBase.h"
 
 constexpr float IdealFrameRate = 60.f;
 constexpr float IdealFrameTime = 1.0f / IdealFrameRate;
 bool bIsRunning = true;
-
-void StopEngine()
-{
-	bIsRunning = false;
-}
 
 EngineCore::EngineCore()
 	: CurrentDeltaT{ 0.f }
@@ -32,14 +29,23 @@ EngineCore::EngineCore()
 
 EngineCore::~EngineCore() = default;
 
+// Init all engine subsystems
 void EngineCore::Init()
 {
 	Engine = new EngineCore{};
 	Engine->CurrentGameMode = GameModeBase::Get();
 
-	// Init all engine subsystems
 	InputSystem::Init();
-	Renderer::Init();
+
+	// Create Main Window
+	Engine->MainWindow = eastl::make_unique<WindowsWindow>();
+
+	// Hide Cursor for input
+	InputSystem::Get().SetCursorMode(Engine->MainWindow->GetHandle(), ECursorMode::Disabled);
+
+	RHIBase::Init();
+
+	ForwardRenderer::Init();
 	SceneManager::Init();
 	TimersManager::Init();
 	MaterialsManager::Init();
@@ -56,7 +62,8 @@ void EngineCore::Terminate()
 	MaterialsManager::Terminate();
 	TimersManager::Terminate();
 	SceneManager::Terminate();
-	Renderer::Terminate();
+	ForwardRenderer::Terminate();
+	RHIBase::Terminate();
 	InputSystem::Terminate();
 
 	ASSERT(Engine);
@@ -103,13 +110,28 @@ void EngineCore::Run()
 		SceneManager::Get().GetCurrentScene().TickObjects(CurrentDeltaT);
 		CurrentGameMode->Tick(CurrentDeltaT);
 
-		Renderer::RHI->Draw();
+		ForwardRenderer::Instance->Draw();
+
+		CheckShouldCloseWindow();
 	}
 
 	Terminate();
 }
 
+void EngineCore::CheckShouldCloseWindow()
+{
+	if (MainWindow->ShouldClose())
+	{
+		StopEngine();
+	}
+}
+
 bool EngineCore::IsRunning()
 {
 	return bIsRunning;
+}
+
+void EngineCore::StopEngine()
+{
+	bIsRunning = false;
 }

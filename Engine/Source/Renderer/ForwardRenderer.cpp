@@ -1,4 +1,4 @@
-#include "Renderer.h"
+#include "ForwardRenderer.h"
 #include "Window/WindowsWindow.h"
 
 #define RENDERERGL 1
@@ -10,9 +10,9 @@
 #include "Renderer/D3D11/D3D11Renderer.h"
 #endif 
 
-void Renderer::Init()
+void ForwardRenderer::Init()
 {
-	RHI = new Renderer();
+	Instance = new ForwardRenderer();
 #if RENDERERGL
 	OpenGLRenderer::Init();
 #elif RENDERERD3D11
@@ -20,7 +20,7 @@ void Renderer::Init()
 #endif
 }
 
-void Renderer::Terminate()
+void ForwardRenderer::Terminate()
 {
 #if RENDERERGL
 	OpenGLRenderer::Terminate();
@@ -29,7 +29,7 @@ void Renderer::Terminate()
 #endif
 }
 
-void Renderer::Draw()
+void ForwardRenderer::Draw()
 {
 #if RENDERERGL
 	OpenGLRenderer::GetRHI().Draw();
@@ -38,11 +38,3 @@ void Renderer::Draw()
 #endif
 }
 
-WindowsWindow& Renderer::GetMainWindow()
-{
-#if RENDERERGL
-	return OpenGLRenderer::GetRHI().GetMainWindow();
-#elif RENDERERD3D11
-	return D3D11Renderer::GetRHI().GetMainWindow();
-#endif
-}

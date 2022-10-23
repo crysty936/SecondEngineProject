@@ -68,25 +68,10 @@ glm::mat4 remapZMatrix = {
 
 D3D11Renderer::D3D11Renderer(const WindowProperties& inMainWindowProperties)
 {
-	CurrentWindow = eastl::make_unique<WindowsWindow>();
-	//  	openglInstance = LoadLibraryA("opengl32.dll");
-	//  	ASSERT(openglInstance);
-	//   	gldc = GetDC(reinterpret_cast<HWND>(CurrentWindow->GetHandle()));
-	//   	HGLRC glrc = init_opengl(gldc);
-	//   
-	//  	const bool gladSuccess = gladLoadGLLoader((GLADloadproc)getProcAddressGLWindows) == 1;
-	//  	ASSERT(gladSuccess);
-	//  	GLWindow = eastl::make_unique<OpenGLWindow>(nullptr, inMainWindowProperties);
-
-			//SetViewportSizeToMain();
-
-	InputSystem::Get().SetCursorMode(CurrentWindow->GetHandle(), ECursorMode::Disabled);
-
-
 	HRESULT hr = S_OK;
 
 	RECT rc;
-	GetClientRect(reinterpret_cast<HWND>(CurrentWindow->GetHandle()), &rc);
+	GetClientRect(static_cast<HWND>(Engine->GetMainWindow().GetHandle()), &rc);
 	UINT width = rc.right - rc.left;
 	UINT height = rc.bottom - rc.top;
 
@@ -122,7 +107,7 @@ D3D11Renderer::D3D11Renderer(const WindowProperties& inMainWindowProperties)
 	sd.BufferDesc.RefreshRate.Numerator = 60;
 	sd.BufferDesc.RefreshRate.Denominator = 1;
 	sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-	sd.OutputWindow = reinterpret_cast<HWND>(CurrentWindow->GetHandle());
+	sd.OutputWindow = static_cast<HWND>(Engine->GetMainWindow().GetHandle());
 	sd.SampleDesc.Count = 1;
 	sd.SampleDesc.Quality = 0;
 	sd.Windowed = TRUE;
@@ -343,7 +328,7 @@ void D3D11Renderer::Draw()
 
 	memcpy(&g_View, &glmView, sizeof(glmView));
 
-	glm::mat4 glmProjection = glm::perspectiveLH_ZO(glm::radians(90.0f), static_cast<float>(CurrentWindow->GetProperties().Width) / static_cast<float>(CurrentWindow->GetProperties().Height), 0.1f, 1000.0f);
+	glm::mat4 glmProjection = glm::perspectiveLH_ZO(glm::radians(90.0f), static_cast<float>(Engine->GetMainWindow().GetProperties().Width) / static_cast<float>(Engine->GetMainWindow().GetProperties().Height), 0.1f, 1000.0f);
 	//glm::mat4 glmProjection = glm::orthoLH_ZO(-2.f, 2.f, -2.f, 2.f, 0.1f, 1000.f);
 	memcpy(&g_Projection, &glmProjection, sizeof(glmProjection));
 
@@ -369,8 +354,6 @@ void D3D11Renderer::Draw()
 	g_pImmediateContext->PSSetShader(g_pPixelShader, NULL, 0);
 	g_pImmediateContext->DrawIndexed(BasicShapesData::GetCubeIndicesCount(), 0, 0);
 
-	CheckShouldCloseWindow(*CurrentWindow);
-
 	// Present the information rendered to the back buffer to the front buffer (the screen)
 	g_pSwapChain->Present(0, 0);
 }
@@ -391,14 +374,3 @@ void D3D11Renderer::Draw()
 // 	UniformsCache["view"] = view;
 // }
 // 
-
-void D3D11Renderer::CheckShouldCloseWindow(const WindowsWindow & inWindow)
-{
-	if (inWindow.ShouldClose())
-	{
-		StopEngine();
-	}
-}
-
-
-

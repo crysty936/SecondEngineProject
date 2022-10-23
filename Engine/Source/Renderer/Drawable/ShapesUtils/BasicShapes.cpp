@@ -1,7 +1,6 @@
 #include "BasicShapes.h"
 #include "Renderer/Drawable/ShapesUtils/BasicShapesData.h"
 #include "Renderer/OpenGL/Buffer/OpenGLIndexBuffer.h"
-#include "Renderer/OpenGL/Buffer/OpenGLVertexBufferLayout.h"
 #include "Renderer/OpenGL/Buffer/OpenGLVertexBuffer.h"
 #include "Renderer/OpenGL/Buffer/VertexArrayObject.h"
 #include "Renderer/OpenGL/OpenGLShader.h"
@@ -14,7 +13,9 @@
 #include "Renderer/Drawable/SkyboxMaterial.h"
 #include "Renderer/Drawable/WithShadowMaterial.h"
 #include "glad/glad.h"
-
+#include "Renderer/RHI/Resources/VertexBufferBase.h"
+#include "Renderer/RHI/RHIBase.h"
+#include "Renderer/RHI/Resources/IndexBufferBase.h"
 
 TriangleShape::TriangleShape() = default;
 TriangleShape::~TriangleShape() = default;
@@ -28,21 +29,23 @@ void TriangleShape::CreateProxy()
 
 	if (!existingVAO)
 	{
+		
+		OpenGLIndexBuffer ibo;
+		const int32_t indicesCount = BasicShapesData::GetTriangleIndicesCount();
+		ibo.SetIndices(BasicShapesData::GetTriangleIndices(), indicesCount);
 
+		//eastl::shared_ptr<IndexBufferBase> ib = RHIBase::RHI->CreateIndexBuffer(BasicShapesData::GetTriangleIndices(), indicesCount);
 
-		OpenGLIndexBuffer ibo = OpenGLIndexBuffer{};
-		int32_t indicesCount = BasicShapesData::GetTriangleIndicesCount();
-		ibo.SetIndices(BasicShapesData::GetTriangleIndices(), indicesCount, GL_STATIC_DRAW);
-
-		OpenGLVertexBufferLayout layout = OpenGLVertexBufferLayout{};
+		VertexBufferLayout layout;
 		// Vertex points
 		layout.Push<float>(3);
 		// Vertex Tex Coords
 		//layout.Push<float>(2);
 
 		OpenGLVertexBuffer vbo = OpenGLVertexBuffer{ ibo, layout };
-		int32_t verticesCount = BasicShapesData::GetTriangleVerticesCount();
-		vbo.SetData(BasicShapesData::GetTriangleVertices(), verticesCount, GL_STATIC_DRAW);
+		const int32_t verticesCount = BasicShapesData::GetTriangleVerticesCount();
+		vbo.SetData(BasicShapesData::GetTriangleVertices(), verticesCount);
+		//const eastl::shared_ptr<VertexBufferBase> vb = RHIBase::RHI->CreateVertexBuffer(layout, BasicShapesData::GetTriangleVertices(), verticesCount);
 
 		thisVAO->VBuffer = vbo;
 	}
@@ -57,6 +60,9 @@ void TriangleShape::CreateProxy()
 		//eastl::shared_ptr<OpenGLTexture> tex = eastl::make_shared<OpenGLTexture>("DiffuseMap");
 		//tex->Init(texturePath);
 		//cubeMaterial->Textures.push_back(std::move(tex));
+
+		//eastl::shared_ptr<ShaderBase> shader = RHIBase::RHI->CreateShaderFromPath("../Data/Shaders/OpenGL/BasicProjectionVertexShader.glsl", "../Data/Shaders/OpenGL/FragmentShader_ColorBasedOnPosition.glsl");
+
 		cubeMaterial->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/OpenGL/BasicProjectionVertexShader.glsl", "../Data/Shaders/OpenGL/FragmentShader_ColorBasedOnPosition.glsl");
 	}
 
@@ -86,9 +92,9 @@ void SquareShape::CreateProxy()
 		// TODO: Buffers creation should be delegated to the renderer
 		OpenGLIndexBuffer ibo = OpenGLIndexBuffer{};
 		int32_t indicesCount = BasicShapesData::GetSquareIndicesCount();
-		ibo.SetIndices(BasicShapesData::GetSquareIndices(), indicesCount, GL_STATIC_DRAW);
+		ibo.SetIndices(BasicShapesData::GetSquareIndices(), indicesCount);
 
-		OpenGLVertexBufferLayout layout = OpenGLVertexBufferLayout{};
+		VertexBufferLayout layout;
 		// Vertex points
 		layout.Push<float>(3);
 		// Vertex Tex Coords
@@ -96,7 +102,7 @@ void SquareShape::CreateProxy()
 
 		OpenGLVertexBuffer vbo = OpenGLVertexBuffer{ ibo, layout };
 		int32_t verticesCount = BasicShapesData::GetSquareVerticesCount();
-		vbo.SetData(BasicShapesData::GetSquareVertices(), verticesCount, GL_STATIC_DRAW);
+		vbo.SetData(BasicShapesData::GetSquareVertices(), verticesCount);
 
 		thisVAO->VBuffer = vbo;
 	}
@@ -158,9 +164,9 @@ void CubeShape::CreateProxy()
 		// TODO: Buffers creation should be delegated to the renderer
 		OpenGLIndexBuffer ibo = OpenGLIndexBuffer{};
 		int32_t indicesCount = BasicShapesData::GetCubeIndicesCount();
-		ibo.SetIndices(BasicShapesData::GetCubeIndices(), indicesCount, GL_STATIC_DRAW);
+		ibo.SetIndices(BasicShapesData::GetCubeIndices(), indicesCount);
 
-		OpenGLVertexBufferLayout layout = OpenGLVertexBufferLayout{};
+		VertexBufferLayout layout;
 		// Vertex points
 		layout.Push<float>(3);
 		// Normals
@@ -170,7 +176,7 @@ void CubeShape::CreateProxy()
 
 		OpenGLVertexBuffer vbo = OpenGLVertexBuffer{ ibo, layout };
 		int32_t verticesCount = BasicShapesData::GetCubeVerticesCount();
-		vbo.SetData(BasicShapesData::GetCubeVertices(), verticesCount, GL_STATIC_DRAW);
+		vbo.SetData(BasicShapesData::GetCubeVertices(), verticesCount);
 
 		thisVAO->VBuffer = vbo;
 	}
@@ -221,13 +227,13 @@ void Skybox::CreateProxy()
 		// TODO: Buffers creation should be delegated to the renderer
 		OpenGLIndexBuffer ibo = OpenGLIndexBuffer{};
 		ibo.IndicesCount = BasicShapesData::GetSkyboxIndicesCount();
-		OpenGLVertexBufferLayout layout = OpenGLVertexBufferLayout{};
+		VertexBufferLayout layout;
 		// Vertex points
 		layout.Push<float>(3);
 
 		OpenGLVertexBuffer vbo = OpenGLVertexBuffer{ ibo, layout };
 		int32_t verticesCount = BasicShapesData::GetSkyboxVerticesCount();
-		vbo.SetData(BasicShapesData::GetSkyboxVertices(), verticesCount, GL_STATIC_DRAW);
+		vbo.SetData(BasicShapesData::GetSkyboxVertices(), verticesCount);
 
 		thisVAO->VBuffer = vbo;
 	}
@@ -283,9 +289,9 @@ void LightSource::CreateProxy()
 		// TODO: Buffers creation should be delegated to the renderer
 		OpenGLIndexBuffer ibo = OpenGLIndexBuffer{};
 		int32_t indicesCount = BasicShapesData::GetCubeIndicesCount();
-		ibo.SetIndices(BasicShapesData::GetCubeIndices(), indicesCount, GL_STATIC_DRAW);
+		ibo.SetIndices(BasicShapesData::GetCubeIndices(), indicesCount);
 
-		OpenGLVertexBufferLayout layout = OpenGLVertexBufferLayout{};
+		VertexBufferLayout layout = VertexBufferLayout{};
 		// Vertex points
 		layout.Push<float>(3);
 		// Normals
@@ -295,7 +301,7 @@ void LightSource::CreateProxy()
 
 		OpenGLVertexBuffer vbo = OpenGLVertexBuffer{ ibo, layout };
 		int32_t verticesCount = BasicShapesData::GetCubeVerticesCount();
-		vbo.SetData(BasicShapesData::GetCubeVertices(), verticesCount, GL_STATIC_DRAW);
+		vbo.SetData(BasicShapesData::GetCubeVertices(), verticesCount);
 
 		thisVAO->VBuffer = vbo;
 	}

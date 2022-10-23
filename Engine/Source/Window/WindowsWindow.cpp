@@ -24,16 +24,16 @@ WindowsWindow::WindowsWindow(const bool Init, const WindowProperties& inProperti
 
 	WindowHandle = WindowsPlatform::CreateWindowsWindow(inProperties.Width, inProperties.Height);
 
-	ShowWindow(reinterpret_cast<HWND>(WindowHandle), SW_SHOW);
-	UpdateWindow(reinterpret_cast<HWND>(WindowHandle));
+	ShowWindow(static_cast<HWND>(WindowHandle), SW_SHOW);
+	UpdateWindow(static_cast<HWND>(WindowHandle));
 
 	InputSystem::Get().OnKeyInput().BindRaw(this, &WindowsWindow::OnKeyInput);
 }
 
 WindowsWindow::~WindowsWindow()
 {
-	RemovePropW(reinterpret_cast<HWND>(WindowHandle), L"WindowProp");
-	DestroyWindow(reinterpret_cast<HWND>(WindowHandle));
+	RemovePropW(static_cast<HWND>(WindowHandle), L"WindowProp");
+	DestroyWindow(static_cast<HWND>(WindowHandle));
 }
 
 void WindowsWindow::OnKeyInput(const EInputKey inKey, const EInputType inType)

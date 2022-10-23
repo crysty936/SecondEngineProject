@@ -5,6 +5,7 @@
 #include "OpenGLRenderer.h"
 #include "OpenGLShader.h"
 #include "Window/WindowsWindow.h"
+#include "Core/EngineCore.h"
 
 // Create a texture buffer
 OpenGLTexture::OpenGLTexture(const eastl::string& inTexName, const uint32_t inGlTexType)
@@ -23,7 +24,7 @@ void OpenGLTexture::Init(const eastl::string& inTexturePath)
 	glGenTextures(1, &TexHandle);
 	glBindTexture(GLTexType, TexHandle);
 
-	const WindowProperties& windowProps = OpenGLRenderer::GetRHI().GetMainWindow().GetProperties();
+	const WindowProperties& windowProps = Engine->GetMainWindow().GetProperties();
 
 	glTexImage2D(GLTexType, 0, GL_RGB, windowProps.Width, windowProps.Height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
 

@@ -52,7 +52,7 @@ void Controller::OnKeyInputReceived(EInputKey inKeyCode, EInputType inEventType)
 {
  	if (inKeyCode == EInputKey::Escape)
  	{
- 		StopEngine();
+ 		Engine->StopEngine();
  	}
 
 	// 	switch (inEventType)

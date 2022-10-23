@@ -10,7 +10,7 @@ public:
 
 	virtual void Bind() const override;
 	virtual void Unbind() const override;
-	void SetIndices(const uint32_t* inIndices, const int32_t inCount, const uint32_t inBufferAccessType);
+	void SetIndices(const uint32_t* inIndices, const int32_t inCount);
 
 public:
 	int32_t IndicesCount;

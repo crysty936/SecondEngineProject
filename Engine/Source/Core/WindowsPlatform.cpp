@@ -4,7 +4,7 @@
 #include "Logger/Logger.h"
 #include "InputSystem/InputType.h"
 #include "InputSystem/InputSystem.h"
-#include "Renderer/Renderer.h"
+#include "Renderer/ForwardRenderer.h"
 #include "Window/WindowsWindow.h"
 #include <atlbase.h>
 #include <atlwin.h>
@@ -305,9 +305,9 @@ namespace WindowsPlatform
 	{
 		if (inMode == ECursorMode::Disabled)
 		{
-			if (IsWindowFocused(reinterpret_cast<HWND>(inWindowHandle)))
+			if (IsWindowFocused(static_cast<HWND>(inWindowHandle)))
 			{
-				DisableCursor(reinterpret_cast<HWND>(inWindowHandle));
+				DisableCursor(static_cast<HWND>(inWindowHandle));
 			}
 		}
 		//else if (_glfw.win32.disabledCursorWindow == window)
@@ -318,7 +318,7 @@ namespace WindowsPlatform
 
 	void SetWindowsWindowText(const eastl::wstring& inText)
 	{
-		SetWindowTextW(reinterpret_cast<HWND>(Renderer::RHI->GetMainWindow().GetHandle()), inText.c_str());
+		SetWindowTextW(static_cast<HWND>(Engine->GetMainWindow().GetHandle()), inText.c_str());
 	}
 	// Message Loop
 
@@ -457,7 +457,7 @@ namespace WindowsPlatform
  		case WM_CLOSE:
  		{
  			LOG_WINMSG(WM_CLOSE);
-            Renderer::RHI->GetMainWindow().RequestClose();
+            Engine->GetMainWindow().RequestClose();
  
  			return 0;
  		}

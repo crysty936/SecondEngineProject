@@ -5,6 +5,7 @@
 #include "Window/WindowProperties.h"
 #include "Window/WindowsWindow.h"
 #include "glad/glad.h"
+#include "Core/EngineCore.h"
 
 OpenGLRenderTexture::OpenGLRenderTexture(const eastl::string& inTexName)
 	: OpenGLTexture(inTexName, GL_TEXTURE_2D) {}
@@ -15,7 +16,7 @@ void OpenGLRenderTexture::Init()
 	glGenTextures(1, &TexHandle);
 	glBindTexture(GLTexType, TexHandle);
 
-	const WindowProperties& windowProps = OpenGLRenderer::GetRHI().GetMainWindow().GetProperties();
+	const WindowProperties& windowProps = Engine->GetMainWindow().GetProperties();
 
 	glTexImage2D(GLTexType, 0, GL_RGB, windowProps.Width, windowProps.Height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
 

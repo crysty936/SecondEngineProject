@@ -1,13 +1,13 @@
 #pragma once
-#include "EASTL/vector.h"
-#include "OpenGLLayoutProperties.h"
-#include "glad/glad.h"
 
-class OpenGLVertexBufferLayout
+#include "EASTL/vector.h"
+#include "VertexLayoutProperties.h"
+
+class VertexBufferLayout
 {
 
 public:
-	OpenGLVertexBufferLayout()
+	VertexBufferLayout()
 		:Stride(0) {}
 
 
@@ -20,23 +20,21 @@ public:
 	template<>
 	void Push<float>(uint32_t Count)
 	{
-		Properties.push_back({ GL_FLOAT, Count, GL_FALSE });
+		Properties.push_back({ VertexPropertyType::Float, Count, false });
 		Stride += Count * sizeof(float);
 	}
 
 	template<>
 	void Push<uint32_t>(uint32_t Count)
 	{
-		Properties.push_back({ GL_UNSIGNED_INT, Count, GL_FALSE });
+		Properties.push_back({ VertexPropertyType::UInt, Count, false });
 		Stride += Count * sizeof(uint32_t);
 	}
 
-	
-
-	inline const eastl::vector<OpenGLLayoutProperties>& GetProperties() const { return Properties; }
+	inline const eastl::vector<VertexLayoutProperties>& GetProperties() const { return Properties; }
 	inline const uint32_t GetStride() const { return Stride; }
 
 private:
-	eastl::vector<OpenGLLayoutProperties> Properties;
+	eastl::vector<VertexLayoutProperties> Properties;
 	uint32_t Stride;
 };

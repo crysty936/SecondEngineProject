@@ -1,7 +1,6 @@
 #include "Renderer/Drawable/MirrorQuad.h"
 #include "Renderer/Drawable/ShapesUtils/BasicShapesData.h"
 #include "Renderer/OpenGL/Buffer/OpenGLIndexBuffer.h"
-#include "Renderer/OpenGL/Buffer/OpenGLVertexBufferLayout.h"
 #include "Renderer/OpenGL/Buffer/OpenGLVertexBuffer.h"
 #include "Renderer/OpenGL/Buffer/VertexArrayObject.h"
 #include "Renderer/OpenGL/OpenGLShader.h"
@@ -27,9 +26,9 @@ void MirrorQuad::CreateProxy()
 		// TODO: Buffers creation should be delegated to the renderer
 		OpenGLIndexBuffer ibo = OpenGLIndexBuffer{};
 		int32_t indicesCount = BasicShapesData::GetQuadIndicesCount();
-		ibo.SetIndices(BasicShapesData::GetQuadIndices(), indicesCount, GL_STATIC_DRAW);
+		ibo.SetIndices(BasicShapesData::GetQuadIndices(), indicesCount);
 
-		OpenGLVertexBufferLayout layout = OpenGLVertexBufferLayout{};
+		VertexBufferLayout layout = VertexBufferLayout{};
 		// Vertex points
 		layout.Push<float>(3);
 		// Vertex Tex Coords
@@ -37,7 +36,7 @@ void MirrorQuad::CreateProxy()
 
 		OpenGLVertexBuffer vbo = OpenGLVertexBuffer{ ibo, layout };
 		int32_t verticesCount = BasicShapesData::GetQuadVerticesCount();
-		vbo.SetData(BasicShapesData::GetQuadVertices(), verticesCount, GL_STATIC_DRAW);
+		vbo.SetData(BasicShapesData::GetQuadVertices(), verticesCount);
 
 		thisVAO->VBuffer = vbo;
 	}

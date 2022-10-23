@@ -15,5 +15,4 @@ public:
 
 protected:
 	uint32_t Handle = 0;
-	mutable bool IsBound = false;
 };

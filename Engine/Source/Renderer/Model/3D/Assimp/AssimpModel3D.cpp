@@ -8,7 +8,6 @@
 #include "Renderer/OpenGL/OpenGLRenderer.h"
 #include "Renderer/RenderingPrimitives.h"
 #include "Renderer/OpenGL/Buffer/OpenGLIndexBuffer.h"
-#include "Renderer/OpenGL/Buffer/OpenGLVertexBufferLayout.h"
 #include "Renderer/OpenGL/Buffer/OpenGLVertexBuffer.h"
 #include "Renderer/OpenGL/Buffer/VertexArrayObject.h"
 #include "glad/glad.h"
@@ -192,9 +191,9 @@ void AssimpModel3DLoader::ProcessMesh(const aiMesh& inMesh, const aiScene& inSce
 
 		OpenGLIndexBuffer ibo = OpenGLIndexBuffer{};
 		int32_t indicesCount = static_cast<int32_t>(indices.size());
-		ibo.SetIndices(indices.data(), indicesCount, GL_STATIC_DRAW);
+		ibo.SetIndices(indices.data(), indicesCount);
 
-		OpenGLVertexBufferLayout layout = OpenGLVertexBufferLayout{};
+		VertexBufferLayout layout;
 		// Vertex points
 		layout.Push<float>(3);
 		// Normals
@@ -204,7 +203,7 @@ void AssimpModel3DLoader::ProcessMesh(const aiMesh& inMesh, const aiScene& inSce
 
 		OpenGLVertexBuffer vbo = OpenGLVertexBuffer{ ibo, layout };
 		int32_t verticesCount = static_cast<int32_t>(vertices.size());
-		vbo.SetVertices(vertices, GL_STATIC_DRAW);
+		vbo.SetVertices(vertices);
 
 		thisVAO->VBuffer = vbo;
 	}

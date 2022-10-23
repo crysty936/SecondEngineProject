@@ -56,7 +56,6 @@ public:
 	void DrawCommand(const RenderCommand& inCommand);
 	eastl::shared_ptr<RenderMaterial> GetMaterial(const RenderCommand& inCommand) const;
 	void SetVSyncEnabled(const bool inEnabled);
-	inline class WindowsWindow& GetMainWindow() { return *CurrentWindow; }
 	static void LoadTexture();
 	void AddCommand(const RenderCommand& inCommand);
 	void AddCommands(eastl::vector<RenderCommand> inCommands);
@@ -72,17 +71,14 @@ public:
 	void AddMirrorCommand(const RenderCommand& inCommand);
 	inline void SetSkyboxCommand(RenderCommand inSkyboxCommand) { MainSkyboxCommand = inSkyboxCommand; }
 
-	inline static OpenGLRenderer& GetRHI() { ASSERT(GlobalRHI); return *GlobalRHI; }
+	inline static OpenGLRenderer& GetRHI() { ASSERT(GLRenderer); return *GLRenderer; }
 
 private:
-	inline static OpenGLRenderer* GlobalRHI = nullptr;
+	inline static OpenGLRenderer* GLRenderer = nullptr;
 
 private:
-	void SetViewportSize(const int32_t inWidth, const int32_t inHeight);
 	void SetViewportSizeToMain();
-	void CheckShouldCloseWindow(const class WindowsWindow& inWindow);
 
-	eastl::unique_ptr<class WindowsWindow> CurrentWindow;
 private:
 	eastl::unique_ptr<class OpenGLWindow> GLWindow;
 	eastl::unordered_map<eastl::string, SelfRegisteringUniform> UniformsCache;

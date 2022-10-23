@@ -25,10 +25,6 @@ public:
 	static void Terminate();
 	void Draw();
 
-	void CheckShouldCloseWindow(const WindowsWindow& inWindow);
-	inline class WindowsWindow& GetMainWindow() { return *CurrentWindow; }
-	eastl::unique_ptr<class WindowsWindow> CurrentWindow;
-
 	inline static D3D11Renderer& GetRHI() { ASSERT(GlobalRHI); return *GlobalRHI; }
 
 private:
