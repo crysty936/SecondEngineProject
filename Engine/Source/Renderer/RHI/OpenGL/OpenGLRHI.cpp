@@ -9,6 +9,7 @@
 #include "Renderer/RHI/Resources/OpenGL/GLShader.h"
 #include "Utils/IOUtils.h"
 #include "Renderer/RHI/Resources/OpenGL/GLUniformBuffer.h"
+#include "Renderer/RHI/Resources/OpenGL/GLVertexBuffer.h"
 
 namespace GLUtils
 {
@@ -258,14 +259,29 @@ OpenGLRHI::OpenGLRHI()
 
 OpenGLRHI::~OpenGLRHI() = default;
 
-eastl::shared_ptr<VertexBufferBase> OpenGLRHI::CreateVertexBuffer(const VertexBufferLayout& inLayout, const float* inVertices, const int32_t inCount)
+eastl::shared_ptr<VertexBufferBase> OpenGLRHI::CreateVertexBuffer(const VertexBufferLayout& inLayout, const float* inVertices, const int32_t inCount, eastl::shared_ptr<IndexBufferBase> inIndexBuffer)
 {
-	return nullptr;
+	uint32_t handle = 0;
+	glGenBuffers(1, &handle);
+	glBindBuffer(GL_ARRAY_BUFFER, handle);
+
+	glNamedBufferData(handle, sizeof(float) * inCount, inVertices, GL_STATIC_DRAW);
+
+	eastl::shared_ptr<GLVertexBuffer> newBuffer = eastl::make_shared<GLVertexBuffer>(handle, inIndexBuffer, inLayout);
+	return newBuffer;
 }
 
-eastl::shared_ptr<VertexBufferBase> OpenGLRHI::CreateVertexBuffer(const VertexBufferLayout& inLayout, const eastl::vector<Vertex>& inVertices)
+eastl::shared_ptr<VertexBufferBase> OpenGLRHI::CreateVertexBuffer(const VertexBufferLayout& inLayout, const eastl::vector<Vertex>& inVertices, eastl::shared_ptr<IndexBufferBase> inIndexBuffer)
 {
-	return nullptr;
+	uint32_t handle = 0;
+	glGenBuffers(1, &handle);
+	glBindBuffer(GL_ARRAY_BUFFER, handle);
+
+	const int32_t verticesCount = static_cast<int32_t>(inVertices.size());
+	glNamedBufferData(handle, sizeof(Vertex) * verticesCount, inVertices.data(), GL_STATIC_DRAW);
+
+	eastl::shared_ptr<GLVertexBuffer> newBuffer = eastl::make_shared<GLVertexBuffer>(handle, inIndexBuffer, inLayout);
+	return newBuffer;
 }
 
 eastl::shared_ptr<IndexBufferBase> OpenGLRHI::CreateIndexBuffer(const uint32_t* inData, uint32_t inCount)
@@ -277,9 +293,7 @@ eastl::shared_ptr<IndexBufferBase> OpenGLRHI::CreateIndexBuffer(const uint32_t* 
 	glNamedBufferData(handle, sizeof(uint32_t) * inCount, inData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-	eastl::shared_ptr<GLIndexBuffer> buffer = eastl::make_shared<GLIndexBuffer>();
-	buffer->Handle = handle;
-	buffer->IndexCount = inCount;
+	eastl::shared_ptr<GLIndexBuffer> buffer = eastl::make_shared<GLIndexBuffer>(handle, inCount);
 
 	return buffer;
 }
@@ -352,7 +366,6 @@ uint32_t CreateShaderInternal(const eastl::string& Source, uint32_t ShaderType)
 
 eastl::shared_ptr<class ShaderBase> OpenGLRHI::CreateShaderFromSource(const eastl::string& inVertexSrc, const eastl::string& inPixelSrc)
 {
-	eastl::shared_ptr<GLShader> newShader = eastl::make_shared<GLShader>();
 
 	// Create an empty vertex shader handle
 	GLuint vertexShader = CreateShaderInternal(inVertexSrc, GL_VERTEX_SHADER);
@@ -364,7 +377,6 @@ eastl::shared_ptr<class ShaderBase> OpenGLRHI::CreateShaderFromSource(const east
 	// Now time to link them together into a program.
 	// Get a program object.
 	GLuint program = glCreateProgram();
-	newShader->Handle = program;
 
 	// Attach our shaders to our program
 	glAttachShader(program, vertexShader);
@@ -401,6 +413,7 @@ eastl::shared_ptr<class ShaderBase> OpenGLRHI::CreateShaderFromSource(const east
 	glDetachShader(program, vertexShader);
 	glDetachShader(program, fragmentShader);
 
+	eastl::shared_ptr<GLShader> newShader = eastl::make_shared<GLShader>(program);
 	return newShader;
 }
 
@@ -413,4 +426,9 @@ eastl::shared_ptr<class ShaderBase> OpenGLRHI::CreateShaderFromPath(const eastl:
 	const bool fragmentReadSuccess = IOUtils::TryFastReadFile(inPixelPath, fragmentShaderCode);
 
 	return CreateShaderFromSource(vertexShaderCode, fragmentShaderCode);
+}
+
+void OpenGLRHI::DrawElements(const int32_t inElementsCount)
+{
+	glDrawElements(GL_TRIANGLES, inElementsCount, GL_UNSIGNED_INT, 0);
 }

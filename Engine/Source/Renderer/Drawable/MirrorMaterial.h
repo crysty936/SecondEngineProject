@@ -1,7 +1,6 @@
 #pragma once
 #include "EASTL/vector.h"
 #include "EASTL/string.h"
-#include "Renderer/OpenGL/OpenGLShader.h"
 #include "Renderer/OpenGL/OpenGLTexture.h"
 #include "Renderer/Material/RenderMaterial.h"
 
@@ -11,5 +10,5 @@ public:
 	MirrorMaterial();
 	~MirrorMaterial();
 
-	void SetUniforms(const eastl::unordered_map<eastl::string, struct SelfRegisteringUniform>& inUniformsCache) override;
+	void SetUniforms(eastl::unordered_map<eastl::string, struct SelfRegisteringUniform>& inUniformsCache) override;
 };

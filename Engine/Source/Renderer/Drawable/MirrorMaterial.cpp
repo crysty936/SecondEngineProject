@@ -4,7 +4,7 @@
 MirrorMaterial::MirrorMaterial() = default;
 MirrorMaterial::~MirrorMaterial() = default;
 
-void MirrorMaterial::SetUniforms(const eastl::unordered_map<eastl::string, SelfRegisteringUniform>& inUniformsCache)
+void MirrorMaterial::SetUniforms(eastl::unordered_map<eastl::string, SelfRegisteringUniform>& inUniformsCache)
 {
 	RenderMaterial::SetUniforms(inUniformsCache);
 }

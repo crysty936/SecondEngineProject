@@ -1,4 +1,4 @@
-#include "RHIBase.h"
+#include "RHI.h"
 #include "Renderer/ForwardRenderer.h"
 #include "OpenGL/OpenGLRHI.h"
 
@@ -16,16 +16,16 @@
 // #include "Renderer/D3D11/D3D11Renderer.h"
 // #endif 
 
-void RHIBase::Init()
+void RHI::Init()
 {
 #if RENDERERGL
-	RHI = new OpenGLRHI();
+	Instance = new OpenGLRHI();
 #elif RENDERERD3D11
 	//TODO
 #endif
 }
 
-void RHIBase::Terminate()
+void RHI::Terminate()
 {
 // #if RENDERERGL
 // 	OpenGLRenderer::Terminate();

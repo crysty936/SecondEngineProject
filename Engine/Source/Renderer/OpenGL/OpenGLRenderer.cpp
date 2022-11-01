@@ -13,7 +13,7 @@
 #include "Renderer/Drawable/Drawable.h"
 #include "EASTL/shared_ptr.h"
 #include "Renderer/Material/RenderMaterial.h"
-#include "Buffer/VertexArrayObject.h"
+#include "Renderer/RHI/Resources/RenderDataContainer.h"
 #include "Renderer/Material/MaterialsManager.h"
 #include "Renderer/Drawable/MirrorQuad.h"
 #include "Core/ObjectCreation.h"
@@ -30,7 +30,8 @@
 #if WITH_GLFW
 #include "GLFW/glfw3.h"
 #endif
-#include "Renderer/RHI/RHIBase.h"
+#include "Renderer/RHI/RHI.h"
+#include "Renderer/RHI/Resources/ShaderBase.h"
 
 constexpr glm::vec4 ClearColor(0.3f, 0.5f, 1.f, 0.4f);
 constexpr glm::vec3 lightPos(-10.0f, 10.0f, -1.0f);
@@ -43,36 +44,36 @@ static std::mutex LoadQueueMutex;
 static std::mutex GetVAOMutex;
 static std::condition_variable LoadQueueCondition;
 
-void LoaderFunc(GLFWwindow* inLoadingThreadContext)
-{
-	while (Engine->IsRunning())
-	{
-		eastl::queue<RenderingLoadCommand>& loadQueue = OpenGLRenderer::GetRHI().GetLoadQueue();
-		std::unique_lock<std::mutex> lock{ LoadQueueMutex };
-		LoadQueueCondition.wait(lock, [&] {return !loadQueue.empty(); });
-
-		RenderingLoadCommand newCommand = loadQueue.front();
-		loadQueue.pop();
-
-		lock.unlock();
-
-		// TODO: Make work without glfw
-		//glfwMakeContextCurrent(inLoadingThreadContext);
-		glEnable(GL_DEBUG_OUTPUT);
-		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-		//glDebugMessageCallback(GLDebugCallback, nullptr);
-
-		newCommand.LoadDel.Execute(newCommand.ModelPath, newCommand.Parent);
-
-		//glfwMakeContextCurrent(nullptr);
-	}
-}
+// void LoaderFunc(GLFWwindow* inLoadingThreadContext)
+// {
+// 	while (Engine->IsRunning())
+// 	{
+// 		eastl::queue<RenderingLoadCommand>& loadQueue = OpenGLRenderer::GetRHI().GetLoadQueue();
+// 		std::unique_lock<std::mutex> lock{ LoadQueueMutex };
+// 		LoadQueueCondition.wait(lock, [&] {return !loadQueue.empty(); });
+// 
+// 		RenderingLoadCommand newCommand = loadQueue.front();
+// 		loadQueue.pop();
+// 
+// 		lock.unlock();
+// 
+// 		// TODO: Make work without glfw
+// 		//glfwMakeContextCurrent(inLoadingThreadContext);
+// 		glEnable(GL_DEBUG_OUTPUT);
+// 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+// 		//glDebugMessageCallback(GLDebugCallback, nullptr);
+// 
+// 		newCommand.LoadDel.Execute(newCommand.ModelPath, newCommand.Parent);
+// 
+// 		//glfwMakeContextCurrent(nullptr);
+// 	}
+// }
 
 OpenGLRenderer::OpenGLRenderer(const WindowProperties& inMainWindowProperties)
 {
 	SetViewportSizeToMain();
 
-	RHIBase::RHI->ClearColor(ClearColor);
+	RHI::Instance->ClearColor(ClearColor);
 
 	// Set the default uniforms
 	SetupBaseUniforms();
@@ -108,7 +109,7 @@ void OpenGLRenderer::Draw()
 	SetupBaseUniforms();
 	UpdateUniforms();
 
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 	//DrawSkybox();
@@ -116,7 +117,7 @@ void OpenGLRenderer::Draw()
 	DrawCommands(MainCommands);
 	RenderCommandsMutex.unlock();
 
-	RHIBase::RHI->SwapBuffers();
+	RHI::Instance->SwapBuffers();
 
 #if WITH_GLFW
 	glfwSwapBuffers(GLWindow->GetHandle());
@@ -143,37 +144,37 @@ void OpenGLRenderer::DrawSkybox()
 
 void OpenGLRenderer::DrawShadowMap()
 {
-	// Cull front face to solve Peter Panning
-	//glCullFace(GL_FRONT);
-	glBindFramebuffer(GL_FRAMEBUFFER, ShadowMapBuffer);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-	SetDrawMode(EDrawMode::DEPTH);
-	RHIBase::RHI->SetViewportSize(SHADOW_WIDTH, SHADOW_HEIGHT);
-
-	//const glm::vec3 lightLoc = LightSource->GetAbsoluteTransform().Translation;
-	const glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-	const float near_plane = 1.f;
-	const float far_plane = 20.f;
-	const glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
-
-	//UniformsCache["projection"] = lightProjection;
-
-	const glm::mat4 lightSpaceMatrix = lightProjection * lightView;
-
-	UniformsCache["lightSpaceMatrix"] = lightSpaceMatrix;
-
-	RenderCommandsMutex.lock();
-	DrawCommands(MainCommands);
-	RenderCommandsMutex.unlock();
-
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	SetViewportSizeToMain();
-	SetDrawMode(EDrawMode::NORMAL);
-
-	// Reset to default
-	//glCullFace(GL_BACK);
+// 	// Cull front face to solve Peter Panning
+// 	//glCullFace(GL_FRONT);
+// 	glBindFramebuffer(GL_FRAMEBUFFER, ShadowMapBuffer);
+// 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+// 
+// 	SetDrawMode(EDrawMode::DEPTH);
+// 	RHIBase::RHI->SetViewportSize(SHADOW_WIDTH, SHADOW_HEIGHT);
+// 
+// 	//const glm::vec3 lightLoc = LightSource->GetAbsoluteTransform().Translation;
+// 	const glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+// 	const float near_plane = 1.f;
+// 	const float far_plane = 20.f;
+// 	const glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+// 
+// 	//UniformsCache["projection"] = lightProjection;
+// 
+// 	const glm::mat4 lightSpaceMatrix = lightProjection * lightView;
+// 
+// 	UniformsCache["lightSpaceMatrix"] = lightSpaceMatrix;
+// 
+// 	RenderCommandsMutex.lock();
+// 	DrawCommands(MainCommands);
+// 	RenderCommandsMutex.unlock();
+// 
+// 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+// 
+// 	SetViewportSizeToMain();
+// 	SetDrawMode(EDrawMode::NORMAL);
+// 
+// 	// Reset to default
+// 	//glCullFace(GL_BACK);
 }
 
 void OpenGLRenderer::SetupBaseUniforms()
@@ -206,23 +207,17 @@ void OpenGLRenderer::DrawCommand(const RenderCommand & inCommand)
 
 	const eastl::shared_ptr<const DrawableObject> parent = inCommand.Parent.lock();
 	const eastl::shared_ptr<RenderMaterial> material = GetMaterial(inCommand);
-	const eastl::shared_ptr<VertexArrayObject>& vao = inCommand.VAO;
+	const eastl::shared_ptr<RenderDataContainer>& dataContainer = inCommand.DataContainer;
 
 	if (!parent->IsVisible())
 	{
 		return;
 	}
 
-	// TODO: Abstract the model and parent dependent uniforms (like the Model Matrix) to be present in the render command 
-	// and updated only if dirty
-
-	// Deffered VAO initialization on the Main Rendering Thread
-	//if (!vao->bReadyForDraw)
 	{
-		//vao->SetupState();
-		vao->VBuffer.Bind();
+		dataContainer->VBuffer->Bind();
 
-		const VertexBufferLayout& layout = vao->VBuffer.GetLayout();
+		const VertexBufferLayout& layout = dataContainer->VBuffer->GetLayout();
 		const eastl::vector<VertexLayoutProperties>& props = layout.GetProperties();
 
 		size_t offset = 0;
@@ -250,7 +245,7 @@ void OpenGLRenderer::DrawCommand(const RenderCommand & inCommand)
 		}
 	}
 
-	material->Shader.Bind();
+	material->Shader->Bind();
 	material->ResetUniforms();
 
 	UniformsCache["model"] = parent->GetModelMatrix();
@@ -269,9 +264,7 @@ void OpenGLRenderer::DrawCommand(const RenderCommand & inCommand)
 	//GlobalRHI->UniformsCache["ShadowMap"] = uint32_t(i);
 	//GlobalRHI->UniformsCache["LightPos"] = lightPos;
 
-	const uint32_t indicesCount = vao->VBuffer.GetIndicesCount();
-	//vao->Bind();
-
+	const uint32_t indicesCount = dataContainer->VBuffer->GetIndicesCount();
 
 	material->SetUniforms(UniformsCache);
 
@@ -279,18 +272,18 @@ void OpenGLRenderer::DrawCommand(const RenderCommand & inCommand)
 	{
 	case EDrawCallType::DrawElements:
 	{
-		glDrawElements(GL_TRIANGLES, indicesCount, GL_UNSIGNED_INT, 0);
+		RHI::Instance->DrawElements(indicesCount);
+
 		break;
 	}
 	case EDrawCallType::DrawArrays:
 	{
-		glDrawArrays(GL_TRIANGLES, 0, indicesCount);
+		//glDrawArrays(GL_TRIANGLES, 0, indicesCount);
 		break;
 	}
 	}
 
-	//vao->Unbind();
-	vao->VBuffer.Unbind();
+	dataContainer->VBuffer->Unbind();
 
 	for (i = 0; i < material->Textures.size(); ++i)
 	{
@@ -303,7 +296,7 @@ void OpenGLRenderer::DrawCommand(const RenderCommand & inCommand)
 	//ShadowBufferTex->Unbind(i);
 	//
 
-	material->Shader.UnBind();
+	material->Shader->Unbind();
 }
 
 eastl::shared_ptr<RenderMaterial> OpenGLRenderer::GetMaterial(const RenderCommand & inCommand) const
@@ -314,45 +307,45 @@ eastl::shared_ptr<RenderMaterial> OpenGLRenderer::GetMaterial(const RenderComman
 	{
 		return inCommand.Material;
 	}
-	case EDrawMode::DEPTH:
-	{
-		MaterialsManager& matManager = MaterialsManager::Get();
-		bool materialExists = false;
-		eastl::shared_ptr<RenderMaterial> depthMaterial = matManager.GetOrAddMaterial<DepthMaterial>("depth_material", materialExists);
-
-		if (!materialExists)
-		{
-			depthMaterial->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/BasicDepthVertexShader.glsl", "../Data/Shaders/BasicDepthFragmentShader.glsl");
-		}
-
-		return depthMaterial;
-	}
-	case EDrawMode::DEPTH_VISUALIZE:
-	{
-		MaterialsManager& matManager = MaterialsManager::Get();
-		bool materialExists = false;
-		eastl::shared_ptr<RenderMaterial> depthMaterial = matManager.GetOrAddMaterial("visualize_depth_material", materialExists);
-
-		if (!materialExists)
-		{
-			depthMaterial->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/BasicProjectionVertexShader.glsl", "../Data/Shaders/VisualizeDepthFragmentShader.glsl");
-		}
-
-		return depthMaterial;
-	}
-	case EDrawMode::OUTLINE:
-	{
-		MaterialsManager& matManager = MaterialsManager::Get();
-		bool materialExists = false;
-		eastl::shared_ptr<RenderMaterial> outlineMaterial = matManager.GetOrAddMaterial("outline_material", materialExists);
-
-		if (!materialExists)
-		{
-			outlineMaterial->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/BasicProjectionVertexShader.glsl", "../Data/Shaders/OutlineFragmentShader.glsl");
-		}
-
-		return outlineMaterial;
-	}
+	//case EDrawMode::DEPTH:
+	//{
+// 		MaterialsManager& matManager = MaterialsManager::Get();
+// 		bool materialExists = false;
+// 		eastl::shared_ptr<RenderMaterial> depthMaterial = matManager.GetOrAddMaterial<DepthMaterial>("depth_material", materialExists);
+// 
+// 		if (!materialExists)
+// 		{
+// 			depthMaterial->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/BasicDepthVertexShader.glsl", "../Data/Shaders/BasicDepthFragmentShader.glsl");
+// 		}
+// 
+// 		return depthMaterial;
+// 	}
+// 	case EDrawMode::DEPTH_VISUALIZE:
+// 	{
+// 		MaterialsManager& matManager = MaterialsManager::Get();
+// 		bool materialExists = false;
+// 		eastl::shared_ptr<RenderMaterial> depthMaterial = matManager.GetOrAddMaterial("visualize_depth_material", materialExists);
+// 
+// 		if (!materialExists)
+// 		{
+// 			depthMaterial->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/BasicProjectionVertexShader.glsl", "../Data/Shaders/VisualizeDepthFragmentShader.glsl");
+// 		}
+// 
+// 		return depthMaterial;
+// 	}
+// 	case EDrawMode::OUTLINE:
+// 	{
+// 		MaterialsManager& matManager = MaterialsManager::Get();
+// 		bool materialExists = false;
+// 		eastl::shared_ptr<RenderMaterial> outlineMaterial = matManager.GetOrAddMaterial("outline_material", materialExists);
+// 
+// 		if (!materialExists)
+// 		{
+// 			outlineMaterial->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/BasicProjectionVertexShader.glsl", "../Data/Shaders/OutlineFragmentShader.glsl");
+// 		}
+// 
+// 		return outlineMaterial;
+	//}
 	}
 
 	return { nullptr };
@@ -389,26 +382,26 @@ void OpenGLRenderer::AddRenderLoadCommand(const RenderingLoadCommand & inCommand
 	LoadQueueCondition.notify_one();
 }
 
-bool OpenGLRenderer::GetOrCreateVAO(const eastl::string & inVAOId, OUT eastl::shared_ptr<VertexArrayObject>&outVAO)
+bool OpenGLRenderer::GetOrCreateContainer(const eastl::string& inInstanceName, OUT eastl::shared_ptr<RenderDataContainer>& outContainer)
 {
-	ASSERT(!inVAOId.empty());
+	ASSERT(!inInstanceName.empty());
 	std::lock_guard<std::mutex> uniqueMutex(GetVAOMutex);
 	//GetVAOMutex.lock(); // TODO: Why does this not work?
 
-	using iterator = const eastl::unordered_map<eastl::string, eastl::shared_ptr<VertexArrayObject>>::iterator;
-	const iterator& vaoIter = VAOs.find(inVAOId);
-	const bool materialExists = vaoIter != VAOs.end();
+	using iterator = const eastl::unordered_map<eastl::string, eastl::shared_ptr<RenderDataContainer>>::iterator;
+	const iterator& containerIter = RenderDataContainerMap.find(inInstanceName);
+	const bool materialExists = containerIter != RenderDataContainerMap.end();
 
 	if (materialExists)
 	{
-		outVAO = (*vaoIter).second;
+		outContainer = (*containerIter).second;
 
 		return true;
 	}
 
-	eastl::shared_ptr<VertexArrayObject> newVAO = eastl::make_shared<VertexArrayObject>();
-	VAOs[inVAOId] = newVAO;
-	outVAO = newVAO;
+	eastl::shared_ptr<RenderDataContainer> newContainer = eastl::make_shared<RenderDataContainer>();
+	RenderDataContainerMap[inInstanceName] = newContainer;
+	outContainer = newContainer;
 
 	//GetVAOMutex.unlock();
 
@@ -419,6 +412,6 @@ void OpenGLRenderer::SetViewportSizeToMain()
 {
 	const WindowsWindow& currentWindow = Engine->GetMainWindow();
 	const WindowProperties& props = currentWindow.GetProperties();
-	RHIBase::RHI->SetViewportSize(props.Width, props.Height);
+	RHI::Instance->SetViewportSize(props.Width, props.Height);
 }
 

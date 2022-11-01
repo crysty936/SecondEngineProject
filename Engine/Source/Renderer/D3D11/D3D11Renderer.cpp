@@ -265,7 +265,7 @@ D3D11Renderer::D3D11Renderer(const WindowProperties& inMainWindowProperties)
 		D3D11_RASTERIZER_DESC rastDesc = {};
 		rastDesc.FillMode = D3D11_FILL_SOLID;
 		rastDesc.CullMode = D3D11_CULL_BACK;
-		rastDesc.FrontCounterClockwise = true; // Change winding order
+		rastDesc.FrontCounterClockwise = true; // Change winding order to keep similar vertices between API's
 		rastDesc.DepthBias = 0;
 		rastDesc.SlopeScaledDepthBias = 0.0f;
 		rastDesc.DepthBiasClamp = 0.0f;

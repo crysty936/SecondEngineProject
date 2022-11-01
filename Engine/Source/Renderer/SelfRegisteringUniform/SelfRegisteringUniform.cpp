@@ -1,5 +1,4 @@
 #include "SelfRegisteringUniform.h"
-#include "Renderer/OpenGL/OpenGLShader.h"
 #include "Renderer/RHI/Resources/UniformBufferContainer.h"
 
 SelfRegisteringUniform::SelfRegisteringUniform(const uint32_t inValue)

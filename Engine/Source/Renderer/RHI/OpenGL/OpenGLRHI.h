@@ -1,16 +1,15 @@
 #pragma once
-#include "Renderer/RHI/RHIBase.h"
+#include "Renderer/RHI/RHI.h"
 #include "EASTL/string.h"
 
-class OpenGLRHI : public RHIBase
+class OpenGLRHI : public RHI
 {
 public:
 	OpenGLRHI();
 	~OpenGLRHI();
 
-	eastl::shared_ptr<class VertexBufferBase> CreateVertexBuffer(const class VertexBufferLayout& inLayout, const float* inVertices, const int32_t inCount) override;
-	eastl::shared_ptr<class VertexBufferBase> CreateVertexBuffer(const class VertexBufferLayout& inLayout, const eastl::vector<Vertex>& inVertices) override;
-
+	eastl::shared_ptr<class VertexBufferBase> CreateVertexBuffer(const class VertexBufferLayout& inLayout, const float* inVertices, const int32_t inCount, eastl::shared_ptr<class IndexBufferBase> inIndexBuffer) override;
+	eastl::shared_ptr<class VertexBufferBase> CreateVertexBuffer(const class VertexBufferLayout& inLayout, const eastl::vector<Vertex>& inVertices, eastl::shared_ptr<class IndexBufferBase> inIndexBuffer) override;
 
 	eastl::shared_ptr<class IndexBufferBase> CreateIndexBuffer(const uint32_t* inData, uint32_t inCount) override;
 
@@ -21,10 +20,13 @@ public:
 
 	void ClearColor(const glm::vec4 inColor) override;
 
+	virtual void DrawElements(const int32_t inElementsCount) override;
 
 	void SwapBuffers() override;
 
 
 	eastl::shared_ptr<class ShaderBase> CreateShaderFromSource(const eastl::string& inVertexSrc, const eastl::string& inPixelSrc) override;
 	eastl::shared_ptr<class ShaderBase> CreateShaderFromPath(const eastl::string& inVertexPath, const eastl::string& inPixelPath) override;
+
+
 };

@@ -7,9 +7,7 @@
 #include "Renderer/OpenGL/RenderCommand.h"
 #include "Renderer/OpenGL/OpenGLRenderer.h"
 #include "Renderer/RenderingPrimitives.h"
-#include "Renderer/OpenGL/Buffer/OpenGLIndexBuffer.h"
-#include "Renderer/OpenGL/Buffer/OpenGLVertexBuffer.h"
-#include "Renderer/OpenGL/Buffer/VertexArrayObject.h"
+#include "Renderer/RHI/Resources/RenderDataContainer.h"
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 
@@ -139,10 +137,10 @@ void AssimpModel3DLoader::ProcessMesh(const aiMesh& inMesh, const aiScene& inSce
 		}
 
  		//thisMaterial->Textures = std::move(textures);
- 		thisMaterial->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/WithNormalProjectionVertexShader.glsl", "../Data/Shaders/LightingTexFragmentShader.glsl");
+ 		//thisMaterial->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/WithNormalProjectionVertexShader.glsl", "../Data/Shaders/LightingTexFragmentShader.glsl");// TODO
  	}
  
-	eastl::shared_ptr<VertexArrayObject> thisVAO = nullptr;
+	//eastl::shared_ptr<VertexArrayObject> thisVAO = nullptr;// TODO
 	const eastl::string vaoName = inMesh.mName.C_Str();
 	ASSERT(false); // Not working with Generic renderer
 	//const bool existingVAO = RHI->GetOrCreateVAO(vaoName, thisVAO);
@@ -189,9 +187,11 @@ void AssimpModel3DLoader::ProcessMesh(const aiMesh& inMesh, const aiScene& inSce
 			}
 		}
 
-		OpenGLIndexBuffer ibo = OpenGLIndexBuffer{};
-		int32_t indicesCount = static_cast<int32_t>(indices.size());
-		ibo.SetIndices(indices.data(), indicesCount);
+		// TODO
+// 
+// 		OpenGLIndexBuffer ibo = OpenGLIndexBuffer{};
+// 		int32_t indicesCount = static_cast<int32_t>(indices.size());
+// 		ibo.SetIndices(indices.data(), indicesCount);
 
 		VertexBufferLayout layout;
 		// Vertex points
@@ -201,16 +201,17 @@ void AssimpModel3DLoader::ProcessMesh(const aiMesh& inMesh, const aiScene& inSce
 		// Vertex Tex Coords
 		layout.Push<float>(2);
 
-		OpenGLVertexBuffer vbo = OpenGLVertexBuffer{ ibo, layout };
-		int32_t verticesCount = static_cast<int32_t>(vertices.size());
-		vbo.SetVertices(vertices);
+		// TODO
+// 		OpenGLVertexBuffer vbo = OpenGLVertexBuffer{ ibo, layout };
+// 		int32_t verticesCount = static_cast<int32_t>(vertices.size());
+// 		vbo.SetVertices(vertices);
 
-		thisVAO->VBuffer = vbo;
+		//thisVAO->VBuffer = vbo;// TODO
 	}
 
 	RenderCommand newCommand;
 	newCommand.Material = thisMaterial;
-	newCommand.VAO = thisVAO;
+	//newCommand.VAO = thisVAO; // TODO
 	newCommand.Parent = inCurrentNode;
 	newCommand.DrawType = EDrawCallType::DrawElements;
 

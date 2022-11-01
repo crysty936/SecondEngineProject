@@ -6,7 +6,7 @@
 // This can either be subclassed by the other specific uniform buffers or it can contain 
 // the resource, by composition
 
-class UniformBufferContainer : public RHIBufferBase
+class UniformBufferContainer
 {
 public:
 

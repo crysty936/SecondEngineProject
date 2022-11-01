@@ -12,7 +12,7 @@
 #include "Renderer/Material/MaterialsManager.h"
 #include "Renderer/ForwardRenderer.h"
 #include "Window/WindowsWindow.h"
-#include "Renderer/RHI/RHIBase.h"
+#include "Renderer/RHI/RHI.h"
 
 constexpr float IdealFrameRate = 60.f;
 constexpr float IdealFrameTime = 1.0f / IdealFrameRate;
@@ -43,7 +43,7 @@ void EngineCore::Init()
 	// Hide Cursor for input
 	InputSystem::Get().SetCursorMode(Engine->MainWindow->GetHandle(), ECursorMode::Disabled);
 
-	RHIBase::Init();
+	RHI::Init();
 
 	ForwardRenderer::Init();
 	SceneManager::Init();
@@ -63,7 +63,7 @@ void EngineCore::Terminate()
 	TimersManager::Terminate();
 	SceneManager::Terminate();
 	ForwardRenderer::Terminate();
-	RHIBase::Terminate();
+	RHI::Terminate();
 	InputSystem::Terminate();
 
 	ASSERT(Engine);

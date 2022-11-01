@@ -13,6 +13,7 @@
 #include "EASTL/queue.h"
 #include "Core/EngineUtils.h"
 #include "Entity/TransformObject.h"
+#include "Renderer/RHI/Resources/RenderDataContainer.h"
 
 /**
  * TODO: A Renderer should be made and that should call whatever RHI is present.
@@ -67,7 +68,7 @@ public:
 	// Returns:   bool, true if the VAO was already present and is initialized, false otherwise
 	// Parameter: eastl::shared_ptr<VertexArrayObject> & outVAO, newly created or cached existing VAO
 	//************************************
-	bool GetOrCreateVAO(const eastl::string& inVAOId, OUT eastl::shared_ptr<VertexArrayObject>& outVAO);
+	bool GetOrCreateContainer(const eastl::string& inInstanceName, OUT eastl::shared_ptr<RenderDataContainer>& outContainer);
 	void AddMirrorCommand(const RenderCommand& inCommand);
 	inline void SetSkyboxCommand(RenderCommand inSkyboxCommand) { MainSkyboxCommand = inSkyboxCommand; }
 
@@ -85,7 +86,7 @@ private:
 	eastl::vector<RenderCommand> MainCommands;
 	EDrawMode DrawMode{ EDrawMode::NORMAL };
 	eastl::queue<RenderingLoadCommand> LoadQueue;
-	eastl::unordered_map<eastl::string, eastl::shared_ptr<class VertexArrayObject>> VAOs;
+	eastl::unordered_map<eastl::string, eastl::shared_ptr<class RenderDataContainer>> RenderDataContainerMap;
 	uint32_t AuxiliarFrameBuffer;
 	uint32_t ShadowMapBuffer;
 	eastl::shared_ptr<class OpenGLDepthMap> ShadowBufferTex;

@@ -1,10 +1,9 @@
 #pragma once
 #include "EASTL/vector.h"
 #include "EASTL/string.h"
-#include "Renderer/OpenGL/OpenGLShader.h"
-#include "Renderer/OpenGL/OpenGLTexture.h"
 #include "EASTL/shared_ptr.h"
 #include "Renderer/RHI/Resources/UniformBufferContainer.h"
+#include "EASTL/unordered_map.h"
 
 struct UniformWithFlag
 {
@@ -22,13 +21,12 @@ public:
 	virtual void Init();
 	void ResetUniforms();
 	virtual void SetRequiredUniforms();
-	virtual void SetUniforms(const eastl::unordered_map<eastl::string, struct SelfRegisteringUniform>& inUniformsCache);
-	
+	virtual void SetUniforms(eastl::unordered_map<eastl::string, struct SelfRegisteringUniform>& inUniformsCache);
 	UniformWithFlag* FindRequiredUniform(const eastl::string& inUniformName);
 
 public:
 	eastl::vector<UniformWithFlag> RequiredUniforms;
 	UniformBufferContainer UBuffer;
-	OpenGLShader Shader;
+	eastl::shared_ptr<class ShaderBase> Shader;
 	eastl::vector<eastl::shared_ptr<class OpenGLTexture>> Textures;
 };

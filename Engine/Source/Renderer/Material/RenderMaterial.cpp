@@ -29,7 +29,7 @@ void RenderMaterial::SetRequiredUniforms()
 		};
 }
 
-void RenderMaterial::SetUniforms(const eastl::unordered_map<eastl::string, SelfRegisteringUniform>& inUniformsCache)
+void RenderMaterial::SetUniforms(eastl::unordered_map<eastl::string, SelfRegisteringUniform>& inUniformsCache)
 {
 	using uniformsIterator = const eastl::unordered_map<eastl::string, SelfRegisteringUniform>::const_iterator;
 

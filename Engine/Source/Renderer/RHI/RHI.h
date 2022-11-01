@@ -6,15 +6,15 @@
 #include "glm/ext/vector_float3.hpp"
 #include "glm/ext/vector_float4.hpp"
 
-class RHIBase
+class RHI
 {
 public:
 	static void Init();
 	static void Terminate();
 
 public:
-	virtual eastl::shared_ptr<class VertexBufferBase> CreateVertexBuffer(const class VertexBufferLayout& inLayout, const float* inVertices, const int32_t inCount) { return nullptr; }
-	virtual eastl::shared_ptr<class VertexBufferBase> CreateVertexBuffer(const class VertexBufferLayout& inLayout, const eastl::vector<Vertex>& inVertices) { return nullptr; }
+	virtual eastl::shared_ptr<class VertexBufferBase> CreateVertexBuffer(const class VertexBufferLayout& inLayout, const float* inVertices, const int32_t inCount, eastl::shared_ptr<class IndexBufferBase> inIndexBuffer) { return nullptr; }
+	virtual eastl::shared_ptr<class VertexBufferBase> CreateVertexBuffer(const class VertexBufferLayout& inLayout, const eastl::vector<Vertex>& inVertices, eastl::shared_ptr<class IndexBufferBase> inIndexBuffer) { return nullptr; }
 
 	virtual eastl::shared_ptr<class IndexBufferBase> CreateIndexBuffer(const uint32_t* inData, uint32_t inCount) { return nullptr; }
 
@@ -26,8 +26,10 @@ public:
 	virtual void SetViewportSize(const int32_t inWidth, const int32_t inHeight) {}
 	virtual void ClearColor(const glm::vec4 inColor) {}
 
+	virtual void DrawElements(const int32_t inElementsCount) {}
+
 	virtual void SwapBuffers() {}
 
 public:
-	inline static class RHIBase* RHI = nullptr;
+	inline static class RHI* Instance = nullptr;
 };

@@ -1,6 +1,6 @@
 #include "UniformBufferContainer.h"
 #include "UniformBufferBase.h"
-#include "Renderer/RHI/RHIBase.h"
+#include "Renderer/RHI/RHI.h"
 
 void UniformBufferContainer::AddData(const char* inData, const size_t inSize)
 {
@@ -17,7 +17,7 @@ void UniformBufferContainer::UpdateData()
 {
 	if (!RHIBuffer)
 	{
-		RHIBuffer = RHIBase::RHI->CreateUniformBuffer(UniformsCache.size());
+		RHIBuffer = RHI::Instance->CreateUniformBuffer(UniformsCache.size());
 	}
 	RHIBuffer->SetData(UniformsCache.data(), UniformsCache.size());
 }

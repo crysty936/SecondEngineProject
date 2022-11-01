@@ -3,7 +3,6 @@
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 #include "OpenGLRenderer.h"
-#include "OpenGLShader.h"
 #include "Window/WindowsWindow.h"
 #include "Core/EngineCore.h"
 
