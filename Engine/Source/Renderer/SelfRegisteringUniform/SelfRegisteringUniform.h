@@ -1,6 +1,7 @@
 #pragma once
 #include "glm/ext/matrix_float4x4.hpp"
 #include "EASTL/string.h"
+#include "EASTL/vector.h"
 
 
 struct SelfRegisteringUniform
@@ -12,7 +13,7 @@ struct SelfRegisteringUniform
 	SelfRegisteringUniform(const glm::vec3 inValue);
 	//SelfRegisteringUniform(const OpenGLTexture& inTexture);
 
-	void Register(const eastl::string& inThisName, const class OpenGLShader& inShader) const;
+	void Register(class UniformBufferContainer& inBuffer) const;
 
 public:
 	enum class UniformType

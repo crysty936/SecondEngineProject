@@ -26,6 +26,7 @@ void TriangleShape::CreateProxy()
 	eastl::shared_ptr<VertexArrayObject> thisVAO{ nullptr };
 
 	const bool existingVAO = OpenGLRenderer::GetRHI().GetOrCreateVAO(vaoName, thisVAO); 
+	//const bool existingVAO = true; 
 
 	if (!existingVAO)
 	{
@@ -65,6 +66,8 @@ void TriangleShape::CreateProxy()
 
 		cubeMaterial->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/OpenGL/BasicProjectionVertexShader.glsl", "../Data/Shaders/OpenGL/FragmentShader_ColorBasedOnPosition.glsl");
 	}
+
+	//TODO: Same system with uniform cache array and shaders have the ones that they need and put them into a char buffer and then into uniform buffer(opengl) or constant buffer(direct3d) and then set then
 
 	RenderCommand newCommand;
 	newCommand.Material = cubeMaterial;

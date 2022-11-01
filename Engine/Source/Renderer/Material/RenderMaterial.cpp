@@ -20,6 +20,7 @@ void RenderMaterial::ResetUniforms()
 
 void RenderMaterial::SetRequiredUniforms()
 {
+	// !! These have to be in the same order as they are in the shader
 	// Default uniforms
 	RequiredUniforms = {
 		{"projection"},
@@ -31,6 +32,9 @@ void RenderMaterial::SetRequiredUniforms()
 void RenderMaterial::SetUniforms(const eastl::unordered_map<eastl::string, SelfRegisteringUniform>& inUniformsCache)
 {
 	using uniformsIterator = const eastl::unordered_map<eastl::string, SelfRegisteringUniform>::const_iterator;
+
+	UBuffer.Clear();
+
 	// Register all required uniforms
 	for (UniformWithFlag& requiredUniform : RequiredUniforms)
 	{
@@ -48,9 +52,11 @@ void RenderMaterial::SetUniforms(const eastl::unordered_map<eastl::string, SelfR
 		}
 
 		const SelfRegisteringUniform& selfRegisteringUniform = (*iter).second;
-		selfRegisteringUniform.Register(requiredUniform.UniformName, Shader);
+		selfRegisteringUniform.Register(UBuffer);
 		requiredUniform.IsSet = true;
 	}
+
+	UBuffer.UpdateData();
 }
 
 UniformWithFlag* RenderMaterial::FindRequiredUniform(const eastl::string& inUniformName)

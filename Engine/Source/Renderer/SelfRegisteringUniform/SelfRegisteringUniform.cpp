@@ -1,5 +1,6 @@
 #include "SelfRegisteringUniform.h"
 #include "Renderer/OpenGL/OpenGLShader.h"
+#include "Renderer/RHI/Resources/UniformBufferContainer.h"
 
 SelfRegisteringUniform::SelfRegisteringUniform(const uint32_t inValue)
 	: Type{ UniformType::Uniform1ui }, Value{ inValue } {}
@@ -19,29 +20,45 @@ SelfRegisteringUniform::SelfRegisteringUniform(const glm::vec3 inValue)
 SelfRegisteringUniform::SelfRegisteringUniform()
 	: Type{}, Value{} {}
 
-
-void SelfRegisteringUniform::Register(const eastl::string& inThisName, const OpenGLShader& inShader) const
+void SelfRegisteringUniform::Register(UniformBufferContainer& inBuffer) const
 {
 	switch (Type)
 	{
 	case UniformType::Uniform1f:
 	{
-		inShader.SetUniformValue1f(inThisName, Value.Value1f);
+		constexpr size_t thisSize = sizeof(float);
+		char thisData[thisSize];
+		memcpy(&thisData, &Value.Value1f, thisSize);
+
+		inBuffer.AddData(thisData, thisSize);
+
 		break;
 	}
 	case UniformType::Uniform4fv:
 	{
-		inShader.SetUniformValue4fv(inThisName, Value.Value4fv);
+		constexpr size_t thisSize = sizeof(float) * 4 * 4;
+		char thisData[thisSize];
+		memcpy(&thisData, &Value.Value4fv, thisSize);
+
+		inBuffer.AddData(thisData, thisSize);
 		break;
 	}
 	case UniformType::Uniform1ui:
 	{
-		inShader.SetUniformValue1i(inThisName, Value.Value1ui);
+		constexpr size_t thisSize = sizeof(uint32_t);
+		char thisData[thisSize];
+		memcpy(&thisData, &Value.Value1ui, thisSize);
+
+		inBuffer.AddData(thisData, thisSize);
 		break;
 	}
 	case UniformType::Uniform3f:
 	{
-		inShader.SetUniformValue3f(inThisName, Value.Value3f.x, Value.Value3f.y, Value.Value3f.z);
+		constexpr size_t thisSize = sizeof(float) * 4; // vec3 has the same alignment as vec4 in GLSL, TODO: Test if this applies in HLSL as well
+		char thisData[thisSize];
+		memcpy(&thisData, &Value.Value3f, thisSize);
+
+		inBuffer.AddData(thisData, thisSize);
 		break;
 	}
 	}

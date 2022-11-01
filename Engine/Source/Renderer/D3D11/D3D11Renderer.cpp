@@ -51,7 +51,7 @@ struct ConstantBuffer
 	DirectX::XMMATRIX mProjection;
 };
 
-// Works just for ortographic
+// Works just for ortographic, TODO test for perspective more like the Unreal PrepareProjectionForRHI thing
 glm::mat4 mirrorMatrix = {
 	1.f, 0.f, 0.f, 0.f,
 	0.f, 1.f, 0.f, 0.f,
@@ -68,6 +68,9 @@ glm::mat4 remapZMatrix = {
 
 D3D11Renderer::D3D11Renderer(const WindowProperties& inMainWindowProperties)
 {
+	triangle->Move(glm::vec3(0.f, 5.f, 1.f));
+
+
 	HRESULT hr = S_OK;
 
 	RECT rc;
@@ -342,9 +345,9 @@ void D3D11Renderer::Draw()
 	// Update variables
 	//
 	ConstantBuffer cb;
-	cb.mWorld = XMMatrixTranspose(g_World);
-	cb.mView = XMMatrixTranspose(g_View);
-	cb.mProjection = XMMatrixTranspose(g_Projection);
+	cb.mWorld = (g_World);
+	cb.mView = (g_View);
+	cb.mProjection = (g_Projection);
 	g_pImmediateContext->UpdateSubresource(g_pConstantBuffer, 0, NULL, &cb, 0, 0);
 
 

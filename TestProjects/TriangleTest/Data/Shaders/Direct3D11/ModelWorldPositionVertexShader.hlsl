@@ -16,9 +16,14 @@ struct VS_INPUT
 
 float4 VS(VS_INPUT input) : SV_POSITION
 {
-	float4 output = mul(input.Pos, World);
-	output = mul(output, View);
-	output = mul(output, Projection);
+	//float4 output = mul(input.Pos, World);
+	//output = mul(output, View);
+	//output = mul(output, Projection);
+
+	float4 output = mul(World, input.Pos);
+	output = mul(View, output);
+	output = mul(Projection, output);
+
 
     return output;
 }

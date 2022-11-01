@@ -8,6 +8,7 @@
 #include "Renderer/RHI/Resources/OpenGL/GLIndexBuffer.h"
 #include "Renderer/RHI/Resources/OpenGL/GLShader.h"
 #include "Utils/IOUtils.h"
+#include "Renderer/RHI/Resources/OpenGL/GLUniformBuffer.h"
 
 namespace GLUtils
 {
@@ -192,8 +193,8 @@ namespace GLUtils
 
 		// Specify that we want to create an OpenGL 3.3 core profile context
 		int gl33_attribs[] = {
-			WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
-			WGL_CONTEXT_MINOR_VERSION_ARB, 3,
+			WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
+			WGL_CONTEXT_MINOR_VERSION_ARB, 2,
 			WGL_CONTEXT_PROFILE_MASK_ARB,  WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
 			0,
 		};
@@ -251,8 +252,8 @@ OpenGLRHI::OpenGLRHI()
 	glFrontFace(GL_CCW);
 	glCullFace(GL_BACK);
 
-	glGenVertexArrays(1, &GlobalVAOHandle);
-	glBindVertexArray(GlobalVAOHandle);
+	glGenVertexArrays(1, &GLUtils::GlobalVAOHandle);
+	glBindVertexArray(GLUtils::GlobalVAOHandle);
 }
 
 OpenGLRHI::~OpenGLRHI() = default;
@@ -281,6 +282,22 @@ eastl::shared_ptr<IndexBufferBase> OpenGLRHI::CreateIndexBuffer(const uint32_t* 
 	buffer->IndexCount = inCount;
 
 	return buffer;
+}
+
+eastl::shared_ptr<UniformBufferBase> OpenGLRHI::CreateUniformBuffer(size_t inSize)
+{
+	uint32_t bufferHandle = 0;
+	glGenBuffers(1, &bufferHandle);
+	ASSERT(bufferHandle != -1);
+
+	glBindBuffer(GL_UNIFORM_BUFFER, bufferHandle);
+	glBufferData(GL_UNIFORM_BUFFER, inSize, NULL, GL_STATIC_DRAW);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	glBindBufferRange(GL_UNIFORM_BUFFER, 0, bufferHandle, 0, inSize);
+
+	eastl::shared_ptr<GlUniformBuffer> newBuffer = eastl::make_shared<GlUniformBuffer>(bufferHandle);
+
+	return newBuffer;
 }
 
 void OpenGLRHI::SetViewportSize(const int32_t inWidth, const int32_t inHeight)

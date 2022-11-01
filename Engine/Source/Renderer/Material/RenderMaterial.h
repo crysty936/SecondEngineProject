@@ -4,6 +4,7 @@
 #include "Renderer/OpenGL/OpenGLShader.h"
 #include "Renderer/OpenGL/OpenGLTexture.h"
 #include "EASTL/shared_ptr.h"
+#include "Renderer/RHI/Resources/UniformBufferContainer.h"
 
 struct UniformWithFlag
 {
@@ -27,6 +28,7 @@ public:
 
 public:
 	eastl::vector<UniformWithFlag> RequiredUniforms;
+	UniformBufferContainer UBuffer;
 	OpenGLShader Shader;
 	eastl::vector<eastl::shared_ptr<class OpenGLTexture>> Textures;
 };

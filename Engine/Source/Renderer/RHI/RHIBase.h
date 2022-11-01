@@ -18,6 +18,8 @@ public:
 
 	virtual eastl::shared_ptr<class IndexBufferBase> CreateIndexBuffer(const uint32_t* inData, uint32_t inCount) { return nullptr; }
 
+	virtual eastl::shared_ptr<class UniformBufferBase> CreateUniformBuffer(size_t inSize) { return nullptr; }
+
 	virtual eastl::shared_ptr<class ShaderBase> CreateShaderFromSource(const eastl::string& inVertexSrc, const eastl::string& inPixelSrc) { return nullptr; }
 	virtual eastl::shared_ptr<class ShaderBase> CreateShaderFromPath(const eastl::string& inVertexPath, const eastl::string& inPixelPath) { return nullptr; }
 
