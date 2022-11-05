@@ -22,16 +22,12 @@
 #include "Renderer/Drawable/DepthMaterial.h"
 #include "Core/WindowsPlatform.h"
 
-#include <windows.h>
 #include "InputSystem/InputType.h"
 #include "Window/WindowsWindow.h"
 #include "InputSystem/InputSystem.h"
 
-#if WITH_GLFW
-#include "GLFW/glfw3.h"
-#endif
 #include "Renderer/RHI/RHI.h"
-#include "Renderer/RHI/Resources/ShaderBase.h"
+#include "Renderer/RHI/Resources/RHIShader.h"
 
 constexpr glm::vec4 ClearColor(0.3f, 0.5f, 1.f, 0.4f);
 constexpr glm::vec3 lightPos(-10.0f, 10.0f, -1.0f);
@@ -89,11 +85,6 @@ void OpenGLRenderer::Init(const WindowProperties & inMainWindowProperties)
 void OpenGLRenderer::Terminate()
 {
 
-#if WITH_GLFW
-	GLRenderer->GLWindow.reset();
-	glfwTerminate();
-#endif;
-
 	glDeleteBuffers(1, &GLRenderer->AuxiliarFrameBuffer);
 
 	ASSERT(GLRenderer);
@@ -118,10 +109,6 @@ void OpenGLRenderer::Draw()
 	RenderCommandsMutex.unlock();
 
 	RHI::Instance->SwapBuffers();
-
-#if WITH_GLFW
-	glfwSwapBuffers(GLWindow->GetHandle());
-#endif
 
 }
 
@@ -214,36 +201,8 @@ void OpenGLRenderer::DrawCommand(const RenderCommand & inCommand)
 		return;
 	}
 
-	{
-		dataContainer->VBuffer->Bind();
-
-		const VertexBufferLayout& layout = dataContainer->VBuffer->GetLayout();
-		const eastl::vector<VertexLayoutProperties>& props = layout.GetProperties();
-
-		size_t offset = 0;
-		for (int32_t i = 0; i < props.size(); i++)
-		{
-			const VertexLayoutProperties& prop = props[i];
-
-			void* offsetPtr = reinterpret_cast<void*>(offset);
-			uint32_t glType = 0;
-
-			switch (prop.Type)
-			{
-			case VertexPropertyType::UInt:
-				glType = GL_UNSIGNED_INT;
-				break;
-			case VertexPropertyType::Float:
-				glType = GL_FLOAT;
-				break;
-			}
-
-			glVertexAttribPointer(i, prop.Count, glType, prop.bNormalized, layout.GetStride(), offsetPtr);
-			glEnableVertexAttribArray(i);
-
-			offset += prop.Count * prop.GetSizeOfType();
-		}
-	}
+	dataContainer->VBuffer->Bind();
+	dataContainer->VBuffer->ApplyLayout();
 
 	material->Shader->Bind();
 	material->ResetUniforms();

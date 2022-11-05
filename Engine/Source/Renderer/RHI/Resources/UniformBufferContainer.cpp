@@ -1,5 +1,5 @@
 #include "UniformBufferContainer.h"
-#include "UniformBufferBase.h"
+#include "RHIUniformBuffer.h"
 #include "Renderer/RHI/RHI.h"
 
 void UniformBufferContainer::AddData(const char* inData, const size_t inSize)

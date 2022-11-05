@@ -16,6 +16,6 @@ public:
 
 public:
 	eastl::vector<char> UniformsCache;
-	eastl::shared_ptr<class UniformBufferBase> RHIBuffer;
+	eastl::shared_ptr<class RHIUniformBuffer> RHIBuffer;
 	size_t Counter = 0;
 };

@@ -8,10 +8,6 @@
 #include "Core/WindowsPlatform.h"
 #include "Core/EngineCore.h"
 
-#if WITH_GLFW
-#include "GLFW/glfw3.h"
-#endif
-
 using KeyDelegate = MulticastDelegate<EInputKey, EInputType>;
 using MousePosDelegate = MulticastDelegate<float, float>;
 using MouseScrollDelegate = MulticastDelegate<float>;
@@ -37,8 +33,6 @@ public:
 
 	void SetCursorMode(void* inWindowHandle, const ECursorMode inMode);
 
-	void RegisterCallbacksGLFW(class OpenGLWindow& inWindow);
-
 	bool OngoingFrameAction = false;
 	bool CursorsTracked = false;
 	ECursorMode CurrentCursorMode = ECursorMode::Enabled;
@@ -48,10 +42,6 @@ public:
 private:
 	void OnKeyPressedLog(EInputKey inKeyCode, EInputType inEventType);
 	static void KeyCallback(EInputKey inKey, EInputType inAction);
-#if WITH_GLFW
-	static void GLFWKeyCallback(GLFWwindow*, int32_t inKeycode, int32_t inScanCode, int32_t inAction, int32_t inMods);
-	static void MousePosChangedCallbackOpenGL(GLFWwindow*, const double inNewYaw, const double inNewPitch);
-#endif
 	static void MousePosChangedCallback(const double inNewYaw, const double inNewPitch);
 	static void MouseScrollCallback(double xoffset, double yoffset);
 

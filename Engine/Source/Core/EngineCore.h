@@ -2,8 +2,6 @@
 #include "EASTL/vector.h"
 #include "EASTL/shared_ptr.h"
 
-#define WITH_GLFW 0
-
 class EngineCore
 {
 public:

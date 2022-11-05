@@ -3,7 +3,6 @@
 #include "Renderer/OpenGL/OpenGLRenderer.h"
 #include "Window/WindowsWindow.h"
 #include "Core/EngineCore.h"
-#include "Window/OpenGLWindow.h"
 
 InputSystem* InputSystem::Instance;
 
@@ -17,40 +16,6 @@ void InputSystem::KeyCallback(EInputKey inKey, EInputType inAction)
 	instance.OnKeyInputDelegate.Invoke(inKey, inAction);
 	LOG_INFO("Key input received for key %d with action: %s", static_cast<int16_t>(inKey), ToString(inAction));
 }
-
-#if WITH_GLFW
-
-void InputSystem::GLFWKeyCallback(GLFWwindow*, int32_t inKeycode, int32_t inScanCode, int32_t inAction, int32_t inMods)
-{
-	InputSystem& instance = InputSystem::Get();
-
-	const EInputKey code = static_cast<EInputKey>(inKeycode);
-
-	EInputType actionType = EInputType::None;
-
-	switch (inAction)
-	{
-	case GLFW_PRESS:
-		actionType = EInputType::InputPress;
-		break;
-	case GLFW_RELEASE:
-		actionType = EInputType::InputRelease;
-		break;
-	case GLFW_REPEAT:
-		actionType = EInputType::InputRepeat;
-		break;
-	default:
-		break;
-	}
-
-	KeyCallback(code, actionType);
-}
-
-void InputSystem::MousePosChangedCallbackOpenGL(GLFWwindow*, double inNewYaw, double inNewPitch)
-{
-	MousePosChangedCallback(inNewYaw, inNewPitch);
-}
-#endif
 
 void InputSystem::MousePosChangedCallback(const double inNewYaw, const double inNewPitch)
 {
@@ -68,17 +33,6 @@ void InputSystem::MouseScrollCallback(double xoffset, double yoffset)
 	Instance->OnMouseScrollDelegate.Invoke(yFloat);
 }
 
-#if WITH_GLFW
-void InputSystem::RegisterCallbacksGLFW(OpenGLWindow& inWindow)
-{
-	//  	Instance->OnKeyInputDelegate.BindRaw(Instance, &InputSystem::OnKeyPressedLog);
-	//glfwSetKeyCallback(inWindow.GetHandle(), &GLFWKeyCallback);
-	glfwSetCursorPosCallback(inWindow.GetHandle(), &MousePosChangedCallbackOpenGL);
-	// 	glfwSetScrollCallback(mainWindow.GetHandle(), &MouseScrollCallback);
-
-}
-#endif
-
 void InputSystem::Init()
 {
 	Instance = new InputSystem{};
@@ -93,13 +47,7 @@ void InputSystem::Terminate()
 
 void InputSystem::PollEvents()
 {
-
-#if WITH_GLFW
-	glfwPollEvents();
-#else
 	WindowsPlatform::PoolMessages();
-#endif
-
 }
 
 void InputSystem::SetCursorMode(void* inWindowHandle, const ECursorMode inMode)

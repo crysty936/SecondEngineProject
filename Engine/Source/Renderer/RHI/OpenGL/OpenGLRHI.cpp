@@ -1,15 +1,16 @@
 #include "OpenGLRHI.h"
-#include "glad/glad.h"
+#include <windows.h>
+
 #include "Core/EngineUtils.h"
 #include "Core/EngineCore.h"
 #include "Window/WindowsWindow.h"
-
-#include <windows.h>
 #include "Renderer/RHI/Resources/OpenGL/GLIndexBuffer.h"
 #include "Renderer/RHI/Resources/OpenGL/GLShader.h"
 #include "Utils/IOUtils.h"
 #include "Renderer/RHI/Resources/OpenGL/GLUniformBuffer.h"
 #include "Renderer/RHI/Resources/OpenGL/GLVertexBuffer.h"
+
+#include "glad/glad.h"
 
 namespace GLUtils
 {
@@ -259,7 +260,7 @@ OpenGLRHI::OpenGLRHI()
 
 OpenGLRHI::~OpenGLRHI() = default;
 
-eastl::shared_ptr<VertexBufferBase> OpenGLRHI::CreateVertexBuffer(const VertexBufferLayout& inLayout, const float* inVertices, const int32_t inCount, eastl::shared_ptr<IndexBufferBase> inIndexBuffer)
+eastl::shared_ptr<RHIVertexBuffer> OpenGLRHI::CreateVertexBuffer(const VertexBufferLayout& inLayout, const float* inVertices, const int32_t inCount, eastl::shared_ptr<IndexBufferBase> inIndexBuffer)
 {
 	uint32_t handle = 0;
 	glGenBuffers(1, &handle);
@@ -271,7 +272,7 @@ eastl::shared_ptr<VertexBufferBase> OpenGLRHI::CreateVertexBuffer(const VertexBu
 	return newBuffer;
 }
 
-eastl::shared_ptr<VertexBufferBase> OpenGLRHI::CreateVertexBuffer(const VertexBufferLayout& inLayout, const eastl::vector<Vertex>& inVertices, eastl::shared_ptr<IndexBufferBase> inIndexBuffer)
+eastl::shared_ptr<RHIVertexBuffer> OpenGLRHI::CreateVertexBuffer(const VertexBufferLayout& inLayout, const eastl::vector<Vertex>& inVertices, eastl::shared_ptr<IndexBufferBase> inIndexBuffer)
 {
 	uint32_t handle = 0;
 	glGenBuffers(1, &handle);
@@ -298,7 +299,7 @@ eastl::shared_ptr<IndexBufferBase> OpenGLRHI::CreateIndexBuffer(const uint32_t* 
 	return buffer;
 }
 
-eastl::shared_ptr<UniformBufferBase> OpenGLRHI::CreateUniformBuffer(size_t inSize)
+eastl::shared_ptr<RHIUniformBuffer> OpenGLRHI::CreateUniformBuffer(size_t inSize)
 {
 	uint32_t bufferHandle = 0;
 	glGenBuffers(1, &bufferHandle);
@@ -364,7 +365,7 @@ uint32_t CreateShaderInternal(const eastl::string& Source, uint32_t ShaderType)
 	return shaderHandle;
 }
 
-eastl::shared_ptr<class ShaderBase> OpenGLRHI::CreateShaderFromSource(const eastl::string& inVertexSrc, const eastl::string& inPixelSrc)
+eastl::shared_ptr<class RHIShader> OpenGLRHI::CreateShaderFromSource(const eastl::string& inVertexSrc, const eastl::string& inPixelSrc)
 {
 
 	// Create an empty vertex shader handle
@@ -417,7 +418,7 @@ eastl::shared_ptr<class ShaderBase> OpenGLRHI::CreateShaderFromSource(const east
 	return newShader;
 }
 
-eastl::shared_ptr<class ShaderBase> OpenGLRHI::CreateShaderFromPath(const eastl::string& inVertexPath, const eastl::string& inPixelPath)
+eastl::shared_ptr<class RHIShader> OpenGLRHI::CreateShaderFromPath(const eastl::string& inVertexPath, const eastl::string& inPixelPath)
 {
 	eastl::string vertexShaderCode;
 	eastl::string fragmentShaderCode;

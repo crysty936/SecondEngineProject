@@ -1,5 +1,4 @@
 #pragma once
-#include "Window/OpenGLWindow.h"
 #include "EASTL/unique_ptr.h"
 #include "EASTL/shared_ptr.h"
 #include "EASTL/vector.h"
@@ -14,10 +13,11 @@
 #include "Core/EngineUtils.h"
 #include "Entity/TransformObject.h"
 #include "Renderer/RHI/Resources/RenderDataContainer.h"
+#include "Window/WindowProperties.h"
 
 /**
  * TODO: A Renderer should be made and that should call whatever RHI is present.
- * Also, Renderers should be differentiated between 2D and 3D because optimizations can be made for 2D only renderers
+ * Also, Renderers should be differentiated between 2D and 3D because optimizations can be made for 2D only renderers (and view(pixel perfect))
  */
 
 using LoadRenderResourceDelegate = Delegate<void, eastl::string, eastl::shared_ptr<class TransformObject>>;
@@ -72,7 +72,7 @@ public:
 	void AddMirrorCommand(const RenderCommand& inCommand);
 	inline void SetSkyboxCommand(RenderCommand inSkyboxCommand) { MainSkyboxCommand = inSkyboxCommand; }
 
-	inline static OpenGLRenderer& GetRHI() { ASSERT(GLRenderer); return *GLRenderer; }
+	inline static OpenGLRenderer& Get() { ASSERT(GLRenderer); return *GLRenderer; }
 
 private:
 	inline static OpenGLRenderer* GLRenderer = nullptr;
@@ -81,7 +81,6 @@ private:
 	void SetViewportSizeToMain();
 
 private:
-	eastl::unique_ptr<class OpenGLWindow> GLWindow;
 	eastl::unordered_map<eastl::string, SelfRegisteringUniform> UniformsCache;
 	eastl::vector<RenderCommand> MainCommands;
 	EDrawMode DrawMode{ EDrawMode::NORMAL };
@@ -93,6 +92,5 @@ private:
 	RenderCommand MainSkyboxCommand;
 };
 
-extern GLFWwindow* LoadingThreadContext;
 extern const uint32_t SHADOW_WIDTH;
 extern const uint32_t SHADOW_HEIGHT;

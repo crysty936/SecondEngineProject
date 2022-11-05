@@ -1,5 +1,5 @@
 #include "RHI.h"
-#include "Renderer/ForwardRenderer.h"
+#include "Renderer/TempRenderWrapper.h"
 #include "OpenGL/OpenGLRHI.h"
 
  #define RENDERERGL 1

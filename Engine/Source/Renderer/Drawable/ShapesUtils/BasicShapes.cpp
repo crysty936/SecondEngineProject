@@ -10,7 +10,7 @@
 #include "Renderer/Drawable/SkyboxMaterial.h"
 #include "Renderer/Drawable/WithShadowMaterial.h"
 #include "glad/glad.h"
-#include "Renderer/RHI/Resources/VertexBufferBase.h"
+#include "Renderer/RHI/Resources/RHIVertexBuffer.h"
 #include "Renderer/RHI/RHI.h"
 #include "Renderer/RHI/Resources/IndexBufferBase.h"
 
@@ -22,8 +22,7 @@ void TriangleShape::CreateProxy()
 	const eastl::string vaoName = "triangleVAO";
 	eastl::shared_ptr<RenderDataContainer> dataContainer{ nullptr };
 
-	const bool existingVAO = OpenGLRenderer::GetRHI().GetOrCreateContainer(vaoName, dataContainer);
-	//const bool existingVAO = true; 
+	const bool existingVAO = OpenGLRenderer::Get().GetOrCreateContainer(vaoName, dataContainer);
 
 	if (!existingVAO)
 	{
@@ -38,34 +37,32 @@ void TriangleShape::CreateProxy()
 		//layout.Push<float>(2);
 
  		const int32_t verticesCount = BasicShapesData::GetTriangleVerticesCount();
-		const eastl::shared_ptr<VertexBufferBase> vb = RHI::Instance->CreateVertexBuffer(layout, BasicShapesData::GetTriangleVertices(), verticesCount, ib);
+		const eastl::shared_ptr<RHIVertexBuffer> vb = RHI::Instance->CreateVertexBuffer(layout, BasicShapesData::GetTriangleVertices(), verticesCount, ib);
 
 		dataContainer->VBuffer = vb;
 	}
 
 	MaterialsManager& matManager = MaterialsManager::Get();
 	bool materialExists = false;
-	eastl::shared_ptr<RenderMaterial> cubeMaterial = matManager.GetOrAddMaterial("square_material", materialExists);
+	eastl::shared_ptr<RenderMaterial> material = matManager.GetOrAddMaterial("square_material", materialExists);
 
 	if (!materialExists)
 	{
 		//eastl::string texturePath = "../Data/Textures/openGLExampleTransparentWindow.png";
 		//eastl::shared_ptr<OpenGLTexture> tex = eastl::make_shared<OpenGLTexture>("DiffuseMap");
 		//tex->Init(texturePath);
-		//cubeMaterial->Textures.push_back(std::move(tex));
+		//material->Textures.push_back(std::move(tex));
 
-		//eastl::shared_ptr<ShaderBase> shader = RHIBase::RHI->CreateShaderFromPath("../Data/Shaders/OpenGL/BasicProjectionVertexShader.glsl", "../Data/Shaders/OpenGL/FragmentShader_ColorBasedOnPosition.glsl");
-
-		cubeMaterial->Shader = RHI::Instance->CreateShaderFromPath("../Data/Shaders/OpenGL/BasicProjectionVertexShader.glsl", "../Data/Shaders/OpenGL/FragmentShader_ColorBasedOnPosition.glsl");
+		material->Shader = RHI::Instance->CreateShaderFromPath("../Data/Shaders/OpenGL/BasicProjectionVertexShader.glsl", "../Data/Shaders/OpenGL/FragmentShader_ColorBasedOnPosition.glsl");
 	}
 
 	RenderCommand newCommand;
-	newCommand.Material = cubeMaterial;
+	newCommand.Material = material;
 	newCommand.DataContainer = dataContainer;
 	newCommand.Parent = this_shared(this);
 	newCommand.DrawType = EDrawCallType::DrawElements;
 
-	OpenGLRenderer::GetRHI().AddCommand(newCommand);
+	OpenGLRenderer::Get().AddCommand(newCommand);
 }
 
 
@@ -74,53 +71,49 @@ SquareShape::~SquareShape() = default;
 
 void SquareShape::CreateProxy()
 {
-// 	const eastl::string vaoName = "squareVAO";
-// 	eastl::shared_ptr<VertexArrayObject> thisVAO{ nullptr };
-// 	ASSERT(false); // Not working with Generic renderer
-// 	//const bool existingVAO = RHI->GetOrCreateVAO(vaoName, thisVAO); 
-// 	const bool existingVAO = false;
-// 
-// 	if (!existingVAO)
-// 	{
-// 		// TODO: Buffers creation should be delegated to the renderer
-// 		OpenGLIndexBuffer ibo = OpenGLIndexBuffer{};
-// 		int32_t indicesCount = BasicShapesData::GetSquareIndicesCount();
-// 		ibo.SetIndices(BasicShapesData::GetSquareIndices(), indicesCount);
-// 
-// 		VertexBufferLayout layout;
-// 		// Vertex points
-// 		layout.Push<float>(3);
-// 		// Vertex Tex Coords
-// 		layout.Push<float>(2);
-// 
-// 		OpenGLVertexBuffer vbo = OpenGLVertexBuffer{ ibo, layout };
-// 		int32_t verticesCount = BasicShapesData::GetSquareVerticesCount();
-// 		vbo.SetData(BasicShapesData::GetSquareVertices(), verticesCount);
-// 
-// 		//thisVAO->VBuffer = vbo;// TODO
-// 	}
-// 
-// 	MaterialsManager& matManager = MaterialsManager::Get();
-// 	bool materialExists = false;
-// 	eastl::shared_ptr<RenderMaterial> cubeMaterial = matManager.GetOrAddMaterial("square_material", materialExists);
-// 
-// 	if (!materialExists)
-// 	{
-// 		//eastl::string texturePath = "../Data/Textures/openGLExampleTransparentWindow.png";
-// 		//eastl::shared_ptr<OpenGLTexture> tex = eastl::make_shared<OpenGLTexture>("DiffuseMap");
-// 		//tex->Init(texturePath);
-// 		//cubeMaterial->Textures.push_back(std::move(tex));
-// 		cubeMaterial->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/BasicProjectionVertexShader.glsl", "../Data/Shaders/BasicTexFragmentShader.glsl");
-// 	}
-// 
-// 	RenderCommand newCommand;
-// 	newCommand.Material = cubeMaterial;
-// 	newCommand.VAO = thisVAO;
-// 	newCommand.Parent = this_shared(this);
-// 	newCommand.DrawType = EDrawCallType::DrawElements;
-// 
-// 	ASSERT(false); // Not working with Generic renderer
-// 	//RHI->AddCommand(newCommand);
+ 	const eastl::string vaoName = "squareVAO";
+	eastl::shared_ptr<RenderDataContainer> dataContainer{ nullptr };
+
+	const bool existingVAO = OpenGLRenderer::Get().GetOrCreateContainer(vaoName, dataContainer);
+ 
+ 	if (!existingVAO)
+ 	{
+ 		int32_t indicesCount = BasicShapesData::GetSquareIndicesCount();
+		eastl::shared_ptr<IndexBufferBase> ib = RHI::Instance->CreateIndexBuffer(BasicShapesData::GetSquareIndices(), indicesCount);
+
+ 		VertexBufferLayout layout;
+ 		// Vertex points
+ 		layout.Push<float>(3);
+ 		// Vertex Tex Coords
+ 		layout.Push<float>(2);
+ 
+ 		int32_t verticesCount = BasicShapesData::GetSquareVerticesCount();
+		const eastl::shared_ptr<RHIVertexBuffer> vb = RHI::Instance->CreateVertexBuffer(layout, BasicShapesData::GetSquareVertices(), verticesCount, ib);
+
+		dataContainer->VBuffer = vb;
+	}
+ 
+ 	MaterialsManager& matManager = MaterialsManager::Get();
+ 	bool materialExists = false;
+ 	eastl::shared_ptr<RenderMaterial> material = matManager.GetOrAddMaterial("square_material", materialExists);
+ 
+ 	if (!materialExists)
+ 	{
+ 		//eastl::string texturePath = "../Data/Textures/openGLExampleTransparentWindow.png";
+ 		//eastl::shared_ptr<OpenGLTexture> tex = eastl::make_shared<OpenGLTexture>("DiffuseMap");
+ 		//tex->Init(texturePath);
+ 		//material->Textures.push_back(std::move(tex));
+
+		material->Shader = RHI::Instance->CreateShaderFromPath("../Data/Shaders/OpenGL/BasicProjectionVertexShader.glsl", "../Data/Shaders/OpenGL/FragmentShader_ColorBasedOnPosition.glsl");
+	}
+ 
+ 	RenderCommand newCommand;
+ 	newCommand.Material = material;
+ 	newCommand.DataContainer = dataContainer;
+ 	newCommand.Parent = this_shared(this);
+ 	newCommand.DrawType = EDrawCallType::DrawElements;
+ 
+	OpenGLRenderer::Get().AddCommand(newCommand);
 }
 
 eastl::shared_ptr<SquareShape> BasicShapes::CreateSquareObject(eastl::string inTexturePath)
@@ -147,60 +140,60 @@ CubeShape::~CubeShape() = default;
 
 void CubeShape::CreateProxy()
 {
-// 	const eastl::string vaoName = "cubeVAO";
-// 	eastl::shared_ptr<VertexArrayObject> thisVAO{ nullptr };
+//  	const eastl::string vaoName = "cubeVAO";
+// 	eastl::shared_ptr<RenderDataContainer> dataContainer{ nullptr };
 // 
-// 	//TODO: Make work with generic renderer
-// 	const bool existingVAO = OpenGLRenderer::GetRHI().GetOrCreateVAO(vaoName, thisVAO); 
+//  	//TODO: Make work with generic renderer
+// 	const bool existingVAO = OpenGLRenderer::GetRHI().GetOrCreateContainer(vaoName, dataContainer);
 // 	if (!existingVAO)
-// 	{
-// 		// TODO: Buffers creation should be delegated to the renderer
-// 		OpenGLIndexBuffer ibo = OpenGLIndexBuffer{};
-// 		int32_t indicesCount = BasicShapesData::GetCubeIndicesCount();
-// 		ibo.SetIndices(BasicShapesData::GetCubeIndices(), indicesCount);
-// 
-// 		VertexBufferLayout layout;
-// 		// Vertex points
-// 		layout.Push<float>(3);
-// 		// Normals
-// 		layout.Push<float>(3);
-// 		// Vertex Tex Coords
-// 		layout.Push<float>(2);
-// 
-// 		OpenGLVertexBuffer vbo = OpenGLVertexBuffer{ ibo, layout };
-// 		int32_t verticesCount = BasicShapesData::GetCubeVerticesCount();
-// 		vbo.SetData(BasicShapesData::GetCubeVertices(), verticesCount);
-// 
-// 		//thisVAO->VBuffer = vbo;// TODO
-// 	}
-// 
-// 	MaterialsManager& matManager = MaterialsManager::Get();
-// 	bool materialExists = false;
-// 	//eastl::shared_ptr<RenderMaterial> cubeMaterial = matManager.GetOrAddMaterial<WithShadowMaterial>("cube_material", materialExists);
-// 	// TODO: Shadow disabled for now
-// 	eastl::shared_ptr<RenderMaterial> cubeMaterial = matManager.GetOrAddMaterial<RenderMaterial>("cube_material", materialExists);
-// 
-// 	if (!materialExists)
-// 	{
-// 		eastl::string texturePath = "../Data/Textures/MinecraftGrass.jpg";
-// 		eastl::shared_ptr<OpenGLTexture> tex = eastl::make_shared<OpenGLTexture>("DiffuseMap");
-// 		tex->Init(texturePath);
-// 		cubeMaterial->Textures.push_back(std::move(tex));
-// 		cubeMaterial->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/BasicPerspVertexShader.glsl", "../Data/Shaders/BasicTexFragmentShader.glsl");
-// 		//cubeMaterial->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/WithNormalProjectionVertexShader.glsl", "../Data/Shaders/LightingTexFragmentShader.glsl");
-// 	}
-// 
-// 	eastl::shared_ptr<MeshNode> cubeNode = eastl::make_shared<MeshNode>();
-// 	AddChild(cubeNode);
-// 
-// 	RenderCommand newCommand;
-// 	newCommand.Material = cubeMaterial;
-// 	newCommand.VAO = thisVAO;
-// 	newCommand.Parent = cubeNode;
-// 	newCommand.DrawType = EDrawCallType::DrawElements;
-// 
-// 	//TODO: Make work with generic renderer
-// 	OpenGLRenderer::GetRHI().AddCommand(newCommand);
+//  	{
+//  		// TODO: Buffers creation should be delegated to the renderer
+//  		OpenGLIndexBuffer ibo = OpenGLIndexBuffer{};
+//  		int32_t indicesCount = BasicShapesData::GetCubeIndicesCount();
+//  		ibo.SetIndices(BasicShapesData::GetCubeIndices(), indicesCount);
+//  
+//  		VertexBufferLayout layout;
+//  		// Vertex points
+//  		layout.Push<float>(3);
+//  		// Normals
+//  		layout.Push<float>(3);
+//  		// Vertex Tex Coords
+//  		layout.Push<float>(2);
+//  
+//  		OpenGLVertexBuffer vbo = OpenGLVertexBuffer{ ibo, layout };
+//  		int32_t verticesCount = BasicShapesData::GetCubeVerticesCount();
+//  		vbo.SetData(BasicShapesData::GetCubeVertices(), verticesCount);
+//  
+//  		//thisVAO->VBuffer = vbo;// TODO
+//  	}
+//  
+//  	MaterialsManager& matManager = MaterialsManager::Get();
+//  	bool materialExists = false;
+//  	//eastl::shared_ptr<RenderMaterial> cubeMaterial = matManager.GetOrAddMaterial<WithShadowMaterial>("cube_material", materialExists);
+//  	// TODO: Shadow disabled for now
+//  	eastl::shared_ptr<RenderMaterial> cubeMaterial = matManager.GetOrAddMaterial<RenderMaterial>("cube_material", materialExists);
+//  
+//  	if (!materialExists)
+//  	{
+//  		eastl::string texturePath = "../Data/Textures/MinecraftGrass.jpg";
+//  		eastl::shared_ptr<OpenGLTexture> tex = eastl::make_shared<OpenGLTexture>("DiffuseMap");
+//  		tex->Init(texturePath);
+//  		cubeMaterial->Textures.push_back(std::move(tex));
+//  		cubeMaterial->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/BasicPerspVertexShader.glsl", "../Data/Shaders/BasicTexFragmentShader.glsl");
+//  		//cubeMaterial->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/WithNormalProjectionVertexShader.glsl", "../Data/Shaders/LightingTexFragmentShader.glsl");
+//  	}
+//  
+//  	eastl::shared_ptr<MeshNode> cubeNode = eastl::make_shared<MeshNode>();
+//  	AddChild(cubeNode);
+//  
+//  	RenderCommand newCommand;
+//  	newCommand.Material = cubeMaterial;
+//  	newCommand.VAO = thisVAO;
+//  	newCommand.Parent = cubeNode;
+//  	newCommand.DrawType = EDrawCallType::DrawElements;
+//  
+//  	//TODO: Make work with generic renderer
+//  	OpenGLRenderer::GetRHI().AddCommand(newCommand);
 }
 
 Skybox::Skybox() = default;

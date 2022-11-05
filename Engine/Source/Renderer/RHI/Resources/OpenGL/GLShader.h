@@ -1,8 +1,8 @@
 #pragma once
-#include "Renderer/RHI/Resources/ShaderBase.h"
+#include "Renderer/RHI/Resources/RHIShader.h"
 #include <stdint.h>
 
-class GLShader : public ShaderBase
+class GLShader : public RHIShader
 {
 public:
 	GLShader(const uint32_t inGLHandle);

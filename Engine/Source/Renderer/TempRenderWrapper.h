@@ -1,12 +1,10 @@
 #pragma once
 #include "EASTL/shared_ptr.h"
 
-class ForwardRenderer
+class TempRenderWrapper
 {
 public:
 	static void Init();
 	static void Terminate();
-	void Draw();
-
-	inline static ForwardRenderer* Instance = nullptr;
+	static void Draw();
 };

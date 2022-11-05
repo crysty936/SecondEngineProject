@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-class UniformBufferBase : public RHIBufferBase
+class RHIUniformBuffer : public RHIBufferBase
 {
 public:
 	virtual void SetData(const char* inData, const size_t inSize) = 0;

@@ -1,8 +1,6 @@
 #include "Core/EngineCore.h"
 #include "Core/WindowsPlatform.h"
-#include "GLFW/glfw3.h"
 #include "Logger/Logger.h"
-#include "Window/OpenGLWindow.h"
 #include "InputSystem/InputSystem.h"
 #include "Scene/SceneManager.h"
 #include "Scene/Scene.h"
@@ -10,7 +8,7 @@
 #include "Core/GameModeBase.h"
 #include "Timer/TimersManager.h"
 #include "Renderer/Material/MaterialsManager.h"
-#include "Renderer/ForwardRenderer.h"
+#include "Renderer/TempRenderWrapper.h"
 #include "Window/WindowsWindow.h"
 #include "Renderer/RHI/RHI.h"
 
@@ -45,7 +43,7 @@ void EngineCore::Init()
 
 	RHI::Init();
 
-	ForwardRenderer::Init();
+	TempRenderWrapper::Init();
 	SceneManager::Init();
 	TimersManager::Init();
 	MaterialsManager::Init();
@@ -62,7 +60,7 @@ void EngineCore::Terminate()
 	MaterialsManager::Terminate();
 	TimersManager::Terminate();
 	SceneManager::Terminate();
-	ForwardRenderer::Terminate();
+	TempRenderWrapper::Terminate();
 	RHI::Terminate();
 	InputSystem::Terminate();
 
@@ -110,7 +108,7 @@ void EngineCore::Run()
 		SceneManager::Get().GetCurrentScene().TickObjects(CurrentDeltaT);
 		CurrentGameMode->Tick(CurrentDeltaT);
 
-		ForwardRenderer::Instance->Draw();
+		TempRenderWrapper::Draw();
 
 		CheckShouldCloseWindow();
 	}

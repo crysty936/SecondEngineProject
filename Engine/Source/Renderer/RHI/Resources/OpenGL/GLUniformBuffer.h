@@ -1,8 +1,8 @@
 #pragma once
-#include "Renderer/RHI/Resources/UniformBufferBase.h"
+#include "Renderer/RHI/Resources/RHIUniformBuffer.h"
 #include <stdint.h>
 
-class GlUniformBuffer : public UniformBufferBase
+class GlUniformBuffer : public RHIUniformBuffer
 {
 public:
 	GlUniformBuffer(const uint32_t inHandle);

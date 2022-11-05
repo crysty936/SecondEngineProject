@@ -1,6 +1,6 @@
 #pragma once
 
-class ShaderBase
+class RHIShader
 {
 public:
 	virtual void Bind();

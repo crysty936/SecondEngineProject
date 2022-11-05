@@ -249,7 +249,7 @@ D3D11Renderer::D3D11Renderer(const WindowProperties& inMainWindowProperties)
 	}
 
 
-
+	
 	// Set vertex buffer
 	UINT stride = sizeof(glm::vec3) + sizeof(glm::vec3) + sizeof(glm::vec2);
 	UINT offset = 0;

@@ -1,5 +1,5 @@
 #pragma once
-#include "Renderer/RHI/Resources/VertexBufferBase.h"
+#include "Renderer/RHI/Resources/RHIVertexBuffer.h"
 
 // Contains data required for drawing.
 // For now just vertex with index buffer
@@ -9,5 +9,5 @@ public:
 	RenderDataContainer();
 	~RenderDataContainer();
 
-	eastl::shared_ptr<class VertexBufferBase> VBuffer;
+	eastl::shared_ptr<class RHIVertexBuffer> VBuffer;
 };
