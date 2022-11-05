@@ -1,23 +1,25 @@
 #include "RHI.h"
 #include "Renderer/TempRenderWrapper.h"
-#include "OpenGL/OpenGLRHI.h"
 
- #define RENDERERGL 1
- #define RENDERERD3D11 0
+ #define RENDERERGL 0
+ #define RENDERERD3D11 1
+
+#if RENDERERGL
+#include "OpenGL/OpenGLRHI.h"
+#elif RENDERERD3D11
+#include "D3D11/D3D11RHI.h"
+#endif
 
 void RHI::Init()
 {
 #if RENDERERGL
 	Instance = new OpenGLRHI();
 #elif RENDERERD3D11
-	//TODO
+	Instance = new D3D11RHI();
 #endif
 }
 
-//TODO
 void RHI::Terminate()
 {
-// #if RENDERERGL
-// #elif RENDERERD3D11
-// #endif
+	delete Instance;
 }

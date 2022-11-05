@@ -83,8 +83,7 @@ void ForwardRenderer::Init(const WindowProperties & inMainWindowProperties)
 
 void ForwardRenderer::Terminate()
 {
-
-	glDeleteBuffers(1, &Instance->AuxiliarFrameBuffer);
+	//glDeleteBuffers(1, &Instance->AuxiliarFrameBuffer);
 
 	ASSERT(Instance);
 	delete Instance;
@@ -99,8 +98,7 @@ void ForwardRenderer::Draw()
 	SetupBaseUniforms();
 	UpdateUniforms();
 
-	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	RHI::Instance->ClearBuffers();
 
 	//DrawSkybox();
 	RenderCommandsMutex.lock();
@@ -165,7 +163,7 @@ void ForwardRenderer::DrawShadowMap()
 
 void ForwardRenderer::SetupBaseUniforms()
 {
-	const glm::mat4 projection = glm::perspective(glm::radians(45.0f), static_cast<float>(Engine->GetMainWindow().GetProperties().Width) / static_cast<float>(Engine->GetMainWindow().GetProperties().Height), 0.1f, 1000.0f);
+	const glm::mat4 projection = glm::perspective(glm::radians(90.0f), static_cast<float>(Engine->GetMainWindow().GetProperties().Width) / static_cast<float>(Engine->GetMainWindow().GetProperties().Height), 0.1f, 1000.0f);
 	UniformsCache["projection"] = projection;
 }
 
@@ -201,8 +199,8 @@ void ForwardRenderer::DrawCommand(const RenderCommand & inCommand)
 	}
 
 	RHI::Instance->BindVertexBuffer(*(dataContainer->VBuffer));
+	RHI::Instance->BindShader(*(material->Shader));
 
-	material->Shader->Bind();
 	material->ResetUniforms();
 
 	UniformsCache["model"] = parent->GetModelMatrix();
@@ -224,6 +222,7 @@ void ForwardRenderer::DrawCommand(const RenderCommand & inCommand)
 	const uint32_t indicesCount = dataContainer->VBuffer->GetIndicesCount();
 
 	material->SetUniforms(UniformsCache);
+	material->UBuffer.Bind();
 
 	switch (inCommand.DrawType)
 	{
@@ -253,7 +252,8 @@ void ForwardRenderer::DrawCommand(const RenderCommand & inCommand)
 	//ShadowBufferTex->Unbind(i);
 	//
 
-	material->Shader->Unbind();
+	material->UBuffer.Unbind();
+	RHI::Instance->UnbindShader(*(material->Shader));
 }
 
 eastl::shared_ptr<RenderMaterial> ForwardRenderer::GetMaterial(const RenderCommand & inCommand) const

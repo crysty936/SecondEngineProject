@@ -262,7 +262,7 @@ OpenGLRHI::OpenGLRHI()
 
 OpenGLRHI::~OpenGLRHI() = default;
 
-eastl::shared_ptr<RHIVertexBuffer> OpenGLRHI::CreateVertexBuffer(const VertexBufferLayout& inLayout, const float* inVertices, const int32_t inCount, eastl::shared_ptr<RHIIndexBuffer> inIndexBuffer)
+eastl::shared_ptr<RHIVertexBuffer> OpenGLRHI::CreateVertexBuffer(const VertexInputLayout& inLayout, const float* inVertices, const int32_t inCount, eastl::shared_ptr<RHIIndexBuffer> inIndexBuffer)
 {
 	uint32_t handle = 0;
 	glGenBuffers(1, &handle);
@@ -274,7 +274,7 @@ eastl::shared_ptr<RHIVertexBuffer> OpenGLRHI::CreateVertexBuffer(const VertexBuf
 	return newBuffer;
 }
 
-eastl::shared_ptr<RHIVertexBuffer> OpenGLRHI::CreateVertexBuffer(const VertexBufferLayout& inLayout, const eastl::vector<Vertex>& inVertices, eastl::shared_ptr<RHIIndexBuffer> inIndexBuffer)
+eastl::shared_ptr<RHIVertexBuffer> OpenGLRHI::CreateVertexBuffer(const VertexInputLayout& inLayout, const eastl::vector<Vertex>& inVertices, eastl::shared_ptr<RHIIndexBuffer> inIndexBuffer)
 {
 	uint32_t handle = 0;
 	glGenBuffers(1, &handle);
@@ -331,10 +331,11 @@ void OpenGLRHI::UniformBufferUpdateData(RHIUniformBuffer& inBuffer, const void* 
 {
 	const GlUniformBuffer& glBuffer = static_cast<const GlUniformBuffer&>(inBuffer);
 	ASSERT(inDataSize == glBuffer.InitSize);
-
+	
 	glBindBuffer(GL_UNIFORM_BUFFER, glBuffer.GLHandle);
 
 	glBufferSubData(GL_UNIFORM_BUFFER, 0, inDataSize, inData);
+
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
@@ -390,6 +391,7 @@ void OpenGLRHI::SetViewportSize(const int32_t inWidth, const int32_t inHeight)
 
 void OpenGLRHI::ClearColor(const glm::vec4 inColor)
 {
+	// Set the clear color to be used when cleaning the back buffers
 	glClearColor(inColor.x, inColor.y, inColor.z, inColor.w);
 }
 
@@ -398,6 +400,10 @@ void OpenGLRHI::SwapBuffers()
 	::SwapBuffers(GLUtils::gldc);
 }
 
+void OpenGLRHI::ClearBuffers()
+{
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+}
 
 void OpenGLRHI::BindVertexBuffer(const RHIVertexBuffer& inBuffer, const bool inBindIndexBuffer)
 {
@@ -443,6 +449,19 @@ void OpenGLRHI::BindIndexBuffer(const RHIIndexBuffer& inBuffer)
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, glBuffer.Handle);
 }
 
+void OpenGLRHI::BindShader(const RHIShader& inShader)
+{
+	const GLShader& glShader = static_cast<const GLShader&>(inShader);
+	glUseProgram(glShader.Handle);
+}
+
+void OpenGLRHI::BindUniformBuffer(const RHIUniformBuffer& inBuffer)
+{
+	const GlUniformBuffer& glbuffer = static_cast<const GlUniformBuffer&>(inBuffer);
+
+	glBindBuffer(GL_UNIFORM_BUFFER, glbuffer.GLHandle);
+}
+
 void OpenGLRHI::UnbindVertexBuffer(const RHIVertexBuffer& inBuffer, const bool inUnbindIndexBuffer)
 {
 	if (inUnbindIndexBuffer)
@@ -457,6 +476,16 @@ void OpenGLRHI::UnbindIndexBuffer(const RHIIndexBuffer& inBuffer)
 {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
+}
+
+void OpenGLRHI::UnbindShader(const RHIShader& inShader)
+{
+	glUseProgram(0);
+}
+
+void OpenGLRHI::UnbindUniformBuffer(const RHIUniformBuffer& inBuffer)
+{
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
 uint32_t CreateShaderInternal(const eastl::string& Source, uint32_t ShaderType)
@@ -494,7 +523,7 @@ uint32_t CreateShaderInternal(const eastl::string& Source, uint32_t ShaderType)
 	return shaderHandle;
 }
 
-eastl::shared_ptr<class RHIShader> OpenGLRHI::CreateShaderFromSource(const eastl::string& inVertexSrc, const eastl::string& inPixelSrc)
+eastl::shared_ptr<class RHIShader> OpenGLRHI::CreateShaderFromSource(const eastl::string& inVertexSrc, const eastl::string& inPixelSrc, const VertexInputLayout& inInputLayout)
 {
 
 	// Create an empty vertex shader handle
@@ -547,15 +576,23 @@ eastl::shared_ptr<class RHIShader> OpenGLRHI::CreateShaderFromSource(const eastl
 	return newShader;
 }
 
-eastl::shared_ptr<class RHIShader> OpenGLRHI::CreateShaderFromPath(const eastl::string& inVertexPath, const eastl::string& inPixelPath)
+eastl::shared_ptr<class RHIShader> OpenGLRHI::CreateShaderFromPath(const eastl::string& inVertexPath, const eastl::string& inPixelPath, const VertexInputLayout& inInputLayout)
 {
+	eastl::string fullVertexpath = inVertexPath;
+	fullVertexpath.insert(0, "../Data/Shaders/OpenGL/");
+	fullVertexpath.append(".glsl");
+
+	eastl::string fullPixelPath = inPixelPath;
+	fullPixelPath.insert(0, "../Data/Shaders/OpenGL/");
+	fullPixelPath.append(".glsl");
+
 	eastl::string vertexShaderCode;
 	eastl::string fragmentShaderCode;
 
-	const bool vertexReadSuccess = IOUtils::TryFastReadFile(inVertexPath, vertexShaderCode);
-	const bool fragmentReadSuccess = IOUtils::TryFastReadFile(inPixelPath, fragmentShaderCode);
+	const bool vertexReadSuccess = IOUtils::TryFastReadFile(fullVertexpath, vertexShaderCode);
+	const bool fragmentReadSuccess = IOUtils::TryFastReadFile(fullPixelPath, fragmentShaderCode);
 
-	return CreateShaderFromSource(vertexShaderCode, fragmentShaderCode);
+	return CreateShaderFromSource(vertexShaderCode, fragmentShaderCode, inInputLayout);
 }
 
 void OpenGLRHI::DrawElements(const int32_t inElementsCount)

@@ -3,31 +3,31 @@
 #include "EASTL/vector.h"
 #include "VertexLayoutProperties.h"
 
-class VertexBufferLayout
+class VertexInputLayout
 {
 
 public:
-	VertexBufferLayout()
+	VertexInputLayout()
 		:Stride(0) {}
 
 
 	template<typename T>
-	void Push(uint32_t Count)
+	void Push(uint32_t Count, const VertexInputType inType)
 	{
 		static_assert(false);
 	}
 
 	template<>
-	void Push<float>(uint32_t Count)
+	void Push<float>(uint32_t Count, const VertexInputType inType)
 	{
-		Properties.push_back({ VertexPropertyType::Float, Count, false });
+		Properties.push_back({ VertexPropertyType::Float, Count, false, inType });
 		Stride += Count * sizeof(float);
 	}
 
 	template<>
-	void Push<uint32_t>(uint32_t Count)
+	void Push<uint32_t>(uint32_t Count, const VertexInputType inType)
 	{
-		Properties.push_back({ VertexPropertyType::UInt, Count, false });
+		Properties.push_back({ VertexPropertyType::UInt, Count, false, inType });
 		Stride += Count * sizeof(uint32_t);
 	}
 

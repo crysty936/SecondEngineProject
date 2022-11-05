@@ -12,6 +12,8 @@
 #include "Renderer/RHI/D3D11/Resources/D3D11IndexBuffer.h"
 #include "Renderer/RHI/D3D11/Resources/D3D11VertexBuffer.h"
 #include "Renderer/RHI/D3D11/Resources/D3D11UniformBuffer.h"
+#include "Utils/IOUtils.h"
+#include "Renderer/RHI/D3D11/Resources/D3D11Shader.h"
 
 static D3D_DRIVER_TYPE	PresentDriverType = D3D_DRIVER_TYPE_NULL;
 static D3D_FEATURE_LEVEL PresentFeatureLevel = D3D_FEATURE_LEVEL_11_0;
@@ -124,7 +126,7 @@ D3D11RHI::D3D11RHI()
 
 D3D11RHI::~D3D11RHI() = default;
 
-eastl::shared_ptr<RHIVertexBuffer> D3D11RHI::CreateVertexBuffer(const VertexBufferLayout& inLayout, const float* inVertices, const int32_t inCount, eastl::shared_ptr<RHIIndexBuffer> inIndexBuffer)
+eastl::shared_ptr<RHIVertexBuffer> D3D11RHI::CreateVertexBuffer(const VertexInputLayout& inLayout, const float* inVertices, const int32_t inCount, eastl::shared_ptr<RHIIndexBuffer> inIndexBuffer)
 {
 	HRESULT hr = S_OK;
 	ID3D11Buffer* bufferHandle = nullptr;
@@ -146,7 +148,7 @@ eastl::shared_ptr<RHIVertexBuffer> D3D11RHI::CreateVertexBuffer(const VertexBuff
 	return newBuffer;
 }
 
-eastl::shared_ptr<RHIVertexBuffer> D3D11RHI::CreateVertexBuffer(const VertexBufferLayout& inLayout, const eastl::vector<Vertex>& inVertices, eastl::shared_ptr<RHIIndexBuffer> inIndexBuffer)
+eastl::shared_ptr<RHIVertexBuffer> D3D11RHI::CreateVertexBuffer(const VertexInputLayout& inLayout, const eastl::vector<Vertex>& inVertices, eastl::shared_ptr<RHIIndexBuffer> inIndexBuffer)
 {
 	HRESULT hr = S_OK;
 	ID3D11Buffer* bufferHandle = nullptr;
@@ -210,6 +212,156 @@ eastl::shared_ptr<class RHIUniformBuffer> D3D11RHI::CreateUniformBuffer(size_t i
 	return newBuffer;
 }
 
+ 
+ eastl::shared_ptr<class RHIShader> D3D11RHI::CreateShaderFromSource(const eastl::string& inVertexSrc, const eastl::string& inPixelSrc, const VertexInputLayout& inInputLayout)
+ {
+	 HRESULT hr = S_OK;
+	 ID3D11VertexShader* vertexShaderHandle = nullptr;
+	 ID3D11PixelShader* pixelShaderHandle = nullptr;
+	 ID3D11InputLayout* vertexShaderLayout = nullptr;
+
+	 // Create Vertex Shader
+	 {
+		 ID3DBlob* vsBlob = NULL;
+		 ID3DBlob* errBlob = NULL;
+
+		 D3DCompile2(inVertexSrc.data(), inVertexSrc.size(), nullptr, nullptr, nullptr, "VS", "vs_5_0", D3DCOMPILE_DEBUG | D3DCOMPILE_DEBUG_NAME_FOR_SOURCE, 0, 0, nullptr, 0, &vsBlob, &errBlob);
+
+		 if (!ENSURE(!errBlob))
+		 {
+			 eastl::string errMessage;
+			 errMessage.InitialiseToSize(errBlob->GetBufferSize(), '\0');
+			 memcpy(errMessage.data(), errBlob->GetBufferPointer(), errBlob->GetBufferSize());
+		 }
+
+		 hr = D3DDevice->CreateVertexShader(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), NULL, &vertexShaderHandle);
+		 ASSERT(!FAILED(hr));
+
+
+		 constexpr int32_t semanticNamesCount = 4;
+		 // This is 1 : 1 with VertexInputType!
+		 constexpr char* semanticsName[semanticNamesCount] = {
+			 "",
+			 "POSITION",
+			 "NORMAL",
+			 "TEXCOORD"
+		 };
+		 static_assert(static_cast<int32_t>(VertexInputType::Count) == semanticNamesCount);
+
+		 // Create Vertex Buffer
+		 {
+			 eastl::vector<D3D11_INPUT_ELEMENT_DESC> elementDescs;
+
+			 int32_t offset = 0;
+			 for (const VertexLayoutProperties& prop : inInputLayout.Properties)
+			 {
+				 D3D11_INPUT_ELEMENT_DESC newDesc = {};
+
+				 DXGI_FORMAT elementFormat = DXGI_FORMAT_UNKNOWN;
+
+				 // TODO: Find a more elegant way
+				 if (prop.Type == VertexPropertyType::Float && prop.Count == 3)
+				 {
+					 elementFormat = DXGI_FORMAT_R32G32B32_FLOAT;
+				 }
+				 else if (prop.Type == VertexPropertyType::UInt && prop.Count == 2)
+				 {
+					 elementFormat = DXGI_FORMAT_R32G32_FLOAT;
+				 }
+				 ASSERT(elementFormat != DXGI_FORMAT_UNKNOWN);
+				 
+
+				 int32_t semanticIndex = static_cast<int32_t>(prop.InputType);
+				 newDesc.SemanticName = semanticsName[semanticIndex];
+				 newDesc.Format = elementFormat;
+				 newDesc.AlignedByteOffset = offset;
+				 newDesc.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+
+				 offset += prop.Count * prop.GetSizeOfType();
+			 }
+
+			 D3D11_INPUT_ELEMENT_DESC layout[] =
+			 {
+				 { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+				 { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+				 { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+			 };
+			 UINT numElements = ARRAYSIZE(layout);
+
+			 hr = D3DDevice->CreateInputLayout(layout, numElements, vsBlob->GetBufferPointer(),
+				 vsBlob->GetBufferSize(), &vertexShaderLayout);
+			 ASSERT(!FAILED(hr));
+
+			 vsBlob->Release();
+
+			 ImmediateContext->IASetInputLayout(vertexShaderLayout);
+		 }
+	 }
+
+	 // Create Pixel shader
+	 {
+		 ID3DBlob* psBlob = NULL;
+		 ID3DBlob* psErrBlob = NULL;
+
+		 D3DCompile2(inPixelSrc.data(), inPixelSrc.size(), nullptr, nullptr, nullptr, "PS", "ps_5_0", D3DCOMPILE_DEBUG | D3DCOMPILE_DEBUG_NAME_FOR_SOURCE, 0, 0, nullptr, 0, &psBlob, &psErrBlob);
+
+		 if (!ENSURE(!psErrBlob))
+		 {
+			 eastl::string errMessage;
+			 errMessage.InitialiseToSize(psErrBlob->GetBufferSize(), '\0');
+			 memcpy(errMessage.data(), psErrBlob->GetBufferPointer(), psErrBlob->GetBufferSize());
+		 }
+		 hr = D3DDevice->CreatePixelShader(psBlob->GetBufferPointer(), psBlob->GetBufferSize(), NULL, &pixelShaderHandle);
+		 ASSERT(!FAILED(hr));
+
+		 psBlob->Release();
+	 }
+
+	 eastl::shared_ptr<D3D11Shader> newShader = eastl::make_shared<D3D11Shader>(vertexShaderHandle, pixelShaderHandle, vertexShaderLayout);
+
+	 return newShader;
+ }
+ 
+ eastl::shared_ptr<class RHIShader> D3D11RHI::CreateShaderFromPath(const eastl::string& inVertexPath, const eastl::string& inPixelPath, const VertexInputLayout& inInputLayout)
+ {
+	 eastl::string fullVertexpath = inVertexPath;
+	 fullVertexpath.insert(0, "../Data/Shaders/D3D11/");
+	 fullVertexpath.append(".hlsl");
+
+	 eastl::string fullPixelPath = inPixelPath;
+	 fullPixelPath.insert(0, "../Data/Shaders/D3D11/");
+	 fullPixelPath.append(".hlsl");
+
+	 eastl::string vertexShaderCode;
+	 eastl::string fragmentShaderCode;
+
+	 const bool vertexReadSuccess = IOUtils::TryFastReadFile(fullVertexpath, vertexShaderCode);
+	 const bool fragmentReadSuccess = IOUtils::TryFastReadFile(fullPixelPath, fragmentShaderCode);
+ 
+ 	return CreateShaderFromSource(vertexShaderCode, fragmentShaderCode, inInputLayout);
+ }
+
+ void D3D11RHI::ClearBuffers()
+ {
+	 // Clear the back buffer 
+	 ImmediateContext->ClearRenderTargetView(RenderTarget, &CurrentClearColor.x);
+ }
+
+ void D3D11RHI::DrawElements(const int32_t inElementsCount)
+ {
+	 ImmediateContext->DrawIndexed(inElementsCount, 0, 0);
+ }
+
+ void D3D11RHI::SwapBuffers()
+ {
+	 SwapChain->Present(0, 0);
+ }
+
+ void D3D11RHI::ClearColor(const glm::vec4 inColor)
+ {
+	 CurrentClearColor = inColor;
+ }
+
 void D3D11RHI::BindVertexBuffer(const RHIVertexBuffer& inBuffer, const bool inBindIndexBuffer /*= true*/)
 {
 	const D3D11VertexBuffer& d3d11Buffer = static_cast<const D3D11VertexBuffer&>(inBuffer);
@@ -231,6 +383,23 @@ void D3D11RHI::BindIndexBuffer(const RHIIndexBuffer& inBuffer)
 	ImmediateContext->IASetIndexBuffer(d3d11Buffer.Handle, DXGI_FORMAT_R32_UINT, 0);
 }
 
+void D3D11RHI::BindShader(const RHIShader& inShader)
+{
+	const D3D11Shader& d3d11Shader = static_cast<const D3D11Shader&>(inShader);
+
+	ImmediateContext->VSSetShader(d3d11Shader.VertexShaderHandle, nullptr, 0);
+	ImmediateContext->IASetInputLayout(d3d11Shader.VertexInputLayout);
+
+	ImmediateContext->PSSetShader(d3d11Shader.PixelShaderHandle, nullptr, 0);
+}
+
+void D3D11RHI::BindUniformBuffer(const RHIUniformBuffer& inBuffer)
+{
+	const D3D11UniformBuffer& d3d11Buffer = static_cast<const D3D11UniformBuffer&>(inBuffer);
+	ImmediateContext->VSSetConstantBuffers(0, 1, &d3d11Buffer.Handle);
+
+}
+
 void D3D11RHI::UnbindVertexBuffer(const RHIVertexBuffer& inBuffer, const bool inUnbindIndexBuffer /*= true*/)
 {
 	ImmediateContext->IASetVertexBuffers(0, 0, nullptr, 0, 0);
@@ -241,28 +410,27 @@ void D3D11RHI::UnbindIndexBuffer(const RHIIndexBuffer& inBuffer)
 	ImmediateContext->IASetIndexBuffer(nullptr, DXGI_FORMAT_UNKNOWN, 0);
 }
 
+void D3D11RHI::UnbindShader(const RHIShader& inShader)
+{
+	const D3D11Shader& d3d11Shader = static_cast<const D3D11Shader&>(inShader);
+
+	ImmediateContext->VSSetShader(nullptr, nullptr, 0);
+	ImmediateContext->IASetInputLayout(nullptr);
+
+	ImmediateContext->PSSetShader(nullptr, nullptr, 0);
+}
+
+void D3D11RHI::UnbindUniformBuffer(const RHIUniformBuffer& inBuffer)
+{
+	ImmediateContext->VSSetConstantBuffers(0, 0, nullptr);
+}
+
 void D3D11RHI::UniformBufferUpdateData(RHIUniformBuffer& inBuffer, const void* inData, const size_t inDataSize)
 {
 	D3D11UniformBuffer& d3d11Buffer = static_cast<D3D11UniformBuffer&>(inBuffer);
 	ImmediateContext->UpdateSubresource(d3d11Buffer.Handle, 0, NULL, inData, 0, 0);
 }
 
-// eastl::shared_ptr<RHIUniformBuffer> OpenGLRHI::CreateUniformBuffer(size_t inSize)
-// {
-// 	uint32_t bufferHandle = 0;
-// 	glGenBuffers(1, &bufferHandle);
-// 	ASSERT(bufferHandle != -1);
-// 
-// 	glBindBuffer(GL_UNIFORM_BUFFER, bufferHandle);
-// 	glBufferData(GL_UNIFORM_BUFFER, inSize, NULL, GL_STATIC_DRAW);
-// 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
-// 	glBindBufferRange(GL_UNIFORM_BUFFER, 0, bufferHandle, 0, inSize);
-// 
-// 	eastl::shared_ptr<GlUniformBuffer> newBuffer = eastl::make_shared<GlUniformBuffer>(bufferHandle);
-// 
-// 	return newBuffer;
-// }
-// 
 // eastl::shared_ptr<RHITexture2D> OpenGLRHI::CreateTexture2D()
 // {
 // 	uint32_t texHandle = 0;
@@ -331,108 +499,4 @@ void D3D11RHI::UniformBufferUpdateData(RHIUniformBuffer& inBuffer, const void* i
 // void OpenGLRHI::SwapBuffers()
 // {
 // 	::SwapBuffers(GLUtils::gldc);
-// }
-// 
-// uint32_t CreateShaderInternal(const eastl::string& Source, uint32_t ShaderType)
-// {
-// 	GLuint shaderHandle = glCreateShader(ShaderType);
-// 
-// 	// Send the vertex shader source code to GL
-// 	// Note that std::string's .c_str is NULL character terminated.
-// 	const GLchar* source = Source.c_str();
-// 	glShaderSource(shaderHandle, 1, &source, nullptr);
-// 
-// 	// Compile the vertex shader
-// 	glCompileShader(shaderHandle);
-// 
-// 	GLint isCompiled = 0;
-// 	glGetShaderiv(shaderHandle, GL_COMPILE_STATUS, &isCompiled);
-// 	if (isCompiled == GL_FALSE)
-// 	{
-// 		GLint maxLength = 0;
-// 		glGetShaderiv(shaderHandle, GL_INFO_LOG_LENGTH, &maxLength);
-// 
-// 		// The maxLength includes the NULL character
-// 		int bytesWritten;
-// 		char* infoLog = (char*)_malloca(maxLength * sizeof(char));
-// 		glGetShaderInfoLog(shaderHandle, maxLength, &bytesWritten, infoLog);
-// 
-// 		// We don't need the shader anymore.
-// 		glDeleteShader(shaderHandle);
-// 
-// 		LOG_ERROR("%s", infoLog);
-// 		ASSERT_MSG(0, "Shader Compilation failure.");
-// 		return -1;
-// 	}
-// 
-// 	return shaderHandle;
-// }
-// 
-// eastl::shared_ptr<class RHIShader> OpenGLRHI::CreateShaderFromSource(const eastl::string& inVertexSrc, const eastl::string& inPixelSrc)
-// {
-// 
-// 	// Create an empty vertex shader handle
-// 	GLuint vertexShader = CreateShaderInternal(inVertexSrc, GL_VERTEX_SHADER);
-// 
-// 	// Create an empty fragment shader handle
-// 	GLuint fragmentShader = CreateShaderInternal(inPixelSrc, GL_FRAGMENT_SHADER);
-// 
-// 	// Vertex and fragment shaders are successfully compiled.
-// 	// Now time to link them together into a program.
-// 	// Get a program object.
-// 	GLuint program = glCreateProgram();
-// 
-// 	// Attach our shaders to our program
-// 	glAttachShader(program, vertexShader);
-// 	glAttachShader(program, fragmentShader);
-// 
-// 	// Link our program
-// 	glLinkProgram(program);
-// 
-// 	// Note the different functions here: glGetProgram* instead of glGetShader*.
-// 	GLint isLinked = 0;
-// 	glGetProgramiv(program, GL_LINK_STATUS, (int*)&isLinked);
-// 	if (isLinked == GL_FALSE)
-// 	{
-// 		GLint maxLength = 0;
-// 		glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxLength);
-// 
-// 		// The maxLength includes the NULL character
-// 		char* infoLog = (char*)_malloca(maxLength * sizeof(char));
-// 		glGetProgramInfoLog(program, maxLength, &maxLength, &infoLog[0]);
-// 
-// 		// We don't need the program anymore.
-// 		glDeleteProgram(program);
-// 		// Don't leak shaders either.
-// 		glDeleteShader(vertexShader);
-// 		glDeleteShader(fragmentShader);
-// 
-// 		LOG_ERROR("%s", infoLog);
-// 		ASSERT_MSG(0, "Shader Link failure.");
-// 
-// 		return nullptr;
-// 	}
-// 
-// 	// Always detach shaders after a successful link.
-// 	glDetachShader(program, vertexShader);
-// 	glDetachShader(program, fragmentShader);
-// 
-// 	eastl::shared_ptr<GLShader> newShader = eastl::make_shared<GLShader>(program);
-// 	return newShader;
-// }
-// 
-// eastl::shared_ptr<class RHIShader> OpenGLRHI::CreateShaderFromPath(const eastl::string& inVertexPath, const eastl::string& inPixelPath)
-// {
-// 	eastl::string vertexShaderCode;
-// 	eastl::string fragmentShaderCode;
-// 
-// 	const bool vertexReadSuccess = IOUtils::TryFastReadFile(inVertexPath, vertexShaderCode);
-// 	const bool fragmentReadSuccess = IOUtils::TryFastReadFile(inPixelPath, fragmentShaderCode);
-// 
-// 	return CreateShaderFromSource(vertexShaderCode, fragmentShaderCode);
-// }
-// 
-// void OpenGLRHI::DrawElements(const int32_t inElementsCount)
-// {
-// 	glDrawElements(GL_TRIANGLES, inElementsCount, GL_UNSIGNED_INT, 0);
 // }

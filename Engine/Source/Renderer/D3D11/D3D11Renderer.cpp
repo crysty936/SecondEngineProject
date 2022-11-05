@@ -144,17 +144,16 @@ D3D11Renderer::D3D11Renderer(const WindowProperties& inMainWindowProperties)
 	vp.TopLeftY = 0;
 	g_pImmediateContext->RSSetViewports(1, &vp);
 
-
 	// Create Vertex Shader
 	{
 		eastl::string vsData;
-		bool readSuccess = IOUtils::TryFastReadFile("../Data/Shaders/Direct3D11/ModelWorldPositionVertexShader.hlsl", vsData);
+		bool readSuccess = IOUtils::TryFastReadFile("../Data/Shaders/D3D11/ModelWorldPositionVertexShader.hlsl", vsData);
 		ASSERT(readSuccess);
 
 		ID3DBlob* vsBlob = NULL;
 		ID3DBlob* errBlob = NULL;
 
-		D3DCompile2(vsData.data(), vsData.size(), "../Data/Shaders/Direct3D11/ModelWorldPositionVertexShader.hlsl", nullptr, nullptr, "VS", "vs_5_0", D3DCOMPILE_DEBUG | D3DCOMPILE_DEBUG_NAME_FOR_SOURCE, 0, 0, nullptr, 0, &vsBlob, &errBlob);
+		D3DCompile2(vsData.data(), vsData.size(), nullptr, nullptr, nullptr, "VS", "vs_5_0", D3DCOMPILE_DEBUG | D3DCOMPILE_DEBUG_NAME_FOR_SOURCE, 0, 0, nullptr, 0, &vsBlob, &errBlob);
 
 		if (!ENSURE(!errBlob))
 		{
@@ -166,7 +165,7 @@ D3D11Renderer::D3D11Renderer(const WindowProperties& inMainWindowProperties)
 		hr = g_pd3dDevice->CreateVertexShader(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), NULL, &g_pVertexShader);
 		ASSERT(!FAILED(hr));
 
-		// Create Vertex Buffer
+		// Create Vertex Shader Vertex input layout
 		{
 			D3D11_INPUT_ELEMENT_DESC layout[] =
 			{
@@ -189,13 +188,13 @@ D3D11Renderer::D3D11Renderer(const WindowProperties& inMainWindowProperties)
 	// Create Pixel shader
 	{
 		eastl::string psData;
-		const bool psReadSuccess = IOUtils::TryFastReadFile("../Data/Shaders/Direct3D11/FlatColorPixelShader.hlsl", psData);
+		const bool psReadSuccess = IOUtils::TryFastReadFile("../Data/Shaders/D3D11/FlatColorPixelShader.hlsl", psData);
 		ASSERT(psReadSuccess);
 
 		ID3DBlob* psBlob = NULL;
 		ID3DBlob* psErrBlob = NULL;
 
-		D3DCompile2(psData.data(), psData.size(), "../Data/Shaders/Direct3D11/FlatColorPixelShader.hlsl", nullptr, nullptr, "PS", "ps_5_0", D3DCOMPILE_DEBUG | D3DCOMPILE_DEBUG_NAME_FOR_SOURCE, 0, 0, nullptr, 0, &psBlob, &psErrBlob);
+		D3DCompile2(psData.data(), psData.size(), nullptr, nullptr, nullptr, "PS", "ps_5_0", D3DCOMPILE_DEBUG | D3DCOMPILE_DEBUG_NAME_FOR_SOURCE, 0, 0, nullptr, 0, &psBlob, &psErrBlob);
 
 		if (!ENSURE(!psErrBlob))
 		{
@@ -283,15 +282,15 @@ D3D11Renderer::~D3D11Renderer() = default;
 
 void D3D11Renderer::Init(const WindowProperties & inMainWindowProperties)
 {
-	GlobalRHI = new D3D11Renderer{ inMainWindowProperties };
+	Instance = new D3D11Renderer{ inMainWindowProperties };
 
 
 }
 
 void D3D11Renderer::Terminate()
 {
-	ASSERT(GlobalRHI);
-	delete GlobalRHI;
+	ASSERT(Instance);
+	delete Instance;
 }
 
 void D3D11Renderer::Draw()
@@ -367,9 +366,6 @@ void D3D11Renderer::Draw()
 	g_pImmediateContext->IASetVertexBuffers(0, 0, nullptr, 0, 0);
 
 }
-
-
-
 
 // 
 // void OpenGLRenderer::SetupBaseUniforms()

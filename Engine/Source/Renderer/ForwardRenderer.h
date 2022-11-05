@@ -86,7 +86,7 @@ private:
 	EDrawMode DrawMode{ EDrawMode::NORMAL };
 	eastl::queue<RenderingLoadCommand> LoadQueue;
 	eastl::unordered_map<eastl::string, eastl::shared_ptr<class RenderDataContainer>> RenderDataContainerMap;
-	uint32_t AuxiliarFrameBuffer;
+	//uint32_t AuxiliarFrameBuffer;
 	uint32_t ShadowMapBuffer;
 	eastl::shared_ptr<class OpenGLDepthMap> ShadowBufferTex;
 	RenderCommand MainSkyboxCommand;

@@ -25,10 +25,10 @@ public:
 	static void Terminate();
 	void Draw();
 
-	inline static D3D11Renderer& Get() { ASSERT(GlobalRHI); return *GlobalRHI; }
+	inline static D3D11Renderer& Get() { ASSERT(Instance); return *Instance; }
 
 private:
-	inline static D3D11Renderer* GlobalRHI = nullptr;
+	inline static D3D11Renderer* Instance = nullptr;
 };
 
 

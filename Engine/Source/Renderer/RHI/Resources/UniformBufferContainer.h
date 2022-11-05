@@ -13,6 +13,8 @@ public:
 	void AddData(const char* inData, const size_t inSize);
 	void UpdateData();
 	void Clear();
+	void Bind();
+	void Unbind();
 
 public:
 	eastl::vector<char> UniformsCache;

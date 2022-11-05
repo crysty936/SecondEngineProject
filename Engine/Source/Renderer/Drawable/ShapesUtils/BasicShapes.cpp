@@ -23,20 +23,21 @@ void TriangleShape::CreateProxy()
 
 	const bool existingVAO = ForwardRenderer::Get().GetOrCreateContainer(vaoName, dataContainer);
 
+	VertexInputLayout inputLayout;
+	// Vertex points
+	inputLayout.Push<float>(3, VertexInputType::Position);
+	// Vertex Tex Coords
+	//layout.Push<float>(2);
+
 	if (!existingVAO)
 	{
  		const int32_t indicesCount = BasicShapesData::GetTriangleIndicesCount();
 
 		eastl::shared_ptr<RHIIndexBuffer> ib = RHI::Instance->CreateIndexBuffer(BasicShapesData::GetTriangleIndices(), indicesCount);
 
-		VertexBufferLayout layout;
-		// Vertex points
-		layout.Push<float>(3);
-		// Vertex Tex Coords
-		//layout.Push<float>(2);
 
  		const int32_t verticesCount = BasicShapesData::GetTriangleVerticesCount();
-		const eastl::shared_ptr<RHIVertexBuffer> vb = RHI::Instance->CreateVertexBuffer(layout, BasicShapesData::GetTriangleVertices(), verticesCount, ib);
+		const eastl::shared_ptr<RHIVertexBuffer> vb = RHI::Instance->CreateVertexBuffer(inputLayout, BasicShapesData::GetTriangleVertices(), verticesCount, ib);
 
 		dataContainer->VBuffer = vb;
 	}
@@ -52,7 +53,7 @@ void TriangleShape::CreateProxy()
 		//tex->Init(texturePath);
 		//material->Textures.push_back(std::move(tex));
 
-		material->Shader = RHI::Instance->CreateShaderFromPath("../Data/Shaders/OpenGL/BasicProjectionVertexShader.glsl", "../Data/Shaders/OpenGL/FragmentShader_ColorBasedOnPosition.glsl");
+		material->Shader = RHI::Instance->CreateShaderFromPath("ModelWorldPositionVertexShader", "FlatColorPixelShader", inputLayout);
 	}
 
 	RenderCommand newCommand;
@@ -75,19 +76,20 @@ void SquareShape::CreateProxy()
 
 	const bool existingVAO = ForwardRenderer::Get().GetOrCreateContainer(vaoName, dataContainer);
  
- 	if (!existingVAO)
+ 	VertexInputLayout inputLayout;
+ 	// Vertex points
+	inputLayout.Push<float>(3, VertexInputType::Position);
+	// Vertex Tex Coords
+ 	inputLayout.Push<float>(2, VertexInputType::TexCoords);
+
+	if (!existingVAO)
  	{
  		int32_t indicesCount = BasicShapesData::GetSquareIndicesCount();
 		eastl::shared_ptr<RHIIndexBuffer> ib = RHI::Instance->CreateIndexBuffer(BasicShapesData::GetSquareIndices(), indicesCount);
 
- 		VertexBufferLayout layout;
- 		// Vertex points
- 		layout.Push<float>(3);
- 		// Vertex Tex Coords
- 		layout.Push<float>(2);
  
  		int32_t verticesCount = BasicShapesData::GetSquareVerticesCount();
-		const eastl::shared_ptr<RHIVertexBuffer> vb = RHI::Instance->CreateVertexBuffer(layout, BasicShapesData::GetSquareVertices(), verticesCount, ib);
+		const eastl::shared_ptr<RHIVertexBuffer> vb = RHI::Instance->CreateVertexBuffer(inputLayout, BasicShapesData::GetSquareVertices(), verticesCount, ib);
 
 		dataContainer->VBuffer = vb;
 	}
@@ -103,7 +105,7 @@ void SquareShape::CreateProxy()
 		RHI::Instance->LoadTextureFromPath(*tex, texturePath);
 		material->DiffuseTextures.push_back(tex);
 
-		material->Shader = RHI::Instance->CreateShaderFromPath("../Data/Shaders/OpenGL/BasicProjectionVertexShaderWithUVOutput.glsl", "../Data/Shaders/OpenGL/BasicTexFragmentShader.glsl");
+		material->Shader = RHI::Instance->CreateShaderFromPath("../Data/Shaders/OpenGL/BasicProjectionVertexShaderWithUVOutput.glsl", "../Data/Shaders/OpenGL/BasicTexFragmentShader.glsl", inputLayout);
 	}
  
  	RenderCommand newCommand;

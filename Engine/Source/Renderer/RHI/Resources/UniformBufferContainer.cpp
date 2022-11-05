@@ -28,3 +28,13 @@ void UniformBufferContainer::Clear()
 	// Reset data counter
 	Counter = 0;
 }
+
+void UniformBufferContainer::Bind()
+{
+	RHI::Instance->BindUniformBuffer(*RHIBuffer);
+}
+
+void UniformBufferContainer::Unbind()
+{
+	RHI::Instance->UnbindUniformBuffer(*RHIBuffer);
+}

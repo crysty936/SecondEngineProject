@@ -195,13 +195,13 @@ void AssimpModel3DLoader::ProcessMesh(const aiMesh& inMesh, const aiScene& inSce
 // 		int32_t indicesCount = static_cast<int32_t>(indices.size());
 // 		ibo.SetIndices(indices.data(), indicesCount);
 
-		VertexBufferLayout layout;
+		VertexInputLayout layout;
 		// Vertex points
-		layout.Push<float>(3);
+		layout.Push<float>(3, VertexInputType::Position);
 		// Normals
-		layout.Push<float>(3);
+		layout.Push<float>(3, VertexInputType::Normal);
 		// Vertex Tex Coords
-		layout.Push<float>(2);
+		layout.Push<float>(2, VertexInputType::TexCoords);
 
 		// TODO
 // 		OpenGLVertexBuffer vbo = OpenGLVertexBuffer{ ibo, layout };
