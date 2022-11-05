@@ -2,10 +2,10 @@
 #include "RHIBufferBase.h"
 #include <stdint.h>
 
-class IndexBufferBase : public RHIBufferBase
+class RHIIndexBuffer : public RHIBufferBase
 {
 public:
-	IndexBufferBase(int32_t inIndicesCount);
+	RHIIndexBuffer(int32_t inIndicesCount);
 
 public:
 	int32_t IndexCount;

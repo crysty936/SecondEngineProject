@@ -1,7 +1,7 @@
-#include "OpenGLTexture.h"
 #include "EASTL/vector.h"
+#include "EASTL/string.h"
 
-class OpenGLDepthMap : public OpenGLTexture
+class OpenGLDepthMap /*: public OpenGLTexture*/
 {
 public:
 	OpenGLDepthMap(const eastl::string& inTexName);

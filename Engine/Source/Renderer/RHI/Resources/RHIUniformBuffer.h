@@ -6,5 +6,8 @@
 class RHIUniformBuffer : public RHIBufferBase
 {
 public:
-	virtual void SetData(const char* inData, const size_t inSize) = 0;
+	RHIUniformBuffer(size_t inInitSize);
+
+public:
+	const size_t InitSize = 0;
 };

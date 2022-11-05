@@ -37,11 +37,11 @@ enum class EDrawMode : uint8_t
 	OUTLINE
 };
 
-class OpenGLRenderer
+class ForwardRenderer
 {
 private:
-	OpenGLRenderer(const WindowProperties& inMainWindowProperties);
-	virtual ~OpenGLRenderer();
+	ForwardRenderer(const WindowProperties& inMainWindowProperties);
+	virtual ~ForwardRenderer();
 
 public:
 	// Will create the base window and return the context for it
@@ -72,10 +72,10 @@ public:
 	void AddMirrorCommand(const RenderCommand& inCommand);
 	inline void SetSkyboxCommand(RenderCommand inSkyboxCommand) { MainSkyboxCommand = inSkyboxCommand; }
 
-	inline static OpenGLRenderer& Get() { ASSERT(GLRenderer); return *GLRenderer; }
+	inline static ForwardRenderer& Get() { ASSERT(Instance); return *Instance; }
 
 private:
-	inline static OpenGLRenderer* GLRenderer = nullptr;
+	inline static ForwardRenderer* Instance = nullptr;
 
 private:
 	void SetViewportSizeToMain();

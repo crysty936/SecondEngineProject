@@ -28,5 +28,6 @@ public:
 	eastl::vector<UniformWithFlag> RequiredUniforms;
 	UniformBufferContainer UBuffer;
 	eastl::shared_ptr<class RHIShader> Shader;
-	eastl::vector<eastl::shared_ptr<class OpenGLTexture>> Textures;
+	// TODO: Add the other types of textures
+	eastl::vector<eastl::shared_ptr<class RHITexture2D>> DiffuseTextures;
 };

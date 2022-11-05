@@ -4,13 +4,15 @@
 #include "Core/EngineUtils.h"
 #include "Core/EngineCore.h"
 #include "Window/WindowsWindow.h"
-#include "Renderer/RHI/Resources/OpenGL/GLIndexBuffer.h"
-#include "Renderer/RHI/Resources/OpenGL/GLShader.h"
+#include "Renderer/RHI/OpenGL/Resources/GLIndexBuffer.h"
+#include "Renderer/RHI/OpenGL/Resources/GLShader.h"
 #include "Utils/IOUtils.h"
-#include "Renderer/RHI/Resources/OpenGL/GLUniformBuffer.h"
-#include "Renderer/RHI/Resources/OpenGL/GLVertexBuffer.h"
+#include "Renderer/RHI/OpenGL/Resources/GLUniformBuffer.h"
+#include "Renderer/RHI/OpenGL/Resources/GLVertexBuffer.h"
+#include "Utils/ImageLoading.h"
 
 #include "glad/glad.h"
+#include "Renderer/RHI/OpenGL/Resources/GLTexture2D.h"
 
 namespace GLUtils
 {
@@ -260,7 +262,7 @@ OpenGLRHI::OpenGLRHI()
 
 OpenGLRHI::~OpenGLRHI() = default;
 
-eastl::shared_ptr<RHIVertexBuffer> OpenGLRHI::CreateVertexBuffer(const VertexBufferLayout& inLayout, const float* inVertices, const int32_t inCount, eastl::shared_ptr<IndexBufferBase> inIndexBuffer)
+eastl::shared_ptr<RHIVertexBuffer> OpenGLRHI::CreateVertexBuffer(const VertexBufferLayout& inLayout, const float* inVertices, const int32_t inCount, eastl::shared_ptr<RHIIndexBuffer> inIndexBuffer)
 {
 	uint32_t handle = 0;
 	glGenBuffers(1, &handle);
@@ -272,7 +274,7 @@ eastl::shared_ptr<RHIVertexBuffer> OpenGLRHI::CreateVertexBuffer(const VertexBuf
 	return newBuffer;
 }
 
-eastl::shared_ptr<RHIVertexBuffer> OpenGLRHI::CreateVertexBuffer(const VertexBufferLayout& inLayout, const eastl::vector<Vertex>& inVertices, eastl::shared_ptr<IndexBufferBase> inIndexBuffer)
+eastl::shared_ptr<RHIVertexBuffer> OpenGLRHI::CreateVertexBuffer(const VertexBufferLayout& inLayout, const eastl::vector<Vertex>& inVertices, eastl::shared_ptr<RHIIndexBuffer> inIndexBuffer)
 {
 	uint32_t handle = 0;
 	glGenBuffers(1, &handle);
@@ -285,7 +287,7 @@ eastl::shared_ptr<RHIVertexBuffer> OpenGLRHI::CreateVertexBuffer(const VertexBuf
 	return newBuffer;
 }
 
-eastl::shared_ptr<IndexBufferBase> OpenGLRHI::CreateIndexBuffer(const uint32_t* inData, uint32_t inCount)
+eastl::shared_ptr<RHIIndexBuffer> OpenGLRHI::CreateIndexBuffer(const uint32_t* inData, uint32_t inCount)
 {
 	uint32_t handle = 0;
 	glGenBuffers(1, &handle);
@@ -310,9 +312,75 @@ eastl::shared_ptr<RHIUniformBuffer> OpenGLRHI::CreateUniformBuffer(size_t inSize
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	glBindBufferRange(GL_UNIFORM_BUFFER, 0, bufferHandle, 0, inSize);
 
-	eastl::shared_ptr<GlUniformBuffer> newBuffer = eastl::make_shared<GlUniformBuffer>(bufferHandle);
+	eastl::shared_ptr<GlUniformBuffer> newBuffer = eastl::make_shared<GlUniformBuffer>(bufferHandle, inSize);
 
 	return newBuffer;
+}
+
+eastl::shared_ptr<RHITexture2D> OpenGLRHI::CreateTexture2D()
+{
+	uint32_t texHandle = 0;
+	glGenTextures(1, &texHandle);
+
+	eastl::shared_ptr<GLTexture2D> newTexture = eastl::make_shared<GLTexture2D>(texHandle);
+
+	return newTexture;
+}
+
+void OpenGLRHI::UniformBufferUpdateData(RHIUniformBuffer& inBuffer, const void* inData, const size_t inDataSize)
+{
+	const GlUniformBuffer& glBuffer = static_cast<const GlUniformBuffer&>(inBuffer);
+	ASSERT(inDataSize == glBuffer.InitSize);
+
+	glBindBuffer(GL_UNIFORM_BUFFER, glBuffer.GLHandle);
+
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, inDataSize, inData);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+}
+
+void OpenGLRHI::LoadTextureFromPath(RHITexture2D& inTexture, const eastl::string& inPath)
+{
+	GLTexture2D& tex = static_cast<GLTexture2D&>(inTexture);
+	ImageData data = ImageLoading::LoadImageData(inPath.data());
+
+	if (!data.RawData)
+	{
+		return;
+	}
+
+	tex.NrChannels = data.NrChannels;
+
+	glBindTexture(GL_TEXTURE_2D, tex.GlHandle);
+
+	GLenum imageFormat = 0;
+	switch (data.NrChannels)
+	{
+	case 1:
+	{
+		imageFormat = GL_RED;
+		break;
+	}
+	case 3:
+	{
+		imageFormat = GL_RGB;
+		break;
+	}
+	case 4:
+	{
+		imageFormat = GL_RGBA;
+		break;
+	}
+	}
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, data.Width, data.Height, 0, imageFormat, GL_UNSIGNED_BYTE, data.RawData);
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	ImageLoading::FreeImageData(data.RawData);
 }
 
 void OpenGLRHI::SetViewportSize(const int32_t inWidth, const int32_t inHeight)
@@ -328,6 +396,67 @@ void OpenGLRHI::ClearColor(const glm::vec4 inColor)
 void OpenGLRHI::SwapBuffers()
 {
 	::SwapBuffers(GLUtils::gldc);
+}
+
+
+void OpenGLRHI::BindVertexBuffer(const RHIVertexBuffer& inBuffer, const bool inBindIndexBuffer)
+{
+	const GLVertexBuffer& glBuffer = static_cast<const GLVertexBuffer&>(inBuffer);
+	if (inBindIndexBuffer)
+	{
+		BindIndexBuffer(*(glBuffer.IndexBuffer));
+	}
+
+	glBindBuffer(GL_ARRAY_BUFFER, glBuffer.Handle);
+
+	// Appy buffer layout
+	const eastl::vector<VertexLayoutProperties>& props = glBuffer.Layout.GetProperties();
+
+	size_t offset = 0;
+	for (int32_t i = 0; i < props.size(); i++)
+	{
+		const VertexLayoutProperties& prop = props[i];
+
+		void* offsetPtr = reinterpret_cast<void*>(offset);
+		uint32_t glType = 0;
+
+		switch (prop.Type)
+		{
+		case VertexPropertyType::UInt:
+			glType = GL_UNSIGNED_INT;
+			break;
+		case VertexPropertyType::Float:
+			glType = GL_FLOAT;
+			break;
+		}
+
+		glVertexAttribPointer(i, prop.Count, glType, prop.bNormalized, glBuffer.Layout.GetStride(), offsetPtr);
+		glEnableVertexAttribArray(i);
+
+		offset += prop.Count * prop.GetSizeOfType();
+	}
+}
+
+void OpenGLRHI::BindIndexBuffer(const RHIIndexBuffer& inBuffer)
+{
+	const GLIndexBuffer& glBuffer = static_cast<const GLIndexBuffer&>(inBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, glBuffer.Handle);
+}
+
+void OpenGLRHI::UnbindVertexBuffer(const RHIVertexBuffer& inBuffer, const bool inUnbindIndexBuffer)
+{
+	if (inUnbindIndexBuffer)
+	{
+		UnbindIndexBuffer(*(inBuffer.IndexBuffer));
+	}
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void OpenGLRHI::UnbindIndexBuffer(const RHIIndexBuffer& inBuffer)
+{
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
 }
 
 uint32_t CreateShaderInternal(const eastl::string& Source, uint32_t ShaderType)

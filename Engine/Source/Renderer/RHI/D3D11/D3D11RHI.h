@@ -2,23 +2,20 @@
 #include "Renderer/RHI/RHI.h"
 #include "EASTL/string.h"
 
-class OpenGLRHI : public RHI
+class D3D11RHI : public RHI
 {
 public:
-	OpenGLRHI();
-	~OpenGLRHI();
+	D3D11RHI();
+	~D3D11RHI();
 
 	eastl::shared_ptr<class RHIVertexBuffer> CreateVertexBuffer(const class VertexBufferLayout& inLayout, const float* inVertices, const int32_t inCount, eastl::shared_ptr<class RHIIndexBuffer> inIndexBuffer) override;
 	eastl::shared_ptr<class RHIVertexBuffer> CreateVertexBuffer(const class VertexBufferLayout& inLayout, const eastl::vector<Vertex>& inVertices, eastl::shared_ptr<class RHIIndexBuffer> inIndexBuffer) override;
 
-	eastl::shared_ptr<class RHIIndexBuffer> CreateIndexBuffer(const uint32_t* inData, uint32_t inCount) override;
+ 	eastl::shared_ptr<class RHIIndexBuffer> CreateIndexBuffer(const uint32_t* inData, uint32_t inCount) override;
 
-	eastl::shared_ptr<class RHIUniformBuffer> CreateUniformBuffer(size_t inSize) override;
-
-	eastl::shared_ptr<class RHIShader> CreateShaderFromSource(const eastl::string& inVertexSrc, const eastl::string& inPixelSrc) override;
-	eastl::shared_ptr<class RHIShader> CreateShaderFromPath(const eastl::string& inVertexPath, const eastl::string& inPixelPath) override;
-
-	virtual eastl::shared_ptr<class RHITexture2D> CreateTexture2D() override;
+ 	eastl::shared_ptr<class RHIUniformBuffer> CreateUniformBuffer(size_t inSize) override;
+ 
+// 	virtual eastl::shared_ptr<class RHITexture2D> CreateTexture2D() override;
 
 	virtual void BindVertexBuffer(const RHIVertexBuffer& inBuffer, const bool inBindIndexBuffer = true) override;
 	virtual void BindIndexBuffer(const RHIIndexBuffer& inBuffer) override;
@@ -27,23 +24,19 @@ public:
 	virtual void UnbindIndexBuffer(const RHIIndexBuffer& inBuffer) override;
 
 	virtual void UniformBufferUpdateData(RHIUniformBuffer& inBuffer, const void* inData, const size_t inDataSize) override;
-
-	virtual void LoadTextureFromPath(RHITexture2D& inTexture, const eastl::string& inPath) override;
-
-	void SetViewportSize(const int32_t inWidth, const int32_t inHeight) override;
-
-
-	void ClearColor(const glm::vec4 inColor) override;
-
-	virtual void DrawElements(const int32_t inElementsCount) override;
-
-	void SwapBuffers() override;
-
-
-
-
-
-
+// 	virtual void LoadTextureFromPath(RHITexture2D& inTexture, const eastl::string& inPath) override;
+// 
+// 	void SetViewportSize(const int32_t inWidth, const int32_t inHeight) override;
+// 
+// 	void ClearColor(const glm::vec4 inColor) override;
+// 
+// 	virtual void DrawElements(const int32_t inElementsCount) override;
+// 
+// 	void SwapBuffers() override;
+// 
+// 
+// 	eastl::shared_ptr<class RHIShader> CreateShaderFromSource(const eastl::string& inVertexSrc, const eastl::string& inPixelSrc) override;
+// 	eastl::shared_ptr<class RHIShader> CreateShaderFromPath(const eastl::string& inVertexPath, const eastl::string& inPixelPath) override;
 
 
 

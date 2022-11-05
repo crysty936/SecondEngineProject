@@ -19,7 +19,8 @@ void UniformBufferContainer::UpdateData()
 	{
 		RHIBuffer = RHI::Instance->CreateUniformBuffer(UniformsCache.size());
 	}
-	RHIBuffer->SetData(UniformsCache.data(), UniformsCache.size());
+
+	RHI::Instance->UniformBufferUpdateData(*RHIBuffer, UniformsCache.data(), UniformsCache.size());
 }
 
 void UniformBufferContainer::Clear()

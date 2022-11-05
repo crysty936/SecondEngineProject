@@ -1,5 +1,6 @@
 #pragma once
-#include "Renderer/OpenGL/DrawType.h"
+#include "Renderer/DrawType.h"
+#include "EASTL/shared_ptr.h"
 
 struct RenderCommand
 {

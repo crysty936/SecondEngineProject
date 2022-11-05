@@ -34,7 +34,7 @@ public:
 	inline const eastl::vector<VertexLayoutProperties>& GetProperties() const { return Properties; }
 	inline const uint32_t GetStride() const { return Stride; }
 
-private:
+public:
 	eastl::vector<VertexLayoutProperties> Properties;
 	uint32_t Stride;
 };

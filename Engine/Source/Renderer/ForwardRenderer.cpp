@@ -1,5 +1,5 @@
 #include <assert.h>
-#include "Renderer/OpenGL/OpenGLRenderer.h"
+#include "Renderer/ForwardRenderer.h"
 #include "glad/glad.h"
 #include "Core/EngineUtils.h"
 #include "Core/EngineCore.h"
@@ -17,8 +17,6 @@
 #include "Renderer/Material/MaterialsManager.h"
 #include "Renderer/Drawable/MirrorQuad.h"
 #include "Core/ObjectCreation.h"
-#include "OpenGLDepthMap.h"
-#include "OpenGLRenderTexture.h"
 #include "Renderer/Drawable/DepthMaterial.h"
 #include "Core/WindowsPlatform.h"
 
@@ -28,6 +26,7 @@
 
 #include "Renderer/RHI/RHI.h"
 #include "Renderer/RHI/Resources/RHIShader.h"
+#include "Renderer/RHI/Resources/RHITexture.h"
 
 constexpr glm::vec4 ClearColor(0.3f, 0.5f, 1.f, 0.4f);
 constexpr glm::vec3 lightPos(-10.0f, 10.0f, -1.0f);
@@ -65,7 +64,7 @@ static std::condition_variable LoadQueueCondition;
 // 	}
 // }
 
-OpenGLRenderer::OpenGLRenderer(const WindowProperties& inMainWindowProperties)
+ForwardRenderer::ForwardRenderer(const WindowProperties& inMainWindowProperties)
 {
 	SetViewportSizeToMain();
 
@@ -75,23 +74,23 @@ OpenGLRenderer::OpenGLRenderer(const WindowProperties& inMainWindowProperties)
 	SetupBaseUniforms();
 }
 
-OpenGLRenderer::~OpenGLRenderer() = default;
+ForwardRenderer::~ForwardRenderer() = default;
 
-void OpenGLRenderer::Init(const WindowProperties & inMainWindowProperties)
+void ForwardRenderer::Init(const WindowProperties & inMainWindowProperties)
 {
-	GLRenderer = new OpenGLRenderer{ inMainWindowProperties };
+	Instance = new ForwardRenderer{ inMainWindowProperties };
 }
 
-void OpenGLRenderer::Terminate()
+void ForwardRenderer::Terminate()
 {
 
-	glDeleteBuffers(1, &GLRenderer->AuxiliarFrameBuffer);
+	glDeleteBuffers(1, &Instance->AuxiliarFrameBuffer);
 
-	ASSERT(GLRenderer);
-	delete GLRenderer;
+	ASSERT(Instance);
+	delete Instance;
 }
 
-void OpenGLRenderer::Draw()
+void ForwardRenderer::Draw()
 {
 	UpdateUniforms();
 
@@ -112,7 +111,7 @@ void OpenGLRenderer::Draw()
 
 }
 
-void OpenGLRenderer::DrawSkybox()
+void ForwardRenderer::DrawSkybox()
 {
 // 	if (!MainSkyboxCommand.Parent.lock())
 // 	{
@@ -129,7 +128,7 @@ void OpenGLRenderer::DrawSkybox()
 // 	glDepthFunc(GL_LESS);
 }
 
-void OpenGLRenderer::DrawShadowMap()
+void ForwardRenderer::DrawShadowMap()
 {
 // 	// Cull front face to solve Peter Panning
 // 	//glCullFace(GL_FRONT);
@@ -164,19 +163,19 @@ void OpenGLRenderer::DrawShadowMap()
 // 	//glCullFace(GL_BACK);
 }
 
-void OpenGLRenderer::SetupBaseUniforms()
+void ForwardRenderer::SetupBaseUniforms()
 {
 	const glm::mat4 projection = glm::perspective(glm::radians(45.0f), static_cast<float>(Engine->GetMainWindow().GetProperties().Width) / static_cast<float>(Engine->GetMainWindow().GetProperties().Height), 0.1f, 1000.0f);
 	UniformsCache["projection"] = projection;
 }
 
-void OpenGLRenderer::UpdateUniforms()
+void ForwardRenderer::UpdateUniforms()
 {
 	const glm::mat4 view = SceneManager::Get().GetCurrentScene().CurrentCamera->GetLookAt();
 	UniformsCache["view"] = view;
 }
 
-void OpenGLRenderer::DrawCommands(const eastl::vector<RenderCommand>&inCommands)
+void ForwardRenderer::DrawCommands(const eastl::vector<RenderCommand>&inCommands)
 {
 	for (const RenderCommand& renderCommand : inCommands)
 	{
@@ -184,7 +183,7 @@ void OpenGLRenderer::DrawCommands(const eastl::vector<RenderCommand>&inCommands)
 	}
 }
 
-void OpenGLRenderer::DrawCommand(const RenderCommand & inCommand)
+void ForwardRenderer::DrawCommand(const RenderCommand & inCommand)
 {
 	const bool parentValid = !inCommand.Parent.expired();
 	if (!ENSURE(parentValid))
@@ -201,8 +200,7 @@ void OpenGLRenderer::DrawCommand(const RenderCommand & inCommand)
 		return;
 	}
 
-	dataContainer->VBuffer->Bind();
-	dataContainer->VBuffer->ApplyLayout();
+	RHI::Instance->BindVertexBuffer(*(dataContainer->VBuffer));
 
 	material->Shader->Bind();
 	material->ResetUniforms();
@@ -210,9 +208,9 @@ void OpenGLRenderer::DrawCommand(const RenderCommand & inCommand)
 	UniformsCache["model"] = parent->GetModelMatrix();
 
 	int32_t i = 0;
-	for (i = 0; i < material->Textures.size(); ++i)
+	for (i = 0; i < material->DiffuseTextures.size(); ++i)
 	{
-		eastl::shared_ptr<OpenGLTexture>& tex = material->Textures[i];
+		eastl::shared_ptr<RHITexture2D>& tex = material->DiffuseTextures[i];
 		tex->Bind(i);
 	}
 
@@ -242,11 +240,11 @@ void OpenGLRenderer::DrawCommand(const RenderCommand & inCommand)
 	}
 	}
 
-	dataContainer->VBuffer->Unbind();
+	RHI::Instance->UnbindVertexBuffer(*(dataContainer->VBuffer));
 
-	for (i = 0; i < material->Textures.size(); ++i)
+	for (i = 0; i < material->DiffuseTextures.size(); ++i)
 	{
-		eastl::shared_ptr<OpenGLTexture>& tex = material->Textures[i];
+		eastl::shared_ptr<RHITexture2D>& tex = material->DiffuseTextures[i];
 		tex->Unbind(i);
 	}
 
@@ -258,7 +256,7 @@ void OpenGLRenderer::DrawCommand(const RenderCommand & inCommand)
 	material->Shader->Unbind();
 }
 
-eastl::shared_ptr<RenderMaterial> OpenGLRenderer::GetMaterial(const RenderCommand & inCommand) const
+eastl::shared_ptr<RenderMaterial> ForwardRenderer::GetMaterial(const RenderCommand & inCommand) const
 {
 	switch (DrawMode)
 	{
@@ -310,30 +308,30 @@ eastl::shared_ptr<RenderMaterial> OpenGLRenderer::GetMaterial(const RenderComman
 	return { nullptr };
 }
 
-void OpenGLRenderer::SetVSyncEnabled(const bool inEnabled)
+void ForwardRenderer::SetVSyncEnabled(const bool inEnabled)
 {
 	//glfwSwapInterval(inEnabled);
 }
 
-void OpenGLRenderer::AddMirrorCommand(const RenderCommand & inCommand)
+void ForwardRenderer::AddMirrorCommand(const RenderCommand & inCommand)
 {
 	// 	std::lock_guard<std::mutex> lock(RenderCommandsMutex);
 	// 	MirrorCommands.push_back(inCommand);
 }
 
-void OpenGLRenderer::AddCommand(const RenderCommand & inCommand)
+void ForwardRenderer::AddCommand(const RenderCommand & inCommand)
 {
 	std::lock_guard<std::mutex> lock(RenderCommandsMutex);
 	MainCommands.push_back(inCommand);
 }
 
-void OpenGLRenderer::AddCommands(eastl::vector<RenderCommand> inCommands)
+void ForwardRenderer::AddCommands(eastl::vector<RenderCommand> inCommands)
 {
 	std::lock_guard<std::mutex> lock(RenderCommandsMutex);
 	MainCommands.insert(MainCommands.end(), inCommands.begin(), inCommands.end());
 }
 
-void OpenGLRenderer::AddRenderLoadCommand(const RenderingLoadCommand & inCommand)
+void ForwardRenderer::AddRenderLoadCommand(const RenderingLoadCommand & inCommand)
 {
 	std::unique_lock<std::mutex> lock{ LoadQueueMutex };
 
@@ -341,7 +339,7 @@ void OpenGLRenderer::AddRenderLoadCommand(const RenderingLoadCommand & inCommand
 	LoadQueueCondition.notify_one();
 }
 
-bool OpenGLRenderer::GetOrCreateContainer(const eastl::string& inInstanceName, OUT eastl::shared_ptr<RenderDataContainer>& outContainer)
+bool ForwardRenderer::GetOrCreateContainer(const eastl::string& inInstanceName, OUT eastl::shared_ptr<RenderDataContainer>& outContainer)
 {
 	ASSERT(!inInstanceName.empty());
 	std::lock_guard<std::mutex> uniqueMutex(GetVAOMutex);
@@ -367,7 +365,7 @@ bool OpenGLRenderer::GetOrCreateContainer(const eastl::string& inInstanceName, O
 	return false;
 }
 
-void OpenGLRenderer::SetViewportSizeToMain()
+void ForwardRenderer::SetViewportSizeToMain()
 {
 	const WindowsWindow& currentWindow = Engine->GetMainWindow();
 	const WindowProperties& props = currentWindow.GetProperties();

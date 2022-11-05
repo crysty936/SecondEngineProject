@@ -7,7 +7,7 @@
 #include "glm/common.hpp"
 #include <stdlib.h>
 #include "Renderer/Model/3D/Assimp/AssimpModel3D.h"
-#include "Renderer/OpenGL/OpenGLRenderer.h"
+#include "Renderer/ForwardRenderer.h"
 #include "Core/ObjectCreation.h"
 #include "Renderer/Drawable/MirrorQuad.h"
 
@@ -21,7 +21,7 @@ TestGameMode::~TestGameMode() = default;
 
 void TestGameMode::Init()
 {
- 	triangle = ObjectCreation::NewObject<SquareShape>();
+ 	triangle = ObjectCreation::NewObject<TriangleShape>();
  	triangle->Move(glm::vec3(0.f, 0.f, -10.f));
 
 // 	triangle2 = ObjectCreation::NewObject<TriangleShape>();

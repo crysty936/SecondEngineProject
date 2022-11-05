@@ -1,6 +1,5 @@
 #pragma once
 #include "Renderer/Model/3D/Model3D.h"
-#include "Renderer/OpenGL/OpenGLTexture.h"
 #include "EASTL/string.h"
 #include "Core/EngineUtils.h"
 #include "assimp/material.h"

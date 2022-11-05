@@ -1,18 +1,17 @@
 #include "BasicShapes.h"
 #include "Renderer/Drawable/ShapesUtils/BasicShapesData.h"
 #include "Renderer/RHI/Resources/RenderDataContainer.h"
-#include "Renderer/OpenGL/OpenGLTexture.h"
 #include "Renderer/OpenGL/OpenGLCubeMap.h"
 #include "Renderer/Material/MaterialsManager.h"
-#include "Renderer/OpenGL/RenderCommand.h"
-#include "Renderer/OpenGL/OpenGLRenderer.h"
+#include "Renderer/RenderCommand.h"
+#include "Renderer/ForwardRenderer.h"
 #include "Core/ObjectCreation.h"
 #include "Renderer/Drawable/SkyboxMaterial.h"
 #include "Renderer/Drawable/WithShadowMaterial.h"
 #include "glad/glad.h"
 #include "Renderer/RHI/Resources/RHIVertexBuffer.h"
 #include "Renderer/RHI/RHI.h"
-#include "Renderer/RHI/Resources/IndexBufferBase.h"
+#include "Renderer/RHI/Resources/RHIIndexBuffer.h"
 
 TriangleShape::TriangleShape() = default;
 TriangleShape::~TriangleShape() = default;
@@ -22,13 +21,13 @@ void TriangleShape::CreateProxy()
 	const eastl::string vaoName = "triangleVAO";
 	eastl::shared_ptr<RenderDataContainer> dataContainer{ nullptr };
 
-	const bool existingVAO = OpenGLRenderer::Get().GetOrCreateContainer(vaoName, dataContainer);
+	const bool existingVAO = ForwardRenderer::Get().GetOrCreateContainer(vaoName, dataContainer);
 
 	if (!existingVAO)
 	{
  		const int32_t indicesCount = BasicShapesData::GetTriangleIndicesCount();
 
-		eastl::shared_ptr<IndexBufferBase> ib = RHI::Instance->CreateIndexBuffer(BasicShapesData::GetTriangleIndices(), indicesCount);
+		eastl::shared_ptr<RHIIndexBuffer> ib = RHI::Instance->CreateIndexBuffer(BasicShapesData::GetTriangleIndices(), indicesCount);
 
 		VertexBufferLayout layout;
 		// Vertex points
@@ -62,7 +61,7 @@ void TriangleShape::CreateProxy()
 	newCommand.Parent = this_shared(this);
 	newCommand.DrawType = EDrawCallType::DrawElements;
 
-	OpenGLRenderer::Get().AddCommand(newCommand);
+	ForwardRenderer::Get().AddCommand(newCommand);
 }
 
 
@@ -74,12 +73,12 @@ void SquareShape::CreateProxy()
  	const eastl::string vaoName = "squareVAO";
 	eastl::shared_ptr<RenderDataContainer> dataContainer{ nullptr };
 
-	const bool existingVAO = OpenGLRenderer::Get().GetOrCreateContainer(vaoName, dataContainer);
+	const bool existingVAO = ForwardRenderer::Get().GetOrCreateContainer(vaoName, dataContainer);
  
  	if (!existingVAO)
  	{
  		int32_t indicesCount = BasicShapesData::GetSquareIndicesCount();
-		eastl::shared_ptr<IndexBufferBase> ib = RHI::Instance->CreateIndexBuffer(BasicShapesData::GetSquareIndices(), indicesCount);
+		eastl::shared_ptr<RHIIndexBuffer> ib = RHI::Instance->CreateIndexBuffer(BasicShapesData::GetSquareIndices(), indicesCount);
 
  		VertexBufferLayout layout;
  		// Vertex points
@@ -99,12 +98,12 @@ void SquareShape::CreateProxy()
  
  	if (!materialExists)
  	{
- 		//eastl::string texturePath = "../Data/Textures/openGLExampleTransparentWindow.png";
- 		//eastl::shared_ptr<OpenGLTexture> tex = eastl::make_shared<OpenGLTexture>("DiffuseMap");
- 		//tex->Init(texturePath);
- 		//material->Textures.push_back(std::move(tex));
+ 		const eastl::string texturePath = "../Data/Textures/MinecraftGrass.jpg";
+		eastl::shared_ptr<RHITexture2D> tex = RHI::Instance->CreateTexture2D();
+		RHI::Instance->LoadTextureFromPath(*tex, texturePath);
+		material->DiffuseTextures.push_back(tex);
 
-		material->Shader = RHI::Instance->CreateShaderFromPath("../Data/Shaders/OpenGL/BasicProjectionVertexShader.glsl", "../Data/Shaders/OpenGL/FragmentShader_ColorBasedOnPosition.glsl");
+		material->Shader = RHI::Instance->CreateShaderFromPath("../Data/Shaders/OpenGL/BasicProjectionVertexShaderWithUVOutput.glsl", "../Data/Shaders/OpenGL/BasicTexFragmentShader.glsl");
 	}
  
  	RenderCommand newCommand;
@@ -113,7 +112,7 @@ void SquareShape::CreateProxy()
  	newCommand.Parent = this_shared(this);
  	newCommand.DrawType = EDrawCallType::DrawElements;
  
-	OpenGLRenderer::Get().AddCommand(newCommand);
+	ForwardRenderer::Get().AddCommand(newCommand);
 }
 
 eastl::shared_ptr<SquareShape> BasicShapes::CreateSquareObject(eastl::string inTexturePath)

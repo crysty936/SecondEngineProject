@@ -4,12 +4,14 @@
 #include "Logger/Logger.h"
 #include "assimp/postprocess.h"
 #include "Renderer/Material/MaterialsManager.h"
-#include "Renderer/OpenGL/RenderCommand.h"
-#include "Renderer/OpenGL/OpenGLRenderer.h"
+#include "Renderer/RenderCommand.h"
+#include "Renderer/ForwardRenderer.h"
 #include "Renderer/RenderingPrimitives.h"
 #include "Renderer/RHI/Resources/RenderDataContainer.h"
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
+#include "Renderer/RHI/Resources/RHITexture.h"
+#include "Renderer/RHI/RHI.h"
 
 AssimpModel3D::AssimpModel3D(const eastl::string& inPath)
 	: ModelPath{ inPath }
@@ -43,12 +45,12 @@ private:
 	void ProcessNode(const struct aiNode& inNode, const struct aiScene& inScene, eastl::shared_ptr<MeshNode>& inCurrentNode, OUT eastl::vector<RenderCommand>& outCommands);
 	void ProcessMesh(const struct aiMesh& inMesh, const struct aiScene& inScene, eastl::shared_ptr<MeshNode>& inCurrentNode, OUT eastl::vector<RenderCommand>& outCommands);
 
-	eastl::vector<eastl::shared_ptr<OpenGLTexture>> LoadMaterialTextures(const struct aiMaterial& inMat, const aiTextureType& inAssimpTexType, const TextureType inTexType);
-	bool IsTextureLoaded(const eastl::string& inTexPath, OUT eastl::shared_ptr<class OpenGLTexture>& outTex);
+	eastl::vector<eastl::shared_ptr<class RHITexture2D>> LoadMaterialTextures(const struct aiMaterial& inMat, const aiTextureType& inAssimpTexType);
+	bool IsTextureLoaded(const eastl::string& inTexPath, OUT eastl::shared_ptr<class RHITexture2D>& outTex);
 
 	static Transform aiMatrixToTransform(const aiMatrix4x4& inMatrix);
 private:
-	eastl::vector<eastl::shared_ptr<OpenGLTexture>> LoadedTextures;
+	eastl::vector<eastl::shared_ptr<class RHITexture2D>> LoadedTextures;
 	eastl::string ModelDir;
 	eastl::string ModelPath;
 
@@ -125,12 +127,12 @@ void AssimpModel3DLoader::ProcessMesh(const aiMesh& inMesh, const aiScene& inSce
  
  	if (!materialExists)
  	{
-		eastl::vector<OpenGLTexture> textures;
+		eastl::vector<RHITexture2D> textures;
 		if (inMesh.mMaterialIndex >= 0)
 		{
 			aiMaterial* Material = inScene.mMaterials[inMesh.mMaterialIndex];
-			eastl::vector<eastl::shared_ptr<OpenGLTexture>> diffuseMaps = LoadMaterialTextures(*Material, aiTextureType_DIFFUSE, TextureType::Diffuse);
-			thisMaterial->Textures.insert(thisMaterial->Textures.end(), eastl::make_move_iterator(diffuseMaps.begin()), eastl::make_move_iterator(diffuseMaps.end()));
+			eastl::vector<eastl::shared_ptr<RHITexture2D>> diffuseMaps = LoadMaterialTextures(*Material, aiTextureType_DIFFUSE);
+			thisMaterial->DiffuseTextures.insert(thisMaterial->DiffuseTextures.end(), eastl::make_move_iterator(diffuseMaps.begin()), eastl::make_move_iterator(diffuseMaps.end()));
 
 			// 		std::vector<Texture> SpecularMaps = LoadMaterialTextures(Material, aiTextureType_SPECULAR, TextureType::Specular);
 			// 		Textures.insert(Textures.end(), SpecularMaps.begin(), SpecularMaps.end());
@@ -221,9 +223,9 @@ void AssimpModel3DLoader::ProcessMesh(const aiMesh& inMesh, const aiScene& inSce
 	// 	inCurrentNode->Meshes.push_back(newMesh);
 }
 
-eastl::vector<eastl::shared_ptr<OpenGLTexture>> AssimpModel3DLoader::LoadMaterialTextures(const aiMaterial & inMat, const aiTextureType & inAssimpTexType, const TextureType inTexType)
+eastl::vector<eastl::shared_ptr<RHITexture2D>> AssimpModel3DLoader::LoadMaterialTextures(const aiMaterial & inMat, const aiTextureType & inAssimpTexType)
 {
-	eastl::vector<eastl::shared_ptr<OpenGLTexture>> textures;
+	eastl::vector<eastl::shared_ptr<RHITexture2D>> textures;
 	const uint32_t texureBaseNr = GL_TEXTURE0;
 	const uint32_t texturesCount = inMat.GetTextureCount(inAssimpTexType);
 
@@ -231,28 +233,27 @@ eastl::vector<eastl::shared_ptr<OpenGLTexture>> AssimpModel3DLoader::LoadMateria
 	{
 		aiString Str;
 		inMat.GetTexture(inAssimpTexType, i, &Str);
-		eastl::shared_ptr<OpenGLTexture> tex = eastl::make_shared<OpenGLTexture>("DiffuseMap");
+		eastl::shared_ptr<RHITexture2D> tex = RHI::Instance->CreateTexture2D();
 
 		if (!IsTextureLoaded(Str.C_Str(), tex))
 		{
-			eastl::string path = ModelDir + eastl::string("/") + eastl::string(Str.C_Str());
-			tex->Init(path);
-			tex->TexType = inTexType;
-			tex->TexPath = eastl::string(Str.C_Str());
+			const eastl::string path = ModelDir + eastl::string("/") + eastl::string(Str.C_Str());
+			RHI::Instance->LoadTextureFromPath(*tex, path);
+			tex->SourcePath = eastl::string(Str.C_Str());
 			LoadedTextures.push_back(tex);
 		}
 
-		textures.push_back(std::move(tex));
+		textures.push_back(tex);
 	}
 
 	return textures;
 }
 
-bool AssimpModel3DLoader::IsTextureLoaded(const eastl::string & inTexPath, OUT eastl::shared_ptr<OpenGLTexture>& outTex)
+bool AssimpModel3DLoader::IsTextureLoaded(const eastl::string& inTexPath, OUT eastl::shared_ptr<RHITexture2D>& outTex)
 {
-	for (const eastl::shared_ptr<OpenGLTexture>& loadedTexture : LoadedTextures)
+	for (const eastl::shared_ptr<RHITexture2D>& loadedTexture : LoadedTextures)
 	{
-		if (loadedTexture->TexPath == inTexPath)
+		if (loadedTexture->SourcePath == inTexPath)
 		{
 			outTex = loadedTexture;
 			return true;

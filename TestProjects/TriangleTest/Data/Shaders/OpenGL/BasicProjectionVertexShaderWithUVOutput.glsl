@@ -5,8 +5,14 @@ layout(location = 0) in vec3 aPosition;
 //layout(location = 1) in vec3 aNormal;
 layout(location = 1) in vec2 inTexCoords;
 
+//out vec3 INormal;
+//out vec3 IFragPos;
 layout(location = 0) out vec2 outTexCoords;
 layout(location = 1) out vec4 outFragPos;
+
+//uniform mat4 model;
+//uniform mat4 view;
+//uniform mat4 projection;
 
 layout(std140, binding = 0) uniform Matrices
 {
@@ -14,6 +20,7 @@ layout(std140, binding = 0) uniform Matrices
 	mat4 view;
 	mat4 model;
 };
+
 
 void main()
 {

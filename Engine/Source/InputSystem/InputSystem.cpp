@@ -1,6 +1,6 @@
 #include "InputSystem/InputSystem.h"
 #include "Core/WindowsPlatform.h"
-#include "Renderer/OpenGL/OpenGLRenderer.h"
+#include "Renderer/ForwardRenderer.h"
 #include "Window/WindowsWindow.h"
 #include "Core/EngineCore.h"
 

@@ -51,7 +51,6 @@ struct ConstantBuffer
 	DirectX::XMMATRIX mProjection;
 };
 
-// Works just for ortographic, TODO test for perspective more like the Unreal PrepareProjectionForRHI thing
 glm::mat4 mirrorMatrix = {
 	1.f, 0.f, 0.f, 0.f,
 	0.f, 1.f, 0.f, 0.f,
@@ -59,6 +58,7 @@ glm::mat4 mirrorMatrix = {
 	0.f, 0.f, 0.f, 1.f
 };
 
+// Works just for ortographic, TODO test for perspective more like the Unreal PrepareProjectionForRHI thing
 glm::mat4 remapZMatrix = {
 	1.f, 0.f, 0.f, 0.f,
 	0.f, 1.f, 0.f, 0.f,
@@ -68,9 +68,6 @@ glm::mat4 remapZMatrix = {
 
 D3D11Renderer::D3D11Renderer(const WindowProperties& inMainWindowProperties)
 {
-	triangle->Move(glm::vec3(0.f, 5.f, 1.f));
-
-
 	HRESULT hr = S_OK;
 
 	RECT rc;
@@ -212,7 +209,7 @@ D3D11Renderer::D3D11Renderer(const WindowProperties& inMainWindowProperties)
 		psBlob->Release();
 	}
 
-	// Create Index Buffer
+	// Create Vertex Buffer
 	{
 		D3D11_BUFFER_DESC bd = {};
 		bd.Usage = D3D11_USAGE_DEFAULT;
@@ -225,6 +222,7 @@ D3D11Renderer::D3D11Renderer(const WindowProperties& inMainWindowProperties)
 		ASSERT(!FAILED(hr));
 	}
 
+	// Create Index Buffer
 	{
 		D3D11_BUFFER_DESC ibd = {};
 		ibd.Usage = D3D11_USAGE_DEFAULT;
@@ -249,7 +247,6 @@ D3D11Renderer::D3D11Renderer(const WindowProperties& inMainWindowProperties)
 	}
 
 
-	
 	// Set vertex buffer
 	UINT stride = sizeof(glm::vec3) + sizeof(glm::vec3) + sizeof(glm::vec2);
 	UINT offset = 0;
@@ -299,6 +296,12 @@ void D3D11Renderer::Terminate()
 
 void D3D11Renderer::Draw()
 {
+	// Set vertex buffer
+	UINT stride = sizeof(glm::vec3) + sizeof(glm::vec3) + sizeof(glm::vec2);
+	UINT offset = 0;
+	g_pImmediateContext->IASetVertexBuffers(0, 1, &g_pVertexBuffer, &stride, &offset);
+	g_pImmediateContext->IASetIndexBuffer(g_pIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
+
 	// Initialize the world matrix
 //g_World = DirectX::XMMatrixTranslation(1.f, 5.f, 20.f);
 //g_World = g_World * DirectX::XMMatrixRotationZ(DirectX::XMConvertToRadians(20.f));
@@ -359,6 +362,10 @@ void D3D11Renderer::Draw()
 
 	// Present the information rendered to the back buffer to the front buffer (the screen)
 	g_pSwapChain->Present(0, 0);
+
+	g_pImmediateContext->IASetIndexBuffer(nullptr, DXGI_FORMAT_UNKNOWN, 0);
+	g_pImmediateContext->IASetVertexBuffers(0, 0, nullptr, 0, 0);
+
 }
 
 

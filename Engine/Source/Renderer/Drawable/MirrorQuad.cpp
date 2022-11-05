@@ -1,10 +1,9 @@
 #include "Renderer/Drawable/MirrorQuad.h"
 #include "Renderer/Drawable/ShapesUtils/BasicShapesData.h"
 #include "Renderer/RHI/Resources/RenderDataContainer.h"
-#include "Renderer/OpenGL/OpenGLTexture.h"
 #include "Renderer/Material/MaterialsManager.h"
-#include "Renderer/OpenGL/RenderCommand.h"
-#include "Renderer/OpenGL/OpenGLRenderer.h"
+#include "Renderer/RenderCommand.h"
+#include "Renderer/ForwardRenderer.h"
 #include "Core/ObjectCreation.h"
 
 MirrorQuad::MirrorQuad() = default;

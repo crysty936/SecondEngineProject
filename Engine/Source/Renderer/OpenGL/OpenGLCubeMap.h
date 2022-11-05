@@ -1,7 +1,7 @@
-#include "OpenGLTexture.h"
 #include "EASTL/vector.h"
+#include "EASTL/string.h"
 
-class OpenGLCubeMap : public OpenGLTexture
+class OpenGLCubeMap /*: public OpenGLTexture*/
 {
 public:
 	OpenGLCubeMap(const eastl::string& inTexName);
