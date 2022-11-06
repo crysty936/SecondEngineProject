@@ -13,6 +13,7 @@
 
 #include "glad/glad.h"
 #include "Renderer/RHI/OpenGL/Resources/GLTexture2D.h"
+#include "glm/ext/matrix_transform.hpp"
 
 namespace GLUtils
 {
@@ -251,6 +252,8 @@ OpenGLRHI::OpenGLRHI()
 
 	glEnable(GL_CULL_FACE);
 
+	glDisable(GL_DEPTH_CLAMP);
+
 	glDebugMessageCallback(GLUtils::GLDebugCallback, nullptr);
 
 	glFrontFace(GL_CCW);
@@ -403,6 +406,12 @@ void OpenGLRHI::SwapBuffers()
 void OpenGLRHI::ClearBuffers()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+}
+
+void OpenGLRHI::PrepareProjectionForRendering(glm::mat4& inProj)
+{
+	inProj[2][2] = (inProj[2][2] * 2.f) - (-1.f);
+	inProj[3][2] *= 2.f;
 }
 
 void OpenGLRHI::BindVertexBuffer(const RHIVertexBuffer& inBuffer, const bool inBindIndexBuffer)

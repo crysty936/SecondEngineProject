@@ -242,6 +242,17 @@ namespace glm
 		Result[2][2] = zFar / (zNear - zFar);
 		Result[2][3] = - static_cast<T>(1);
 		Result[3][2] = -(zFar * zNear) / (zFar - zNear);
+
+
+
+		mat<4, 4, T, defaultp> Result2(static_cast<T>(0));
+		Result2[0][0] = static_cast<T>(1) / (aspect * tanHalfFovy);
+		Result2[1][1] = static_cast<T>(1) / (tanHalfFovy);
+		Result2[2][2] = -(zFar + zNear) / (zFar - zNear);
+		Result2[2][3] = -static_cast<T>(1);
+		Result2[3][2] = -(static_cast<T>(2) * zFar * zNear) / (zFar - zNear);
+
+
 		return Result;
 	}
 

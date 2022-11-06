@@ -163,7 +163,11 @@ void ForwardRenderer::DrawShadowMap()
 
 void ForwardRenderer::SetupBaseUniforms()
 {
-	const glm::mat4 projection = glm::perspective(glm::radians(90.0f), static_cast<float>(Engine->GetMainWindow().GetProperties().Width) / static_cast<float>(Engine->GetMainWindow().GetProperties().Height), 0.1f, 1000.0f);
+	// By default, use a D3D11 projection matrix.
+	// Note: glm is RH but uses - to change the handedness of the output, in this case to LH
+	glm::mat4 projection = glm::perspectiveRH_ZO(glm::radians(90.0f), static_cast<float>(Engine->GetMainWindow().GetProperties().Width) / static_cast<float>(Engine->GetMainWindow().GetProperties().Height), 1.f, 1000.0f);
+	RHI::Instance->PrepareProjectionForRendering(projection);
+
 	UniformsCache["projection"] = projection;
 }
 

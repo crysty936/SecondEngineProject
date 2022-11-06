@@ -45,7 +45,6 @@ public:
 // 
 // 
 
-
 	virtual void ClearBuffers() override;
 
 
@@ -56,6 +55,9 @@ public:
 
 
 	virtual void ClearColor(const glm::vec4 inColor) override;
+
+
+	virtual void PrepareProjectionForRendering(glm::mat4& inProj) override;
 
 private:
 	glm::vec4 CurrentClearColor = glm::vec4(1.f, 1.f, 1.f, 1.f);

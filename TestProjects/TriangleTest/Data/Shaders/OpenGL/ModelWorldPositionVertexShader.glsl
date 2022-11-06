@@ -21,7 +21,11 @@ void main()
 	//INormal = mat3(transpose(inverse(model))) * aNormal;
 	//IFragPos = vec3(model * vec4(aPosition, 1.0));
 
-	outFragPos = projection * view * model * vec4(aPosition, 1.0);;
-	gl_Position = outFragPos;
+	//vec4 canonicalViewPos = vec4(aPosition, 1.0);
+	vec4 canonicalViewPos = projection * view * model * vec4(aPosition, 1.0);
 
+	//canonicalViewPos.z = 1.0;
+
+	outFragPos = canonicalViewPos;
+	gl_Position = canonicalViewPos;
 }

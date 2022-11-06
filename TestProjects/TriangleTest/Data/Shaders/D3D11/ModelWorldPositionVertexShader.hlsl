@@ -24,6 +24,9 @@ float4 VS(VS_INPUT input) : SV_POSITION
 	output = mul(View, output);
 	output = mul(Projection, output);
 
+	//float4 output = input.Pos;
+
+	//output.z = 1.f;
 
     return output;
 }

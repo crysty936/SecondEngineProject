@@ -5,6 +5,7 @@
 #include "Renderer/RenderingPrimitives.h"
 #include "glm/ext/vector_float3.hpp"
 #include "glm/ext/vector_float4.hpp"
+#include "glm/ext/matrix_float4x4.hpp"
 
 class RHI
 {
@@ -46,6 +47,8 @@ public:
 	virtual void SwapBuffers() {}
 
 	virtual void ClearBuffers() {}
+
+	virtual void PrepareProjectionForRendering(glm::mat4& inProj) {}
 
 public:
 	inline static class RHI* Instance = nullptr;

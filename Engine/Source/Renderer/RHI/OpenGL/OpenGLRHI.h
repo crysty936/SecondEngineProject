@@ -46,4 +46,5 @@ public:
 
 	virtual void ClearBuffers() override;
 
+	virtual void PrepareProjectionForRendering(glm::mat4& inProj) override;
 };

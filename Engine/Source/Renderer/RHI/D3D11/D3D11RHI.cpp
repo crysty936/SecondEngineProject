@@ -91,7 +91,7 @@ D3D11RHI::D3D11RHI()
 	ImmediateContext->OMSetRenderTargets(1, &RenderTarget, NULL);
 
 	// Setup the viewport
-	D3D11_VIEWPORT vp;
+	D3D11_VIEWPORT vp = {};
 	vp.Width = (FLOAT)width;
 	vp.Height = (FLOAT)height;
 	vp.MinDepth = 0.0f;
@@ -360,6 +360,11 @@ eastl::shared_ptr<class RHIUniformBuffer> D3D11RHI::CreateUniformBuffer(size_t i
  void D3D11RHI::ClearColor(const glm::vec4 inColor)
  {
 	 CurrentClearColor = inColor;
+ }
+
+ void D3D11RHI::PrepareProjectionForRendering(glm::mat4& inProj)
+ {
+	// Default Matrix is D3D11 so don't do anything
  }
 
 void D3D11RHI::BindVertexBuffer(const RHIVertexBuffer& inBuffer, const bool inBindIndexBuffer /*= true*/)
