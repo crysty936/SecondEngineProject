@@ -34,7 +34,8 @@ void Logger::Print(const char* inFormat, Severity inSeverity, ...)
  #endif
 
 	// Try to use a stack allocated buffer
- 	constexpr int32_t bufferSize = 512;
+ 	constexpr int32_t bufferSize = 1024;
+
   	char stackArray[bufferSize];
  
   	va_list argumentList;

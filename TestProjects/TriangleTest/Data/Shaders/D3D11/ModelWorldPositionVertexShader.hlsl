@@ -1,5 +1,5 @@
 
-cbuffer ConstantBuffer : register(b0)
+cbuffer ConstantBuffer
 {
 	matrix Projection;
 	matrix View;
@@ -20,7 +20,7 @@ struct PS_INPUT
 };
 
  
-PS_INPUT VS(VS_INPUT input)
+PS_INPUT VSEntry(VS_INPUT input)
 {
 	//float4 output = mul(input.Pos, Model);
 	//output = mul(output, View);
@@ -30,7 +30,7 @@ PS_INPUT VS(VS_INPUT input)
 	output = mul(View, output);
 	output = mul(Projection, output);
 
-	PS_INPUT psOut = (PS_INPUT)0;
+	PS_INPUT psOut;
 	psOut.Pos = output;
 	psOut.TexCoord = input.Coord;
 

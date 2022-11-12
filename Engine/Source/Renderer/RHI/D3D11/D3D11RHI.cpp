@@ -311,7 +311,7 @@ eastl::shared_ptr<class RHIShader> D3D11RHI::CreateShaderFromSource(const eastl:
 		 ID3DBlob* vsBlob = NULL;
 		 ID3DBlob* errBlob = NULL;
 
-		 D3DCompile2(inVertexSrc.data(), inVertexSrc.size(), inVSName.c_str(), nullptr, nullptr, "VS", "vs_5_0", D3DCOMPILE_DEBUG | D3DCOMPILE_DEBUG_NAME_FOR_SOURCE, 0, 0, nullptr, 0, &vsBlob, &errBlob);
+		 D3DCompile2(inVertexSrc.data(), inVertexSrc.size(), inVSName.c_str(), nullptr, nullptr, "VSEntry", "vs_5_0", D3DCOMPILE_DEBUG | D3DCOMPILE_DEBUG_NAME_FOR_SOURCE, 0, 0, nullptr, 0, &vsBlob, &errBlob);
 
 		 if (!ENSURE(!errBlob))
 		 {

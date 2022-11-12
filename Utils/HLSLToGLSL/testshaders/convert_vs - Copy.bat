@@ -1,0 +1,1 @@
+..\win32\HLSL2GLSLConverter.exe -i D:\dev\SecondEngineProject\TestProjects\TriangleTest\Data\Shaders\D3D11\ModelWorldPositionVertexShader.hlsl -d .\ -d .\include -t vs -e VSEntry -c -o ModelWorldPositionVertexShader.glsl
