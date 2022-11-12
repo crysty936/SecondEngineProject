@@ -21,8 +21,8 @@ TestGameMode::~TestGameMode() = default;
 
 void TestGameMode::Init()
 {
- 	triangle = ObjectCreation::NewObject<TriangleShape>();
- 	triangle->Move(glm::vec3(0.f, 0.f, -500.f));
+ 	triangle = ObjectCreation::NewObject<CubeShape>();
+ 	triangle->Move(glm::vec3(0.f, 0.f, -5.f));
 
  	//triangle2 = ObjectCreation::NewObject<TriangleShape>();
  	//triangle2->Move(glm::vec3(0.f, 0.f, -100.f));
@@ -31,6 +31,6 @@ void TestGameMode::Init()
 
  void TestGameMode::Tick(float inDeltaT)
  {
-	 triangle->Rotate(inDeltaT, glm::vec3(0.f, 0.f, 1.f));
+	 triangle->Rotate(inDeltaT * 50.f, glm::vec3(0.f, 1.f, 1.f));
 	 //triangle2->Rotate(inDeltaT, glm::vec3(0.f, 0.f, -1.f));
  }

@@ -320,12 +320,13 @@ eastl::shared_ptr<RHIUniformBuffer> OpenGLRHI::CreateUniformBuffer(size_t inSize
 	return newBuffer;
 }
 
-eastl::shared_ptr<RHITexture2D> OpenGLRHI::CreateTexture2D()
+eastl::shared_ptr<RHITexture2D> OpenGLRHI::CreateTexture2D(const eastl::string& inDataPath)
 {
 	uint32_t texHandle = 0;
 	glGenTextures(1, &texHandle);
 
 	eastl::shared_ptr<GLTexture2D> newTexture = eastl::make_shared<GLTexture2D>(texHandle);
+	LoadImageToTextureFromPath(*newTexture, inDataPath);
 
 	return newTexture;
 }
@@ -342,7 +343,7 @@ void OpenGLRHI::UniformBufferUpdateData(RHIUniformBuffer& inBuffer, const void* 
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
-void OpenGLRHI::LoadTextureFromPath(RHITexture2D& inTexture, const eastl::string& inPath)
+void OpenGLRHI::LoadImageToTextureFromPath(RHITexture2D& inTexture, const eastl::string& inPath)
 {
 	GLTexture2D& tex = static_cast<GLTexture2D&>(inTexture);
 	ImageData data = ImageLoading::LoadImageData(inPath.data());
@@ -384,7 +385,7 @@ void OpenGLRHI::LoadTextureFromPath(RHITexture2D& inTexture, const eastl::string
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-	ImageLoading::FreeImageData(data.RawData);
+	ImageLoading::FreeImageData(data);
 }
 
 void OpenGLRHI::SetViewportSize(const int32_t inWidth, const int32_t inHeight)
@@ -410,8 +411,18 @@ void OpenGLRHI::ClearBuffers()
 
 void OpenGLRHI::PrepareProjectionForRendering(glm::mat4& inProj)
 {
-	inProj[2][2] = (inProj[2][2] * 2.f) - (-1.f);
-	inProj[3][2] *= 2.f;
+  	inProj[2][2] = (inProj[2][2] * 2.f) - (-1.f);
+  	inProj[3][2] *= 2.f;
+
+	// From Unreal - same thing
+// 	const glm::mat4 scaleMultiply = glm::scale(glm::identity<glm::mat4>(), glm::vec3(1.f, 1.f, 2.f));
+// 	const glm::mat4 trans = glm::translate(glm::identity<glm::mat4>(), glm::vec3(0.f, 0.f, -1.f));
+// 
+// 	inProj = trans * scaleMultiply * inProj;
+
+	// same thing
+// 	glm::scale(inProj, glm::vec3(1.f, 1.f, 2.f));
+// 	glm::translate(inProj, glm::vec3(0.f, 0.f, -1.f));
 }
 
 void OpenGLRHI::BindVertexBuffer(const RHIVertexBuffer& inBuffer, const bool inBindIndexBuffer)
@@ -471,6 +482,13 @@ void OpenGLRHI::BindUniformBuffer(const RHIUniformBuffer& inBuffer)
 	glBindBuffer(GL_UNIFORM_BUFFER, glbuffer.GLHandle);
 }
 
+void OpenGLRHI::BindTexture2D(const RHITexture2D& inTex, const int32_t inTexId)
+{
+	const GLTexture2D& glTex = static_cast<const GLTexture2D&>(inTex);
+	glActiveTexture(GL_TEXTURE0 + inTexId);
+	glBindTexture(GL_TEXTURE_2D, glTex.GlHandle);
+}
+
 void OpenGLRHI::UnbindVertexBuffer(const RHIVertexBuffer& inBuffer, const bool inUnbindIndexBuffer)
 {
 	if (inUnbindIndexBuffer)
@@ -495,6 +513,12 @@ void OpenGLRHI::UnbindShader(const RHIShader& inShader)
 void OpenGLRHI::UnbindUniformBuffer(const RHIUniformBuffer& inBuffer)
 {
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+}
+
+void OpenGLRHI::UnbindTexture2D(const RHITexture2D& inTex, const int32_t inTexId)
+{
+	glActiveTexture(GL_TEXTURE0 + inTexId);
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 uint32_t CreateShaderInternal(const eastl::string& Source, uint32_t ShaderType)
@@ -532,7 +556,7 @@ uint32_t CreateShaderInternal(const eastl::string& Source, uint32_t ShaderType)
 	return shaderHandle;
 }
 
-eastl::shared_ptr<class RHIShader> OpenGLRHI::CreateShaderFromSource(const eastl::string& inVertexSrc, const eastl::string& inPixelSrc, const VertexInputLayout& inInputLayout)
+eastl::shared_ptr<class RHIShader> OpenGLRHI::CreateShaderFromSource(const eastl::string& inVertexSrc, const eastl::string& inPixelSrc, const VertexInputLayout& inInputLayout, const eastl::string&, const eastl::string&)
 {
 
 	// Create an empty vertex shader handle

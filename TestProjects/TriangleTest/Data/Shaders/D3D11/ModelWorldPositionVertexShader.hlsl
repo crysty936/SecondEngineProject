@@ -9,12 +9,18 @@ cbuffer ConstantBuffer : register(b0)
 struct VS_INPUT
 {
 	float4 Pos : POSITION;
-	//float3 Norm : NORMAL;
-	//float2 Coord : TEXCOORD;
+	float3 Norm : NORMAL;
+	float2 Coord : TEXCOORD0;
 };
 
+struct PS_INPUT
+{
+	float4 Pos : SV_POSITION;
+	float2 TexCoord : TEXCOORD0;
+};
 
-float4 VS(VS_INPUT input) : SV_POSITION
+ 
+PS_INPUT VS(VS_INPUT input)
 {
 	//float4 output = mul(input.Pos, Model);
 	//output = mul(output, View);
@@ -24,9 +30,9 @@ float4 VS(VS_INPUT input) : SV_POSITION
 	output = mul(View, output);
 	output = mul(Projection, output);
 
-	//float4 output = input.Pos;
+	PS_INPUT psOut = (PS_INPUT)0;
+	psOut.Pos = output;
+	psOut.TexCoord = input.Coord;
 
-	//output.z = 1.f;
-
-    return output;
+    return psOut;
 }

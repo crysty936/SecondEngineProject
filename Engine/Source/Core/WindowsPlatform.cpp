@@ -4,7 +4,6 @@
 #include "Logger/Logger.h"
 #include "InputSystem/InputType.h"
 #include "InputSystem/InputSystem.h"
-#include "Renderer/TempRenderWrapper.h"
 #include "Window/WindowsWindow.h"
 #include <atlbase.h>
 #include <atlwin.h>

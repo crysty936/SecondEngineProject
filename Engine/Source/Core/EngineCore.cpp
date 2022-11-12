@@ -8,9 +8,9 @@
 #include "Core/GameModeBase.h"
 #include "Timer/TimersManager.h"
 #include "Renderer/Material/MaterialsManager.h"
-#include "Renderer/TempRenderWrapper.h"
 #include "Window/WindowsWindow.h"
 #include "Renderer/RHI/RHI.h"
+#include "Renderer/ForwardRenderer.h"
 
 constexpr float IdealFrameRate = 60.f;
 constexpr float IdealFrameTime = 1.0f / IdealFrameRate;
@@ -42,8 +42,8 @@ void EngineCore::Init()
 	InputSystem::Get().SetCursorMode(Engine->MainWindow->GetHandle(), ECursorMode::Disabled);
 
 	RHI::Init();
+	ForwardRenderer::Init();
 
-	TempRenderWrapper::Init();
 	SceneManager::Init();
 	TimersManager::Init();
 	MaterialsManager::Init();
@@ -60,7 +60,7 @@ void EngineCore::Terminate()
 	MaterialsManager::Terminate();
 	TimersManager::Terminate();
 	SceneManager::Terminate();
-	TempRenderWrapper::Terminate();
+	ForwardRenderer::Terminate();
 	RHI::Terminate();
 	InputSystem::Terminate();
 
@@ -108,7 +108,7 @@ void EngineCore::Run()
 		SceneManager::Get().GetCurrentScene().TickObjects(CurrentDeltaT);
 		CurrentGameMode->Tick(CurrentDeltaT);
 
-		TempRenderWrapper::Draw();
+		ForwardRenderer::Get().Draw();
 
 		CheckShouldCloseWindow();
 	}

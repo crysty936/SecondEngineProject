@@ -18,6 +18,6 @@ struct ImageData
 namespace ImageLoading
 {
 	ImageData LoadImageData(const char* inTexurePath, const bool inFlipped = true);
-	void FreeImageData(unsigned char* inData);
+	void FreeImageData(ImageData inData);
 }
 

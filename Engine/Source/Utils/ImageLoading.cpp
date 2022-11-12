@@ -6,7 +6,7 @@
 #include <mutex>
 
 // TODO: Handle multiple threads with stbi
-// At the moment, flip vertically flag is making multithreading on this impossible
+// At the moment, global flip vertically flag is making multithreading on this impossible
 static std::mutex stbiMutex;
 
 ImageData ImageLoading::LoadImageData(const char* inTexurePath, const bool inFlipped)
@@ -18,7 +18,7 @@ ImageData ImageLoading::LoadImageData(const char* inTexurePath, const bool inFli
 	int32_t width, height, nrChannels;
 	width, height, nrChannels = 0;
 
-	rawData = stbi_load(inTexurePath, &width, &height, &nrChannels, 0);
+	rawData = stbi_load(inTexurePath, &width, &height, &nrChannels, 4);
 
 	if (!ENSURE_MSG(rawData, "Image %s Loading Failed", inTexurePath))
 	{
@@ -27,12 +27,12 @@ ImageData ImageLoading::LoadImageData(const char* inTexurePath, const bool inFli
 		return {};
 	}
 
-	ImageData data{ rawData, nrChannels, width, height };
+	ImageData data{ rawData, 4, width, height };
 
 	return data;
 }
 
-void ImageLoading::FreeImageData(unsigned char* inData)
+void ImageLoading::FreeImageData(ImageData inData)
 {
-	stbi_image_free(inData);
+	stbi_image_free(inData.RawData);
 }

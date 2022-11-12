@@ -100,12 +100,10 @@ void SquareShape::CreateProxy()
  
  	if (!materialExists)
  	{
- 		const eastl::string texturePath = "../Data/Textures/MinecraftGrass.jpg";
-		eastl::shared_ptr<RHITexture2D> tex = RHI::Instance->CreateTexture2D();
-		RHI::Instance->LoadTextureFromPath(*tex, texturePath);
-		material->DiffuseTextures.push_back(tex);
+ 		eastl::shared_ptr<RHITexture2D> tex = RHI::Instance->CreateTexture2D("../Data/Textures/MinecraftGrass.jpg");
+ 		material->DiffuseTextures.push_back(tex);
 
-		material->Shader = RHI::Instance->CreateShaderFromPath("../Data/Shaders/OpenGL/BasicProjectionVertexShaderWithUVOutput.glsl", "../Data/Shaders/OpenGL/BasicTexFragmentShader.glsl", inputLayout);
+		material->Shader = RHI::Instance->CreateShaderFromPath("ModelWorldPositionVertexShader", "BasicTexFragmentShader", inputLayout);
 	}
  
  	RenderCommand newCommand;
@@ -119,11 +117,6 @@ void SquareShape::CreateProxy()
 
 eastl::shared_ptr<SquareShape> BasicShapes::CreateSquareObject(eastl::string inTexturePath)
 {
-// 	if (inTexturePath.empty())
-// 	{
-// 		inTexturePath = eastl::string("../Data/Textures/ExampleContainer.jpg");
-// 	}
-
 	eastl::shared_ptr<SquareShape> obj = ObjectCreation::NewObject<SquareShape>();
 
 	return obj;
@@ -141,60 +134,52 @@ CubeShape::~CubeShape() = default;
 
 void CubeShape::CreateProxy()
 {
-//  	const eastl::string vaoName = "cubeVAO";
-// 	eastl::shared_ptr<RenderDataContainer> dataContainer{ nullptr };
-// 
-//  	//TODO: Make work with generic renderer
-// 	const bool existingVAO = OpenGLRenderer::GetRHI().GetOrCreateContainer(vaoName, dataContainer);
-// 	if (!existingVAO)
-//  	{
-//  		// TODO: Buffers creation should be delegated to the renderer
-//  		OpenGLIndexBuffer ibo = OpenGLIndexBuffer{};
-//  		int32_t indicesCount = BasicShapesData::GetCubeIndicesCount();
-//  		ibo.SetIndices(BasicShapesData::GetCubeIndices(), indicesCount);
-//  
-//  		VertexBufferLayout layout;
-//  		// Vertex points
-//  		layout.Push<float>(3);
-//  		// Normals
-//  		layout.Push<float>(3);
-//  		// Vertex Tex Coords
-//  		layout.Push<float>(2);
-//  
-//  		OpenGLVertexBuffer vbo = OpenGLVertexBuffer{ ibo, layout };
-//  		int32_t verticesCount = BasicShapesData::GetCubeVerticesCount();
-//  		vbo.SetData(BasicShapesData::GetCubeVertices(), verticesCount);
-//  
-//  		//thisVAO->VBuffer = vbo;// TODO
-//  	}
-//  
-//  	MaterialsManager& matManager = MaterialsManager::Get();
-//  	bool materialExists = false;
-//  	//eastl::shared_ptr<RenderMaterial> cubeMaterial = matManager.GetOrAddMaterial<WithShadowMaterial>("cube_material", materialExists);
-//  	// TODO: Shadow disabled for now
-//  	eastl::shared_ptr<RenderMaterial> cubeMaterial = matManager.GetOrAddMaterial<RenderMaterial>("cube_material", materialExists);
-//  
-//  	if (!materialExists)
-//  	{
-//  		eastl::string texturePath = "../Data/Textures/MinecraftGrass.jpg";
-//  		eastl::shared_ptr<OpenGLTexture> tex = eastl::make_shared<OpenGLTexture>("DiffuseMap");
-//  		tex->Init(texturePath);
-//  		cubeMaterial->Textures.push_back(std::move(tex));
-//  		cubeMaterial->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/BasicPerspVertexShader.glsl", "../Data/Shaders/BasicTexFragmentShader.glsl");
-//  		//cubeMaterial->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/WithNormalProjectionVertexShader.glsl", "../Data/Shaders/LightingTexFragmentShader.glsl");
-//  	}
-//  
-//  	eastl::shared_ptr<MeshNode> cubeNode = eastl::make_shared<MeshNode>();
-//  	AddChild(cubeNode);
-//  
-//  	RenderCommand newCommand;
-//  	newCommand.Material = cubeMaterial;
-//  	newCommand.VAO = thisVAO;
-//  	newCommand.Parent = cubeNode;
-//  	newCommand.DrawType = EDrawCallType::DrawElements;
-//  
-//  	//TODO: Make work with generic renderer
-//  	OpenGLRenderer::GetRHI().AddCommand(newCommand);
+  	const eastl::string vaoName = "cubeVAO";
+ 	eastl::shared_ptr<RenderDataContainer> dataContainer{ nullptr };
+
+	const bool existingVAO = ForwardRenderer::Get().GetOrCreateContainer(vaoName, dataContainer);
+	VertexInputLayout inputLayout;
+	// Vertex points
+	inputLayout.Push<float>(3, VertexInputType::Position);
+    // Vertex Normal
+	inputLayout.Push<float>(3, VertexInputType::Normal);
+	// Vertex Tex Coords
+	inputLayout.Push<float>(2, VertexInputType::TexCoords);
+ 	if (!existingVAO)
+  	{
+		int32_t indicesCount = BasicShapesData::GetCubeIndicesCount();
+		eastl::shared_ptr<RHIIndexBuffer> ib = RHI::Instance->CreateIndexBuffer(BasicShapesData::GetCubeIndices(), indicesCount);
+
+
+		int32_t verticesCount = BasicShapesData::GetCubeVerticesCount();
+		const eastl::shared_ptr<RHIVertexBuffer> vb = RHI::Instance->CreateVertexBuffer(inputLayout, BasicShapesData::GetCubeVertices(), verticesCount, ib);
+
+		dataContainer->VBuffer = vb;
+  	}
+  
+  	MaterialsManager& matManager = MaterialsManager::Get();
+  	bool materialExists = false;
+  	//eastl::shared_ptr<RenderMaterial> cubeMaterial = matManager.GetOrAddMaterial<WithShadowMaterial>("cube_material", materialExists);
+  	// TODO: Shadow disabled for now
+	eastl::shared_ptr<RenderMaterial> material = matManager.GetOrAddMaterial("cube_material", materialExists);
+  
+  	if (!materialExists)
+  	{
+		eastl::shared_ptr<RHITexture2D> tex = RHI::Instance->CreateTexture2D("../Data/Textures/MinecraftGrass.jpg");
+		material->DiffuseTextures.push_back(tex);
+		material->Shader = RHI::Instance->CreateShaderFromPath("ModelWorldPositionVertexShader", "BasicTexFragmentShader", inputLayout);
+  	}
+  
+  	eastl::shared_ptr<MeshNode> cubeNode = eastl::make_shared<MeshNode>();
+  	AddChild(cubeNode);
+  
+	RenderCommand newCommand;
+	newCommand.Material = material;
+	newCommand.DataContainer = dataContainer;
+	newCommand.Parent = cubeNode;
+	newCommand.DrawType = EDrawCallType::DrawElements;
+  
+	ForwardRenderer::Get().AddCommand(newCommand);
 }
 
 Skybox::Skybox() = default;

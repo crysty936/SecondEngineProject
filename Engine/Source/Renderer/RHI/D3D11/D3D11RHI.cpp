@@ -12,8 +12,11 @@
 #include "Renderer/RHI/D3D11/Resources/D3D11IndexBuffer.h"
 #include "Renderer/RHI/D3D11/Resources/D3D11VertexBuffer.h"
 #include "Renderer/RHI/D3D11/Resources/D3D11UniformBuffer.h"
-#include "Utils/IOUtils.h"
 #include "Renderer/RHI/D3D11/Resources/D3D11Shader.h"
+#include "Renderer/RHI/D3D11/Resources/D3D11UniformBuffer.h"
+#include "Renderer/RHI/D3D11/Resources/D3D11Texture2D.h"
+#include "Utils/IOUtils.h"
+#include "Utils/ImageLoading.h"
 
 static D3D_DRIVER_TYPE	PresentDriverType = D3D_DRIVER_TYPE_NULL;
 static D3D_FEATURE_LEVEL PresentFeatureLevel = D3D_FEATURE_LEVEL_11_0;
@@ -21,6 +24,7 @@ static ID3D11Device* D3DDevice = NULL;
 static ID3D11DeviceContext* ImmediateContext = NULL;
 static IDXGISwapChain* SwapChain = NULL;
 static ID3D11RenderTargetView* RenderTarget = NULL;
+static ID3D11SamplerState* GlobalSamplerLinear = NULL;
 
 D3D11RHI::D3D11RHI()
 {
@@ -122,6 +126,24 @@ D3D11RHI::D3D11RHI()
 		D3DDevice->CreateRasterizerState(&rastDesc, &newState);
 		ImmediateContext->RSSetState(newState);
 	}
+
+	// Create the global linear sample state
+	D3D11_SAMPLER_DESC samplerDesc = {};
+	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+	samplerDesc.MipLODBias = 0.0f;
+	samplerDesc.MaxAnisotropy = 1;
+	samplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+	samplerDesc.BorderColor[0] = 0;
+	samplerDesc.BorderColor[1] = 0;
+	samplerDesc.BorderColor[2] = 0;
+	samplerDesc.BorderColor[3] = 0;
+	samplerDesc.MinLOD = 0;
+	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+	hr = D3DDevice->CreateSamplerState(&samplerDesc, &GlobalSamplerLinear);
+	ASSERT(!FAILED(hr));
 }
 
 D3D11RHI::~D3D11RHI() = default;
@@ -199,10 +221,12 @@ eastl::shared_ptr<class RHIUniformBuffer> D3D11RHI::CreateUniformBuffer(size_t i
 	D3D11_BUFFER_DESC bd = {};
 
 	const uint32_t usize = static_cast<uint32_t>(inSize);
-	bd.Usage = D3D11_USAGE_DEFAULT;
+	bd.Usage = D3D11_USAGE_DYNAMIC;
 	bd.ByteWidth = usize;
 	bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	bd.CPUAccessFlags = 0;
+	bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	bd.MiscFlags = 0;
+	bd.StructureByteStride = 0;
 
 	hr = D3DDevice->CreateBuffer(&bd, NULL, &bufferHandle);
 	ASSERT(!FAILED(hr));
@@ -212,8 +236,70 @@ eastl::shared_ptr<class RHIUniformBuffer> D3D11RHI::CreateUniformBuffer(size_t i
 	return newBuffer;
 }
 
- 
- eastl::shared_ptr<class RHIShader> D3D11RHI::CreateShaderFromSource(const eastl::string& inVertexSrc, const eastl::string& inPixelSrc, const VertexInputLayout& inInputLayout)
+eastl::shared_ptr<class RHITexture2D> D3D11RHI::CreateTexture2D(const eastl::string& inDataPath)
+{
+	// TODO: Create empty texture and they update it using UpdateSubresource
+
+	ImageData data = ImageLoading::LoadImageData(inDataPath.data());
+	if (!data.RawData)
+ 	{
+ 		return nullptr;
+ 	}
+
+  	D3D11_TEXTURE2D_DESC desc = {};
+	desc.Width = data.Width;
+	desc.Height = data.Height;
+	desc.MipLevels = 0;
+	desc.ArraySize = 1;
+	desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	desc.SampleDesc.Count = 1;
+	desc.SampleDesc.Quality = 0;
+	desc.Usage = D3D11_USAGE_DEFAULT;
+	desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
+	desc.CPUAccessFlags = 0;
+	desc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
+
+	HRESULT hr = S_OK;
+ 	ID3D11Texture2D* texHandle = nullptr;
+	//hr = D3DDevice->CreateTexture2D(&desc, &srd, &texHandle);
+	hr = D3DDevice->CreateTexture2D(&desc, nullptr, &texHandle);
+	ASSERT(!FAILED(hr));
+
+	uint32_t rowPitch = (data.Width * 4) * sizeof(unsigned char);
+
+	ImmediateContext->UpdateSubresource(texHandle, 0, nullptr, data.RawData, rowPitch, 0);
+
+ 	eastl::shared_ptr<D3D11Texture2D> newTex = eastl::make_shared<D3D11Texture2D>(texHandle);
+
+	ImageLoading::FreeImageData(data);
+
+ 	return newTex;
+}
+
+void D3D11RHI::BindTexture2D(const RHITexture2D& inTex, const int32_t inTexId)
+{
+	const D3D11Texture2D& d3d11Tex = static_cast<const D3D11Texture2D&>(inTex);
+	D3D11Texture2D& nonconst_d3d11Tex = const_cast<D3D11Texture2D&>(d3d11Tex);
+
+	if (!d3d11Tex.ResourceViewHandle)
+	{
+		HRESULT hr = S_OK;
+		D3D11_SHADER_RESOURCE_VIEW_DESC desc = {};
+		desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+		desc.Texture2D.MostDetailedMip = 0;
+		desc.Texture2D.MipLevels = -1;
+		hr = D3DDevice->CreateShaderResourceView(d3d11Tex.Handle, &desc, &nonconst_d3d11Tex.ResourceViewHandle);
+		ASSERT(!FAILED(hr));
+
+		ImmediateContext->GenerateMips(nonconst_d3d11Tex.ResourceViewHandle);
+	}
+
+	ImmediateContext->PSSetShaderResources(0, 1, &d3d11Tex.ResourceViewHandle);
+	ImmediateContext->PSSetSamplers(0, 1, &GlobalSamplerLinear);
+}
+
+eastl::shared_ptr<class RHIShader> D3D11RHI::CreateShaderFromSource(const eastl::string& inVertexSrc, const eastl::string& inPixelSrc, const VertexInputLayout& inInputLayout, const eastl::string& inVSName, const eastl::string& inPSName)
  {
 	 HRESULT hr = S_OK;
 	 ID3D11VertexShader* vertexShaderHandle = nullptr;
@@ -225,7 +311,7 @@ eastl::shared_ptr<class RHIUniformBuffer> D3D11RHI::CreateUniformBuffer(size_t i
 		 ID3DBlob* vsBlob = NULL;
 		 ID3DBlob* errBlob = NULL;
 
-		 D3DCompile2(inVertexSrc.data(), inVertexSrc.size(), nullptr, nullptr, nullptr, "VS", "vs_5_0", D3DCOMPILE_DEBUG | D3DCOMPILE_DEBUG_NAME_FOR_SOURCE, 0, 0, nullptr, 0, &vsBlob, &errBlob);
+		 D3DCompile2(inVertexSrc.data(), inVertexSrc.size(), inVSName.c_str(), nullptr, nullptr, "VS", "vs_5_0", D3DCOMPILE_DEBUG | D3DCOMPILE_DEBUG_NAME_FOR_SOURCE, 0, 0, nullptr, 0, &vsBlob, &errBlob);
 
 		 if (!ENSURE(!errBlob))
 		 {
@@ -264,12 +350,11 @@ eastl::shared_ptr<class RHIUniformBuffer> D3D11RHI::CreateUniformBuffer(size_t i
 				 {
 					 elementFormat = DXGI_FORMAT_R32G32B32_FLOAT;
 				 }
-				 else if (prop.Type == VertexPropertyType::UInt && prop.Count == 2)
+				 else if (prop.Type == VertexPropertyType::Float && prop.Count == 2)
 				 {
 					 elementFormat = DXGI_FORMAT_R32G32_FLOAT;
 				 }
 				 ASSERT(elementFormat != DXGI_FORMAT_UNKNOWN);
-				 
 
 				 int32_t semanticIndex = static_cast<int32_t>(prop.InputType);
 				 newDesc.SemanticName = semanticsName[semanticIndex];
@@ -278,17 +363,19 @@ eastl::shared_ptr<class RHIUniformBuffer> D3D11RHI::CreateUniformBuffer(size_t i
 				 newDesc.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 
 				 offset += prop.Count * prop.GetSizeOfType();
+
+				 elementDescs.push_back(newDesc);
 			 }
 
-			 D3D11_INPUT_ELEMENT_DESC layout[] =
-			 {
-				 { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-				 { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-				 { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-			 };
-			 UINT numElements = ARRAYSIZE(layout);
+// 			 D3D11_INPUT_ELEMENT_DESC layout[] =
+// 			 {
+// 				 { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+// 				 { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+// 				 { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+// 			 };
+// 			 UINT numElements = ARRAYSIZE(layout);
 
-			 hr = D3DDevice->CreateInputLayout(layout, numElements, vsBlob->GetBufferPointer(),
+			 hr = D3DDevice->CreateInputLayout(elementDescs.data(), elementDescs.size(), vsBlob->GetBufferPointer(),
 				 vsBlob->GetBufferSize(), &vertexShaderLayout);
 			 ASSERT(!FAILED(hr));
 
@@ -303,7 +390,7 @@ eastl::shared_ptr<class RHIUniformBuffer> D3D11RHI::CreateUniformBuffer(size_t i
 		 ID3DBlob* psBlob = NULL;
 		 ID3DBlob* psErrBlob = NULL;
 
-		 D3DCompile2(inPixelSrc.data(), inPixelSrc.size(), nullptr, nullptr, nullptr, "PS", "ps_5_0", D3DCOMPILE_DEBUG | D3DCOMPILE_DEBUG_NAME_FOR_SOURCE, 0, 0, nullptr, 0, &psBlob, &psErrBlob);
+		 D3DCompile2(inPixelSrc.data(), inPixelSrc.size(), inPSName.c_str(), nullptr, nullptr, "PS", "ps_5_0", D3DCOMPILE_DEBUG | D3DCOMPILE_DEBUG_NAME_FOR_SOURCE, 0, 0, nullptr, 0, &psBlob, &psErrBlob);
 
 		 if (!ENSURE(!psErrBlob))
 		 {
@@ -367,6 +454,8 @@ eastl::shared_ptr<class RHIUniformBuffer> D3D11RHI::CreateUniformBuffer(size_t i
 	// Default Matrix is D3D11 so don't do anything
  }
 
+
+
 void D3D11RHI::BindVertexBuffer(const RHIVertexBuffer& inBuffer, const bool inBindIndexBuffer /*= true*/)
 {
 	const D3D11VertexBuffer& d3d11Buffer = static_cast<const D3D11VertexBuffer&>(inBuffer);
@@ -405,6 +494,7 @@ void D3D11RHI::BindUniformBuffer(const RHIUniformBuffer& inBuffer)
 
 }
 
+
 void D3D11RHI::UnbindVertexBuffer(const RHIVertexBuffer& inBuffer, const bool inUnbindIndexBuffer /*= true*/)
 {
 	ImmediateContext->IASetVertexBuffers(0, 0, nullptr, 0, 0);
@@ -430,78 +520,23 @@ void D3D11RHI::UnbindUniformBuffer(const RHIUniformBuffer& inBuffer)
 	ImmediateContext->VSSetConstantBuffers(0, 0, nullptr);
 }
 
+void D3D11RHI::UnbindTexture2D(const RHITexture2D& inTex, const int32_t inTexId)
+{
+	ImmediateContext->PSSetSamplers(0, 0, nullptr);
+	ImmediateContext->PSSetShaderResources(0, 0, nullptr);
+}
+
 void D3D11RHI::UniformBufferUpdateData(RHIUniformBuffer& inBuffer, const void* inData, const size_t inDataSize)
 {
 	D3D11UniformBuffer& d3d11Buffer = static_cast<D3D11UniformBuffer&>(inBuffer);
-	ImmediateContext->UpdateSubresource(d3d11Buffer.Handle, 0, NULL, inData, 0, 0);
-}
 
-// eastl::shared_ptr<RHITexture2D> OpenGLRHI::CreateTexture2D()
-// {
-// 	uint32_t texHandle = 0;
-// 	glGenTextures(1, &texHandle);
-// 
-// 	eastl::shared_ptr<GLTexture2D> newTexture = eastl::make_shared<GLTexture2D>(texHandle);
-// 
-// 	return newTexture;
-// }
-// 
-// void OpenGLRHI::LoadTextureFromPath(RHITexture2D& inTexture, const eastl::string& inPath)
-// {
-// 	GLTexture2D& tex = static_cast<GLTexture2D&>(inTexture);
-// 	ImageData data = ImageLoading::LoadImageData(inPath.data());
-// 
-// 	if (!data.RawData)
-// 	{
-// 		return;
-// 	}
-// 
-// 	tex.NrChannels = data.NrChannels;
-// 
-// 	glBindTexture(GL_TEXTURE_2D, tex.GlHandle);
-// 
-// 	GLenum imageFormat = 0;
-// 	switch (data.NrChannels)
-// 	{
-// 	case 1:
-// 	{
-// 		imageFormat = GL_RED;
-// 		break;
-// 	}
-// 	case 3:
-// 	{
-// 		imageFormat = GL_RGB;
-// 		break;
-// 	}
-// 	case 4:
-// 	{
-// 		imageFormat = GL_RGBA;
-// 		break;
-// 	}
-// 	}
-// 
-// 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, data.Width, data.Height, 0, imageFormat, GL_UNSIGNED_BYTE, data.RawData);
-// 	glGenerateMipmap(GL_TEXTURE_2D);
-// 
-// 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-// 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-// 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-// 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-// 
-// 	ImageLoading::FreeImageData(data.RawData);
-// }
-// 
-// void OpenGLRHI::SetViewportSize(const int32_t inWidth, const int32_t inHeight)
-// {
-// 	glViewport(0, 0, inWidth, inHeight);
-// }
-// 
-// void OpenGLRHI::ClearColor(const glm::vec4 inColor)
-// {
-// 	glClearColor(inColor.x, inColor.y, inColor.z, inColor.w);
-// }
-// 
-// void OpenGLRHI::SwapBuffers()
-// {
-// 	::SwapBuffers(GLUtils::gldc);
-// }
+	D3D11_MAPPED_SUBRESOURCE mappedResource;
+	HRESULT res = S_OK;
+	res = ImmediateContext->Map(d3d11Buffer.Handle, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	ASSERT(!FAILED(res));
+
+	memcpy(mappedResource.pData, inData, inDataSize);
+
+	// Unlock the constant buffer.
+	ImmediateContext->Unmap(d3d11Buffer.Handle, 0);
+}

@@ -25,19 +25,20 @@ public:
 	virtual void BindIndexBuffer(const class RHIIndexBuffer& inBuffer) {};
 	virtual void BindShader(const class RHIShader& inShader) {};
 	virtual void BindUniformBuffer(const RHIUniformBuffer& inBuffer) {};
+	virtual void BindTexture2D(const class RHITexture2D& inTex, const int32_t inTexId) {};
 
 	virtual void UnbindVertexBuffer(const class RHIVertexBuffer& inBuffer, const bool inUnbindIndexBuffer = true) {};
 	virtual void UnbindIndexBuffer(const class RHIIndexBuffer& inBuffer) {};
 	virtual void UnbindShader(const class RHIShader& inShader) {};
 	virtual void UnbindUniformBuffer(const RHIUniformBuffer& inBuffer) {};
+	virtual void UnbindTexture2D(const class RHITexture2D& inTex, const int32_t inTexId) {};
 
 	virtual void UniformBufferUpdateData(RHIUniformBuffer& inBuffer, const void* inData, const size_t inDataSize) {};
 
-	virtual eastl::shared_ptr<class RHIShader> CreateShaderFromSource(const eastl::string& inVertexSrc, const eastl::string& inPixelSrc, const VertexInputLayout& inInputLayout) { return nullptr; }
+	virtual eastl::shared_ptr<class RHIShader> CreateShaderFromSource(const eastl::string& inVertexSrc, const eastl::string& inPixelSrc, const VertexInputLayout& inInputLayout, const eastl::string& inVSName = "VS", const eastl::string& inPSName = "PS") { return nullptr; }
 	virtual eastl::shared_ptr<class RHIShader> CreateShaderFromPath(const eastl::string& inVertexPath, const eastl::string& inPixelPath, const VertexInputLayout& inInputLayout) { return nullptr; }
 
-	virtual eastl::shared_ptr<class RHITexture2D> CreateTexture2D() { return nullptr; }
-	virtual void LoadTextureFromPath(RHITexture2D& inTexture, const eastl::string& inPath) {};
+	virtual eastl::shared_ptr<class RHITexture2D> CreateTexture2D(const eastl::string& inDataPath) { return nullptr; }
 
 	virtual void SetViewportSize(const int32_t inWidth, const int32_t inHeight) {}
 	virtual void ClearColor(const glm::vec4 inColor) {}

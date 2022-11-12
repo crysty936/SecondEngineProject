@@ -1,8 +1,9 @@
 #include "RHI.h"
-#include "Renderer/TempRenderWrapper.h"
 
- #define RENDERERGL 1
- #define RENDERERD3D11 0
+#define RENDERERINDEX 1
+
+#define RENDERERGL RENDERERINDEX == 1
+#define RENDERERD3D11 RENDERERINDEX == 2
 
 #if RENDERERGL
 #include "OpenGL/OpenGLRHI.h"

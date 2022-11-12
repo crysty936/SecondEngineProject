@@ -164,7 +164,7 @@ void ForwardRenderer::DrawShadowMap()
 void ForwardRenderer::SetupBaseUniforms()
 {
 	// By default, use a D3D11 projection matrix.
-	// Note: glm is RH but uses - to change the handedness of the output, in this case to LH
+	// Note: glm is RH but uses a sneaky minus to change the handedness of the output to LH (how OpenGL is)
 	glm::mat4 projection = glm::perspectiveRH_ZO(glm::radians(90.0f), static_cast<float>(Engine->GetMainWindow().GetProperties().Width) / static_cast<float>(Engine->GetMainWindow().GetProperties().Height), 1.f, 1000.0f);
 	RHI::Instance->PrepareProjectionForRendering(projection);
 
@@ -213,7 +213,7 @@ void ForwardRenderer::DrawCommand(const RenderCommand & inCommand)
 	for (i = 0; i < material->DiffuseTextures.size(); ++i)
 	{
 		eastl::shared_ptr<RHITexture2D>& tex = material->DiffuseTextures[i];
-		tex->Bind(i);
+		RHI::Instance->BindTexture2D(*tex, i);
 	}
 
 	// Shadows
@@ -248,7 +248,7 @@ void ForwardRenderer::DrawCommand(const RenderCommand & inCommand)
 	for (i = 0; i < material->DiffuseTextures.size(); ++i)
 	{
 		eastl::shared_ptr<RHITexture2D>& tex = material->DiffuseTextures[i];
-		tex->Unbind(i);
+		RHI::Instance->UnbindTexture2D(*tex, i);
 	}
 
 	// Shadows
