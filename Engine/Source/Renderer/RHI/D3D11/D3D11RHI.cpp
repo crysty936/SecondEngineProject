@@ -390,7 +390,7 @@ eastl::shared_ptr<class RHIShader> D3D11RHI::CreateShaderFromSource(const eastl:
 		 ID3DBlob* psBlob = NULL;
 		 ID3DBlob* psErrBlob = NULL;
 
-		 D3DCompile2(inPixelSrc.data(), inPixelSrc.size(), inPSName.c_str(), nullptr, nullptr, "PS", "ps_5_0", D3DCOMPILE_DEBUG | D3DCOMPILE_DEBUG_NAME_FOR_SOURCE, 0, 0, nullptr, 0, &psBlob, &psErrBlob);
+		 D3DCompile2(inPixelSrc.data(), inPixelSrc.size(), inPSName.c_str(), nullptr, nullptr, "PSEntry", "ps_5_0", D3DCOMPILE_DEBUG | D3DCOMPILE_DEBUG_NAME_FOR_SOURCE, 0, 0, nullptr, 0, &psBlob, &psErrBlob);
 
 		 if (!ENSURE(!psErrBlob))
 		 {

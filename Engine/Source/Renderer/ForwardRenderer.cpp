@@ -165,7 +165,7 @@ void ForwardRenderer::SetupBaseUniforms()
 {
 	// By default, use a D3D11 projection matrix.
 	// Note: glm is RH but uses a sneaky minus to change the handedness of the output to LH (how OpenGL is)
-	glm::mat4 projection = glm::perspectiveRH_ZO(glm::radians(90.0f), static_cast<float>(Engine->GetMainWindow().GetProperties().Width) / static_cast<float>(Engine->GetMainWindow().GetProperties().Height), 1.f, 1000.0f);
+	glm::mat4 projection = glm::perspectiveRH_ZO(glm::radians(45.0f), static_cast<float>(Engine->GetMainWindow().GetProperties().Width) / static_cast<float>(Engine->GetMainWindow().GetProperties().Height), 0.1f, 1000.0f);
 	RHI::Instance->PrepareProjectionForRendering(projection);
 
 	UniformsCache["projection"] = projection;

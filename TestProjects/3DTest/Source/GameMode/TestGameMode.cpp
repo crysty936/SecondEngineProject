@@ -7,7 +7,6 @@
 #include "glm/common.hpp"
 #include <stdlib.h>
 #include "Renderer/Model/3D/Assimp/AssimpModel3D.h"
-#include "Renderer/OpenGL/OpenGLRenderer.h"
 #include "Core/ObjectCreation.h"
 #include "Renderer/Drawable/MirrorQuad.h"
 

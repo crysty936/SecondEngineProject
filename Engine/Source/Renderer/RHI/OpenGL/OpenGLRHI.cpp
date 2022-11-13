@@ -566,7 +566,7 @@ eastl::shared_ptr<class RHIShader> OpenGLRHI::CreateShaderFromSource(const eastl
 
 	// Create an empty fragment shader handle
 	eastl::string formattedPS = inPixelSrc;
-	formattedPS.insert(0, "#version 420 \n #define PIXEL_SHADER \n ");
+	formattedPS.insert(0, "#version 420 \n #define FRAGMENT_SHADER \n ");
 	GLuint fragmentShader = CreateShaderInternal(formattedPS, GL_FRAGMENT_SHADER);
 
 	// Vertex and fragment shaders are successfully compiled.

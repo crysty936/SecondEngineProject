@@ -1,0 +1,2 @@
+..\win32\HLSL2GLSLConverter.exe -i  D:\dev\SecondEngineProject\TestProjects\3DTest\Data\Shaders\D3D11\BasicTexFragmentShader.hlsl -d .\ -d .\include -t ps -e PSEntry -c -o D:\dev\SecondEngineProject\TestProjects\3DTest\Data\Shaders\OpenGL\BasicTexFragmentShader.glsl
+pause 

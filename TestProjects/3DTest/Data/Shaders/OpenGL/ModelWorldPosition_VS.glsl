@@ -1114,8 +1114,19 @@ void _GetGLTessLevelInner(out float InnerLevel)
 
 #endif // _GLSL_DEFINITIONS_
 
-uniform sampler2D txDiffuse : register(t0);
-SamplerState samLinear : register(s0);
+uniform ConstantBuffer
+{
+	matrix Projection;
+	matrix View;
+	matrix Model;
+};
+
+struct VS_INPUT
+{
+	float4 Pos;
+	float3 Norm;
+	float2 Coord;
+};
 
 struct PS_INPUT
 {
@@ -1123,18 +1134,35 @@ struct PS_INPUT
 	float2 TexCoord;
 };
 
-layout(location = 0) out float4 _psout_PS;
-layout(location = 0) in float2 _in_input_TexCoord;
+ 
+layout(location = 0) in float4 _vsin_input_Pos;
+layout(location = 1) in float3 _vsin_input_Norm;
+layout(location = 2) in float2 _vsin_input_Coord;
+layout(location = 0) out float2 _vsout_VSEntry_TexCoord;
 
 #define _RETURN_(_RET_VAL_){\
-_psout_PS = _RET_VAL_;\
+_SET_GL_POSITION(_RET_VAL_.Pos);\
+_vsout_VSEntry_TexCoord = _RET_VAL_.TexCoord;\
 return;}
 
 void main()
 {
-    PS_INPUT input;
-    _GET_GL_FRAG_COORD(input.Pos);
-    input.TexCoord = _in_input_TexCoord;
+    VS_INPUT input;
+    input.Pos = _vsin_input_Pos;
+    input.Norm = _vsin_input_Norm;
+    input.Coord = _vsin_input_Coord;
 
-	_RETURN_( txDiffuse.Sample(samLinear, input.TexCoord))     // Yellow
+	//float4 output = mul(input.Pos, Model);
+	//output = mul(output, View);
+	//output = mul(output, Projection);
+
+	float4 output = mul(Model, input.Pos);
+	output = mul(View, output);
+	output = mul(Projection, output);
+
+	PS_INPUT psOut;
+	psOut.Pos = output;
+	psOut.TexCoord = input.Coord;
+
+    _RETURN_( psOut)
 }

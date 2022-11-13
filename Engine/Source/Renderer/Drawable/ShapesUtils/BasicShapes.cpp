@@ -103,7 +103,7 @@ void SquareShape::CreateProxy()
  		eastl::shared_ptr<RHITexture2D> tex = RHI::Instance->CreateTexture2D("../Data/Textures/MinecraftGrass.jpg");
  		material->DiffuseTextures.push_back(tex);
 
-		material->Shader = RHI::Instance->CreateShaderFromPath("ModelWorldPositionVertexShader", "BasicTexFragmentShader", inputLayout);
+		material->Shader = RHI::Instance->CreateShaderFromPath("ModelWorldPosition_VS", "BasicTex_PS", inputLayout);
 	}
  
  	RenderCommand newCommand;
@@ -167,7 +167,7 @@ void CubeShape::CreateProxy()
   	{
 		eastl::shared_ptr<RHITexture2D> tex = RHI::Instance->CreateTexture2D("../Data/Textures/MinecraftGrass.jpg");
 		material->DiffuseTextures.push_back(tex);
-		material->Shader = RHI::Instance->CreateShaderFromPath("ModelWorldPositionVertexShader", "BasicTexFragmentShader", inputLayout);
+		material->Shader = RHI::Instance->CreateShaderFromPath("ModelWorldPosition_VS", "BasicTex_PS", inputLayout);
   	}
   
   	eastl::shared_ptr<MeshNode> cubeNode = eastl::make_shared<MeshNode>();

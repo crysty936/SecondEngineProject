@@ -1114,8 +1114,8 @@ void _GetGLTessLevelInner(out float InnerLevel)
 
 #endif // _GLSL_DEFINITIONS_
 
-uniform sampler2D txDiffuse : register(t0);
-SamplerState samLinear : register(s0);
+uniform sampler2D TexDiffuse;
+SamplerState TexDiffuse_sampler;
 
 struct PS_INPUT
 {
@@ -1123,11 +1123,20 @@ struct PS_INPUT
 	float2 TexCoord;
 };
 
-layout(location = 0) out float4 _psout_PS;
+
+float4 SampleDiffuse(PS_INPUT input)
+{
+	float2 UVs = input.TexCoord;
+	float4 color = Sample_2( TexDiffuse,TexDiffuse_sampler, UVs)_SWIZZLE0;
+
+	return color;
+}
+
+layout(location = 0) out float4 _psout_PSEntry;
 layout(location = 0) in float2 _in_input_TexCoord;
 
 #define _RETURN_(_RET_VAL_){\
-_psout_PS = _RET_VAL_;\
+_psout_PSEntry = _RET_VAL_;\
 return;}
 
 void main()
@@ -1136,5 +1145,7 @@ void main()
     _GET_GL_FRAG_COORD(input.Pos);
     input.TexCoord = _in_input_TexCoord;
 
-	_RETURN_( txDiffuse.Sample(samLinear, input.TexCoord))     // Yellow
+	float4 color = SampleDiffuse(input);
+	
+	_RETURN_( color)
 }

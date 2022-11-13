@@ -992,6 +992,9 @@ float TestPS  ( in VSOutput In,
     Out.Color3 = float4(0.0, 1.0, 2.0, 3.0);
     Out.substr.Color4 = float4(0.0, 1.0, 2.0, 3.0);
 
+    Tex2D_F1.Sample(Tex2D_F1_sampler, f3UVW.xy).xyzw.xyzw;
+
+
     TestFuncArgs1( Tex2D_F6,
                    Tex2D_F6_sampler,
                    Tex2DS_F5, 
