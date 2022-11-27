@@ -18,10 +18,10 @@ public:
 public:
 	// TODO: This should preferrably be removed, materials should only be added by the Asset Manager at startup once deserialization is done
 	template<class T = RenderMaterial>
-	eastl::shared_ptr<class RenderMaterial> GetOrAddMaterial(const eastl::string& inMaterialID, OUT bool& outAlreadyExists);
+	eastl::shared_ptr<T> GetOrAddMaterial(const eastl::string& inMaterialID, OUT bool& outAlreadyExists);
 
 private:
-	eastl::shared_ptr<RenderMaterial> FindMaterial(const eastl::string& inMaterialID);
+	eastl::shared_ptr<class RenderMaterial> FindMaterial(const eastl::string& inMaterialID);
 	void AddMaterial(const eastl::string& inMatId, eastl::shared_ptr<class RenderMaterial> inNewMat);
 
 private:
@@ -30,7 +30,7 @@ private:
 };
 
 template<class T>
-eastl::shared_ptr<class RenderMaterial> MaterialsManager::GetOrAddMaterial(const eastl::string& inMaterialID, OUT bool& outAlreadyExists)
+eastl::shared_ptr<T> MaterialsManager::GetOrAddMaterial(const eastl::string& inMaterialID, OUT bool& outAlreadyExists)
 {
 	eastl::shared_ptr<RenderMaterial> mat = FindMaterial(inMaterialID);
 	outAlreadyExists = !!mat;
@@ -44,5 +44,5 @@ eastl::shared_ptr<class RenderMaterial> MaterialsManager::GetOrAddMaterial(const
 		return newMat;
 	}
 
-	return mat;
+	return eastl::static_shared_pointer_cast<T>(mat);
 }

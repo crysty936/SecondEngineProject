@@ -3,6 +3,12 @@
 
 #include <stdint.h>
 
+enum class ConstantBufferType
+{
+	Vertex,
+	Pixel
+};
+
 class RHIUniformBuffer : public RHIBufferBase
 {
 public:
@@ -10,4 +16,5 @@ public:
 
 public:
 	const size_t InitSize = 0;
+	ConstantBufferType BType = ConstantBufferType::Vertex;
 };

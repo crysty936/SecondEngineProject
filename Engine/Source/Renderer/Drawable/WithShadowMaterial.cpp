@@ -9,8 +9,8 @@ void WithShadowMaterial::SetRequiredUniforms()
 {
 	__super::SetRequiredUniforms();
 	
-	RequiredUniforms.push_back({ "lightSpaceMatrix" });
-	RequiredUniforms.push_back({ "ShadowMap" });
-	RequiredUniforms.push_back({ "LightPos" });
+// 	RequiredUniforms.push_back({ "lightSpaceMatrix" });
+// 	RequiredUniforms.push_back({ "ShadowMap" });
+// 	RequiredUniforms.push_back({ "LightPos" });
 }
 

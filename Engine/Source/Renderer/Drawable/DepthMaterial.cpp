@@ -7,9 +7,9 @@ DepthMaterial::~DepthMaterial() = default;
 
 void DepthMaterial::SetRequiredUniforms()
 {
-	RequiredUniforms = {
-		{"model"},
-		{"lightSpaceMatrix"},
-		};
+// 	RequiredUniforms = {
+// 		{"model"},
+// 		{"lightSpaceMatrix"},
+// 		};
 }
 

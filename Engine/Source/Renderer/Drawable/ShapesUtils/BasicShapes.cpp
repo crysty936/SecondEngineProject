@@ -12,6 +12,7 @@
 #include "Renderer/RHI/Resources/RHIVertexBuffer.h"
 #include "Renderer/RHI/RHI.h"
 #include "Renderer/RHI/Resources/RHIIndexBuffer.h"
+#include "Renderer/Drawable//BallTestMaterial.h"
 
 TriangleShape::TriangleShape() = default;
 TriangleShape::~TriangleShape() = default;
@@ -44,7 +45,7 @@ void TriangleShape::CreateProxy()
 
 	MaterialsManager& matManager = MaterialsManager::Get();
 	bool materialExists = false;
-	eastl::shared_ptr<RenderMaterial> material = matManager.GetOrAddMaterial("square_material", materialExists);
+	eastl::shared_ptr<RenderMaterial> material = matManager.GetOrAddMaterial("triangle_material", materialExists);
 
 	if (!materialExists)
 	{
@@ -96,14 +97,14 @@ void SquareShape::CreateProxy()
  
  	MaterialsManager& matManager = MaterialsManager::Get();
  	bool materialExists = false;
- 	eastl::shared_ptr<RenderMaterial> material = matManager.GetOrAddMaterial("square_material", materialExists);
+ 	eastl::shared_ptr<BallTestMaterial> material = matManager.GetOrAddMaterial<BallTestMaterial>("square_material", materialExists);
  
  	if (!materialExists)
  	{
- 		eastl::shared_ptr<RHITexture2D> tex = RHI::Instance->CreateTexture2D("../Data/Textures/MinecraftGrass.jpg");
- 		material->DiffuseTextures.push_back(tex);
+  		eastl::shared_ptr<RHITexture2D> tex = RHI::Instance->CreateTexture2D("../Data/Textures/numbers_corrected.png");
+  		material->DiffuseTextures.push_back(tex);
 
-		material->Shader = RHI::Instance->CreateShaderFromPath("ModelWorldPosition_VS", "BasicTex_PS", inputLayout);
+		material->Shader = RHI::Instance->CreateShaderFromPath("ModelWorldPosition_VS_Pos-Normal-UV-LightPos-ScreenToWorld", "8BallTest_PS", inputLayout);
 	}
  
  	RenderCommand newCommand;
@@ -167,7 +168,7 @@ void CubeShape::CreateProxy()
   	{
 		eastl::shared_ptr<RHITexture2D> tex = RHI::Instance->CreateTexture2D("../Data/Textures/MinecraftGrass.jpg");
 		material->DiffuseTextures.push_back(tex);
-		material->Shader = RHI::Instance->CreateShaderFromPath("ModelWorldPosition_VS", "BasicTex_PS", inputLayout);
+		material->Shader = RHI::Instance->CreateShaderFromPath("ModelWorldPosition_VS_Pos-Normal-UV", "BasicTex_PS", inputLayout);
   	}
   
   	eastl::shared_ptr<MeshNode> cubeNode = eastl::make_shared<MeshNode>();

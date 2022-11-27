@@ -1123,11 +1123,26 @@ struct PS_INPUT
 	float2 TexCoord;
 };
 
-
 float4 SampleDiffuse(PS_INPUT input)
 {
+	//uint uWidth, uHeight;
+	//TexDiffuse.GetDimensions(uWidth, uHeight);
+
+	//float2 invSize = float2(1.0 / uWidth, 1.0 / uHeight);
+
+	//float2 relPos = input.Pos.xy * invSize;
+	//bool isEdge = any(abs(relPos - 0.5) > 0.48);
+
+
 	float2 UVs = input.TexCoord;
-	float4 color = Sample_2( TexDiffuse,TexDiffuse_sampler, UVs)_SWIZZLE0;
+	bool isEdge = abs(UVs - 0.5).x > 0.48 || abs(UVs - 0.5).y > 0.48;
+
+	float4 color = float4(0.5, 0.5, 0.5, 1.0);
+
+	if (!isEdge)
+	{
+		color = Sample_2( TexDiffuse,TexDiffuse_sampler, UVs)_SWIZZLE0;
+	}
 
 	return color;
 }

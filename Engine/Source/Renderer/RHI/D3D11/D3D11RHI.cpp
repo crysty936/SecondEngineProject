@@ -17,14 +17,17 @@
 #include "Renderer/RHI/D3D11/Resources/D3D11Texture2D.h"
 #include "Utils/IOUtils.h"
 #include "Utils/ImageLoading.h"
+#include <d3d11_1.h>
 
 static D3D_DRIVER_TYPE	PresentDriverType = D3D_DRIVER_TYPE_NULL;
 static D3D_FEATURE_LEVEL PresentFeatureLevel = D3D_FEATURE_LEVEL_11_0;
-static ID3D11Device* D3DDevice = NULL;
-static ID3D11DeviceContext* ImmediateContext = NULL;
-static IDXGISwapChain* SwapChain = NULL;
-static ID3D11RenderTargetView* RenderTarget = NULL;
-static ID3D11SamplerState* GlobalSamplerLinear = NULL;
+static ID3D11Device* D3DDevice = nullptr;
+static ID3D11DeviceContext* ImmediateContext = nullptr;
+static IDXGISwapChain* SwapChain = nullptr;
+static ID3D11RenderTargetView* RenderTarget = nullptr;
+static ID3D11DepthStencilView* DepthTarget = nullptr;
+static ID3D11SamplerState* GlobalSamplerLinear = nullptr;
+static ID3D11BlendState* GlobalBlendState = nullptr;
 
 D3D11RHI::D3D11RHI()
 {
@@ -75,7 +78,7 @@ D3D11RHI::D3D11RHI()
 	for (UINT driverTypeIndex = 0; driverTypeIndex < numDriverTypes; driverTypeIndex++)
 	{
 		PresentDriverType = driverTypes[driverTypeIndex];
-		hr = D3D11CreateDeviceAndSwapChain(NULL, PresentDriverType, NULL, createDeviceFlags, featureLevels, numFeatureLevels,
+		hr = D3D11CreateDeviceAndSwapChain(nullptr, PresentDriverType, nullptr, createDeviceFlags, featureLevels, numFeatureLevels,
 			D3D11_SDK_VERSION, &sd, &SwapChain, &D3DDevice, &PresentFeatureLevel, &ImmediateContext);
 		if (SUCCEEDED(hr))
 			break;
@@ -84,15 +87,43 @@ D3D11RHI::D3D11RHI()
 	ASSERT(!FAILED(hr));
 
 	// Create a render target view
-	ID3D11Texture2D* pBackBuffer = NULL;
+	ID3D11Texture2D* pBackBuffer = nullptr;
 	hr = SwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer);
 	ASSERT(!FAILED(hr));
 
-	hr = D3DDevice->CreateRenderTargetView(pBackBuffer, NULL, &RenderTarget);
+	hr = D3DDevice->CreateRenderTargetView(pBackBuffer, nullptr, &RenderTarget);
 	pBackBuffer->Release();
 	ASSERT(!FAILED(hr));
 
-	ImmediateContext->OMSetRenderTargets(1, &RenderTarget, NULL);
+	// Create depth and stencil buffer
+	D3D11_TEXTURE2D_DESC depthTextureDesc;
+	ZeroMemory(&depthTextureDesc, sizeof(depthTextureDesc));
+	depthTextureDesc.Width = width;
+	depthTextureDesc.Height = height;
+	depthTextureDesc.MipLevels = 1;
+	depthTextureDesc.ArraySize = 1;
+	depthTextureDesc.SampleDesc.Count = 1;
+	depthTextureDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	depthTextureDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+
+	ID3D11Texture2D* DepthStencilTexture;
+	hr = D3DDevice->CreateTexture2D(&depthTextureDesc, nullptr, &DepthStencilTexture);
+
+	ASSERT(!FAILED(hr));
+
+	D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc;
+	ZeroMemory(&dsvDesc, sizeof(dsvDesc));
+	dsvDesc.Format = depthTextureDesc.Format;
+	dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DMS;
+	dsvDesc.Texture2D.MipSlice = 0;
+
+	hr = D3DDevice->CreateDepthStencilView(DepthStencilTexture, &dsvDesc, &DepthTarget);
+	DepthStencilTexture->Release();
+
+	ASSERT(!FAILED(hr));
+
+	ImmediateContext->OMSetRenderTargets(1, &RenderTarget, DepthTarget);
+
 
 	// Setup the viewport
 	D3D11_VIEWPORT vp = {};
@@ -144,6 +175,34 @@ D3D11RHI::D3D11RHI()
 	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
 	hr = D3DDevice->CreateSamplerState(&samplerDesc, &GlobalSamplerLinear);
 	ASSERT(!FAILED(hr));
+
+
+	// Create blend state
+
+	{
+		D3D11_RENDER_TARGET_BLEND_DESC desc = {};
+		desc.BlendEnable = TRUE;
+		desc.SrcBlend = D3D11_BLEND_SRC_ALPHA;
+		desc.DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+		desc.BlendOp = D3D11_BLEND_OP_ADD;
+
+		desc.SrcBlendAlpha = D3D11_BLEND_ONE;
+		desc.DestBlendAlpha = D3D11_BLEND_ZERO;
+		desc.BlendOpAlpha = D3D11_BLEND_OP_ADD;
+		desc.RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+
+		D3D11_BLEND_DESC BlendState = {};
+		BlendState.RenderTarget[0] = desc;
+// 		BlendState.AlphaToCoverageEnable = false;
+// 		BlendState.IndependentBlendEnable = true;
+		hr = D3DDevice->CreateBlendState(&BlendState, &GlobalBlendState);
+		ASSERT(!FAILED(hr));
+
+		// 	float blendFactor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+		UINT sampleMask = 0xffffffff;
+
+		ImmediateContext->OMSetBlendState(GlobalBlendState, nullptr, sampleMask);
+	}
 }
 
 D3D11RHI::~D3D11RHI() = default;
@@ -228,7 +287,7 @@ eastl::shared_ptr<class RHIUniformBuffer> D3D11RHI::CreateUniformBuffer(size_t i
 	bd.MiscFlags = 0;
 	bd.StructureByteStride = 0;
 
-	hr = D3DDevice->CreateBuffer(&bd, NULL, &bufferHandle);
+	hr = D3DDevice->CreateBuffer(&bd, nullptr, &bufferHandle);
 	ASSERT(!FAILED(hr));
 
 	eastl::shared_ptr<D3D11UniformBuffer> newBuffer = eastl::make_shared<D3D11UniformBuffer>(bufferHandle, inSize);
@@ -306,12 +365,19 @@ eastl::shared_ptr<class RHIShader> D3D11RHI::CreateShaderFromSource(const eastl:
 	 ID3D11PixelShader* pixelShaderHandle = nullptr;
 	 ID3D11InputLayout* vertexShaderLayout = nullptr;
 
+	 // Set up compilation environment
+	 eastl::string formattedVS = "#define VERTEX_SHADER ";
+	 formattedVS.append(inVertexSrc);
+
+	 eastl::string formattedPS = "#define FRAGMENT_SHADER ";
+	 formattedPS.append(inPixelSrc);
+
 	 // Create Vertex Shader
 	 {
-		 ID3DBlob* vsBlob = NULL;
-		 ID3DBlob* errBlob = NULL;
+		 ID3DBlob* vsBlob = nullptr;
+		 ID3DBlob* errBlob = nullptr;
 
-		 D3DCompile2(inVertexSrc.data(), inVertexSrc.size(), inVSName.c_str(), nullptr, nullptr, "VSEntry", "vs_5_0", D3DCOMPILE_DEBUG | D3DCOMPILE_DEBUG_NAME_FOR_SOURCE, 0, 0, nullptr, 0, &vsBlob, &errBlob);
+		 D3DCompile2(formattedVS.data(), formattedVS.size(), inVSName.c_str(), nullptr, nullptr, "VSEntry", "vs_5_0", D3DCOMPILE_DEBUG | D3DCOMPILE_DEBUG_NAME_FOR_SOURCE | D3DCOMPILE_SKIP_OPTIMIZATION, 0, 0, nullptr, 0, &vsBlob, &errBlob);
 
 		 if (!ENSURE(!errBlob))
 		 {
@@ -320,7 +386,7 @@ eastl::shared_ptr<class RHIShader> D3D11RHI::CreateShaderFromSource(const eastl:
 			 memcpy(errMessage.data(), errBlob->GetBufferPointer(), errBlob->GetBufferSize());
 		 }
 
-		 hr = D3DDevice->CreateVertexShader(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), NULL, &vertexShaderHandle);
+		 hr = D3DDevice->CreateVertexShader(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), nullptr, &vertexShaderHandle);
 		 ASSERT(!FAILED(hr));
 
 
@@ -387,10 +453,10 @@ eastl::shared_ptr<class RHIShader> D3D11RHI::CreateShaderFromSource(const eastl:
 
 	 // Create Pixel shader
 	 {
-		 ID3DBlob* psBlob = NULL;
-		 ID3DBlob* psErrBlob = NULL;
+		 ID3DBlob* psBlob = nullptr;
+		 ID3DBlob* psErrBlob = nullptr;
 
-		 D3DCompile2(inPixelSrc.data(), inPixelSrc.size(), inPSName.c_str(), nullptr, nullptr, "PSEntry", "ps_5_0", D3DCOMPILE_DEBUG | D3DCOMPILE_DEBUG_NAME_FOR_SOURCE, 0, 0, nullptr, 0, &psBlob, &psErrBlob);
+		 D3DCompile2(formattedPS.data(), formattedPS.size(), inPSName.c_str(), nullptr, nullptr, "PSEntry", "ps_5_0", D3DCOMPILE_DEBUG | D3DCOMPILE_DEBUG_NAME_FOR_SOURCE | D3DCOMPILE_SKIP_OPTIMIZATION, 0, 0, nullptr, 0, &psBlob, &psErrBlob);
 
 		 if (!ENSURE(!psErrBlob))
 		 {
@@ -398,7 +464,7 @@ eastl::shared_ptr<class RHIShader> D3D11RHI::CreateShaderFromSource(const eastl:
 			 errMessage.InitialiseToSize(psErrBlob->GetBufferSize(), '\0');
 			 memcpy(errMessage.data(), psErrBlob->GetBufferPointer(), psErrBlob->GetBufferSize());
 		 }
-		 hr = D3DDevice->CreatePixelShader(psBlob->GetBufferPointer(), psBlob->GetBufferSize(), NULL, &pixelShaderHandle);
+		 hr = D3DDevice->CreatePixelShader(psBlob->GetBufferPointer(), psBlob->GetBufferSize(), nullptr, &pixelShaderHandle);
 		 ASSERT(!FAILED(hr));
 
 		 psBlob->Release();
@@ -431,6 +497,7 @@ eastl::shared_ptr<class RHIShader> D3D11RHI::CreateShaderFromSource(const eastl:
  void D3D11RHI::ClearBuffers()
  {
 	 // Clear the back buffer 
+	 ImmediateContext->ClearDepthStencilView(DepthTarget, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 	 ImmediateContext->ClearRenderTargetView(RenderTarget, &CurrentClearColor.x);
  }
 
@@ -489,9 +556,16 @@ void D3D11RHI::BindShader(const RHIShader& inShader)
 
 void D3D11RHI::BindUniformBuffer(const RHIUniformBuffer& inBuffer)
 {
+	// TODO: Also need to treat different buffer registers
 	const D3D11UniformBuffer& d3d11Buffer = static_cast<const D3D11UniformBuffer&>(inBuffer);
-	ImmediateContext->VSSetConstantBuffers(0, 1, &d3d11Buffer.Handle);
-
+	if (inBuffer.BType == ConstantBufferType::Vertex)
+	{
+		ImmediateContext->VSSetConstantBuffers(0, 1, &d3d11Buffer.Handle);
+	}
+	else if (inBuffer.BType == ConstantBufferType::Pixel)
+	{
+		ImmediateContext->PSSetConstantBuffers(0, 1, &d3d11Buffer.Handle);
+	}
 }
 
 
@@ -518,6 +592,15 @@ void D3D11RHI::UnbindShader(const RHIShader& inShader)
 void D3D11RHI::UnbindUniformBuffer(const RHIUniformBuffer& inBuffer)
 {
 	ImmediateContext->VSSetConstantBuffers(0, 0, nullptr);
+
+	if (inBuffer.BType == ConstantBufferType::Vertex)
+	{
+		ImmediateContext->VSSetConstantBuffers(0, 0, nullptr);
+	}
+	else if (inBuffer.BType == ConstantBufferType::Pixel)
+	{
+		ImmediateContext->PSSetConstantBuffers(0, 0, nullptr);
+	}
 }
 
 void D3D11RHI::UnbindTexture2D(const RHITexture2D& inTex, const int32_t inTexId)

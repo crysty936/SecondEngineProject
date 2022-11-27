@@ -2,6 +2,7 @@
 #include "RHIBufferBase.h"
 #include "EASTL/vector.h"
 #include "EASTL/shared_ptr.h"
+#include "RHIUniformBuffer.h"
 
 // This can either be subclassed by the other specific uniform buffers or it can contain 
 // the resource, by composition
@@ -11,13 +12,13 @@ class UniformBufferContainer
 public:
 
 	void AddData(const char* inData, const size_t inSize);
-	void UpdateData();
+	void UpdateData(const ConstantBufferType inBufferType);
 	void Clear();
 	void Bind();
 	void Unbind();
 
 public:
 	eastl::vector<char> UniformsCache;
-	eastl::shared_ptr<class RHIUniformBuffer> RHIBuffer;
+	eastl::shared_ptr<RHIUniformBuffer> RHIBuffer;
 	size_t Counter = 0;
 };

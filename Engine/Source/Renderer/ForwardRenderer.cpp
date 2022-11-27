@@ -72,6 +72,24 @@ ForwardRenderer::ForwardRenderer(const WindowProperties& inMainWindowProperties)
 
 	// Set the default uniforms
 	SetupBaseUniforms();
+
+
+// 	// Create the shadow map framebuffer
+// 	glGenFramebuffers(1, &RHI->ShadowMapBuffer);
+// 	glBindFramebuffer(GL_FRAMEBUFFER, RHI->ShadowMapBuffer);
+// 
+// 	RHI->ShadowBufferTex = eastl::make_shared<OpenGLDepthMap>("ShadowMap");
+// 	RHI->ShadowBufferTex->Init();
+// 
+// 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, RHI->ShadowBufferTex->TexHandle, 0);
+// 
+// 	glDrawBuffer(GL_NONE);
+// 	glReadBuffer(GL_NONE);
+// 
+// 	ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
+// 
+// 	// Bind the default frame buffer
+// 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 ForwardRenderer::~ForwardRenderer() = default;
@@ -226,7 +244,7 @@ void ForwardRenderer::DrawCommand(const RenderCommand & inCommand)
 	const uint32_t indicesCount = dataContainer->VBuffer->GetIndicesCount();
 
 	material->SetUniforms(UniformsCache);
-	material->UBuffer.Bind();
+	material->BindBuffers();
 
 	switch (inCommand.DrawType)
 	{
@@ -256,7 +274,7 @@ void ForwardRenderer::DrawCommand(const RenderCommand & inCommand)
 	//ShadowBufferTex->Unbind(i);
 	//
 
-	material->UBuffer.Unbind();
+	material->UnbindBuffers();
 	RHI::Instance->UnbindShader(*(material->Shader));
 }
 

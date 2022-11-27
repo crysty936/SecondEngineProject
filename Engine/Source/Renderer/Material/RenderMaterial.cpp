@@ -12,62 +12,88 @@ void RenderMaterial::Init()
 
 void RenderMaterial::ResetUniforms()
 {
-	for (UniformWithFlag& u : RequiredUniforms)
+	for (BufferWithRequirements& buffer : UBuffers)
 	{
-		u.IsSet = false;
+		for (UniformWithFlag& u : buffer.RequiredUniforms)
+		{
+			u.IsSet = false;
+		}
 	}
+
 }
 
 void RenderMaterial::SetRequiredUniforms()
 {
 	// !! These have to be in the same order as they are in the shader
-	// Default uniforms
-	RequiredUniforms = {
+	eastl::vector<UniformWithFlag> defaultUniforms = {
 		{"projection"},
 		{"view"},
 		{"model"}
 		};
+
+	UBuffers.push_back({ defaultUniforms, ConstantBufferType::Vertex });
 }
 
 void RenderMaterial::SetUniforms(eastl::unordered_map<eastl::string, SelfRegisteringUniform>& inUniformsCache)
 {
 	using uniformsIterator = const eastl::unordered_map<eastl::string, SelfRegisteringUniform>::const_iterator;
 
-	UBuffer.Clear();
-
-	// Register all required uniforms
-	for (UniformWithFlag& requiredUniform : RequiredUniforms)
+	for (BufferWithRequirements& buffer : UBuffers)
 	{
-		if (requiredUniform.IsSet)
+		buffer.BufferContainer.Clear();
+
+		// Register all required uniforms
+		for (UniformWithFlag& requiredUniform : buffer.RequiredUniforms)
 		{
-			continue;
+			if (requiredUniform.IsSet)
+			{
+				continue;
+			}
+
+			const uniformsIterator& iter = inUniformsCache.find(requiredUniform.UniformName);
+
+			if (iter == inUniformsCache.end())
+			{
+				ENSURE_MSG(false, "Failed to find uniform with name %s in cache.");
+				continue;
+			}
+
+			const SelfRegisteringUniform& selfRegisteringUniform = (*iter).second;
+			selfRegisteringUniform.Register(buffer.BufferContainer);
+			requiredUniform.IsSet = true;
 		}
 
-		const uniformsIterator& iter = inUniformsCache.find(requiredUniform.UniformName);
-
-		if (iter == inUniformsCache.end())
-		{
-			ENSURE_MSG(false, "Failed to find uniform with name %s in cache.");
-			continue;
-		}
-
-		const SelfRegisteringUniform& selfRegisteringUniform = (*iter).second;
-		selfRegisteringUniform.Register(UBuffer);
-		requiredUniform.IsSet = true;
+		buffer.BufferContainer.UpdateData(buffer.BufferType);
 	}
+}
 
-	UBuffer.UpdateData();
+void RenderMaterial::BindBuffers()
+{
+	for (BufferWithRequirements& buffer : UBuffers)
+	{
+		buffer.BufferContainer.Bind();
+	}
+}
+
+void RenderMaterial::UnbindBuffers()
+{
+	for (BufferWithRequirements& buffer : UBuffers)
+	{
+		buffer.BufferContainer.Unbind();
+	}
 }
 
 UniformWithFlag* RenderMaterial::FindRequiredUniform(const eastl::string& inUniformName)
 {
-	auto iterRequiredUniform = eastl::find_if(RequiredUniforms.begin(), RequiredUniforms.end(), [&](const UniformWithFlag& arg) {
-		return arg.UniformName == inUniformName; });
+// 	auto iterRequiredUniform = eastl::find_if(RequiredUniforms.begin(), RequiredUniforms.end(), [&](const UniformWithFlag& arg) {
+// 		return arg.UniformName == inUniformName; });
+// 
+// 	if (iterRequiredUniform == RequiredUniforms.end())
+// 	{
+// 		return nullptr;
+// 	}
 
-	if (iterRequiredUniform == RequiredUniforms.end())
-	{
-		return nullptr;
-	}
+	//return &*iterRequiredUniform;
 
-	return &*iterRequiredUniform;
+	return nullptr;
 }

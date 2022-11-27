@@ -4,12 +4,24 @@
 #include "EASTL/shared_ptr.h"
 #include "Renderer/RHI/Resources/UniformBufferContainer.h"
 #include "EASTL/unordered_map.h"
+#include "Renderer/RHI/Resources/RHIUniformBuffer.h"
 
 struct UniformWithFlag
 {
 	UniformWithFlag(const eastl::string& inName) : UniformName{ inName } {}
 	eastl::string UniformName;
 	bool IsSet = false;
+};
+
+struct BufferWithRequirements
+{
+	BufferWithRequirements(eastl::vector<UniformWithFlag>& inRequiredUniforms, ConstantBufferType inBufferType)
+		: RequiredUniforms(inRequiredUniforms), BufferType(inBufferType), BufferContainer()
+	{}
+
+	eastl::vector<UniformWithFlag> RequiredUniforms;
+	ConstantBufferType BufferType = ConstantBufferType::Vertex;
+	UniformBufferContainer BufferContainer;
 };
 
 class RenderMaterial
@@ -22,11 +34,12 @@ public:
 	void ResetUniforms();
 	virtual void SetRequiredUniforms();
 	virtual void SetUniforms(eastl::unordered_map<eastl::string, struct SelfRegisteringUniform>& inUniformsCache);
+	void BindBuffers();
+	void UnbindBuffers();
 	UniformWithFlag* FindRequiredUniform(const eastl::string& inUniformName);
 
 public:
-	eastl::vector<UniformWithFlag> RequiredUniforms;
-	UniformBufferContainer UBuffer;
+	eastl::vector<BufferWithRequirements> UBuffers;
 	eastl::shared_ptr<class RHIShader> Shader;
 	// TODO: Add the other types of textures
 	eastl::vector<eastl::shared_ptr<class RHITexture2D>> DiffuseTextures;

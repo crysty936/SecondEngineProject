@@ -84,7 +84,11 @@ void TestGameMode::Init()
  
  	}
 	{
-		eastl::shared_ptr<CubeShape> centerObj = BasicShapes::CreateCubeObject();
+		//eastl::shared_ptr<CubeShape> centerObj = BasicShapes::CreateCubeObject();
+		eastl::shared_ptr<SquareShape> centerObj = BasicShapes::CreateSquareObject();
+
+		eastl::shared_ptr<CubeShape> lightObj = BasicShapes::CreateCubeObject();
+		lightObj->SetRelativeLocation(glm::vec3(10.f, 20.f, 15.f));
 	}
 // 	{
 // 		eastl::shared_ptr<CubeShape> centerObj = BasicShapes::CreateCubeObject();
