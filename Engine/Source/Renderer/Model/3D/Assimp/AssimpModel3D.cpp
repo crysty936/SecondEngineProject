@@ -19,19 +19,17 @@ AssimpModel3D::AssimpModel3D(const eastl::string& inPath)
 
 AssimpModel3D::~AssimpModel3D() = default;
 
-void LoadTemp(const eastl::string inPath, TransformObjPtr inParent);
-
 void AssimpModel3D::CreateProxy()
 {
 	eastl::shared_ptr<AssimpModel3D> thisShared = this_shared(this);
 
-	RenderingLoadCommand loadCommand;
-	loadCommand.LoadDel = LoadRenderResourceDelegate::CreateStatic(LoadModelToRoot);
-	loadCommand.ModelPath = ModelPath;
-	loadCommand.Parent = thisShared;
+	// TODO: Make this work with multithreaded again
+	//RenderingLoadCommand loadCommand;
+	//loadCommand.LoadDel = LoadRenderResourceDelegate::CreateStatic(LoadModelToRoot);
+	//loadCommand.ModelPath = ModelPath;
+	//loadCommand.Parent = thisShared;
 
-	ASSERT(false); // Not working with Generic renderer
-	//RHI->AddRenderLoadCommand(loadCommand);
+	LoadModelToRoot(ModelPath, thisShared);
 }
 
 class AssimpModel3DLoader
@@ -42,7 +40,7 @@ protected:
 
 private:
 	eastl::shared_ptr<MeshNode> LoadData(OUT eastl::vector<RenderCommand>& outCommands);
-	void ProcessNode(const struct aiNode& inNode, const struct aiScene& inScene, eastl::shared_ptr<MeshNode>& inCurrentNode, OUT eastl::vector<RenderCommand>& outCommands);
+	void ProcessNodesRecursively(const struct aiNode& inNode, const struct aiScene& inScene, eastl::shared_ptr<MeshNode>& inCurrentNode, OUT eastl::vector<RenderCommand>& outCommands);
 	void ProcessMesh(const struct aiMesh& inMesh, const struct aiScene& inScene, eastl::shared_ptr<MeshNode>& inCurrentNode, OUT eastl::vector<RenderCommand>& outCommands);
 
 	eastl::vector<eastl::shared_ptr<class RHITexture2D>> LoadMaterialTextures(const struct aiMaterial& inMat, const aiTextureType& inAssimpTexType);
@@ -64,8 +62,7 @@ void AssimpModel3D::LoadModelToRoot(const eastl::string inPath, TransformObjPtr 
 	eastl::vector<RenderCommand> resultingCommands;
 	eastl::shared_ptr<MeshNode> mesh = modelLoader.LoadData(resultingCommands);
 
-	ASSERT(false); // Not working with Generic renderer
-	//RHI->AddCommands(resultingCommands);
+	ForwardRenderer::Get().AddCommands(resultingCommands);
 
 	inParent->AddChild(mesh);
 }
@@ -93,12 +90,12 @@ eastl::shared_ptr<MeshNode> AssimpModel3DLoader::LoadData(OUT eastl::vector<Rend
 
 	eastl::shared_ptr<MeshNode> newNode = eastl::make_shared<MeshNode>();
 	newNode->SetRelTransform(aiMatrixToTransform(scene->mRootNode->mTransformation));
-	ProcessNode(*scene->mRootNode, *scene, newNode, outCommands);
+	ProcessNodesRecursively(*scene->mRootNode, *scene, newNode, outCommands);
 
 	return newNode;
 }
 
-void AssimpModel3DLoader::ProcessNode(const aiNode & inNode, const aiScene & inScene, eastl::shared_ptr<MeshNode>& inCurrentNode, OUT eastl::vector<RenderCommand>& outCommands)
+void AssimpModel3DLoader::ProcessNodesRecursively(const aiNode & inNode, const aiScene & inScene, eastl::shared_ptr<MeshNode>& inCurrentNode, OUT eastl::vector<RenderCommand>& outCommands)
 {
 	for (uint32_t i = 0; i < inNode.mNumMeshes; ++i)
 	{
@@ -114,16 +111,24 @@ void AssimpModel3DLoader::ProcessNode(const aiNode & inNode, const aiScene & inS
 		eastl::shared_ptr<MeshNode> newNode = eastl::make_shared<MeshNode>();
 		newNode->SetRelTransform(aiMatrixToTransform(nextAiNode.mTransformation));
 
-		ProcessNode(nextAiNode, inScene, newNode, outCommands);
+		ProcessNodesRecursively(nextAiNode, inScene, newNode, outCommands);
 		inCurrentNode->AddChild((newNode));
 	}
 }
 
 void AssimpModel3DLoader::ProcessMesh(const aiMesh& inMesh, const aiScene& inScene, eastl::shared_ptr<MeshNode>& inCurrentNode, OUT eastl::vector<RenderCommand>& outCommands)
 {
+	VertexInputLayout inputLayout;
+	// Vertex points
+	inputLayout.Push<float>(3, VertexInputType::Position);
+	// Normals
+	inputLayout.Push<float>(3, VertexInputType::Normal);
+	// Vertex Tex Coords
+	inputLayout.Push<float>(2, VertexInputType::TexCoords);
+
  	MaterialsManager& matManager = MaterialsManager::Get();
  	bool materialExists = false;
- 	eastl::shared_ptr<RenderMaterial> thisMaterial = matManager.GetOrAddMaterial("Assimp_Material_Temp", materialExists);
+ 	eastl::shared_ptr<RenderMaterial> thisMaterial = matManager.GetOrAddMaterial(eastl::string("Assimp_Material_") + inMesh.mName.data, materialExists);
  
  	if (!materialExists)
  	{
@@ -138,17 +143,14 @@ void AssimpModel3DLoader::ProcessMesh(const aiMesh& inMesh, const aiScene& inSce
 			// 		Textures.insert(Textures.end(), SpecularMaps.begin(), SpecularMaps.end());
 		}
 
- 		//thisMaterial->Textures = std::move(textures);
- 		//thisMaterial->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/WithNormalProjectionVertexShader.glsl", "../Data/Shaders/LightingTexFragmentShader.glsl");// TODO
+		thisMaterial->Shader = RHI::Instance->CreateShaderFromPath("ModelWorldPosition_VS_Pos-Normal-UV", "BasicTex_PS", inputLayout);
  	}
  
-	//eastl::shared_ptr<VertexArrayObject> thisVAO = nullptr;// TODO
-	const eastl::string vaoName = inMesh.mName.C_Str();
-	ASSERT(false); // Not working with Generic renderer
-	//const bool existingVAO = RHI->GetOrCreateVAO(vaoName, thisVAO);
-	const bool existingVAO = false;
+	const eastl::string renderDataContainerID = inMesh.mName.C_Str();
+	eastl::shared_ptr<RenderDataContainer> dataContainer;
+	const bool existingContainer = ForwardRenderer::Get().GetOrCreateContainer(renderDataContainerID, dataContainer);
 
-	if (!existingVAO)
+	if (!existingContainer)
 	{
 		eastl::vector<Vertex> vertices;
 		eastl::vector<uint32_t> indices;
@@ -189,41 +191,27 @@ void AssimpModel3DLoader::ProcessMesh(const aiMesh& inMesh, const aiScene& inSce
 			}
 		}
 
-		// TODO
-// 
-// 		OpenGLIndexBuffer ibo = OpenGLIndexBuffer{};
-// 		int32_t indicesCount = static_cast<int32_t>(indices.size());
-// 		ibo.SetIndices(indices.data(), indicesCount);
+		const int32_t indicesCount = static_cast<int32_t>(indices.size());
+		eastl::shared_ptr<RHIIndexBuffer> ib = RHI::Instance->CreateIndexBuffer(indices.data(), indicesCount);
+		const int32_t verticesCount = static_cast<int32_t>(vertices.size());
+		const eastl::shared_ptr<RHIVertexBuffer> vb = RHI::Instance->CreateVertexBuffer(inputLayout, vertices, ib);
 
-		VertexInputLayout layout;
-		// Vertex points
-		layout.Push<float>(3, VertexInputType::Position);
-		// Normals
-		layout.Push<float>(3, VertexInputType::Normal);
-		// Vertex Tex Coords
-		layout.Push<float>(2, VertexInputType::TexCoords);
-
-		// TODO
-// 		OpenGLVertexBuffer vbo = OpenGLVertexBuffer{ ibo, layout };
-// 		int32_t verticesCount = static_cast<int32_t>(vertices.size());
-// 		vbo.SetVertices(vertices);
-
-		//thisVAO->VBuffer = vbo;// TODO
+		dataContainer->VBuffer = vb;
 	}
+
+	eastl::shared_ptr<MeshNode> newMesh = eastl::make_shared<MeshNode>();
+	inCurrentNode->AddChild(newMesh);
 
 	RenderCommand newCommand;
 	newCommand.Material = thisMaterial;
-	//newCommand.VAO = thisVAO; // TODO
 	newCommand.Parent = inCurrentNode;
+	newCommand.DataContainer = dataContainer;
 	newCommand.DrawType = EDrawCallType::DrawElements;
 
 	outCommands.push_back(newCommand);
-
-	// 	Mesh3D newMesh;
-	// 	inCurrentNode->Meshes.push_back(newMesh);
 }
 
-eastl::vector<eastl::shared_ptr<RHITexture2D>> AssimpModel3DLoader::LoadMaterialTextures(const aiMaterial & inMat, const aiTextureType & inAssimpTexType)
+eastl::vector<eastl::shared_ptr<RHITexture2D>> AssimpModel3DLoader::LoadMaterialTextures(const aiMaterial& inMat, const aiTextureType& inAssimpTexType)
 {
 	eastl::vector<eastl::shared_ptr<RHITexture2D>> textures;
 	const uint32_t texureBaseNr = GL_TEXTURE0;

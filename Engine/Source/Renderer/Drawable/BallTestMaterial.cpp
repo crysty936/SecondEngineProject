@@ -25,6 +25,8 @@ void BallTestMaterial::SetUniforms(eastl::unordered_map<eastl::string, SelfRegis
 
 void BallTestMaterial::SetRequiredUniforms()
 {
+	__super::SetRequiredUniforms();
+
   	eastl::vector<UniformWithFlag> additionalUniforms = {
   	{"LightPos"},
   	{"ScreenToWorld"},
@@ -32,6 +34,4 @@ void BallTestMaterial::SetRequiredUniforms()
   	};
   
 	UBuffers.push_back({ additionalUniforms, ConstantBufferType::Pixel });
-
-	__super::SetRequiredUniforms();
 }

@@ -33,7 +33,7 @@ public:
 	virtual void UnbindUniformBuffer(const RHIUniformBuffer& inBuffer) {};
 	virtual void UnbindTexture2D(const class RHITexture2D& inTex, const int32_t inTexId) {};
 
-	virtual void UniformBufferUpdateData(RHIUniformBuffer& inBuffer, const void* inData, const size_t inDataSize) {};
+	virtual void UniformBufferUpdateData(RHIUniformBuffer& inBuffer, const void* inData, const size_t inDataSize, const int32_t inBufferNr) {};
 
 	virtual eastl::shared_ptr<class RHIShader> CreateShaderFromSource(const eastl::string& inVertexSrc, const eastl::string& inPixelSrc, const VertexInputLayout& inInputLayout, const eastl::string& inVSName = "VS", const eastl::string& inPSName = "PS") { return nullptr; }
 	virtual eastl::shared_ptr<class RHIShader> CreateShaderFromPath(const eastl::string& inVertexPath, const eastl::string& inPixelPath, const VertexInputLayout& inInputLayout) { return nullptr; }

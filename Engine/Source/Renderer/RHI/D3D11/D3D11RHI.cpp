@@ -609,7 +609,7 @@ void D3D11RHI::UnbindTexture2D(const RHITexture2D& inTex, const int32_t inTexId)
 	ImmediateContext->PSSetShaderResources(0, 0, nullptr);
 }
 
-void D3D11RHI::UniformBufferUpdateData(RHIUniformBuffer& inBuffer, const void* inData, const size_t inDataSize)
+void D3D11RHI::UniformBufferUpdateData(RHIUniformBuffer& inBuffer, const void* inData, const size_t inDataSize, const int32_t inBufferNr)
 {
 	D3D11UniformBuffer& d3d11Buffer = static_cast<D3D11UniformBuffer&>(inBuffer);
 

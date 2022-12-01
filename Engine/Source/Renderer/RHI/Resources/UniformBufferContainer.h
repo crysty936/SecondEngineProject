@@ -12,7 +12,7 @@ class UniformBufferContainer
 public:
 
 	void AddData(const char* inData, const size_t inSize);
-	void UpdateData(const ConstantBufferType inBufferType);
+	void UpdateData(const ConstantBufferType inBufferType, const int32_t inBufferNr);
 	void Clear();
 	void Bind();
 	void Unbind();

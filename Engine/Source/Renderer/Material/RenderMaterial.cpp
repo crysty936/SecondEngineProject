@@ -38,8 +38,9 @@ void RenderMaterial::SetUniforms(eastl::unordered_map<eastl::string, SelfRegiste
 {
 	using uniformsIterator = const eastl::unordered_map<eastl::string, SelfRegisteringUniform>::const_iterator;
 
-	for (BufferWithRequirements& buffer : UBuffers)
+	for (int32_t i = 0; i < UBuffers.size(); ++i)
 	{
+		BufferWithRequirements& buffer = UBuffers[i];
 		buffer.BufferContainer.Clear();
 
 		// Register all required uniforms
@@ -63,7 +64,7 @@ void RenderMaterial::SetUniforms(eastl::unordered_map<eastl::string, SelfRegiste
 			requiredUniform.IsSet = true;
 		}
 
-		buffer.BufferContainer.UpdateData(buffer.BufferType);
+		buffer.BufferContainer.UpdateData(buffer.BufferType, i);
 	}
 }
 

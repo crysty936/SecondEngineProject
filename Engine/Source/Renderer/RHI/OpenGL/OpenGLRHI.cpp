@@ -313,7 +313,6 @@ eastl::shared_ptr<RHIUniformBuffer> OpenGLRHI::CreateUniformBuffer(size_t inSize
 	glBindBuffer(GL_UNIFORM_BUFFER, bufferHandle);
 	glBufferData(GL_UNIFORM_BUFFER, inSize, NULL, GL_STATIC_DRAW);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
-	glBindBufferRange(GL_UNIFORM_BUFFER, 0, bufferHandle, 0, inSize);
 
 	eastl::shared_ptr<GlUniformBuffer> newBuffer = eastl::make_shared<GlUniformBuffer>(bufferHandle, inSize);
 
@@ -331,14 +330,16 @@ eastl::shared_ptr<RHITexture2D> OpenGLRHI::CreateTexture2D(const eastl::string& 
 	return newTexture;
 }
 
-void OpenGLRHI::UniformBufferUpdateData(RHIUniformBuffer& inBuffer, const void* inData, const size_t inDataSize)
+void OpenGLRHI::UniformBufferUpdateData(RHIUniformBuffer& inBuffer, const void* inData, const size_t inDataSize, const int32_t inBufferNr)
 {
 	const GlUniformBuffer& glBuffer = static_cast<const GlUniformBuffer&>(inBuffer);
-	ASSERT(inDataSize == glBuffer.InitSize);
+	ASSERT(inDataSize <= glBuffer.InitSize);
 	
 	glBindBuffer(GL_UNIFORM_BUFFER, glBuffer.GLHandle);
-
 	glBufferSubData(GL_UNIFORM_BUFFER, 0, inDataSize, inData);
+
+	// Also bind it to the slot
+	glBindBufferRange(GL_UNIFORM_BUFFER, inBufferNr, glBuffer.GLHandle, 0, inDataSize);
 
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }

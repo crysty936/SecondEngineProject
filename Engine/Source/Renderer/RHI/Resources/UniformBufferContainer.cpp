@@ -13,7 +13,7 @@ void UniformBufferContainer::AddData(const char* inData, const size_t inSize)
 	Counter += inSize;
 }
 
-void UniformBufferContainer::UpdateData(const ConstantBufferType inBufferType)
+void UniformBufferContainer::UpdateData(const ConstantBufferType inBufferType, const int32_t inBufferNr)
 {
 	if (!RHIBuffer)
 	{
@@ -21,6 +21,7 @@ void UniformBufferContainer::UpdateData(const ConstantBufferType inBufferType)
 		size_t bufferSize = UniformsCache.size();
 		if ((bufferSize % 16) > 0)
 		{
+			// Round size to the next 16 multiple
 			const int multiplier = (bufferSize / 16) + 1;
 			bufferSize = multiplier * 16;
 		}
@@ -29,7 +30,7 @@ void UniformBufferContainer::UpdateData(const ConstantBufferType inBufferType)
 		RHIBuffer->BType = inBufferType;
 	}
 
-	RHI::Instance->UniformBufferUpdateData(*RHIBuffer, UniformsCache.data(), UniformsCache.size());
+	RHI::Instance->UniformBufferUpdateData(*RHIBuffer, UniformsCache.data(), UniformsCache.size(), inBufferNr);
 }
 
 void UniformBufferContainer::Clear()

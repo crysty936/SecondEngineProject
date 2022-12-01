@@ -350,6 +350,14 @@ void ForwardRenderer::AddCommand(const RenderCommand & inCommand)
 void ForwardRenderer::AddCommands(eastl::vector<RenderCommand> inCommands)
 {
 	std::lock_guard<std::mutex> lock(RenderCommandsMutex);
+#ifdef _DEBUG
+	for (RenderCommand& command : inCommands)
+	{
+		ASSERT(command.DataContainer);
+		ASSERT(command.Material);
+	}
+#endif
+
 	MainCommands.insert(MainCommands.end(), inCommands.begin(), inCommands.end());
 }
 

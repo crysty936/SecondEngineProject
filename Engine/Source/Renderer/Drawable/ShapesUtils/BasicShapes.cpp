@@ -19,10 +19,10 @@ TriangleShape::~TriangleShape() = default;
 
 void TriangleShape::CreateProxy()
 {
-	const eastl::string vaoName = "triangleVAO";
+	const eastl::string RenderDataContainerID = "triangleVAO";
 	eastl::shared_ptr<RenderDataContainer> dataContainer{ nullptr };
 
-	const bool existingVAO = ForwardRenderer::Get().GetOrCreateContainer(vaoName, dataContainer);
+	const bool existingContainer = ForwardRenderer::Get().GetOrCreateContainer(RenderDataContainerID, dataContainer);
 
 	VertexInputLayout inputLayout;
 	// Vertex points
@@ -30,7 +30,7 @@ void TriangleShape::CreateProxy()
 	// Vertex Tex Coords
 	//layout.Push<float>(2);
 
-	if (!existingVAO)
+	if (!existingContainer)
 	{
  		const int32_t indicesCount = BasicShapesData::GetTriangleIndicesCount();
 
@@ -72,10 +72,10 @@ SquareShape::~SquareShape() = default;
 
 void SquareShape::CreateProxy()
 {
- 	const eastl::string vaoName = "squareVAO";
+ 	const eastl::string RenderDataContainerID = "squareVAO";
 	eastl::shared_ptr<RenderDataContainer> dataContainer{ nullptr };
 
-	const bool existingVAO = ForwardRenderer::Get().GetOrCreateContainer(vaoName, dataContainer);
+	const bool existingContainer = ForwardRenderer::Get().GetOrCreateContainer(RenderDataContainerID, dataContainer);
  
  	VertexInputLayout inputLayout;
  	// Vertex points
@@ -83,7 +83,7 @@ void SquareShape::CreateProxy()
 	// Vertex Tex Coords
  	inputLayout.Push<float>(2, VertexInputType::TexCoords);
 
-	if (!existingVAO)
+	if (!existingContainer)
  	{
  		int32_t indicesCount = BasicShapesData::GetSquareIndicesCount();
 		eastl::shared_ptr<RHIIndexBuffer> ib = RHI::Instance->CreateIndexBuffer(BasicShapesData::GetSquareIndices(), indicesCount);
@@ -104,7 +104,7 @@ void SquareShape::CreateProxy()
   		eastl::shared_ptr<RHITexture2D> tex = RHI::Instance->CreateTexture2D("../Data/Textures/numbers_corrected.png");
   		material->DiffuseTextures.push_back(tex);
 
-		material->Shader = RHI::Instance->CreateShaderFromPath("ModelWorldPosition_VS_Pos-Normal-UV-LightPos-ScreenToWorld", "8BallTest_PS", inputLayout);
+		material->Shader = RHI::Instance->CreateShaderFromPath("ModelWorldPosition_VS_Pos-UV", "8BallTest_PS", inputLayout);
 	}
  
  	RenderCommand newCommand;
@@ -135,10 +135,10 @@ CubeShape::~CubeShape() = default;
 
 void CubeShape::CreateProxy()
 {
-  	const eastl::string vaoName = "cubeVAO";
+  	const eastl::string RenderDataContainerID = "cubeVAO";
  	eastl::shared_ptr<RenderDataContainer> dataContainer{ nullptr };
 
-	const bool existingVAO = ForwardRenderer::Get().GetOrCreateContainer(vaoName, dataContainer);
+	const bool existingContainer = ForwardRenderer::Get().GetOrCreateContainer(RenderDataContainerID, dataContainer);
 	VertexInputLayout inputLayout;
 	// Vertex points
 	inputLayout.Push<float>(3, VertexInputType::Position);
@@ -146,7 +146,7 @@ void CubeShape::CreateProxy()
 	inputLayout.Push<float>(3, VertexInputType::Normal);
 	// Vertex Tex Coords
 	inputLayout.Push<float>(2, VertexInputType::TexCoords);
- 	if (!existingVAO)
+ 	if (!existingContainer)
   	{
 		int32_t indicesCount = BasicShapesData::GetCubeIndicesCount();
 		eastl::shared_ptr<RHIIndexBuffer> ib = RHI::Instance->CreateIndexBuffer(BasicShapesData::GetCubeIndices(), indicesCount);
@@ -188,14 +188,14 @@ Skybox::~Skybox() = default;
 
 void Skybox::CreateProxy()
 {
-// 	const eastl::string vaoName = "skyboxVAO";
+// 	const eastl::string RenderDataContainerID = "skyboxVAO";
 // 	eastl::shared_ptr<VertexArrayObject> thisVAO{ nullptr };
 // 
 // 	ASSERT(false); // Not working with Generic renderer
-// 	//const bool existingVAO = RHI->GetOrCreateVAO(vaoName, thisVAO); 
-// 	const bool existingVAO = false;
+// 	//const bool existingContainer = RHI->GetOrCreateVAO(RenderDataContainerID, thisVAO); 
+// 	const bool existingContainer = false;
 // 
-// 	if (!existingVAO)
+// 	if (!existingContainer)
 // 	{
 // 		// TODO: Buffers creation should be delegated to the renderer
 // 		OpenGLIndexBuffer ibo = OpenGLIndexBuffer{};
@@ -251,13 +251,13 @@ LightSource::~LightSource() = default;
 
 void LightSource::CreateProxy()
 {
-// 	const eastl::string vaoName = "lightSourceVAO";
+// 	const eastl::string RenderDataContainerID = "lightSourceVAO";
 // 	eastl::shared_ptr<VertexArrayObject> thisVAO{ nullptr };
 // 	ASSERT(false); // Not working with Generic renderer
-// 	//const bool existingVAO = RHI->GetOrCreateVAO(vaoName, thisVAO);
-// 	const bool existingVAO = false;
+// 	//const bool existingContainer = RHI->GetOrCreateVAO(RenderDataContainerID, thisVAO);
+// 	const bool existingContainer = false;
 // 
-// 	if (!existingVAO)
+// 	if (!existingContainer)
 // 	{
 // 		// TODO: Buffers creation should be delegated to the renderer
 // 		OpenGLIndexBuffer ibo = OpenGLIndexBuffer{};

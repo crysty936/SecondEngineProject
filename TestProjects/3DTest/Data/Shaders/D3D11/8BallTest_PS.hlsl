@@ -138,7 +138,5 @@ float4 PSEntry(PS_INPUT input) : SV_Target
 	float3 color = GetColor(input, vert.xyz);
 	float4 finalColor = float4(brightness * color, alpha);
 
-
-
     return finalColor;
 }

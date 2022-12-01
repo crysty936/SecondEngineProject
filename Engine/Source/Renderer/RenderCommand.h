@@ -4,8 +4,8 @@
 
 struct RenderCommand
 {
-	eastl::shared_ptr<class RenderDataContainer> DataContainer{ nullptr };
-	eastl::shared_ptr<class RenderMaterial> Material{ nullptr };
+	eastl::shared_ptr<class RenderDataContainer> DataContainer;
+	eastl::shared_ptr<class RenderMaterial> Material;
 	eastl::weak_ptr<const class DrawableObject> Parent;
 	EDrawCallType DrawType{ EDrawCallType::DrawElements };
 };

@@ -85,19 +85,27 @@ void TestGameMode::Init()
  	}
 	{
 		//eastl::shared_ptr<CubeShape> centerObj = BasicShapes::CreateCubeObject();
+
 		eastl::shared_ptr<SquareShape> centerObj = BasicShapes::CreateSquareObject();
 
-		eastl::shared_ptr<CubeShape> lightObj = BasicShapes::CreateCubeObject();
-		lightObj->SetRelativeLocation(glm::vec3(10.f, 20.f, 15.f));
+		//eastl::shared_ptr<CubeShape> lightObj = BasicShapes::CreateCubeObject();
+		//lightObj->SetRelativeLocation(glm::vec3(10.f, 20.f, 15.f));
 	}
 // 	{
 // 		eastl::shared_ptr<CubeShape> centerObj = BasicShapes::CreateCubeObject();
 // 		centerObj->Move(glm::vec3(0.f, 20.f, 0.f));
 // 	}
-// 	{
-// 		eastl::shared_ptr<CubeShape> centerObj = BasicShapes::CreateCubeObject();
-// 		centerObj->Move(glm::vec3(0.f, 0.f, -5.f));
-// 	}
+ 	{
+// 		for (int32_t j = 0; j < 100; ++j)
+// 		{
+// 			for (int32_t i = 0; i < 100; ++i)
+// 			{
+//  				eastl::shared_ptr<CubeShape> centerObj = BasicShapes::CreateCubeObject();
+//  				centerObj->Move(glm::vec3(j * 3.f, 5.f, i * 3.f));
+// 				//centerObj->SetScale(glm::vec3(0.01f, 0.01f, 0.01f));
+// 			}
+// 		}
+ 	}
 
 	//eastl::shared_ptr<AssimpModel3D> shibaModel = ObjectCreation::NewObject<AssimpModel3D>("../Data/Models/Shiba/scene.gltf");
 		
@@ -117,9 +125,10 @@ void TestGameMode::Init()
 //  
 //  		test->Move(glm::vec3(0.0f, 0.0f, -10.f));
 //  	}
-// 	eastl::shared_ptr<AssimpModel3D> model = ObjectCreation::NewObject<AssimpModel3D>("../Data/Models/Backpack/scene.gltf");
-// 	model->Move(glm::vec3(5.f, 5.f, 5.f));
-// 	model->SetScale(glm::vec3(0.01f, 0.01f, 0.01f));
+
+//    	eastl::shared_ptr<AssimpModel3D> model = ObjectCreation::NewObject<AssimpModel3D>("../Data/Models/Shiba/scene.gltf");
+//    	model->Move(glm::vec3(0.f, 0.f, -5.f));
+   	//model->SetScale(glm::vec3(0.01f, 0.01f, 0.01f));
 
 	//eastl::shared_ptr<Skybox> skybox = ObjectCreation::NewObject<Skybox>();
 // 

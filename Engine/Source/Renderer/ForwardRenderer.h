@@ -65,8 +65,8 @@ public:
 	inline eastl::queue<RenderingLoadCommand>& GetLoadQueue() { return LoadQueue; }
 
 	//************************************
-	// Returns:   bool, true if the VAO was already present and is initialized, false otherwise
-	// Parameter: eastl::shared_ptr<VertexArrayObject> & outVAO, newly created or cached existing VAO
+	// Returns:   bool, true if the RenderDataContainer was already present and is initialized, false otherwise
+	// Parameter: eastl::shared_ptr<RenderDataContainer> & outContainer, newly created or cached existing Container
 	//************************************
 	bool GetOrCreateContainer(const eastl::string& inInstanceName, OUT eastl::shared_ptr<RenderDataContainer>& outContainer);
 	void AddMirrorCommand(const RenderCommand& inCommand);

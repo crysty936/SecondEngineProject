@@ -32,7 +32,7 @@ public:
 	virtual void UnbindUniformBuffer(const RHIUniformBuffer& inBuffer) override;
 	virtual void UnbindTexture2D(const RHITexture2D& inTex, const int32_t inTexId);
 
-	virtual void UniformBufferUpdateData(RHIUniformBuffer& inBuffer, const void* inData, const size_t inDataSize) override;
+	virtual void UniformBufferUpdateData(RHIUniformBuffer& inBuffer, const void* inData, const size_t inDataSize, const int32_t inBufferNr) override;
 
 
 	void SetViewportSize(const int32_t inWidth, const int32_t inHeight) override;
