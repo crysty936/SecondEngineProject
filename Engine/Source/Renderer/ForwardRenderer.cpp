@@ -16,7 +16,7 @@
 #include "Renderer/RHI/Resources/RenderDataContainer.h"
 #include "Renderer/Material/MaterialsManager.h"
 #include "Renderer/Drawable/MirrorQuad.h"
-#include "Core/ObjectCreation.h"
+#include "Core/EntityHelper.h"
 #include "Renderer/Drawable/DepthMaterial.h"
 #include "Core/WindowsPlatform.h"
 
@@ -183,7 +183,11 @@ void ForwardRenderer::SetupBaseUniforms()
 {
 	// By default, use a D3D11 projection matrix.
 	// Note: glm is RH but uses a sneaky minus to change the handedness of the output to LH (how OpenGL is)
-	glm::mat4 projection = glm::perspectiveRH_ZO(glm::radians(45.0f), static_cast<float>(Engine->GetMainWindow().GetProperties().Width) / static_cast<float>(Engine->GetMainWindow().GetProperties().Height), 0.1f, 1000.0f);
+	constexpr float fov = 45.f;
+	const float windowWidth = static_cast<float>(Engine->GetMainWindow().GetProperties().Width);
+	const float windowHeight = static_cast<float>(Engine->GetMainWindow().GetProperties().Height);
+
+	glm::mat4 projection = glm::perspectiveRH_ZO(glm::radians(45.0f),  windowWidth / windowHeight, 0.1f, 1000.0f);
 	RHI::Instance->PrepareProjectionForRendering(projection);
 
 	UniformsCache["projection"] = projection;
@@ -201,6 +205,17 @@ void ForwardRenderer::DrawCommands(const eastl::vector<RenderCommand>&inCommands
 	{
 		DrawCommand(renderCommand);
 	}
+
+
+ 	for (const RenderCommand& renderCommand : inCommands)
+ 	{
+ 		if (renderCommand.test)
+ 		{
+ 			DrawMode = EDrawMode::NORMAL_VISUALIZE;
+ 			DrawCommand(renderCommand);
+ 			DrawMode = EDrawMode::Default;
+ 		}
+ 	}
 }
 
 void ForwardRenderer::DrawCommand(const RenderCommand & inCommand)
@@ -282,7 +297,7 @@ eastl::shared_ptr<RenderMaterial> ForwardRenderer::GetMaterial(const RenderComma
 {
 	switch (DrawMode)
 	{
-	case EDrawMode::NORMAL:
+	case EDrawMode::Default:
 	{
 		return inCommand.Material;
 	}
@@ -325,6 +340,29 @@ eastl::shared_ptr<RenderMaterial> ForwardRenderer::GetMaterial(const RenderComma
 // 
 // 		return outlineMaterial;
 	//}
+	 	case EDrawMode::NORMAL_VISUALIZE:
+ 	{
+ 		MaterialsManager& matManager = MaterialsManager::Get();
+ 		bool materialExists = false;
+ 		eastl::shared_ptr<RenderMaterial> visNormalMat = matManager.GetOrAddMaterial("normal_visualize_material", materialExists);
+ 
+ 		if (!materialExists)
+ 		{
+			VertexInputLayout inputLayout;
+			inputLayout.Push<float>(3, VertexInputType::Position);
+			inputLayout.Push<float>(3, VertexInputType::Normal);
+			inputLayout.Push<float>(2, VertexInputType::TexCoords);
+
+			eastl::vector<ShaderSourceInput> shaders = {
+			{ "ModelWorldPosition_VS_Pos-UV-Normal_Geometry_ManuallyWritten", EShaderType::Vertex },
+			{ "GeometryTest_GS", EShaderType::Geometry },
+			{ "FlatColor_PS", EShaderType::Fragment } };
+
+			visNormalMat->Shader = RHI::Instance->CreateShaderFromPath(shaders, inputLayout);
+ 		}
+ 
+ 		return visNormalMat;
+	}
 	}
 
 	return { nullptr };

@@ -5,7 +5,7 @@
 #include "Renderer/Material/MaterialsManager.h"
 #include "Renderer/RenderCommand.h"
 #include "Renderer/ForwardRenderer.h"
-#include "Core/ObjectCreation.h"
+#include "Core/EntityHelper.h"
 #include "Renderer/Drawable/SkyboxMaterial.h"
 #include "Renderer/Drawable/WithShadowMaterial.h"
 #include "glad/glad.h"
@@ -54,7 +54,10 @@ void TriangleShape::CreateProxy()
 		//tex->Init(texturePath);
 		//material->Textures.push_back(std::move(tex));
 
-		material->Shader = RHI::Instance->CreateShaderFromPath("ModelWorldPositionVertexShader", "FlatColorPixelShader", inputLayout);
+		eastl::vector<ShaderSourceInput> shaders = {
+		{ "ModelWorldPositionVertexShader", EShaderType::Vertex },
+		{ "FlatColorPixelShader", EShaderType::Fragment } };
+		material->Shader = RHI::Instance->CreateShaderFromPath(shaders, inputLayout);
 	}
 
 	RenderCommand newCommand;
@@ -104,7 +107,12 @@ void SquareShape::CreateProxy()
   		eastl::shared_ptr<RHITexture2D> tex = RHI::Instance->CreateTexture2D("../Data/Textures/numbers_corrected.png");
   		material->DiffuseTextures.push_back(tex);
 
-		material->Shader = RHI::Instance->CreateShaderFromPath("ModelWorldPosition_VS_Pos-UV", "8BallTest_PS", inputLayout);
+		eastl::vector<ShaderSourceInput> shaders = {
+		{ "ModelWorldPosition_VS_Pos-UV", EShaderType::Vertex },
+		//{ "GeometryTest_GS", EShaderType::Geometry },
+		{ "FlatColor_PS", EShaderType::Fragment } };
+
+		material->Shader = RHI::Instance->CreateShaderFromPath(shaders, inputLayout);
 	}
  
  	RenderCommand newCommand;
@@ -118,15 +126,13 @@ void SquareShape::CreateProxy()
 
 eastl::shared_ptr<SquareShape> BasicShapes::CreateSquareObject(eastl::string inTexturePath)
 {
-	eastl::shared_ptr<SquareShape> obj = ObjectCreation::NewObject<SquareShape>();
-
+	eastl::shared_ptr<SquareShape> obj = EntityHelper::CreateObject<SquareShape>();
 	return obj;
 }
 
 eastl::shared_ptr<CubeShape> BasicShapes::CreateCubeObject()
 {
-	eastl::shared_ptr<CubeShape> obj = ObjectCreation::NewObject<CubeShape>();
-
+	eastl::shared_ptr<CubeShape> obj = EntityHelper::CreateObject<CubeShape>();
 	return obj;
 }
 
@@ -146,6 +152,7 @@ void CubeShape::CreateProxy()
 	inputLayout.Push<float>(3, VertexInputType::Normal);
 	// Vertex Tex Coords
 	inputLayout.Push<float>(2, VertexInputType::TexCoords);
+
  	if (!existingContainer)
   	{
 		int32_t indicesCount = BasicShapesData::GetCubeIndicesCount();
@@ -168,7 +175,12 @@ void CubeShape::CreateProxy()
   	{
 		eastl::shared_ptr<RHITexture2D> tex = RHI::Instance->CreateTexture2D("../Data/Textures/MinecraftGrass.jpg");
 		material->DiffuseTextures.push_back(tex);
-		material->Shader = RHI::Instance->CreateShaderFromPath("ModelWorldPosition_VS_Pos-Normal-UV", "BasicTex_PS", inputLayout);
+
+		eastl::vector<ShaderSourceInput> shaders = {
+		{ "ModelWorldPosition_VS_Pos-Normal-UV", EShaderType::Vertex },
+		{ "BasicTex_PS", EShaderType::Fragment } };
+
+		material->Shader = RHI::Instance->CreateShaderFromPath(shaders, inputLayout);
   	}
   
   	eastl::shared_ptr<MeshNode> cubeNode = eastl::make_shared<MeshNode>();

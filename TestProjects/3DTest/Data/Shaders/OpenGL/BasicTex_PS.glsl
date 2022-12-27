@@ -1133,7 +1133,6 @@ float4 SampleDiffuse(PS_INPUT input)
 	//float2 relPos = input.Pos.xy * invSize;
 	//bool isEdge = any(abs(relPos - 0.5) > 0.48);
 
-
 	float2 UVs = input.TexCoord;
 	bool isEdge = abs(UVs - 0.5).x > 0.48 || abs(UVs - 0.5).y > 0.48;
 

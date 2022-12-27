@@ -8,4 +8,6 @@ struct RenderCommand
 	eastl::shared_ptr<class RenderMaterial> Material;
 	eastl::weak_ptr<const class DrawableObject> Parent;
 	EDrawCallType DrawType{ EDrawCallType::DrawElements };
+	
+	bool test = false;
 };

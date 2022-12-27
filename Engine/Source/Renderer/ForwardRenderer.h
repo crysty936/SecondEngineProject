@@ -31,10 +31,11 @@ struct RenderingLoadCommand
 
 enum class EDrawMode : uint8_t
 {
-	NORMAL,
+	Default,
 	DEPTH,
 	DEPTH_VISUALIZE,
-	OUTLINE
+	OUTLINE,
+	NORMAL_VISUALIZE
 };
 
 class ForwardRenderer
@@ -64,10 +65,10 @@ public:
 	void AddRenderLoadCommand(const RenderingLoadCommand& inCommand);
 	inline eastl::queue<RenderingLoadCommand>& GetLoadQueue() { return LoadQueue; }
 
-	//************************************
-	// Returns:   bool, true if the RenderDataContainer was already present and is initialized, false otherwise
-	// Parameter: eastl::shared_ptr<RenderDataContainer> & outContainer, newly created or cached existing Container
-	//************************************
+	/**
+	 * return: bool, true if the RenderDataContainer was already present and is initialized, false otherwise
+	 * outContainer: newly created or cached existing Container
+	 */
 	bool GetOrCreateContainer(const eastl::string& inInstanceName, OUT eastl::shared_ptr<RenderDataContainer>& outContainer);
 	void AddMirrorCommand(const RenderCommand& inCommand);
 	inline void SetSkyboxCommand(RenderCommand inSkyboxCommand) { MainSkyboxCommand = inSkyboxCommand; }
@@ -83,7 +84,7 @@ private:
 private:
 	eastl::unordered_map<eastl::string, SelfRegisteringUniform> UniformsCache;
 	eastl::vector<RenderCommand> MainCommands;
-	EDrawMode DrawMode{ EDrawMode::NORMAL };
+	EDrawMode DrawMode{ EDrawMode::Default };
 	eastl::queue<RenderingLoadCommand> LoadQueue;
 	eastl::unordered_map<eastl::string, eastl::shared_ptr<class RenderDataContainer>> RenderDataContainerMap;
 	//uint32_t AuxiliarFrameBuffer;

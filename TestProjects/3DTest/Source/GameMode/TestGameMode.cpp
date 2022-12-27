@@ -7,7 +7,7 @@
 #include "glm/common.hpp"
 #include <stdlib.h>
 #include "Renderer/Model/3D/Assimp/AssimpModel3D.h"
-#include "Core/ObjectCreation.h"
+#include "Core/EntityHelper.h"
 #include "Renderer/Drawable/MirrorQuad.h"
 
 TestGameMode GameMode = {};
@@ -81,12 +81,11 @@ void TestGameMode::Init()
    	 	eastl::shared_ptr<CubeShape> centerObj = BasicShapes::CreateCubeObject();
    		centerObj->Move(glm::vec3(0.f, -2.f, 0.f));
    		centerObj->SetScale(glm::vec3(100.f, 0.5f, 100.f));
- 
  	}
 	{
 		//eastl::shared_ptr<CubeShape> centerObj = BasicShapes::CreateCubeObject();
 
-		eastl::shared_ptr<SquareShape> centerObj = BasicShapes::CreateSquareObject();
+		//eastl::shared_ptr<SquareShape> SquareTestObj = BasicShapes::CreateSquareObject();
 
 		//eastl::shared_ptr<CubeShape> lightObj = BasicShapes::CreateCubeObject();
 		//lightObj->SetRelativeLocation(glm::vec3(10.f, 20.f, 15.f));
@@ -108,7 +107,10 @@ void TestGameMode::Init()
  	}
 
 	//eastl::shared_ptr<AssimpModel3D> shibaModel = ObjectCreation::NewObject<AssimpModel3D>("../Data/Models/Shiba/scene.gltf");
-		
+	eastl::shared_ptr<AssimpModel3D> model = EntityHelper::CreateObject<AssimpModel3D>("../Data/Models/Backpack/scene.gltf");
+	model->SetScale(glm::vec3(0.01f, 0.01f, 0.01f));
+	model->Move(glm::vec3(0.f, 3.f, 0.f));
+
 	// Really slow because no batching or camera culling or lods
 	//for (int32_t i = 0; i < 5; ++i)
 	//{

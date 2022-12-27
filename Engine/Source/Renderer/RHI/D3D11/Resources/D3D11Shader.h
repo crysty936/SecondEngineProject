@@ -9,5 +9,6 @@ public:
 public:
 	struct ID3D11VertexShader* VertexShaderHandle = nullptr;
 	struct ID3D11PixelShader* PixelShaderHandle = nullptr;
+	struct ID3D11GeometryShader* GeometryShaderHandle = nullptr;
 	struct ID3D11InputLayout* VertexInputLayout = nullptr;
 };

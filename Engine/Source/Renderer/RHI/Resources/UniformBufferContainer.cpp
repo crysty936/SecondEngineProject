@@ -22,7 +22,7 @@ void UniformBufferContainer::UpdateData(const ConstantBufferType inBufferType, c
 		if ((bufferSize % 16) > 0)
 		{
 			// Round size to the next 16 multiple
-			const int multiplier = (bufferSize / 16) + 1;
+			const size_t multiplier = (bufferSize / 16) + 1;
 			bufferSize = multiplier * 16;
 		}
 

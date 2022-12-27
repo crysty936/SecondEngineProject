@@ -84,6 +84,8 @@ namespace GLUtils
 
 		if (!dummyWindow) {
 			ASSERT_MSG(false, "Failed to create dummy OpenGL window.");
+
+			return;
 		}
 
 		ShowWindow(dummyWindow, SW_HIDE);
@@ -130,6 +132,7 @@ namespace GLUtils
 
 		wglMakeCurrent(dummyDeviceContext, 0);
 		wglDeleteContext(dummyGLContext);
+
 		ReleaseDC(dummyWindow, dummyDeviceContext);
 		DestroyWindow(dummyWindow);
 	}
@@ -457,6 +460,8 @@ void OpenGLRHI::BindVertexBuffer(const RHIVertexBuffer& inBuffer, const bool inB
 			break;
 		}
 
+		// TODO: For Instanced: Just make it so that adding a mat4 adds 4 properties to the VertexLayoutProperties, each with 4 floats - don't forget about the divisor
+
 		glVertexAttribPointer(i, prop.Count, glType, prop.bNormalized, glBuffer.Layout.GetStride(), offsetPtr);
 		glEnableVertexAttribArray(i);
 
@@ -503,7 +508,6 @@ void OpenGLRHI::UnbindVertexBuffer(const RHIVertexBuffer& inBuffer, const bool i
 void OpenGLRHI::UnbindIndexBuffer(const RHIIndexBuffer& inBuffer)
 {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
 }
 
 void OpenGLRHI::UnbindShader(const RHIShader& inShader)
@@ -557,18 +561,46 @@ uint32_t CreateShaderInternal(const eastl::string& Source, uint32_t ShaderType)
 	return shaderHandle;
 }
 
-eastl::shared_ptr<class RHIShader> OpenGLRHI::CreateShaderFromSource(const eastl::string& inVertexSrc, const eastl::string& inPixelSrc, const VertexInputLayout& inInputLayout, const eastl::string&, const eastl::string&)
+eastl::shared_ptr<RHIShader> OpenGLRHI::CreateShaderFromSource(const eastl::vector<ShaderSourceInput> inShaderSources, const VertexInputLayout& inInputLayout, const eastl::string&, const eastl::string&)
 {
+	GLuint vertexShader = 0;
+	GLuint fragmentShader = 0;
+	GLuint geometryShader = 0;
 
-	// Create an empty vertex shader handle
-	eastl::string formattedVS = inVertexSrc;
-	formattedVS.insert(0, "#version 420 \n #define VERTEX_SHADER \n ");
-	GLuint vertexShader = CreateShaderInternal(formattedVS, GL_VERTEX_SHADER);
+	for (const ShaderSourceInput& input : inShaderSources)
+	{
+		switch (input.ShaderType)
+		{
+		case EShaderType::Vertex:
+		{
+			eastl::string formattedVS = input.ShaderSource;
+			formattedVS.insert(0, "#version 420 \n #define VERTEX_SHADER \n #line 0 \n ");
+			vertexShader = CreateShaderInternal(formattedVS, GL_VERTEX_SHADER);
 
-	// Create an empty fragment shader handle
-	eastl::string formattedPS = inPixelSrc;
-	formattedPS.insert(0, "#version 420 \n #define FRAGMENT_SHADER \n ");
-	GLuint fragmentShader = CreateShaderInternal(formattedPS, GL_FRAGMENT_SHADER);
+			break;
+		}
+		case EShaderType::Fragment:
+		{
+			eastl::string formattedPS = input.ShaderSource;
+			formattedPS.insert(0, "#version 420 \n #define FRAGMENT_SHADER \n #line 0 \n ");
+			fragmentShader = CreateShaderInternal(formattedPS, GL_FRAGMENT_SHADER);
+
+			break;
+		}
+		case EShaderType::Geometry:
+		{
+			eastl::string formattedGS = input.ShaderSource;
+			formattedGS.insert(0, "#version 420 \n #define GEOMETRY_SHADER \n #line 0 \n ");
+			geometryShader = CreateShaderInternal(formattedGS, GL_GEOMETRY_SHADER);
+
+			break;
+		}
+		default:
+			break;
+
+		}
+
+	}
 
 	// Vertex and fragment shaders are successfully compiled.
 	// Now time to link them together into a program.
@@ -578,6 +610,11 @@ eastl::shared_ptr<class RHIShader> OpenGLRHI::CreateShaderFromSource(const eastl
 	// Attach our shaders to our program
 	glAttachShader(program, vertexShader);
 	glAttachShader(program, fragmentShader);
+
+	if (geometryShader != 0)
+	{
+		glAttachShader(program, geometryShader);
+	}
 
 	// Link our program
 	glLinkProgram(program);
@@ -600,6 +637,11 @@ eastl::shared_ptr<class RHIShader> OpenGLRHI::CreateShaderFromSource(const eastl
 		glDeleteShader(vertexShader);
 		glDeleteShader(fragmentShader);
 
+		if (geometryShader != 0)
+		{
+			glDeleteShader(geometryShader);
+		}
+
 		LOG_ERROR("%s", infoLog);
 		ASSERT_MSG(0, "Shader Link failure.");
 
@@ -614,23 +656,29 @@ eastl::shared_ptr<class RHIShader> OpenGLRHI::CreateShaderFromSource(const eastl
 	return newShader;
 }
 
-eastl::shared_ptr<class RHIShader> OpenGLRHI::CreateShaderFromPath(const eastl::string& inVertexPath, const eastl::string& inPixelPath, const VertexInputLayout& inInputLayout)
+eastl::shared_ptr<class RHIShader> OpenGLRHI::CreateShaderFromPath(const eastl::vector<ShaderSourceInput> inPathShaderSources, const VertexInputLayout& inInputLayout)
 {
-	eastl::string fullVertexpath = inVertexPath;
-	fullVertexpath.insert(0, "../Data/Shaders/OpenGL/");
-	fullVertexpath.append(".glsl");
+	eastl::vector<ShaderSourceInput> rhiSpecificSources;
+	rhiSpecificSources.reserve(inPathShaderSources.size());
 
-	eastl::string fullPixelPath = inPixelPath;
-	fullPixelPath.insert(0, "../Data/Shaders/OpenGL/");
-	fullPixelPath.append(".glsl");
+	for (const ShaderSourceInput& sourceInput : inPathShaderSources)
+	{
+		eastl::string fullPath = sourceInput.ShaderSource;
+		fullPath.insert(0, "../Data/Shaders/OpenGL/");
+		fullPath.append(".glsl");
 
-	eastl::string vertexShaderCode;
-	eastl::string fragmentShaderCode;
+		eastl::string shaderCode;
+		const bool readSuccess = IOUtils::TryFastReadFile(fullPath, shaderCode);
 
-	const bool vertexReadSuccess = IOUtils::TryFastReadFile(fullVertexpath, vertexShaderCode);
-	const bool fragmentReadSuccess = IOUtils::TryFastReadFile(fullPixelPath, fragmentShaderCode);
+		if (!ENSURE(readSuccess))
+		{
+			continue;
+		}
 
-	return CreateShaderFromSource(vertexShaderCode, fragmentShaderCode, inInputLayout);
+		rhiSpecificSources.push_back({ shaderCode, sourceInput.ShaderType });
+	}
+
+	return CreateShaderFromSource(rhiSpecificSources, inInputLayout);
 }
 
 void OpenGLRHI::DrawElements(const int32_t inElementsCount)

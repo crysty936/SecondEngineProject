@@ -15,8 +15,8 @@ public:
 
 	eastl::shared_ptr<class RHIUniformBuffer> CreateUniformBuffer(size_t inSize) override;
 
-	eastl::shared_ptr<class RHIShader> CreateShaderFromSource(const eastl::string& inVertexSrc, const eastl::string& inPixelSrc, const VertexInputLayout& inInputLayout, const eastl::string& inVSName = "VS", const eastl::string& inPSName = "PS") override;
-	eastl::shared_ptr<class RHIShader> CreateShaderFromPath(const eastl::string& inVertexPath, const eastl::string& inPixelPath, const VertexInputLayout& inInputLayout) override;
+	eastl::shared_ptr<class RHIShader> CreateShaderFromSource(const eastl::vector<ShaderSourceInput> inShaderSources, const VertexInputLayout& inInputLayout, const eastl::string& inVSName = "VS", const eastl::string& inPSName = "PS") override;
+	eastl::shared_ptr<class RHIShader> CreateShaderFromPath(const eastl::vector<ShaderSourceInput> inPathShaderSources, const VertexInputLayout& inInputLayout) override;
 
 	virtual eastl::shared_ptr<class RHITexture2D> CreateTexture2D(const eastl::string& inDataPath) override;
 
@@ -30,7 +30,7 @@ public:
 	virtual void UnbindIndexBuffer(const RHIIndexBuffer& inBuffer) override;
 	virtual void UnbindShader(const RHIShader& inShader) override;
 	virtual void UnbindUniformBuffer(const RHIUniformBuffer& inBuffer) override;
-	virtual void UnbindTexture2D(const RHITexture2D& inTex, const int32_t inTexId);
+	virtual void UnbindTexture2D(const RHITexture2D& inTex, const int32_t inTexId) override;
 
 	virtual void UniformBufferUpdateData(RHIUniformBuffer& inBuffer, const void* inData, const size_t inDataSize, const int32_t inBufferNr) override;
 

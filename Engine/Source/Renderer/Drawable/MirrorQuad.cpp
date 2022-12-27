@@ -4,7 +4,7 @@
 #include "Renderer/Material/MaterialsManager.h"
 #include "Renderer/RenderCommand.h"
 #include "Renderer/ForwardRenderer.h"
-#include "Core/ObjectCreation.h"
+#include "Core/EntityHelper.h"
 
 MirrorQuad::MirrorQuad() = default;
 MirrorQuad::~MirrorQuad() = default;

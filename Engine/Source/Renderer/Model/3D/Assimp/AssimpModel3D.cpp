@@ -143,7 +143,11 @@ void AssimpModel3DLoader::ProcessMesh(const aiMesh& inMesh, const aiScene& inSce
 			// 		Textures.insert(Textures.end(), SpecularMaps.begin(), SpecularMaps.end());
 		}
 
-		thisMaterial->Shader = RHI::Instance->CreateShaderFromPath("ModelWorldPosition_VS_Pos-Normal-UV", "BasicTex_PS", inputLayout);
+
+		eastl::vector<ShaderSourceInput> shaders = {
+		{ "ModelWorldPosition_VS_Pos-Normal-UV", EShaderType::Vertex },
+		{ "BasicTex_PS", EShaderType::Fragment } };
+		thisMaterial->Shader = RHI::Instance->CreateShaderFromPath(shaders, inputLayout);
  	}
  
 	const eastl::string renderDataContainerID = inMesh.mName.C_Str();
@@ -207,6 +211,8 @@ void AssimpModel3DLoader::ProcessMesh(const aiMesh& inMesh, const aiScene& inSce
 	newCommand.Parent = inCurrentNode;
 	newCommand.DataContainer = dataContainer;
 	newCommand.DrawType = EDrawCallType::DrawElements;
+
+	newCommand.test = true;
 
 	outCommands.push_back(newCommand);
 }
