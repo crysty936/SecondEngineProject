@@ -3,5 +3,6 @@
 enum class EDrawCallType
 {
 	DrawElements,
-	DrawArrays
+	DrawArrays,
+	DrawInstanced
 };

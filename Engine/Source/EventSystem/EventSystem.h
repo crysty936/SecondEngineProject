@@ -3,12 +3,14 @@
 #include "EASTL/vector.h"
 #include "DelegateBase.h"
 #include "EventSystem/IFunctionContainerBase.h"
+#include "Core/EngineUtils.h"
 
 template<typename inRetType, typename... inParamTypes>
 class IFunctionContainer : IFunctionContainerBase
 {
 public:
 	virtual inRetType Execute(inParamTypes&&...) const = 0;
+	virtual bool IsBound() const = 0;
 	virtual ~IFunctionContainer() = default;
 };
 
@@ -55,17 +57,24 @@ public:
 		:Obj(inObj), MemberFunctionPtr(inMemberFunction)
 	{}
 
-	virtual ~MemberFuncContainer()
-		= default;
+	virtual ~MemberFuncContainer() = default;
 
 	inRetType Execute(inParamTypes&&... inParams) const
 	{
+		ASSERT(Obj);
+
 		return (Obj->*MemberFunctionPtr)(std::forward<inParamTypes>(inParams)...);
 	}
 
+
+	virtual bool IsBound() const override
+	{
+		return !!Obj;
+	}
+
 private:
-	inObjType* Obj;
-	MemberFunctionType MemberFunctionPtr;
+	inObjType* Obj = nullptr;
+	MemberFunctionType MemberFunctionPtr = nullptr;
 };
 
 
@@ -143,6 +152,11 @@ public:
 		const FuncContainerType* funcContainer = GetFuncContainer();
 
 		return funcContainer->Execute(std::forward<inParamTypes>(inParams)...);
+	}
+
+	inline bool IsBound() const
+	{
+		return GetFuncContainer()->IsBound();
 	}
 
 private:

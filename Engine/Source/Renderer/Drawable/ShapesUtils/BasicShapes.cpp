@@ -177,7 +177,7 @@ void CubeShape::CreateProxy()
 		material->DiffuseTextures.push_back(tex);
 
 		eastl::vector<ShaderSourceInput> shaders = {
-		{ "ModelWorldPosition_VS_Pos-Normal-UV", EShaderType::Vertex },
+		{ "ModelWorldPosition_VS_Pos-UV-Normal_ManuallyWritten", EShaderType::Vertex },
 		{ "BasicTex_PS", EShaderType::Fragment } };
 
 		material->Shader = RHI::Instance->CreateShaderFromPath(shaders, inputLayout);
@@ -191,7 +191,7 @@ void CubeShape::CreateProxy()
 	newCommand.DataContainer = dataContainer;
 	newCommand.Parent = cubeNode;
 	newCommand.DrawType = EDrawCallType::DrawElements;
-  
+
 	ForwardRenderer::Get().AddCommand(newCommand);
 }
 

@@ -293,6 +293,18 @@ eastl::shared_ptr<RHIVertexBuffer> OpenGLRHI::CreateVertexBuffer(const VertexInp
 	return newBuffer;
 }
 
+eastl::shared_ptr<class RHIVertexBuffer> OpenGLRHI::CreateVertexBuffer(const class VertexInputLayout& inLayout, const void* inData, const int32_t inSize, eastl::shared_ptr<class RHIIndexBuffer> inIndexBuffer /*= nullptr*/)
+{
+	uint32_t handle = 0;
+	glGenBuffers(1, &handle);
+	glBindBuffer(GL_ARRAY_BUFFER, handle);
+
+	glNamedBufferData(handle, inSize, inData, GL_STATIC_DRAW);
+
+	eastl::shared_ptr<GLVertexBuffer> newBuffer = eastl::make_shared<GLVertexBuffer>(handle, inIndexBuffer, inLayout);
+	return newBuffer;
+}
+
 eastl::shared_ptr<RHIIndexBuffer> OpenGLRHI::CreateIndexBuffer(const uint32_t* inData, uint32_t inCount)
 {
 	uint32_t handle = 0;
@@ -429,6 +441,7 @@ void OpenGLRHI::PrepareProjectionForRendering(glm::mat4& inProj)
 // 	glm::translate(inProj, glm::vec3(0.f, 0.f, -1.f));
 }
 
+
 void OpenGLRHI::BindVertexBuffer(const RHIVertexBuffer& inBuffer, const bool inBindIndexBuffer)
 {
 	const GLVertexBuffer& glBuffer = static_cast<const GLVertexBuffer&>(inBuffer);
@@ -460,10 +473,11 @@ void OpenGLRHI::BindVertexBuffer(const RHIVertexBuffer& inBuffer, const bool inB
 			break;
 		}
 
-		// TODO: For Instanced: Just make it so that adding a mat4 adds 4 properties to the VertexLayoutProperties, each with 4 floats - don't forget about the divisor
+		const int32_t attribIndex = glBuffer.Layout.AttribsOffset + i;
+		glEnableVertexAttribArray(attribIndex);
+		glVertexAttribPointer(attribIndex, prop.Count, glType, prop.bNormalized, glBuffer.Layout.GetStride(), offsetPtr);
 
-		glVertexAttribPointer(i, prop.Count, glType, prop.bNormalized, glBuffer.Layout.GetStride(), offsetPtr);
-		glEnableVertexAttribArray(i);
+		glVertexAttribDivisor(attribIndex, static_cast<int32_t>(prop.Divisor));
 
 		offset += prop.Count * prop.GetSizeOfType();
 	}
@@ -685,3 +699,9 @@ void OpenGLRHI::DrawElements(const int32_t inElementsCount)
 {
 	glDrawElements(GL_TRIANGLES, inElementsCount, GL_UNSIGNED_INT, 0);
 }
+
+void OpenGLRHI::DrawInstanced(const int32_t inElementsCount, const int32_t inInstancesCount)
+{
+	glDrawElementsInstanced(GL_TRIANGLES, inElementsCount, GL_UNSIGNED_INT, 0, inInstancesCount);
+}
+

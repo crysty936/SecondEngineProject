@@ -30,8 +30,9 @@ public:
 	static void Terminate();
 
 public:
-	virtual eastl::shared_ptr<class RHIVertexBuffer> CreateVertexBuffer(const class VertexInputLayout& inLayout, const float* inVertices, const int32_t inCount, eastl::shared_ptr<class RHIIndexBuffer> inIndexBuffer) { return nullptr; }
-	virtual eastl::shared_ptr<class RHIVertexBuffer> CreateVertexBuffer(const class VertexInputLayout& inLayout, const eastl::vector<Vertex>& inVertices, eastl::shared_ptr<class RHIIndexBuffer> inIndexBuffer) { return nullptr; }
+	virtual eastl::shared_ptr<class RHIVertexBuffer> CreateVertexBuffer(const class VertexInputLayout& inLayout, const float* inVertices, const int32_t inCount, eastl::shared_ptr<class RHIIndexBuffer> inIndexBuffer = nullptr) { return nullptr; }
+	virtual eastl::shared_ptr<class RHIVertexBuffer> CreateVertexBuffer(const class VertexInputLayout& inLayout, const eastl::vector<Vertex>& inVertices, eastl::shared_ptr<class RHIIndexBuffer> inIndexBuffer = nullptr) { return nullptr; }
+	virtual eastl::shared_ptr<class RHIVertexBuffer> CreateVertexBuffer(const class VertexInputLayout& inLayout, const void* inData, const int32_t inSize, eastl::shared_ptr<class RHIIndexBuffer> inIndexBuffer = nullptr) { return nullptr; }
 
 	virtual eastl::shared_ptr<class RHIIndexBuffer> CreateIndexBuffer(const uint32_t* inData, uint32_t inCount) { return nullptr; }
 
@@ -60,6 +61,7 @@ public:
 	virtual void ClearColor(const glm::vec4 inColor) {}
 
 	virtual void DrawElements(const int32_t inElementsCount) {}
+	virtual void DrawInstanced(const int32_t inElementsCount, const int32_t inInstancesCount) {}
 
 	virtual void SwapBuffers() {}
 

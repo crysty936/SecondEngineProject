@@ -7,17 +7,16 @@
 #include "glm/ext/matrix_float4x4.hpp"
 #include "Math/Transform.h"
 #include "Renderer/SelfRegisteringUniform/SelfRegisteringUniform.h"
-#include "RenderCommand.h"
 #include "EventSystem/EventSystem.h"
 #include "EASTL/queue.h"
 #include "Core/EngineUtils.h"
 #include "Entity/TransformObject.h"
 #include "Renderer/RHI/Resources/RenderDataContainer.h"
 #include "Window/WindowProperties.h"
+#include "RenderCommand.h"
 
 /**
- * TODO: A Renderer should be made and that should call whatever RHI is present.
- * Also, Renderers should be differentiated between 2D and 3D because optimizations can be made for 2D only renderers (and view(pixel perfect))
+ * TODO: Renderers should be differentiated between 2D and 3D because optimizations can be made for 2D only renderers (pixel perfect view)
  */
 
 using LoadRenderResourceDelegate = Delegate<void, eastl::string, eastl::shared_ptr<class TransformObject>>;
@@ -27,15 +26,6 @@ struct RenderingLoadCommand
 	LoadRenderResourceDelegate LoadDel;
 	eastl::string ModelPath;
 	eastl::shared_ptr<class TransformObject> Parent;
-};
-
-enum class EDrawMode : uint8_t
-{
-	Default,
-	DEPTH,
-	DEPTH_VISUALIZE,
-	OUTLINE,
-	NORMAL_VISUALIZE
 };
 
 class ForwardRenderer
@@ -61,7 +51,7 @@ public:
 	static void LoadTexture();
 	void AddCommand(const RenderCommand& inCommand);
 	void AddCommands(eastl::vector<RenderCommand> inCommands);
-	inline void SetDrawMode(const EDrawMode inDrawMode) { DrawMode = inDrawMode; }
+	inline void SetDrawMode(const EDrawMode::Type inDrawMode) { CurrentDrawMode = inDrawMode; }
 	void AddRenderLoadCommand(const RenderingLoadCommand& inCommand);
 	inline eastl::queue<RenderingLoadCommand>& GetLoadQueue() { return LoadQueue; }
 
@@ -84,7 +74,7 @@ private:
 private:
 	eastl::unordered_map<eastl::string, SelfRegisteringUniform> UniformsCache;
 	eastl::vector<RenderCommand> MainCommands;
-	EDrawMode DrawMode{ EDrawMode::Default };
+	EDrawMode::Type CurrentDrawMode = EDrawMode::Default;
 	eastl::queue<RenderingLoadCommand> LoadQueue;
 	eastl::unordered_map<eastl::string, eastl::shared_ptr<class RenderDataContainer>> RenderDataContainerMap;
 	//uint32_t AuxiliarFrameBuffer;

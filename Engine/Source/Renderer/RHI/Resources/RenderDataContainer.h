@@ -10,4 +10,5 @@ public:
 	~RenderDataContainer();
 
 	eastl::shared_ptr<class RHIVertexBuffer> VBuffer;
+	eastl::vector<eastl::shared_ptr<class RHIVertexBuffer>> AdditionalBuffers;
 };

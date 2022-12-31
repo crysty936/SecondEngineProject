@@ -1128,11 +1128,21 @@ struct VS_INPUT
 	float2 Coord;
 };
 
+struct PS_INPUT
+{
+	float4 Pos;
+	float2 TexCoord;
+};
+ 
 layout(location = 0) in float4 _vsin_input_Pos;
 layout(location = 1) in float3 _vsin_input_Norm;
 layout(location = 2) in float2 _vsin_input_Coord;
-
 layout(location = 0) out float2 _vsout_VSEntry_TexCoord;
+
+#define _RETURN_(_RET_VAL_){\
+_SET_GL_POSITION(_RET_VAL_.Pos);\
+_vsout_VSEntry_TexCoord = _RET_VAL_.TexCoord;\
+return;}
 
 void main()
 {
@@ -1141,7 +1151,6 @@ void main()
     input.Norm = _vsin_input_Norm;
     input.Coord = _vsin_input_Coord;
 
-    // Multiplication done in d3d if matrices are transposed before sending them over, making them column based
 	//float4 output = mul(input.Pos, Model);
 	//output = mul(output, View);
 	//output = mul(output, Projection);
@@ -1150,6 +1159,9 @@ void main()
 	output = mul(View, output);
 	output = mul(Projection, output);
 
-    _vsout_VSEntry_TexCoord = input.Coord;
-    gl_Position = output;
+	PS_INPUT psOut;
+	psOut.Pos = output;
+	psOut.TexCoord = input.Coord;
+
+    _RETURN_( psOut)
 }

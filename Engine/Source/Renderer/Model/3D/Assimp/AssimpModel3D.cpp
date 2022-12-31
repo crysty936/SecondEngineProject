@@ -13,6 +13,20 @@
 #include "Renderer/RHI/Resources/RHITexture.h"
 #include "Renderer/RHI/RHI.h"
 
+static Transform aiMatrixToTransform(const aiMatrix4x4& inMatrix)
+{
+	aiVector3D aiScaling;
+	aiVector3D aiRotation;
+	aiVector3D aiPosition;
+	inMatrix.Decompose(aiScaling, aiRotation, aiPosition);
+
+	glm::vec3 scaling(aiScaling.x, aiScaling.y, aiScaling.z);
+	glm::vec3 rotation(aiRotation.x, aiRotation.y, aiRotation.z);
+	glm::vec3 translation(aiPosition.x, aiPosition.y, aiPosition.z);
+
+	return Transform(translation, rotation, scaling);
+}
+
 AssimpModel3D::AssimpModel3D(const eastl::string& inPath)
 	: ModelPath{ inPath }
 {}
@@ -21,59 +35,29 @@ AssimpModel3D::~AssimpModel3D() = default;
 
 void AssimpModel3D::CreateProxy()
 {
-	eastl::shared_ptr<AssimpModel3D> thisShared = this_shared(this);
 
 	// TODO: Make this work with multithreaded again
+	//eastl::shared_ptr<AssimpModel3D> thisShared = this_shared(this);
 	//RenderingLoadCommand loadCommand;
 	//loadCommand.LoadDel = LoadRenderResourceDelegate::CreateStatic(LoadModelToRoot);
 	//loadCommand.ModelPath = ModelPath;
 	//loadCommand.Parent = thisShared;
-
-	LoadModelToRoot(ModelPath, thisShared);
+	// Add load command
+	
+	LoadModelToRoot(ModelPath, shared_from_this());
 }
-
-class AssimpModel3DLoader
-{
-protected:
-	AssimpModel3DLoader(const eastl::string& inPath);
-	~AssimpModel3DLoader();
-
-private:
-	eastl::shared_ptr<MeshNode> LoadData(OUT eastl::vector<RenderCommand>& outCommands);
-	void ProcessNodesRecursively(const struct aiNode& inNode, const struct aiScene& inScene, eastl::shared_ptr<MeshNode>& inCurrentNode, OUT eastl::vector<RenderCommand>& outCommands);
-	void ProcessMesh(const struct aiMesh& inMesh, const struct aiScene& inScene, eastl::shared_ptr<MeshNode>& inCurrentNode, OUT eastl::vector<RenderCommand>& outCommands);
-
-	eastl::vector<eastl::shared_ptr<class RHITexture2D>> LoadMaterialTextures(const struct aiMaterial& inMat, const aiTextureType& inAssimpTexType);
-	bool IsTextureLoaded(const eastl::string& inTexPath, OUT eastl::shared_ptr<class RHITexture2D>& outTex);
-
-	static Transform aiMatrixToTransform(const aiMatrix4x4& inMatrix);
-private:
-	eastl::vector<eastl::shared_ptr<class RHITexture2D>> LoadedTextures;
-	eastl::string ModelDir;
-	eastl::string ModelPath;
-
-	friend class AssimpModel3D;
-};
 
 void AssimpModel3D::LoadModelToRoot(const eastl::string inPath, TransformObjPtr inParent)
 {
-	AssimpModel3DLoader modelLoader(inPath);
-
 	eastl::vector<RenderCommand> resultingCommands;
-	eastl::shared_ptr<MeshNode> mesh = modelLoader.LoadData(resultingCommands);
+	eastl::shared_ptr<MeshNode> mesh = LoadData(resultingCommands);
 
 	ForwardRenderer::Get().AddCommands(resultingCommands);
 
 	inParent->AddChild(mesh);
 }
 
-AssimpModel3DLoader::AssimpModel3DLoader(const eastl::string & inPath)
-	: ModelPath{ inPath }
-{}
-
-AssimpModel3DLoader::~AssimpModel3DLoader() = default;
-
-eastl::shared_ptr<MeshNode> AssimpModel3DLoader::LoadData(OUT eastl::vector<RenderCommand>& outCommands)
+eastl::shared_ptr<MeshNode> AssimpModel3D::LoadData(OUT eastl::vector<RenderCommand>& outCommands)
 {
 	Assimp::Importer modelImporter;
 
@@ -95,7 +79,7 @@ eastl::shared_ptr<MeshNode> AssimpModel3DLoader::LoadData(OUT eastl::vector<Rend
 	return newNode;
 }
 
-void AssimpModel3DLoader::ProcessNodesRecursively(const aiNode & inNode, const aiScene & inScene, eastl::shared_ptr<MeshNode>& inCurrentNode, OUT eastl::vector<RenderCommand>& outCommands)
+void AssimpModel3D::ProcessNodesRecursively(const aiNode & inNode, const aiScene & inScene, eastl::shared_ptr<MeshNode>& inCurrentNode, OUT eastl::vector<RenderCommand>& outCommands)
 {
 	for (uint32_t i = 0; i < inNode.mNumMeshes; ++i)
 	{
@@ -116,7 +100,33 @@ void AssimpModel3DLoader::ProcessNodesRecursively(const aiNode & inNode, const a
 	}
 }
 
-void AssimpModel3DLoader::ProcessMesh(const aiMesh& inMesh, const aiScene& inScene, eastl::shared_ptr<MeshNode>& inCurrentNode, OUT eastl::vector<RenderCommand>& outCommands)
+eastl::shared_ptr<RHIShader> AssimpModel3D::CreateShaders(const VertexInputLayout& inLayout) const
+{
+	eastl::vector<ShaderSourceInput> shaders = {
+		{ "ModelWorldPosition_VS_Pos-Normal-UV", EShaderType::Vertex },
+		{ "BasicTex_PS", EShaderType::Fragment } };
+
+	return RHI::Instance->CreateShaderFromPath(shaders, inLayout);
+}
+
+void AssimpModel3D::AddAdditionalBuffers(eastl::shared_ptr<RenderDataContainer>& inDataContainer) const
+{
+	// to be inherited for instancing, etc
+}
+
+RenderCommand AssimpModel3D::CreateRenderCommand(eastl::shared_ptr<RenderMaterial>& inMaterial, eastl::shared_ptr<MeshNode>& inParent, eastl::shared_ptr<RenderDataContainer>& inDataContainer)
+{
+	RenderCommand newCommand;
+	newCommand.Material = inMaterial;
+	newCommand.Parent = inParent;
+	newCommand.DataContainer = inDataContainer;
+	newCommand.DrawType = EDrawCallType::DrawElements;
+	//newCommand.DrawPasses = static_cast<EDrawMode::Type>(EDrawMode::Default | EDrawMode::NORMAL_VISUALIZE);
+
+	return newCommand;
+}
+
+void AssimpModel3D::ProcessMesh(const aiMesh& inMesh, const aiScene& inScene, eastl::shared_ptr<MeshNode>& inCurrentNode, OUT eastl::vector<RenderCommand>& outCommands)
 {
 	VertexInputLayout inputLayout;
 	// Vertex points
@@ -147,7 +157,8 @@ void AssimpModel3DLoader::ProcessMesh(const aiMesh& inMesh, const aiScene& inSce
 		eastl::vector<ShaderSourceInput> shaders = {
 		{ "ModelWorldPosition_VS_Pos-Normal-UV", EShaderType::Vertex },
 		{ "BasicTex_PS", EShaderType::Fragment } };
-		thisMaterial->Shader = RHI::Instance->CreateShaderFromPath(shaders, inputLayout);
+
+		thisMaterial->Shader = CreateShaders(inputLayout);
  	}
  
 	const eastl::string renderDataContainerID = inMesh.mName.C_Str();
@@ -162,20 +173,15 @@ void AssimpModel3DLoader::ProcessMesh(const aiMesh& inMesh, const aiScene& inSce
 		for (uint32_t i = 0; i < inMesh.mNumVertices; i++)
 		{
 			Vertex vert;
-			aiVector3D aiVertex = inMesh.mVertices[i];
-			aiVector3D aiNormal = inMesh.mNormals[i];
+			const aiVector3D& aiVertex = inMesh.mVertices[i];
+			const aiVector3D& aiNormal = inMesh.mNormals[i];
 			vert.Position = glm::vec3(aiVertex.x, aiVertex.y, aiVertex.z);
 			vert.Normal = glm::vec3(aiNormal.x, aiNormal.y, aiNormal.z);
 
 			if (inMesh.mTextureCoords[0])
 			{
-				aiVector3D aiTexCoords = inMesh.mTextureCoords[0][i];
-
-				glm::vec2 Coords;
-				Coords.x = aiTexCoords.x;
-				Coords.y = aiTexCoords.y;
-
-				vert.TexCoords = Coords;
+				const aiVector3D& aiTexCoords = inMesh.mTextureCoords[0][i];
+				vert.TexCoords = glm::vec2(aiTexCoords.x, aiTexCoords.y);
 			}
 			else
 			{
@@ -187,7 +193,7 @@ void AssimpModel3DLoader::ProcessMesh(const aiMesh& inMesh, const aiScene& inSce
 
 		for (uint32_t i = 0; i < inMesh.mNumFaces; i++)
 		{
-			aiFace Face = inMesh.mFaces[i];
+			const aiFace& Face = inMesh.mFaces[i];
 
 			for (uint32_t j = 0; j < Face.mNumIndices; j++)
 			{
@@ -203,21 +209,16 @@ void AssimpModel3DLoader::ProcessMesh(const aiMesh& inMesh, const aiScene& inSce
 		dataContainer->VBuffer = vb;
 	}
 
+	AddAdditionalBuffers(dataContainer);
+
 	eastl::shared_ptr<MeshNode> newMesh = eastl::make_shared<MeshNode>();
 	inCurrentNode->AddChild(newMesh);
 
-	RenderCommand newCommand;
-	newCommand.Material = thisMaterial;
-	newCommand.Parent = inCurrentNode;
-	newCommand.DataContainer = dataContainer;
-	newCommand.DrawType = EDrawCallType::DrawElements;
-
-	newCommand.test = true;
-
+	RenderCommand newCommand = CreateRenderCommand(thisMaterial, inCurrentNode, dataContainer);
 	outCommands.push_back(newCommand);
 }
 
-eastl::vector<eastl::shared_ptr<RHITexture2D>> AssimpModel3DLoader::LoadMaterialTextures(const aiMaterial& inMat, const aiTextureType& inAssimpTexType)
+eastl::vector<eastl::shared_ptr<RHITexture2D>> AssimpModel3D::LoadMaterialTextures(const aiMaterial& inMat, const aiTextureType& inAssimpTexType)
 {
 	eastl::vector<eastl::shared_ptr<RHITexture2D>> textures;
 	const uint32_t texureBaseNr = GL_TEXTURE0;
@@ -243,7 +244,7 @@ eastl::vector<eastl::shared_ptr<RHITexture2D>> AssimpModel3DLoader::LoadMaterial
 	return textures;
 }
 
-bool AssimpModel3DLoader::IsTextureLoaded(const eastl::string& inTexPath, OUT eastl::shared_ptr<RHITexture2D>& outTex)
+bool AssimpModel3D::IsTextureLoaded(const eastl::string& inTexPath, OUT eastl::shared_ptr<RHITexture2D>& outTex)
 {
 	for (const eastl::shared_ptr<RHITexture2D>& loadedTexture : LoadedTextures)
 	{
@@ -255,18 +256,4 @@ bool AssimpModel3DLoader::IsTextureLoaded(const eastl::string& inTexPath, OUT ea
 	}
 
 	return false;
-}
-
-Transform AssimpModel3DLoader::aiMatrixToTransform(const aiMatrix4x4 & inMatrix)
-{
-	aiVector3D aiScaling;
-	aiVector3D aiRotation;
-	aiVector3D aiPosition;
-	inMatrix.Decompose(aiScaling, aiRotation, aiPosition);
-
-	glm::vec3 scaling(aiScaling.x, aiScaling.y, aiScaling.z);
-	glm::vec3 rotation(aiRotation.x, aiRotation.y, aiRotation.z);
-	glm::vec3 translation(aiPosition.x, aiPosition.y, aiPosition.z);
-
-	return Transform(translation, rotation, scaling);
 }

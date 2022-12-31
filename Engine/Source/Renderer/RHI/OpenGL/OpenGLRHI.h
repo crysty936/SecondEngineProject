@@ -8,8 +8,9 @@ public:
 	OpenGLRHI();
 	~OpenGLRHI();
 
-	eastl::shared_ptr<class RHIVertexBuffer> CreateVertexBuffer(const class VertexInputLayout& inLayout, const float* inVertices, const int32_t inCount, eastl::shared_ptr<class RHIIndexBuffer> inIndexBuffer) override;
-	eastl::shared_ptr<class RHIVertexBuffer> CreateVertexBuffer(const class VertexInputLayout& inLayout, const eastl::vector<Vertex>& inVertices, eastl::shared_ptr<class RHIIndexBuffer> inIndexBuffer) override;
+	eastl::shared_ptr<class RHIVertexBuffer> CreateVertexBuffer(const class VertexInputLayout& inLayout, const float* inVertices, const int32_t inCount, eastl::shared_ptr<class RHIIndexBuffer> inIndexBuffer = nullptr) override;
+	eastl::shared_ptr<class RHIVertexBuffer> CreateVertexBuffer(const class VertexInputLayout& inLayout, const eastl::vector<Vertex>& inVertices, eastl::shared_ptr<class RHIIndexBuffer> inIndexBuffer = nullptr) override;
+	virtual eastl::shared_ptr<class RHIVertexBuffer> CreateVertexBuffer(const class VertexInputLayout& inLayout, const void* inData, const int32_t inSize, eastl::shared_ptr<class RHIIndexBuffer> inIndexBuffer = nullptr) override;
 
 	eastl::shared_ptr<class RHIIndexBuffer> CreateIndexBuffer(const uint32_t* inData, uint32_t inCount) override;
 
@@ -48,6 +49,8 @@ public:
 	virtual void ClearBuffers() override;
 
 	virtual void PrepareProjectionForRendering(glm::mat4& inProj) override;
+
+	virtual void DrawInstanced(const int32_t inElementsCount, const int32_t inInstancesCount) override;
 
 private:
 	void LoadImageToTextureFromPath(RHITexture2D& inTexture, const eastl::string& inPath);

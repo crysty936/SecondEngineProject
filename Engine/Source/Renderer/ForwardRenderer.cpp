@@ -199,26 +199,25 @@ void ForwardRenderer::UpdateUniforms()
 	UniformsCache["view"] = view;
 }
 
-void ForwardRenderer::DrawCommands(const eastl::vector<RenderCommand>&inCommands)
+void ForwardRenderer::DrawCommands(const eastl::vector<RenderCommand>& inCommands)
 {
-	for (const RenderCommand& renderCommand : inCommands)
+	const int32_t builtInPassesCount = EDrawMode::Count;
+	for (int i = 0; i < builtInPassesCount; ++i)
 	{
-		DrawCommand(renderCommand);
+		const EDrawMode::Type currentMode = static_cast<EDrawMode::Type>(1 << i);
+		SetDrawMode(currentMode);
+
+		for (const RenderCommand& renderCommand : inCommands)
+		{
+			if (renderCommand.DrawPasses & currentMode)
+			{
+				DrawCommand(renderCommand);
+			}
+		}
 	}
-
-
- 	for (const RenderCommand& renderCommand : inCommands)
- 	{
- 		if (renderCommand.test)
- 		{
- 			DrawMode = EDrawMode::NORMAL_VISUALIZE;
- 			DrawCommand(renderCommand);
- 			DrawMode = EDrawMode::Default;
- 		}
- 	}
 }
 
-void ForwardRenderer::DrawCommand(const RenderCommand & inCommand)
+void ForwardRenderer::DrawCommand(const RenderCommand& inCommand)
 {
 	const bool parentValid = !inCommand.Parent.expired();
 	if (!ENSURE(parentValid))
@@ -236,6 +235,14 @@ void ForwardRenderer::DrawCommand(const RenderCommand & inCommand)
 	}
 
 	RHI::Instance->BindVertexBuffer(*(dataContainer->VBuffer));
+
+	// Additional vertex data buffers
+  	for (const eastl::shared_ptr<RHIVertexBuffer>& additionalBuffer : dataContainer->AdditionalBuffers)
+  	{
+  		constexpr bool bindIndexBuffer = false;
+  		RHI::Instance->BindVertexBuffer(*(additionalBuffer), bindIndexBuffer);
+  	}
+
 	RHI::Instance->BindShader(*(material->Shader));
 
 	material->ResetUniforms();
@@ -274,7 +281,20 @@ void ForwardRenderer::DrawCommand(const RenderCommand & inCommand)
 		//glDrawArrays(GL_TRIANGLES, 0, indicesCount);
 		break;
 	}
+	case EDrawCallType::DrawInstanced:
+	{
+		RHI::Instance->DrawInstanced(indicesCount, inCommand.InstancesCount);
+		break;
 	}
+	}
+
+
+	// Additional vertex data buffers
+//  	for (const eastl::shared_ptr<RHIVertexBuffer>& additionalBuffer : dataContainer->AdditionalBuffers)
+//  	{
+//  		constexpr bool unbindIndexBuffer = false;
+//  		RHI::Instance->UnbindVertexBuffer(*(additionalBuffer), unbindIndexBuffer);
+//  	}
 
 	RHI::Instance->UnbindVertexBuffer(*(dataContainer->VBuffer));
 
@@ -295,7 +315,7 @@ void ForwardRenderer::DrawCommand(const RenderCommand & inCommand)
 
 eastl::shared_ptr<RenderMaterial> ForwardRenderer::GetMaterial(const RenderCommand & inCommand) const
 {
-	switch (DrawMode)
+	switch (CurrentDrawMode)
 	{
 	case EDrawMode::Default:
 	{

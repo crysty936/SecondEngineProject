@@ -9,15 +9,174 @@
 #include "Renderer/Model/3D/Assimp/AssimpModel3D.h"
 #include "Core/EntityHelper.h"
 #include "Renderer/Drawable/MirrorQuad.h"
+#include "Renderer/RHI/Resources/RenderDataContainer.h"
+#include "Renderer/ForwardRenderer.h"
+#include "Renderer/RHI/Resources/VertexInputLayout.h"
+#include "Renderer/Drawable/ShapesUtils/BasicShapesData.h"
+#include "Renderer/RHI/RHI.h"
+#include "Renderer/Material/MaterialsManager.h"
 
 TestGameMode GameMode = {};
 
-TestGameMode::TestGameMode()
-	: GameModeBase()
-{
-}
-
+TestGameMode::TestGameMode() = default;
 TestGameMode::~TestGameMode() = default;
+
+
+class InstancedAssimpModelTest : public AssimpModel3D
+{
+public:
+	InstancedAssimpModelTest(const eastl::string& inPath)
+		: AssimpModel3D(inPath) {}
+	virtual ~InstancedAssimpModelTest() = default;
+
+protected:
+	virtual eastl::shared_ptr<RHIShader> CreateShaders(const class VertexInputLayout& inLayout) const override
+	{
+		eastl::vector<ShaderSourceInput> shaders = {
+		{ "ModelWorldPosition_VS_Pos-UV-Normal_ManuallyWritten-Instanced", EShaderType::Vertex },
+		{ "BasicTex_PS", EShaderType::Fragment } };
+
+		return RHI::Instance->CreateShaderFromPath(shaders, inLayout);
+	}
+
+
+	virtual void AddAdditionalBuffers(eastl::shared_ptr<RenderDataContainer>& inDataContainer) const override
+	{
+		// Instance data
+		glm::mat4* instanceOffsets = new glm::mat4[InstancesCount * InstancesCount];
+
+		for (int32_t i = 0; i < InstancesCount; ++i)
+		{
+			for (int32_t j = 0; j < InstancesCount; ++j)
+			{
+				glm::mat4& instanceMat = instanceOffsets[i * InstancesCount + j];
+
+				instanceMat = glm::identity<glm::mat4>();
+
+				instanceMat = glm::translate(instanceMat, glm::vec3(4.f * i, 4.f * j, 0.f));
+			}
+		}
+
+		VertexInputLayout vertexInstanceLayout;
+		vertexInstanceLayout.Push<float>(4, VertexInputType::InstanceData, EAttribDivisor::PerInstance);
+		vertexInstanceLayout.Push<float>(4, VertexInputType::InstanceData, EAttribDivisor::PerInstance);
+		vertexInstanceLayout.Push<float>(4, VertexInputType::InstanceData, EAttribDivisor::PerInstance);
+		vertexInstanceLayout.Push<float>(4, VertexInputType::InstanceData, EAttribDivisor::PerInstance);
+
+		vertexInstanceLayout.AttribsOffset = 3;
+
+		const eastl::shared_ptr<RHIVertexBuffer> instanceBuffer = RHI::Instance->CreateVertexBuffer(vertexInstanceLayout, &instanceOffsets[0], sizeof(glm::mat4) * InstancesCount * InstancesCount);
+		inDataContainer->AdditionalBuffers.push_back(instanceBuffer);
+	}
+
+
+	virtual RenderCommand CreateRenderCommand(eastl::shared_ptr<RenderMaterial>& inMaterial, eastl::shared_ptr<MeshNode>& inParent, eastl::shared_ptr<RenderDataContainer>& inDataContainer) override
+	{
+		RenderCommand newCommand;
+		newCommand.Material = inMaterial;
+		newCommand.Parent = inParent;
+		newCommand.DataContainer = inDataContainer;
+		newCommand.DrawType = EDrawCallType::DrawInstanced;
+		newCommand.InstancesCount = InstancesCount * InstancesCount;
+		//newCommand.DrawPasses = static_cast<EDrawMode::Type>(EDrawMode::Default | EDrawMode::NORMAL_VISUALIZE);
+
+		return newCommand;
+	}
+
+	const int32_t InstancesCount = 10;
+};
+
+// Instanced textured cube
+class InstancedCubeTest : public CubeShape
+{
+public:
+	InstancedCubeTest() = default;
+	virtual ~InstancedCubeTest() = default;
+
+	virtual void CreateProxy() override
+	{
+ 		const eastl::string RenderDataContainerID = "instancedCubeVAO";
+ 		eastl::shared_ptr<RenderDataContainer> dataContainer{ nullptr };
+ 
+ 		const bool existingContainer = ForwardRenderer::Get().GetOrCreateContainer(RenderDataContainerID, dataContainer);
+ 		VertexInputLayout inputLayout;
+
+ 		// Vertex points
+ 		inputLayout.Push<float>(3, VertexInputType::Position);
+ 		// Vertex Normal
+ 		inputLayout.Push<float>(3, VertexInputType::Normal);
+ 		// Vertex Tex Coords
+ 		inputLayout.Push<float>(2, VertexInputType::TexCoords);
+
+
+		if (!existingContainer)
+		{
+			int32_t indicesCount = BasicShapesData::GetCubeIndicesCount();
+			eastl::shared_ptr<RHIIndexBuffer> ib = RHI::Instance->CreateIndexBuffer(BasicShapesData::GetCubeIndices(), indicesCount);
+
+
+			int32_t verticesCount = BasicShapesData::GetCubeVerticesCount();
+			const eastl::shared_ptr<RHIVertexBuffer> vb = RHI::Instance->CreateVertexBuffer(inputLayout, BasicShapesData::GetCubeVertices(), verticesCount, ib);
+
+			dataContainer->VBuffer = vb;
+		}
+
+		// Instance data
+		constexpr int32_t instancesCount = 100;
+		glm::mat4* instanceOffsets = new glm::mat4[instancesCount * instancesCount];
+
+		for (int32_t i = 0; i < instancesCount; ++i)
+		{
+			for (int32_t j = 0; j < instancesCount; ++j)
+			{
+				glm::mat4& instanceMat = instanceOffsets[i * instancesCount + j];
+
+				instanceMat = glm::identity<glm::mat4>();
+
+				instanceMat = glm::translate(instanceMat, glm::vec3(2.f * i, 2.f * j, 0.f));
+			}
+		}
+
+		VertexInputLayout vertexInstanceLayout;
+		vertexInstanceLayout.Push<float>(4, VertexInputType::InstanceData, EAttribDivisor::PerInstance);
+		vertexInstanceLayout.Push<float>(4, VertexInputType::InstanceData, EAttribDivisor::PerInstance);
+		vertexInstanceLayout.Push<float>(4, VertexInputType::InstanceData, EAttribDivisor::PerInstance);
+		vertexInstanceLayout.Push<float>(4, VertexInputType::InstanceData, EAttribDivisor::PerInstance);
+
+		vertexInstanceLayout.AttribsOffset = 3;
+		
+		const eastl::shared_ptr<RHIVertexBuffer> instanceBuffer = RHI::Instance->CreateVertexBuffer(vertexInstanceLayout, &instanceOffsets[0], sizeof(glm::mat4) * instancesCount * instancesCount);
+		dataContainer->AdditionalBuffers.push_back(instanceBuffer);
+
+  		MaterialsManager& matManager = MaterialsManager::Get();
+  		bool materialExists = false;
+  		eastl::shared_ptr<RenderMaterial> material = matManager.GetOrAddMaterial("instanced_cube_material", materialExists);
+  
+  		if (!materialExists)
+  		{
+  			eastl::shared_ptr<RHITexture2D> tex = RHI::Instance->CreateTexture2D("../Data/Textures/MinecraftGrass.jpg");
+  			material->DiffuseTextures.push_back(tex);
+  
+  			eastl::vector<ShaderSourceInput> shaders = {
+  			{ "ModelWorldPosition_VS_Pos-UV-Normal_ManuallyWritten-Instanced", EShaderType::Vertex },
+  			{ "BasicTex_PS", EShaderType::Fragment } };
+  
+  			material->Shader = RHI::Instance->CreateShaderFromPath(shaders, inputLayout);
+  		}
+  
+  		eastl::shared_ptr<MeshNode> cubeNode = eastl::make_shared<MeshNode>();
+  		AddChild(cubeNode);
+  
+  		RenderCommand newCommand;
+  		newCommand.Material = material;
+  		newCommand.DataContainer = dataContainer;
+  		newCommand.Parent = cubeNode;
+  		newCommand.DrawType = EDrawCallType::DrawInstanced;
+		newCommand.InstancesCount = instancesCount * instancesCount;
+  
+  		ForwardRenderer::Get().AddCommand(newCommand);
+	}
+};
 
 void TestGameMode::Init()
 {
@@ -83,7 +242,7 @@ void TestGameMode::Init()
    		centerObj->SetScale(glm::vec3(100.f, 0.5f, 100.f));
  	}
 	{
-		//eastl::shared_ptr<CubeShape> centerObj = BasicShapes::CreateCubeObject();
+		eastl::shared_ptr<CubeShape> centerObj = BasicShapes::CreateCubeObject();
 
 		//eastl::shared_ptr<SquareShape> SquareTestObj = BasicShapes::CreateSquareObject();
 
@@ -107,9 +266,19 @@ void TestGameMode::Init()
  	}
 
 	//eastl::shared_ptr<AssimpModel3D> shibaModel = ObjectCreation::NewObject<AssimpModel3D>("../Data/Models/Shiba/scene.gltf");
-	eastl::shared_ptr<AssimpModel3D> model = EntityHelper::CreateObject<AssimpModel3D>("../Data/Models/Backpack/scene.gltf");
-	model->SetScale(glm::vec3(0.01f, 0.01f, 0.01f));
-	model->Move(glm::vec3(0.f, 3.f, 0.f));
+
+//  	eastl::shared_ptr<AssimpModel3D> model = EntityHelper::CreateObject<AssimpModel3D>("../Data/Models/Backpack/scene.gltf");
+//  	model->SetScale(glm::vec3(0.01f, 0.01f, 0.01f));
+//  	model->Move(glm::vec3(0.f, 3.f, 0.f));
+
+
+	//eastl::shared_ptr<InstancedCubeTest> instancedObj = EntityHelper::CreateObject<InstancedCubeTest>();
+	eastl::shared_ptr<InstancedAssimpModelTest> instancedObj = EntityHelper::CreateObject<InstancedAssimpModelTest>("../Data/Models/Backpack/scene.gltf");
+	instancedObj->SetScale(glm::vec3(0.01f, 0.01f, 0.01f));
+	instancedObj->Move(glm::vec3(0.f, 3.f, 0.f));
+
+
+
 
 	// Really slow because no batching or camera culling or lods
 	//for (int32_t i = 0; i < 5; ++i)
