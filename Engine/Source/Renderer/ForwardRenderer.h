@@ -11,7 +11,7 @@
 #include "EASTL/queue.h"
 #include "Core/EngineUtils.h"
 #include "Entity/TransformObject.h"
-#include "Renderer/RHI/Resources/RenderDataContainer.h"
+#include "Renderer/RHI/Resources/MeshDataContainer.h"
 #include "Window/WindowProperties.h"
 #include "RenderCommand.h"
 
@@ -51,17 +51,18 @@ public:
 	static void LoadTexture();
 	void AddCommand(const RenderCommand& inCommand);
 	void AddCommands(eastl::vector<RenderCommand> inCommands);
-	inline void SetDrawMode(const EDrawMode::Type inDrawMode) { CurrentDrawMode = inDrawMode; }
+	void SetDrawMode(const EDrawMode::Type inDrawMode);
 	void AddRenderLoadCommand(const RenderingLoadCommand& inCommand);
-	inline eastl::queue<RenderingLoadCommand>& GetLoadQueue() { return LoadQueue; }
+
+	//inline eastl::queue<RenderingLoadCommand>& GetLoadQueue() { return LoadQueue; }
 
 	/**
 	 * return: bool, true if the RenderDataContainer was already present and is initialized, false otherwise
-	 * outContainer: newly created or cached existing Container
+	 * outContainer: newly created or existing cached Container
 	 */
-	bool GetOrCreateContainer(const eastl::string& inInstanceName, OUT eastl::shared_ptr<RenderDataContainer>& outContainer);
+	bool GetOrCreateContainer(const eastl::string& inInstanceName, OUT eastl::shared_ptr<MeshDataContainer>& outContainer);
 	void AddMirrorCommand(const RenderCommand& inCommand);
-	inline void SetSkyboxCommand(RenderCommand inSkyboxCommand) { MainSkyboxCommand = inSkyboxCommand; }
+	//inline void SetSkyboxCommand(RenderCommand inSkyboxCommand) { MainSkyboxCommand = inSkyboxCommand; }
 
 	inline static ForwardRenderer& Get() { ASSERT(Instance); return *Instance; }
 
@@ -75,12 +76,8 @@ private:
 	eastl::unordered_map<eastl::string, SelfRegisteringUniform> UniformsCache;
 	eastl::vector<RenderCommand> MainCommands;
 	EDrawMode::Type CurrentDrawMode = EDrawMode::Default;
-	eastl::queue<RenderingLoadCommand> LoadQueue;
-	eastl::unordered_map<eastl::string, eastl::shared_ptr<class RenderDataContainer>> RenderDataContainerMap;
-	//uint32_t AuxiliarFrameBuffer;
-	uint32_t ShadowMapBuffer;
-	eastl::shared_ptr<class OpenGLDepthMap> ShadowBufferTex;
-	RenderCommand MainSkyboxCommand;
+	//eastl::queue<RenderingLoadCommand> LoadQueue;
+	eastl::unordered_map<eastl::string, eastl::shared_ptr<class MeshDataContainer>> RenderDataContainerMap;
 };
 
 extern const uint32_t SHADOW_WIDTH;

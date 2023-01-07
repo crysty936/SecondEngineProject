@@ -43,19 +43,28 @@ public:
 	virtual void BindShader(const class RHIShader& inShader) {};
 	virtual void BindUniformBuffer(const RHIUniformBuffer& inBuffer) {};
 	virtual void BindTexture2D(const class RHITexture2D& inTex, const int32_t inTexId) {};
+	virtual void BindFrameBuffer(const class RHIFrameBuffer& inFrameBuffer) {};
 
 	virtual void UnbindVertexBuffer(const class RHIVertexBuffer& inBuffer, const bool inUnbindIndexBuffer = true) {};
 	virtual void UnbindIndexBuffer(const class RHIIndexBuffer& inBuffer) {};
 	virtual void UnbindShader(const class RHIShader& inShader) {};
 	virtual void UnbindUniformBuffer(const RHIUniformBuffer& inBuffer) {};
 	virtual void UnbindTexture2D(const class RHITexture2D& inTex, const int32_t inTexId) {};
+	virtual void UnbindFrameBuffer(const class RHIFrameBuffer& inFrameBuffer) {};
 
-	virtual void UniformBufferUpdateData(RHIUniformBuffer& inBuffer, const void* inData, const size_t inDataSize, const int32_t inBufferNr) {};
+	virtual void UniformBufferUpdateData(class RHIUniformBuffer& inBuffer, const void* inData, const size_t inDataSize, const int32_t inBufferNr) {};
+	virtual void AttachTextureToFramebuffer(class  RHIFrameBuffer& inFrameBuffer, class RHITexture2D& inTex) {}
+	virtual void ClearTexture(const RHITexture2D& inTexture, const glm::vec4& inColor) {}
 
 	virtual eastl::shared_ptr<class RHIShader> CreateShaderFromSource(const eastl::vector<ShaderSourceInput> inShaderSources, const VertexInputLayout& inInputLayout, const eastl::string& inVSName = "VS", const eastl::string& inPSName = "PS") { return nullptr; }
 	virtual eastl::shared_ptr<class RHIShader> CreateShaderFromPath(const eastl::vector<ShaderSourceInput> inPathShaderSources, const VertexInputLayout& inInputLayout) { return nullptr; }
 
 	virtual eastl::shared_ptr<class RHITexture2D> CreateTexture2D(const eastl::string& inDataPath) { return nullptr; }
+
+	// A frame buffer that already has Depth Stencil attachments
+	virtual eastl::shared_ptr<class RHIFrameBuffer> CreateDepthStencilFrameBuffer() { return nullptr; }
+
+	virtual eastl::shared_ptr<class RHITexture2D> CreateRenderTexture() { return nullptr; }
 
 	virtual void SetViewportSize(const int32_t inWidth, const int32_t inHeight) {}
 	virtual void ClearColor(const glm::vec4 inColor) {}

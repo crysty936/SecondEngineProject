@@ -41,14 +41,15 @@ void EngineCore::Init()
 	// Hide Cursor for input
 	InputSystem::Get().SetCursorMode(Engine->MainWindow->GetHandle(), ECursorMode::Disabled);
 
+	SceneManager::Init();
+
+	MaterialsManager::Init();
 	RHI::Init();
 	ForwardRenderer::Init();
 
-	SceneManager::Init();
 	TimersManager::Init();
-	MaterialsManager::Init();
 
-	SceneManager::Get().LoadScene();
+	//SceneManager::Get().LoadScene();
 
 	// After initializing all engine subsystems, Game Mode init is called
 	Engine->CurrentGameMode->Init();
@@ -57,11 +58,12 @@ void EngineCore::Init()
 
 void EngineCore::Terminate()
 {
-	MaterialsManager::Terminate();
 	TimersManager::Terminate();
-	SceneManager::Terminate();
 	ForwardRenderer::Terminate();
 	RHI::Terminate();
+	MaterialsManager::Terminate();
+
+	SceneManager::Terminate();
 	InputSystem::Terminate();
 
 	ASSERT(Engine);

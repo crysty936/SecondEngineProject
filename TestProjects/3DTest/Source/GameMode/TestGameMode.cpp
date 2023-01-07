@@ -8,8 +8,7 @@
 #include <stdlib.h>
 #include "Renderer/Model/3D/Assimp/AssimpModel3D.h"
 #include "Core/EntityHelper.h"
-#include "Renderer/Drawable/MirrorQuad.h"
-#include "Renderer/RHI/Resources/RenderDataContainer.h"
+#include "Renderer/RHI/Resources/MeshDataContainer.h"
 #include "Renderer/ForwardRenderer.h"
 #include "Renderer/RHI/Resources/VertexInputLayout.h"
 #include "Renderer/Drawable/ShapesUtils/BasicShapesData.h"
@@ -40,7 +39,7 @@ protected:
 	}
 
 
-	virtual void AddAdditionalBuffers(eastl::shared_ptr<RenderDataContainer>& inDataContainer) const override
+	virtual void AddAdditionalBuffers(eastl::shared_ptr<MeshDataContainer>& inDataContainer) const override
 	{
 		// Instance data
 		glm::mat4* instanceOffsets = new glm::mat4[InstancesCount * InstancesCount];
@@ -70,7 +69,7 @@ protected:
 	}
 
 
-	virtual RenderCommand CreateRenderCommand(eastl::shared_ptr<RenderMaterial>& inMaterial, eastl::shared_ptr<MeshNode>& inParent, eastl::shared_ptr<RenderDataContainer>& inDataContainer) override
+	virtual RenderCommand CreateRenderCommand(eastl::shared_ptr<RenderMaterial>& inMaterial, eastl::shared_ptr<MeshNode>& inParent, eastl::shared_ptr<MeshDataContainer>& inDataContainer) override
 	{
 		RenderCommand newCommand;
 		newCommand.Material = inMaterial;
@@ -96,7 +95,7 @@ public:
 	virtual void CreateProxy() override
 	{
  		const eastl::string RenderDataContainerID = "instancedCubeVAO";
- 		eastl::shared_ptr<RenderDataContainer> dataContainer{ nullptr };
+ 		eastl::shared_ptr<MeshDataContainer> dataContainer{ nullptr };
  
  		const bool existingContainer = ForwardRenderer::Get().GetOrCreateContainer(RenderDataContainerID, dataContainer);
  		VertexInputLayout inputLayout;
@@ -132,7 +131,6 @@ public:
 				glm::mat4& instanceMat = instanceOffsets[i * instancesCount + j];
 
 				instanceMat = glm::identity<glm::mat4>();
-
 				instanceMat = glm::translate(instanceMat, glm::vec3(2.f * i, 2.f * j, 0.f));
 			}
 		}
@@ -237,14 +235,14 @@ void TestGameMode::Init()
 
  	{
 		// Ground
-   	 	eastl::shared_ptr<CubeShape> centerObj = BasicShapes::CreateCubeObject();
+   	 	eastl::shared_ptr<CubeShape> centerObj = BasicShapesHelpers::CreateCubeObject();
    		centerObj->Move(glm::vec3(0.f, -2.f, 0.f));
    		centerObj->SetScale(glm::vec3(100.f, 0.5f, 100.f));
  	}
 	{
-		eastl::shared_ptr<CubeShape> centerObj = BasicShapes::CreateCubeObject();
+		//eastl::shared_ptr<CubeShape> centerObj = BasicShapes::CreateCubeObject();
 
-		//eastl::shared_ptr<SquareShape> SquareTestObj = BasicShapes::CreateSquareObject();
+		eastl::shared_ptr<SquareShape> SquareTestObj = BasicShapesHelpers::CreateSquareObject();
 
 		//eastl::shared_ptr<CubeShape> lightObj = BasicShapes::CreateCubeObject();
 		//lightObj->SetRelativeLocation(glm::vec3(10.f, 20.f, 15.f));
@@ -273,9 +271,10 @@ void TestGameMode::Init()
 
 
 	//eastl::shared_ptr<InstancedCubeTest> instancedObj = EntityHelper::CreateObject<InstancedCubeTest>();
-	eastl::shared_ptr<InstancedAssimpModelTest> instancedObj = EntityHelper::CreateObject<InstancedAssimpModelTest>("../Data/Models/Backpack/scene.gltf");
-	instancedObj->SetScale(glm::vec3(0.01f, 0.01f, 0.01f));
-	instancedObj->Move(glm::vec3(0.f, 3.f, 0.f));
+// 
+// 	eastl::shared_ptr<InstancedAssimpModelTest> instancedObj = EntityHelper::CreateObject<InstancedAssimpModelTest>("../Data/Models/Backpack/scene.gltf");
+// 	instancedObj->SetScale(glm::vec3(0.01f, 0.01f, 0.01f));
+// 	instancedObj->Move(glm::vec3(0.f, 3.f, 0.f));
 
 
 

@@ -6,7 +6,18 @@
 
 SceneManager* SceneManager::Instance = nullptr;
 
-SceneManager::SceneManager() = default;
+SceneManager::SceneManager()
+{
+	// TODO Should be implemented to read the scene from a serialized output
+
+	CurrentScene = eastl::make_unique<class Scene>();
+	CurrentScene->CurrentCamera = eastl::make_shared<Camera>();
+
+	// !Trying to copy the gameplay engine tactic to see if it works
+	EntityPtr CameraParent = eastl::make_shared<Entity>();
+	CameraParent->AddChild(CurrentScene->CurrentCamera);
+	CurrentScene->AddObject(CameraParent);
+}
 SceneManager::~SceneManager() = default;
 
 void SceneManager::Init()
@@ -17,14 +28,6 @@ void SceneManager::Init()
 void SceneManager::LoadScene()
 {
 	// TODO Should be implemented to read the scene from a serialized output
-
-	Instance->CurrentScene = eastl::make_unique<class Scene>();
-	Instance->CurrentScene->CurrentCamera = eastl::make_shared<Camera>();
-
-	// !Trying to copy the gameplay engine tactic to see if it works
-	EntityPtr CameraParent = eastl::make_shared<Entity>();
-	CameraParent->AddChild(Instance->CurrentScene->CurrentCamera);
-	Instance->CurrentScene->AddObject(CameraParent);
 }
 
 void SceneManager::Terminate()

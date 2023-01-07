@@ -3,11 +3,11 @@
 
 // Contains data required for drawing.
 // For now just vertex with index buffer
-class RenderDataContainer
+class MeshDataContainer
 {
 public:
-	RenderDataContainer();
-	~RenderDataContainer();
+	MeshDataContainer();
+	~MeshDataContainer();
 
 	eastl::shared_ptr<class RHIVertexBuffer> VBuffer;
 	eastl::vector<eastl::shared_ptr<class RHIVertexBuffer>> AdditionalBuffers;

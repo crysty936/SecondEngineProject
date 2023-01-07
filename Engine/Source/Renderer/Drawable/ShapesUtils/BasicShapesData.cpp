@@ -74,10 +74,10 @@ int32_t BasicShapesData::GetQuadIndicesCount()
 // Square
 // CCW Vertices with secondary diagonal split drawing
 const float SquareVertices[] = {
- 0.5f,  0.5f, 0.0f,  1.f, 1.f, // top right
--0.5f,  0.5f, 0.0f,  0.f, 1.f,  // top left 
- 0.5f, -0.5f, 0.0f,  1.f, 0.f, // bottom right
--0.5f, -0.5f, 0.0f,  0.f, 0.f, // bottom left
+ 1.f,  1.f, 0.0f,  1.f, 1.f, // top right
+-1.f,  1.f, 0.0f,  0.f, 1.f,  // top left 
+ 1.f, -1.f, 0.0f,  1.f, 0.f, // bottom right
+-1.f, -1.f, 0.0f,  0.f, 0.f, // bottom left
 };
 
 const uint32_t SquareIndices[] = {

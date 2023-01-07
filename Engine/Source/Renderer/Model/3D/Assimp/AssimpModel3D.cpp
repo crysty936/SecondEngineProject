@@ -7,7 +7,7 @@
 #include "Renderer/RenderCommand.h"
 #include "Renderer/ForwardRenderer.h"
 #include "Renderer/RenderingPrimitives.h"
-#include "Renderer/RHI/Resources/RenderDataContainer.h"
+#include "Renderer/RHI/Resources/MeshDataContainer.h"
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 #include "Renderer/RHI/Resources/RHITexture.h"
@@ -109,12 +109,12 @@ eastl::shared_ptr<RHIShader> AssimpModel3D::CreateShaders(const VertexInputLayou
 	return RHI::Instance->CreateShaderFromPath(shaders, inLayout);
 }
 
-void AssimpModel3D::AddAdditionalBuffers(eastl::shared_ptr<RenderDataContainer>& inDataContainer) const
+void AssimpModel3D::AddAdditionalBuffers(eastl::shared_ptr<MeshDataContainer>& inDataContainer) const
 {
 	// to be inherited for instancing, etc
 }
 
-RenderCommand AssimpModel3D::CreateRenderCommand(eastl::shared_ptr<RenderMaterial>& inMaterial, eastl::shared_ptr<MeshNode>& inParent, eastl::shared_ptr<RenderDataContainer>& inDataContainer)
+RenderCommand AssimpModel3D::CreateRenderCommand(eastl::shared_ptr<RenderMaterial>& inMaterial, eastl::shared_ptr<MeshNode>& inParent, eastl::shared_ptr<MeshDataContainer>& inDataContainer)
 {
 	RenderCommand newCommand;
 	newCommand.Material = inMaterial;
@@ -162,7 +162,7 @@ void AssimpModel3D::ProcessMesh(const aiMesh& inMesh, const aiScene& inScene, ea
  	}
  
 	const eastl::string renderDataContainerID = inMesh.mName.C_Str();
-	eastl::shared_ptr<RenderDataContainer> dataContainer;
+	eastl::shared_ptr<MeshDataContainer> dataContainer;
 	const bool existingContainer = ForwardRenderer::Get().GetOrCreateContainer(renderDataContainerID, dataContainer);
 
 	if (!existingContainer)

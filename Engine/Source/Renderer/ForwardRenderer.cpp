@@ -13,9 +13,8 @@
 #include "Renderer/Drawable/Drawable.h"
 #include "EASTL/shared_ptr.h"
 #include "Renderer/Material/RenderMaterial.h"
-#include "Renderer/RHI/Resources/RenderDataContainer.h"
+#include "Renderer/RHI/Resources/MeshDataContainer.h"
 #include "Renderer/Material/MaterialsManager.h"
-#include "Renderer/Drawable/MirrorQuad.h"
 #include "Core/EntityHelper.h"
 #include "Renderer/Drawable/DepthMaterial.h"
 #include "Core/WindowsPlatform.h"
@@ -27,6 +26,7 @@
 #include "Renderer/RHI/RHI.h"
 #include "Renderer/RHI/Resources/RHIShader.h"
 #include "Renderer/RHI/Resources/RHITexture.h"
+#include "Drawable/ShapesUtils/BasicShapes.h"
 
 constexpr glm::vec4 ClearColor(0.3f, 0.5f, 1.f, 0.4f);
 constexpr glm::vec3 lightPos(-10.0f, 10.0f, -1.0f);
@@ -94,15 +94,24 @@ ForwardRenderer::ForwardRenderer(const WindowProperties& inMainWindowProperties)
 
 ForwardRenderer::~ForwardRenderer() = default;
 
+eastl::shared_ptr<RHIFrameBuffer> globalFrameBuffer = nullptr;
+eastl::shared_ptr<RHITexture2D> globalRenderTexture = nullptr;
+eastl::shared_ptr<FullScreenQuad> fullScreenQuad;
+
 void ForwardRenderer::Init(const WindowProperties & inMainWindowProperties)
 {
 	Instance = new ForwardRenderer{ inMainWindowProperties };
+
+	globalFrameBuffer = RHI::Instance->CreateDepthStencilFrameBuffer();
+	globalRenderTexture = RHI::Instance->CreateRenderTexture();
+	RHI::Instance->AttachTextureToFramebuffer(*globalFrameBuffer, *globalRenderTexture);
+
+	fullScreenQuad = EntityHelper::CreateObject<FullScreenQuad>(globalRenderTexture);
+	fullScreenQuad->CreateCommand();
 }
 
 void ForwardRenderer::Terminate()
 {
-	//glDeleteBuffers(1, &Instance->AuxiliarFrameBuffer);
-
 	ASSERT(Instance);
 	delete Instance;
 }
@@ -111,20 +120,28 @@ void ForwardRenderer::Draw()
 {
 	UpdateUniforms();
 
-	//DrawShadowMap();
-
 	SetupBaseUniforms();
 	UpdateUniforms();
 
+	// Clear default framebuffer buffers
 	RHI::Instance->ClearBuffers();
 
-	//DrawSkybox();
+	RHI::Instance->BindFrameBuffer(*globalFrameBuffer);
+	RHI::Instance->ClearTexture(*globalRenderTexture, glm::vec4(0.f, 0.f, 0.f, 0.f));
+
+	// Clear additional framebuffer buffers
+	RHI::Instance->ClearBuffers();
+
 	RenderCommandsMutex.lock();
 	DrawCommands(MainCommands);
 	RenderCommandsMutex.unlock();
 
-	RHI::Instance->SwapBuffers();
+	RHI::Instance->UnbindFrameBuffer(*globalFrameBuffer);
 
+	SetDrawMode(EDrawMode::Default);
+	DrawCommand(fullScreenQuad->GetCommand());
+
+	RHI::Instance->SwapBuffers();
 }
 
 void ForwardRenderer::DrawSkybox()
@@ -227,9 +244,9 @@ void ForwardRenderer::DrawCommand(const RenderCommand& inCommand)
 
 	const eastl::shared_ptr<const DrawableObject> parent = inCommand.Parent.lock();
 	const eastl::shared_ptr<RenderMaterial> material = GetMaterial(inCommand);
-	const eastl::shared_ptr<RenderDataContainer>& dataContainer = inCommand.DataContainer;
+	const eastl::shared_ptr<MeshDataContainer>& dataContainer = inCommand.DataContainer;
 
-	if (!parent->IsVisible())
+	if (!parent->IsVisible() || !material)
 	{
 		return;
 	}
@@ -313,7 +330,7 @@ void ForwardRenderer::DrawCommand(const RenderCommand& inCommand)
 	RHI::Instance->UnbindShader(*(material->Shader));
 }
 
-eastl::shared_ptr<RenderMaterial> ForwardRenderer::GetMaterial(const RenderCommand & inCommand) const
+eastl::shared_ptr<RenderMaterial> ForwardRenderer::GetMaterial(const RenderCommand& inCommand) const
 {
 	switch (CurrentDrawMode)
 	{
@@ -419,21 +436,26 @@ void ForwardRenderer::AddCommands(eastl::vector<RenderCommand> inCommands)
 	MainCommands.insert(MainCommands.end(), inCommands.begin(), inCommands.end());
 }
 
+void ForwardRenderer::SetDrawMode(const EDrawMode::Type inDrawMode)
+{
+	CurrentDrawMode = inDrawMode;
+}
+
 void ForwardRenderer::AddRenderLoadCommand(const RenderingLoadCommand & inCommand)
 {
 	std::unique_lock<std::mutex> lock{ LoadQueueMutex };
 
-	LoadQueue.push(inCommand);
+	//LoadQueue.push(inCommand);
 	LoadQueueCondition.notify_one();
 }
 
-bool ForwardRenderer::GetOrCreateContainer(const eastl::string& inInstanceName, OUT eastl::shared_ptr<RenderDataContainer>& outContainer)
+bool ForwardRenderer::GetOrCreateContainer(const eastl::string& inInstanceName, OUT eastl::shared_ptr<MeshDataContainer>& outContainer)
 {
 	ASSERT(!inInstanceName.empty());
 	std::lock_guard<std::mutex> uniqueMutex(GetVAOMutex);
 	//GetVAOMutex.lock(); // TODO: Why does this not work?
 
-	using iterator = const eastl::unordered_map<eastl::string, eastl::shared_ptr<RenderDataContainer>>::iterator;
+	using iterator = const eastl::unordered_map<eastl::string, eastl::shared_ptr<MeshDataContainer>>::iterator;
 	const iterator& containerIter = RenderDataContainerMap.find(inInstanceName);
 	const bool materialExists = containerIter != RenderDataContainerMap.end();
 
@@ -444,7 +466,7 @@ bool ForwardRenderer::GetOrCreateContainer(const eastl::string& inInstanceName, 
 		return true;
 	}
 
-	eastl::shared_ptr<RenderDataContainer> newContainer = eastl::make_shared<RenderDataContainer>();
+	eastl::shared_ptr<MeshDataContainer> newContainer = eastl::make_shared<MeshDataContainer>();
 	RenderDataContainerMap[inInstanceName] = newContainer;
 	outContainer = newContainer;
 

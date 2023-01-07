@@ -1,6 +1,6 @@
 #include "BasicShapes.h"
 #include "Renderer/Drawable/ShapesUtils/BasicShapesData.h"
-#include "Renderer/RHI/Resources/RenderDataContainer.h"
+#include "Renderer/RHI/Resources/MeshDataContainer.h"
 #include "Renderer/OpenGL/OpenGLCubeMap.h"
 #include "Renderer/Material/MaterialsManager.h"
 #include "Renderer/RenderCommand.h"
@@ -20,7 +20,7 @@ TriangleShape::~TriangleShape() = default;
 void TriangleShape::CreateProxy()
 {
 	const eastl::string RenderDataContainerID = "triangleVAO";
-	eastl::shared_ptr<RenderDataContainer> dataContainer{ nullptr };
+	eastl::shared_ptr<MeshDataContainer> dataContainer{ nullptr };
 
 	const bool existingContainer = ForwardRenderer::Get().GetOrCreateContainer(RenderDataContainerID, dataContainer);
 
@@ -76,7 +76,7 @@ SquareShape::~SquareShape() = default;
 void SquareShape::CreateProxy()
 {
  	const eastl::string RenderDataContainerID = "squareVAO";
-	eastl::shared_ptr<RenderDataContainer> dataContainer{ nullptr };
+	eastl::shared_ptr<MeshDataContainer> dataContainer{ nullptr };
 
 	const bool existingContainer = ForwardRenderer::Get().GetOrCreateContainer(RenderDataContainerID, dataContainer);
  
@@ -100,13 +100,10 @@ void SquareShape::CreateProxy()
  
  	MaterialsManager& matManager = MaterialsManager::Get();
  	bool materialExists = false;
- 	eastl::shared_ptr<BallTestMaterial> material = matManager.GetOrAddMaterial<BallTestMaterial>("square_material", materialExists);
+ 	eastl::shared_ptr<RenderMaterial> material = matManager.GetOrAddMaterial<RenderMaterial>("square_material", materialExists);
  
  	if (!materialExists)
  	{
-  		eastl::shared_ptr<RHITexture2D> tex = RHI::Instance->CreateTexture2D("../Data/Textures/numbers_corrected.png");
-  		material->DiffuseTextures.push_back(tex);
-
 		eastl::vector<ShaderSourceInput> shaders = {
 		{ "ModelWorldPosition_VS_Pos-UV", EShaderType::Vertex },
 		//{ "GeometryTest_GS", EShaderType::Geometry },
@@ -124,16 +121,14 @@ void SquareShape::CreateProxy()
 	ForwardRenderer::Get().AddCommand(newCommand);
 }
 
-eastl::shared_ptr<SquareShape> BasicShapes::CreateSquareObject(eastl::string inTexturePath)
+eastl::shared_ptr<SquareShape> BasicShapesHelpers::CreateSquareObject(eastl::string inTexturePath)
 {
-	eastl::shared_ptr<SquareShape> obj = EntityHelper::CreateObject<SquareShape>();
-	return obj;
+	return EntityHelper::CreateObject<SquareShape>();
 }
 
-eastl::shared_ptr<CubeShape> BasicShapes::CreateCubeObject()
+eastl::shared_ptr<CubeShape> BasicShapesHelpers::CreateCubeObject()
 {
-	eastl::shared_ptr<CubeShape> obj = EntityHelper::CreateObject<CubeShape>();
-	return obj;
+	return EntityHelper::CreateObject<CubeShape>();
 }
 
 CubeShape::CubeShape() = default;
@@ -142,7 +137,7 @@ CubeShape::~CubeShape() = default;
 void CubeShape::CreateProxy()
 {
   	const eastl::string RenderDataContainerID = "cubeVAO";
- 	eastl::shared_ptr<RenderDataContainer> dataContainer{ nullptr };
+ 	eastl::shared_ptr<MeshDataContainer> dataContainer{ nullptr };
 
 	const bool existingContainer = ForwardRenderer::Get().GetOrCreateContainer(RenderDataContainerID, dataContainer);
 	VertexInputLayout inputLayout;
@@ -312,3 +307,130 @@ void LightSource::CreateProxy()
 // 	ASSERT(false); // Not working with Generic renderer
 	//RHI->AddCommand(newCommand);
 }
+
+// Mirror
+
+MirrorQuad::MirrorQuad() = default;
+MirrorQuad::~MirrorQuad() = default;
+
+void MirrorQuad::CreateProxy()
+{
+	// 	const eastl::string vaoName = "mirrorVAO";
+	// 	eastl::shared_ptr<VertexArrayObject> thisVAO{ nullptr };
+	// 	ASSERT(false); // Not working with Generic renderer
+	// 	//const bool existingVAO = RHI->GetOrCreateVAO(vaoName, thisVAO); 
+	// 	const bool existingVAO = false;
+	// 
+	// 	if (!existingVAO)
+	// 	{
+	// 		// TODO: Buffers creation should be delegated to the renderer
+	// 		OpenGLIndexBuffer ibo = OpenGLIndexBuffer{};
+	// 		int32_t indicesCount = BasicShapesData::GetQuadIndicesCount();
+	// 		ibo.SetIndices(BasicShapesData::GetQuadIndices(), indicesCount);
+	// 
+	// 		VertexBufferLayout layout = VertexBufferLayout{};
+	// 		// Vertex points
+	// 		layout.Push<float>(3);
+	// 		// Vertex Tex Coords
+	// 		layout.Push<float>(2);
+	// 
+	// 		OpenGLVertexBuffer vbo = OpenGLVertexBuffer{ ibo, layout };
+	// 		int32_t verticesCount = BasicShapesData::GetQuadVerticesCount();
+	// 		vbo.SetData(BasicShapesData::GetQuadVertices(), verticesCount);
+	// 
+	// 		//thisVAO->VBuffer = vbo;// TODO
+	// 	}
+	// 	// Mirrors have to have unique materials
+	// 	static int mirrorNr = 0;
+	// 	const eastl::string mirrorMaterialName(eastl::string::CtorSprintf{}, "mirror_material_%d", ++mirrorNr);
+	// 
+	// 	MaterialsManager& matManager = MaterialsManager::Get();
+	// 	bool materialExists = false;
+	// 	eastl::shared_ptr<RenderMaterial> material = matManager.GetOrAddMaterial(mirrorMaterialName, materialExists);
+	// 	//eastl::string texturePath = "../Data/Textures/openGLExampleTransparentWindow.png";
+	// 
+	// 	if (!materialExists)
+	// 	{
+	// 		//OpenGLTexture tex{ texturePath, texureBaseNr + 0 };
+	// 		//cubeMaterial->Textures.push_back(tex);
+	// 		material->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/BasicProjectionVertexShader.glsl", "../Data/Shaders/QuadTexFragmentShader.glsl");
+	// 	}
+	// 
+	// 	//material->Textures.push_back(OpenGLTexture());
+	// 
+	// 	RenderCommand newCommand;
+	// 	newCommand.Material = material;
+	// 	newCommand.VAO = thisVAO;
+	// 	newCommand.Parent = this_shared(this);
+	// 	newCommand.DrawType = EDrawCallType::DrawElements;
+	// 
+	// 	//RHI->AddMirrorCommand(newCommand);
+
+}
+
+
+class FullScreenQuadMaterial : public RenderMaterial
+{
+
+public:
+	virtual void SetRequiredUniforms() override
+	{}
+};
+
+FullScreenQuad::FullScreenQuad(eastl::shared_ptr<RHITexture2D>& inTexture)
+	: DrawableObject(), MainTexture(inTexture)
+{
+}
+FullScreenQuad::~FullScreenQuad() = default;
+
+void FullScreenQuad::CreateProxy()
+{
+
+}
+
+void FullScreenQuad::CreateCommand()
+{
+	const eastl::string RenderDataContainerID = "squareVAO";
+	eastl::shared_ptr<MeshDataContainer> dataContainer{ nullptr };
+
+	const bool existingContainer = ForwardRenderer::Get().GetOrCreateContainer(RenderDataContainerID, dataContainer);
+
+	VertexInputLayout inputLayout;
+	// Vertex points
+	inputLayout.Push<float>(3, VertexInputType::Position);
+	// Vertex Tex Coords
+	inputLayout.Push<float>(2, VertexInputType::TexCoords);
+
+	if (!existingContainer)
+	{
+		int32_t indicesCount = BasicShapesData::GetSquareIndicesCount();
+		eastl::shared_ptr<RHIIndexBuffer> ib = RHI::Instance->CreateIndexBuffer(BasicShapesData::GetSquareIndices(), indicesCount);
+
+
+		int32_t verticesCount = BasicShapesData::GetSquareVerticesCount();
+		const eastl::shared_ptr<RHIVertexBuffer> vb = RHI::Instance->CreateVertexBuffer(inputLayout, BasicShapesData::GetSquareVertices(), verticesCount, ib);
+
+		dataContainer->VBuffer = vb;
+	}
+
+	MaterialsManager& matManager = MaterialsManager::Get();
+	bool materialExists = false;
+	eastl::shared_ptr<FullScreenQuadMaterial> material = matManager.GetOrAddMaterial<FullScreenQuadMaterial>("TexQuad_Material", materialExists);
+
+	if (!materialExists)
+	{
+		eastl::vector<ShaderSourceInput> shaders = {
+		{ "UnchangedPosition_VS_Pos-UV_ManuallyWritten", EShaderType::Vertex },
+		{ "BasicTex_PS", EShaderType::Fragment } };
+
+		material->Shader = RHI::Instance->CreateShaderFromPath(shaders, inputLayout);
+
+		material->DiffuseTextures.push_back(MainTexture);
+	}
+
+	QuadCommand.Material = material;
+	QuadCommand.DataContainer = dataContainer;
+	QuadCommand.Parent = this_shared(this);
+	QuadCommand.DrawType = EDrawCallType::DrawElements;
+}
+

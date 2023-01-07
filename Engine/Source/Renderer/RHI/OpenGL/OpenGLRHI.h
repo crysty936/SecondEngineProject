@@ -20,6 +20,9 @@ public:
 	eastl::shared_ptr<class RHIShader> CreateShaderFromPath(const eastl::vector<ShaderSourceInput> inPathShaderSources, const VertexInputLayout& inInputLayout) override;
 
 	virtual eastl::shared_ptr<class RHITexture2D> CreateTexture2D(const eastl::string& inDataPath) override;
+	virtual eastl::shared_ptr<class RHITexture2D> CreateRenderTexture() override;
+	virtual eastl::shared_ptr<class RHIFrameBuffer> CreateDepthStencilFrameBuffer() override;
+
 
 	virtual void BindVertexBuffer(const RHIVertexBuffer& inBuffer, const bool inBindIndexBuffer = true) override;
 	virtual void BindIndexBuffer(const RHIIndexBuffer& inBuffer) override;
@@ -34,6 +37,7 @@ public:
 	virtual void UnbindTexture2D(const RHITexture2D& inTex, const int32_t inTexId) override;
 
 	virtual void UniformBufferUpdateData(RHIUniformBuffer& inBuffer, const void* inData, const size_t inDataSize, const int32_t inBufferNr) override;
+	virtual void AttachTextureToFramebuffer(RHIFrameBuffer& inFrameBuffer, RHITexture2D& inTex) override;
 
 
 	void SetViewportSize(const int32_t inWidth, const int32_t inHeight) override;
@@ -51,6 +55,15 @@ public:
 	virtual void PrepareProjectionForRendering(glm::mat4& inProj) override;
 
 	virtual void DrawInstanced(const int32_t inElementsCount, const int32_t inInstancesCount) override;
+
+
+	virtual void ClearTexture(const RHITexture2D& inTexture, const glm::vec4& inColor) override;
+
+
+	virtual void BindFrameBuffer(const class RHIFrameBuffer& inFrameBuffer) override;
+
+
+	virtual void UnbindFrameBuffer(const class RHIFrameBuffer& inFrameBuffer) override;
 
 private:
 	void LoadImageToTextureFromPath(RHITexture2D& inTexture, const eastl::string& inPath);
