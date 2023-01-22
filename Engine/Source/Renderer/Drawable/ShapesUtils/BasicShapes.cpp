@@ -378,7 +378,7 @@ public:
 };
 
 FullScreenQuad::FullScreenQuad(eastl::shared_ptr<RHITexture2D>& inTexture)
-	: DrawableObject(), MainTexture(inTexture)
+	: DrawableObject()
 {
 }
 FullScreenQuad::~FullScreenQuad() = default;
@@ -424,8 +424,6 @@ void FullScreenQuad::CreateCommand()
 		{ "BasicTex_PS", EShaderType::Fragment } };
 
 		material->Shader = RHI::Instance->CreateShaderFromPath(shaders, inputLayout);
-
-		material->DiffuseTextures.push_back(MainTexture);
 	}
 
 	QuadCommand.Material = material;

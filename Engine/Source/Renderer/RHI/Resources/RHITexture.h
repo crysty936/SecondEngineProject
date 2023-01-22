@@ -2,6 +2,12 @@
 #include <stdint.h>
 #include "EASTL/string.h"
 
+enum class RHITextureType
+{
+	RGBA,
+	Depth
+};
+
 class RHITexture2D
 {
 public:
@@ -11,4 +17,6 @@ public:
 
 	// TODO: Debug only
 	eastl::string SourcePath;
+
+	RHITextureType TextureType = RHITextureType::RGBA;
 };

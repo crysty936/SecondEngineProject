@@ -21,7 +21,9 @@ public:
 
 	virtual eastl::shared_ptr<class RHITexture2D> CreateTexture2D(const eastl::string& inDataPath) override;
 	virtual eastl::shared_ptr<class RHITexture2D> CreateRenderTexture() override;
+	virtual eastl::shared_ptr<class RHITexture2D> CreateDepthMap(const int32_t inWidth, const int32_t inHeight) override;
 	virtual eastl::shared_ptr<class RHIFrameBuffer> CreateDepthStencilFrameBuffer() override;
+	virtual eastl::shared_ptr<class RHIFrameBuffer> CreateEmptyFrameBuffer() override;
 
 
 	virtual void BindVertexBuffer(const RHIVertexBuffer& inBuffer, const bool inBindIndexBuffer = true) override;
@@ -37,7 +39,8 @@ public:
 	virtual void UnbindTexture2D(const RHITexture2D& inTex, const int32_t inTexId) override;
 
 	virtual void UniformBufferUpdateData(RHIUniformBuffer& inBuffer, const void* inData, const size_t inDataSize, const int32_t inBufferNr) override;
-	virtual void AttachTextureToFramebuffer(RHIFrameBuffer& inFrameBuffer, RHITexture2D& inTex) override;
+	virtual void AttachTextureToFramebufferColor(RHIFrameBuffer& inFrameBuffer, RHITexture2D& inTex) override;
+	virtual void AttachTextureToFramebufferDepth(RHIFrameBuffer& inFrameBuffer, RHITexture2D& inTex) override;
 
 
 	void SetViewportSize(const int32_t inWidth, const int32_t inHeight) override;

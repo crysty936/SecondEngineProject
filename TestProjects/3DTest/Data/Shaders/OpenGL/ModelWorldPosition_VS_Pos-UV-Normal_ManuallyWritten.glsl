@@ -5,7 +5,12 @@ layout(location = 1) in vec3 inNormal;
 layout(location = 2) in vec2 inTexCoords;
 
 //layout(location = 0) out vec3 outNormal;
-layout(location = 0) out vec2 outTexCoords;
+//layout(location = 0) out vec2 outTexCoords;
+
+out VS_OUT
+{
+	vec2 TexCoords;
+} vs_out;
 
 layout(std140, binding = 0) uniform ConstantBuffer
 {
@@ -17,7 +22,7 @@ layout(std140, binding = 0) uniform ConstantBuffer
 void main()
 {
 	vec3 fragPos = vec3(model * vec4(inPosition, 1.0));
-	outTexCoords = inTexCoords;
+	vs_out.TexCoords = inTexCoords;
 	//outNormal = mat3(transpose(inverse(model))) * inNormal;
 	gl_Position = projection * view * vec4(fragPos, 1.0);
 }

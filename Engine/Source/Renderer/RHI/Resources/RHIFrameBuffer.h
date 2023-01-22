@@ -5,6 +5,6 @@
 class RHIFrameBuffer
 {
 public:
-	bool HasDepthStencilAttachment = false;
-	bool HasColorAttachment = false;
+	virtual bool HasDepthStencilAttachment() const = 0;
+	virtual bool HasColorAttachment() const = 0;
 };

@@ -53,18 +53,32 @@ public:
 	virtual void UnbindFrameBuffer(const class RHIFrameBuffer& inFrameBuffer) {};
 
 	virtual void UniformBufferUpdateData(class RHIUniformBuffer& inBuffer, const void* inData, const size_t inDataSize, const int32_t inBufferNr) {};
-	virtual void AttachTextureToFramebuffer(class  RHIFrameBuffer& inFrameBuffer, class RHITexture2D& inTex) {}
+
+	/** Attach a texture to the color ouput of a framebuffer */
+	virtual void AttachTextureToFramebufferColor(class  RHIFrameBuffer& inFrameBuffer, class RHITexture2D& inTex) {}
+
+	/** Attach a texture to the depth output of a framebuffer. Preferrably a texture with only depth component */
+	virtual void AttachTextureToFramebufferDepth(class  RHIFrameBuffer& inFrameBuffer, class RHITexture2D& inTex) {}
+
 	virtual void ClearTexture(const RHITexture2D& inTexture, const glm::vec4& inColor) {}
 
 	virtual eastl::shared_ptr<class RHIShader> CreateShaderFromSource(const eastl::vector<ShaderSourceInput> inShaderSources, const VertexInputLayout& inInputLayout, const eastl::string& inVSName = "VS", const eastl::string& inPSName = "PS") { return nullptr; }
+
 	virtual eastl::shared_ptr<class RHIShader> CreateShaderFromPath(const eastl::vector<ShaderSourceInput> inPathShaderSources, const VertexInputLayout& inInputLayout) { return nullptr; }
 
 	virtual eastl::shared_ptr<class RHITexture2D> CreateTexture2D(const eastl::string& inDataPath) { return nullptr; }
 
-	// A frame buffer that already has Depth Stencil attachments
+	/**  A frame buffer that already has Depth Stencil attachments, can be used with texture color attachment */
 	virtual eastl::shared_ptr<class RHIFrameBuffer> CreateDepthStencilFrameBuffer() { return nullptr; }
 
+	/** Empty framebuffer, texture can be attached to any output */
+	virtual eastl::shared_ptr<class RHIFrameBuffer> CreateEmptyFrameBuffer() { return nullptr; }
+
+	/** Render texture with all channels */
 	virtual eastl::shared_ptr<class RHITexture2D> CreateRenderTexture() { return nullptr; }
+
+	/** Texture with only one channel for depth */
+	virtual eastl::shared_ptr<class RHITexture2D> CreateDepthMap(const int32_t inWidth, const int32_t inHeight) { return nullptr; }
 
 	virtual void SetViewportSize(const int32_t inWidth, const int32_t inHeight) {}
 	virtual void ClearColor(const glm::vec4 inColor) {}

@@ -76,6 +76,5 @@ public:
 	inline const RenderCommand& GetCommand() { return QuadCommand; };
 
 private:
-	eastl::shared_ptr<RHITexture2D> MainTexture;
 	RenderCommand QuadCommand;
 };

@@ -18,6 +18,7 @@
 #include "Core/EntityHelper.h"
 #include "Renderer/Drawable/DepthMaterial.h"
 #include "Core/WindowsPlatform.h"
+#include "glm/gtc/integer.hpp"
 
 #include "InputSystem/InputType.h"
 #include "Window/WindowsWindow.h"
@@ -29,10 +30,10 @@
 #include "Drawable/ShapesUtils/BasicShapes.h"
 
 constexpr glm::vec4 ClearColor(0.3f, 0.5f, 1.f, 0.4f);
-constexpr glm::vec3 lightPos(-10.0f, 10.0f, -1.0f);
+constexpr glm::vec3 lightPos(-15.0f, 20.0f, -1.0f);
 
-const uint32_t SHADOW_WIDTH = 4096;
-const uint32_t SHADOW_HEIGHT = 4096;
+const uint32_t SHADOW_WIDTH = 1024;
+const uint32_t SHADOW_HEIGHT = 1024;
 
 static std::mutex RenderCommandsMutex;
 static std::mutex LoadQueueMutex;
@@ -94,20 +95,29 @@ ForwardRenderer::ForwardRenderer(const WindowProperties& inMainWindowProperties)
 
 ForwardRenderer::~ForwardRenderer() = default;
 
-eastl::shared_ptr<RHIFrameBuffer> globalFrameBuffer = nullptr;
-eastl::shared_ptr<RHITexture2D> globalRenderTexture = nullptr;
-eastl::shared_ptr<FullScreenQuad> fullScreenQuad;
+eastl::shared_ptr<FullScreenQuad> ScreenQuad;
+
+eastl::shared_ptr<RHIFrameBuffer> GlobalFrameBuffer = nullptr;
+eastl::shared_ptr<RHITexture2D> GlobalRenderTexture = nullptr;
+
+eastl::shared_ptr<RHIFrameBuffer> ShadowFrameBuffer = nullptr;
+eastl::shared_ptr<RHITexture2D> ShadowRenderTexture = nullptr;
 
 void ForwardRenderer::Init(const WindowProperties & inMainWindowProperties)
 {
 	Instance = new ForwardRenderer{ inMainWindowProperties };
 
-	globalFrameBuffer = RHI::Instance->CreateDepthStencilFrameBuffer();
-	globalRenderTexture = RHI::Instance->CreateRenderTexture();
-	RHI::Instance->AttachTextureToFramebuffer(*globalFrameBuffer, *globalRenderTexture);
+	GlobalFrameBuffer = RHI::Instance->CreateDepthStencilFrameBuffer();
+	GlobalRenderTexture = RHI::Instance->CreateRenderTexture();
+	RHI::Instance->AttachTextureToFramebufferColor(*GlobalFrameBuffer, *GlobalRenderTexture);
 
-	fullScreenQuad = EntityHelper::CreateObject<FullScreenQuad>(globalRenderTexture);
-	fullScreenQuad->CreateCommand();
+	ScreenQuad = EntityHelper::CreateObject<FullScreenQuad>(GlobalRenderTexture);
+	ScreenQuad->CreateCommand();
+	ScreenQuad->GetCommand().Material->DiffuseTextures.push_back(GlobalRenderTexture);
+
+	ShadowFrameBuffer = RHI::Instance->CreateEmptyFrameBuffer();
+	ShadowRenderTexture = RHI::Instance->CreateDepthMap(SHADOW_WIDTH, SHADOW_HEIGHT);
+	RHI::Instance->AttachTextureToFramebufferDepth(*ShadowFrameBuffer, *ShadowRenderTexture);
 }
 
 void ForwardRenderer::Terminate()
@@ -118,28 +128,31 @@ void ForwardRenderer::Terminate()
 
 void ForwardRenderer::Draw()
 {
-	UpdateUniforms();
-
 	SetupBaseUniforms();
 	UpdateUniforms();
+
+	DrawShadowMap();
 
 	// Clear default framebuffer buffers
 	RHI::Instance->ClearBuffers();
 
-	RHI::Instance->BindFrameBuffer(*globalFrameBuffer);
-	RHI::Instance->ClearTexture(*globalRenderTexture, glm::vec4(0.f, 0.f, 0.f, 0.f));
+	//RHI::Instance->BindFrameBuffer(*GlobalFrameBuffer);
+	//RHI::Instance->ClearTexture(*GlobalRenderTexture, glm::vec4(0.f, 0.f, 0.f, 1.f));
 
 	// Clear additional framebuffer buffers
-	RHI::Instance->ClearBuffers();
+	//RHI::Instance->ClearBuffers();
+// 
 
-	RenderCommandsMutex.lock();
-	DrawCommands(MainCommands);
-	RenderCommandsMutex.unlock();
+    DrawCommands(MainCommands);
 
-	RHI::Instance->UnbindFrameBuffer(*globalFrameBuffer);
+	//RHI::Instance->UnbindFrameBuffer(*GlobalFrameBuffer);
 
-	SetDrawMode(EDrawMode::Default);
-	DrawCommand(fullScreenQuad->GetCommand());
+// 	SetDrawMode(EDrawMode::DEPTH_VISUALIZE);
+// 
+// 	ScreenQuad->GetCommand().Material->DiffuseTextures.clear();
+// 	ScreenQuad->GetCommand().Material->DiffuseTextures.push_back(ShadowRenderTexture);
+// 
+// 	DrawCommand(ScreenQuad->GetCommand());
 
 	RHI::Instance->SwapBuffers();
 }
@@ -168,29 +181,40 @@ void ForwardRenderer::DrawShadowMap()
 // 	glBindFramebuffer(GL_FRAMEBUFFER, ShadowMapBuffer);
 // 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 // 
-// 	SetDrawMode(EDrawMode::DEPTH);
-// 	RHIBase::RHI->SetViewportSize(SHADOW_WIDTH, SHADOW_HEIGHT);
-// 
+
+	RHI::Instance->BindFrameBuffer(*ShadowFrameBuffer);
+	RHI::Instance->ClearBuffers();
+
+ 	SetDrawMode(EDrawMode::DEPTH);
+ 	RHI::Instance->SetViewportSize(SHADOW_WIDTH, SHADOW_HEIGHT);
+	RHI::Instance->ClearTexture(*ShadowRenderTexture, glm::vec4(1.f, 1.f, 1.f, 1.f));
+
 // 	//const glm::vec3 lightLoc = LightSource->GetAbsoluteTransform().Translation;
-// 	const glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-// 	const float near_plane = 1.f;
-// 	const float far_plane = 20.f;
-// 	const glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
-// 
-// 	//UniformsCache["projection"] = lightProjection;
-// 
-// 	const glm::mat4 lightSpaceMatrix = lightProjection * lightView;
-// 
-// 	UniformsCache["lightSpaceMatrix"] = lightSpaceMatrix;
-// 
+
+ 	const glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+  	const float near_plane = 1.f;
+  	const float far_plane = 50.f;
+  	glm::mat4 lightProjection = glm::orthoRH_ZO(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+ 	RHI::Instance->PrepareProjectionForRendering(lightProjection);
+ 
+  	UniformsCache["view"] = lightView;
+  	UniformsCache["projection"] = lightProjection;
+ 
+ 	//const glm::mat4 lightSpaceMatrix = lightProjection * lightView;
+ 	//UniformsCache["lightSpaceMatrix"] = lightSpaceMatrix;
+ 
 // 	RenderCommandsMutex.lock();
-// 	DrawCommands(MainCommands);
+ 	DrawCommands(MainCommands);
 // 	RenderCommandsMutex.unlock();
 // 
-// 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-// 
-// 	SetViewportSizeToMain();
-// 	SetDrawMode(EDrawMode::NORMAL);
+	RHI::Instance->UnbindFrameBuffer(*ShadowFrameBuffer);
+
+ 	SetViewportSizeToMain();
+ 	SetDrawMode(EDrawMode::Default);
+
+	// Reset projection
+	SetupBaseUniforms();
+	UpdateUniforms();
 // 
 // 	// Reset to default
 // 	//glCullFace(GL_BACK);
@@ -205,6 +229,7 @@ void ForwardRenderer::SetupBaseUniforms()
 	const float windowHeight = static_cast<float>(Engine->GetMainWindow().GetProperties().Height);
 
 	glm::mat4 projection = glm::perspectiveRH_ZO(glm::radians(45.0f),  windowWidth / windowHeight, 0.1f, 1000.0f);
+	//glm::mat4 lightProjection = glm::orthoRH_ZO(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
 	RHI::Instance->PrepareProjectionForRendering(projection);
 
 	UniformsCache["projection"] = projection;
@@ -218,18 +243,30 @@ void ForwardRenderer::UpdateUniforms()
 
 void ForwardRenderer::DrawCommands(const eastl::vector<RenderCommand>& inCommands)
 {
-	const int32_t builtInPassesCount = EDrawMode::Count;
-	for (int i = 0; i < builtInPassesCount; ++i)
+	// TODO: Fix the draw mode thing with objects being able to tell which passes they are in
+	// and the renderer being able to use certain passes
+	if (CurrentDrawMode == EDrawMode::Default)
 	{
-		const EDrawMode::Type currentMode = static_cast<EDrawMode::Type>(1 << i);
-		SetDrawMode(currentMode);
+		const int32_t builtInPassesCount = glm::log2((int)EDrawMode::Count);
+		for (int i = 0; i < builtInPassesCount; ++i)
+		{
+			const EDrawMode::Type currentMode = static_cast<EDrawMode::Type>(1 << i);
+			SetDrawMode(currentMode);
 
+			for (const RenderCommand& renderCommand : inCommands)
+			{
+				if (renderCommand.DrawPasses & currentMode)
+				{
+					DrawCommand(renderCommand);
+				}
+			}
+		}
+	}
+	else
+	{
 		for (const RenderCommand& renderCommand : inCommands)
 		{
-			if (renderCommand.DrawPasses & currentMode)
-			{
-				DrawCommand(renderCommand);
-			}
+			DrawCommand(renderCommand);
 		}
 	}
 }
@@ -305,7 +342,6 @@ void ForwardRenderer::DrawCommand(const RenderCommand& inCommand)
 	}
 	}
 
-
 	// Additional vertex data buffers
 //  	for (const eastl::shared_ptr<RHIVertexBuffer>& additionalBuffer : dataContainer->AdditionalBuffers)
 //  	{
@@ -338,32 +374,51 @@ eastl::shared_ptr<RenderMaterial> ForwardRenderer::GetMaterial(const RenderComma
 	{
 		return inCommand.Material;
 	}
-	//case EDrawMode::DEPTH:
-	//{
-// 		MaterialsManager& matManager = MaterialsManager::Get();
-// 		bool materialExists = false;
-// 		eastl::shared_ptr<RenderMaterial> depthMaterial = matManager.GetOrAddMaterial<DepthMaterial>("depth_material", materialExists);
-// 
-// 		if (!materialExists)
-// 		{
-// 			depthMaterial->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/BasicDepthVertexShader.glsl", "../Data/Shaders/BasicDepthFragmentShader.glsl");
-// 		}
-// 
-// 		return depthMaterial;
-// 	}
-// 	case EDrawMode::DEPTH_VISUALIZE:
-// 	{
-// 		MaterialsManager& matManager = MaterialsManager::Get();
-// 		bool materialExists = false;
-// 		eastl::shared_ptr<RenderMaterial> depthMaterial = matManager.GetOrAddMaterial("visualize_depth_material", materialExists);
-// 
-// 		if (!materialExists)
-// 		{
-// 			depthMaterial->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/BasicProjectionVertexShader.glsl", "../Data/Shaders/VisualizeDepthFragmentShader.glsl");
-// 		}
-// 
-// 		return depthMaterial;
-// 	}
+	case EDrawMode::DEPTH:
+	{
+		MaterialsManager& matManager = MaterialsManager::Get();
+		bool materialExists = false;
+		eastl::shared_ptr<RenderMaterial> depthMaterial = matManager.GetOrAddMaterial("depth_material", materialExists);
+
+		if (!materialExists)
+		{
+			VertexInputLayout inputLayout;
+			inputLayout.Push<float>(3, VertexInputType::Position);
+			inputLayout.Push<float>(3, VertexInputType::Normal);
+			inputLayout.Push<float>(2, VertexInputType::TexCoords);
+
+			eastl::vector<ShaderSourceInput> shaders = {
+			{ "ModelWorldPosition_VS_Pos-UV-Normal_ManuallyWritten", EShaderType::Vertex },
+			{ "Empty_PS", EShaderType::Fragment } };
+
+			depthMaterial->Shader = RHI::Instance->CreateShaderFromPath(shaders, inputLayout);
+		}
+
+		return depthMaterial;
+	}
+	case EDrawMode::DEPTH_VISUALIZE:
+	{
+		MaterialsManager& matManager = MaterialsManager::Get();
+		bool materialExists = false;
+		eastl::shared_ptr<RenderMaterial> depthMaterial = matManager.GetOrAddMaterial("visualise_depth_material", materialExists);
+
+		if (!materialExists)
+		{
+			VertexInputLayout inputLayout;
+			inputLayout.Push<float>(3, VertexInputType::Position);
+			inputLayout.Push<float>(3, VertexInputType::Normal);
+			inputLayout.Push<float>(2, VertexInputType::TexCoords);
+
+			eastl::vector<ShaderSourceInput> shaders = {
+			{ "UnchangedPosition_VS_Pos-UV_ManuallyWritten", EShaderType::Vertex },
+			{ "VisualiseDepth_PS", EShaderType::Fragment } };
+
+			depthMaterial->Shader = RHI::Instance->CreateShaderFromPath(shaders, inputLayout);
+			depthMaterial->DiffuseTextures.push_back(ShadowRenderTexture);
+		}
+
+		return depthMaterial;
+	}
 // 	case EDrawMode::OUTLINE:
 // 	{
 // 		MaterialsManager& matManager = MaterialsManager::Get();

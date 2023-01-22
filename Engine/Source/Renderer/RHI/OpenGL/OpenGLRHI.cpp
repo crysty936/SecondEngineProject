@@ -368,6 +368,36 @@ eastl::shared_ptr<class RHITexture2D> OpenGLRHI::CreateRenderTexture()
 	newTexture->Width = windowProps.Width;
 	newTexture->Height = windowProps.Height;
 	newTexture->NrChannels = 3;
+	newTexture->TextureType = RHITextureType::RGBA;
+
+	return newTexture;
+}
+
+eastl::shared_ptr<class RHITexture2D> OpenGLRHI::CreateDepthMap(const int32_t inWidth, const int32_t inHeight)
+{
+	uint32_t texHandle = 0;
+	glGenTextures(1, &texHandle);
+	eastl::shared_ptr<GLTexture2D> newTexture = eastl::make_shared<GLTexture2D>(texHandle);
+
+	glBindTexture(GL_TEXTURE_2D, texHandle);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, inWidth, inHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+
+ 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+ 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+ 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+ 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+
+ 	constexpr float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+ 	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	newTexture->Width = inWidth;
+	newTexture->Height = inHeight;
+	newTexture->NrChannels = 3;
+	newTexture->TextureType = RHITextureType::Depth;
 
 	return newTexture;
 }
@@ -400,8 +430,23 @@ eastl::shared_ptr<RHIFrameBuffer> OpenGLRHI::CreateDepthStencilFrameBuffer()
 
 	eastl::shared_ptr<GLFrameBuffer> frameBuffer = eastl::make_shared<GLFrameBuffer>(frameBufferHandle);
 	frameBuffer->DepthStencingAttachment = rbo;
-	frameBuffer->HasDepthStencilAttachment = true;
-	frameBuffer->HasColorAttachment = false;
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	return frameBuffer;
+}
+
+eastl::shared_ptr<class RHIFrameBuffer> OpenGLRHI::CreateEmptyFrameBuffer()
+{
+	uint32_t frameBufferHandle = 0;
+
+	glGenFramebuffers(1, &frameBufferHandle);
+	glBindFramebuffer(GL_FRAMEBUFFER, frameBufferHandle);
+
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+
+	eastl::shared_ptr<GLFrameBuffer> frameBuffer = eastl::make_shared<GLFrameBuffer>(frameBufferHandle);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -422,7 +467,7 @@ void OpenGLRHI::UniformBufferUpdateData(RHIUniformBuffer& inBuffer, const void* 
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
-void OpenGLRHI::AttachTextureToFramebuffer(RHIFrameBuffer& inFrameBuffer, RHITexture2D& inTex)
+void OpenGLRHI::AttachTextureToFramebufferColor(RHIFrameBuffer& inFrameBuffer, RHITexture2D& inTex)
 {
 	GLFrameBuffer& glBuffer = static_cast< GLFrameBuffer&>(inFrameBuffer);
 	const GLTexture2D& tex = static_cast<const GLTexture2D&>(inTex);
@@ -431,12 +476,28 @@ void OpenGLRHI::AttachTextureToFramebuffer(RHIFrameBuffer& inFrameBuffer, RHITex
 
 	// Attach the texture to the FBO
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex.GlHandle, 0);
+	glBuffer.ColorAttachment = tex.GlHandle;
 
 	UnbindFrameBuffer(inFrameBuffer);
 
-
 	// Detach the current texture from the buffer
 	//glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0);
+}
+
+void OpenGLRHI::AttachTextureToFramebufferDepth(RHIFrameBuffer& inFrameBuffer, RHITexture2D& inTex)
+{
+	GLFrameBuffer& glBuffer = static_cast<GLFrameBuffer&>(inFrameBuffer);
+	const GLTexture2D& tex = static_cast<const GLTexture2D&>(inTex);
+
+	BindFrameBuffer(inFrameBuffer);
+
+	// Attach the texture to the FBO
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, tex.GlHandle, 0);
+	//glBuffer.DepthStencingAttachment = tex.GlHandle;
+
+	ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
+
+	UnbindFrameBuffer(inFrameBuffer);
 }
 
 void OpenGLRHI::LoadImageToTextureFromPath(RHITexture2D& inTexture, const eastl::string& inPath)
@@ -509,14 +570,14 @@ void OpenGLRHI::ClearBuffers()
 
 void OpenGLRHI::PrepareProjectionForRendering(glm::mat4& inProj)
 {
-  	inProj[2][2] = (inProj[2][2] * 2.f) - (-1.f);
-  	inProj[3][2] *= 2.f;
+  	//inProj[2][2] = (inProj[2][2] * 2.f) - (-1.f);
+  	//inProj[3][2] *= 2.f;
 
 	// From Unreal - same thing
-// 	const glm::mat4 scaleMultiply = glm::scale(glm::identity<glm::mat4>(), glm::vec3(1.f, 1.f, 2.f));
-// 	const glm::mat4 trans = glm::translate(glm::identity<glm::mat4>(), glm::vec3(0.f, 0.f, -1.f));
-// 
-// 	inProj = trans * scaleMultiply * inProj;
+	const glm::mat4 scaleMultiply = glm::scale(glm::identity<glm::mat4>(), glm::vec3(1.f, 1.f, 2.f));
+	const glm::mat4 trans = glm::translate(glm::identity<glm::mat4>(), glm::vec3(0.f, 0.f, -1.f));
+
+	inProj = trans * scaleMultiply * inProj;
 
 	// same thing
 // 	glm::scale(inProj, glm::vec3(1.f, 1.f, 2.f));
@@ -791,8 +852,22 @@ void OpenGLRHI::ClearTexture(const RHITexture2D& inTexture, const glm::vec4& inC
 {
 	const GLTexture2D& glTex = static_cast<const GLTexture2D&>(inTexture);
 
-	// Set the color in the texture to ClearColor
-	glClearTexImage(glTex.GlHandle, 0, GL_RGBA, GL_FLOAT, &inColor);
+	switch (inTexture.TextureType)
+	{
+	case RHITextureType::RGBA:
+	{
+		// Set the color in the texture to ClearColor
+		glClearTexImage(glTex.GlHandle, 0, GL_RGBA, GL_FLOAT, &inColor);
+		break;
+	}
+	case RHITextureType::Depth:
+	{
+		glClearTexImage(glTex.GlHandle, 0, GL_DEPTH_COMPONENT, GL_FLOAT, &inColor);
+		break;
+	}
+	default:
+		break;
+	}
 }
 
 void OpenGLRHI::BindFrameBuffer(const class RHIFrameBuffer& inFrameBuffer)

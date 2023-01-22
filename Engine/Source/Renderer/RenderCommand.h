@@ -8,10 +8,11 @@ namespace EDrawMode
 	enum Type : uint8_t
 	{
 		Default = 1 << 0,
-		DEPTH_VISUALIZE = 1 << 2,
-		OUTLINE = 1 << 3,
-		NORMAL_VISUALIZE = 1 << 4,
-		Count = 1 << 5
+		DEPTH = 1 << 2,
+		DEPTH_VISUALIZE = 1 << 3,
+		OUTLINE = 1 << 4,
+		NORMAL_VISUALIZE = 1 << 5,
+		Count = 1 << 6
 	};
 }
 
