@@ -1,6 +1,5 @@
 #include <assert.h>
 #include "Renderer/ForwardRenderer.h"
-#include "glad/glad.h"
 #include "Core/EngineUtils.h"
 #include "Core/EngineCore.h"
 #include "Scene/Scene.h"
@@ -32,8 +31,8 @@
 constexpr glm::vec4 ClearColor(0.3f, 0.5f, 1.f, 0.4f);
 constexpr glm::vec3 lightPos(-15.0f, 20.0f, -1.0f);
 
-const uint32_t SHADOW_WIDTH = 1024;
-const uint32_t SHADOW_HEIGHT = 1024;
+const uint32_t SHADOW_WIDTH = 8192;
+const uint32_t SHADOW_HEIGHT = 8192;
 
 static std::mutex RenderCommandsMutex;
 static std::mutex LoadQueueMutex;
@@ -100,8 +99,8 @@ eastl::shared_ptr<FullScreenQuad> ScreenQuad;
 eastl::shared_ptr<RHIFrameBuffer> GlobalFrameBuffer = nullptr;
 eastl::shared_ptr<RHITexture2D> GlobalRenderTexture = nullptr;
 
-eastl::shared_ptr<RHIFrameBuffer> ShadowFrameBuffer = nullptr;
-eastl::shared_ptr<RHITexture2D> ShadowRenderTexture = nullptr;
+eastl::shared_ptr<RHIFrameBuffer> DepthFrameBuffer = nullptr;
+eastl::shared_ptr<RHITexture2D> DepthRenderTexture = nullptr;
 
 void ForwardRenderer::Init(const WindowProperties & inMainWindowProperties)
 {
@@ -113,11 +112,11 @@ void ForwardRenderer::Init(const WindowProperties & inMainWindowProperties)
 
 	ScreenQuad = EntityHelper::CreateObject<FullScreenQuad>(GlobalRenderTexture);
 	ScreenQuad->CreateCommand();
-	ScreenQuad->GetCommand().Material->DiffuseTextures.push_back(GlobalRenderTexture);
+	ScreenQuad->GetCommand().Material->OwnedTextures.push_back(GlobalRenderTexture);
 
-	ShadowFrameBuffer = RHI::Instance->CreateEmptyFrameBuffer();
-	ShadowRenderTexture = RHI::Instance->CreateDepthMap(SHADOW_WIDTH, SHADOW_HEIGHT);
-	RHI::Instance->AttachTextureToFramebufferDepth(*ShadowFrameBuffer, *ShadowRenderTexture);
+	DepthFrameBuffer = RHI::Instance->CreateEmptyFrameBuffer();
+	DepthRenderTexture = RHI::Instance->CreateDepthMap(SHADOW_WIDTH, SHADOW_HEIGHT);
+	RHI::Instance->AttachTextureToFramebufferDepth(*DepthFrameBuffer, *DepthRenderTexture);
 }
 
 void ForwardRenderer::Terminate()
@@ -147,12 +146,13 @@ void ForwardRenderer::Draw()
 
 	//RHI::Instance->UnbindFrameBuffer(*GlobalFrameBuffer);
 
-// 	SetDrawMode(EDrawMode::DEPTH_VISUALIZE);
-// 
-// 	ScreenQuad->GetCommand().Material->DiffuseTextures.clear();
-// 	ScreenQuad->GetCommand().Material->DiffuseTextures.push_back(ShadowRenderTexture);
-// 
-// 	DrawCommand(ScreenQuad->GetCommand());
+
+
+// To draw the depth map
+//  	SetDrawMode(EDrawMode::DEPTH_VISUALIZE);
+//  	ScreenQuad->GetCommand().Material->DiffuseTextures.clear();
+//  	ScreenQuad->GetCommand().Material->DiffuseTextures.push_back(ShadowRenderTexture);
+//  	DrawCommand(ScreenQuad->GetCommand());
 
 	RHI::Instance->SwapBuffers();
 }
@@ -176,18 +176,15 @@ void ForwardRenderer::DrawSkybox()
 
 void ForwardRenderer::DrawShadowMap()
 {
-// 	// Cull front face to solve Peter Panning
-// 	//glCullFace(GL_FRONT);
-// 	glBindFramebuffer(GL_FRAMEBUFFER, ShadowMapBuffer);
-// 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-// 
+	// Cull front face to solve Peter Panning
+	//RHI::Instance->SetFaceCullMode(EFaceCullMode::Front);
 
-	RHI::Instance->BindFrameBuffer(*ShadowFrameBuffer);
+	RHI::Instance->BindFrameBuffer(*DepthFrameBuffer);
 	RHI::Instance->ClearBuffers();
 
  	SetDrawMode(EDrawMode::DEPTH);
  	RHI::Instance->SetViewportSize(SHADOW_WIDTH, SHADOW_HEIGHT);
-	RHI::Instance->ClearTexture(*ShadowRenderTexture, glm::vec4(1.f, 1.f, 1.f, 1.f));
+	RHI::Instance->ClearTexture(*DepthRenderTexture, glm::vec4(1.f, 1.f, 1.f, 1.f));
 
 // 	//const glm::vec3 lightLoc = LightSource->GetAbsoluteTransform().Translation;
 
@@ -196,18 +193,17 @@ void ForwardRenderer::DrawShadowMap()
   	const float far_plane = 50.f;
   	glm::mat4 lightProjection = glm::orthoRH_ZO(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
  	RHI::Instance->PrepareProjectionForRendering(lightProjection);
- 
+	const glm::vec3 lightDir = glm::normalize(glm::vec3(0.0f, 0.0f, 0.0f) - lightPos);
+
   	UniformsCache["view"] = lightView;
   	UniformsCache["projection"] = lightProjection;
- 
- 	//const glm::mat4 lightSpaceMatrix = lightProjection * lightView;
- 	//UniformsCache["lightSpaceMatrix"] = lightSpaceMatrix;
+  	UniformsCache["lightDir"] = lightDir;
  
 // 	RenderCommandsMutex.lock();
  	DrawCommands(MainCommands);
 // 	RenderCommandsMutex.unlock();
-// 
-	RHI::Instance->UnbindFrameBuffer(*ShadowFrameBuffer);
+
+	RHI::Instance->UnbindFrameBuffer(*DepthFrameBuffer);
 
  	SetViewportSizeToMain();
  	SetDrawMode(EDrawMode::Default);
@@ -215,9 +211,9 @@ void ForwardRenderer::DrawShadowMap()
 	// Reset projection
 	SetupBaseUniforms();
 	UpdateUniforms();
-// 
-// 	// Reset to default
-// 	//glCullFace(GL_BACK);
+
+ 	// Reset to default
+	//RHI::Instance->SetFaceCullMode(EFaceCullMode::Back);
 }
 
 void ForwardRenderer::SetupBaseUniforms()
@@ -303,13 +299,27 @@ void ForwardRenderer::DrawCommand(const RenderCommand& inCommand)
 
 	UniformsCache["model"] = parent->GetModelMatrix();
 
-	int32_t i = 0;
-	for (i = 0; i < material->DiffuseTextures.size(); ++i)
 	{
-		eastl::shared_ptr<RHITexture2D>& tex = material->DiffuseTextures[i];
-		RHI::Instance->BindTexture2D(*tex, i);
-	}
+		int texNr = 0;
+		for (const eastl::shared_ptr<RHITexture2D>& tex : material->OwnedTextures)
+		{
+			RHI::Instance->BindTexture2D(*tex, texNr);
+			++texNr;
+		}
 
+		for (const eastl::weak_ptr<RHITexture2D>& tex : material->WeakTextures)
+		{
+			if (tex.expired())
+			{
+				continue;
+			}
+
+			eastl::shared_ptr<RHITexture2D>& sharedTex = tex.lock();
+
+			RHI::Instance->BindTexture2D(*sharedTex, texNr);
+			++texNr;
+		}
+	}
 	// Shadows
 	//
 	//ShadowBufferTex->Bind(i);
@@ -351,10 +361,25 @@ void ForwardRenderer::DrawCommand(const RenderCommand& inCommand)
 
 	RHI::Instance->UnbindVertexBuffer(*(dataContainer->VBuffer));
 
-	for (i = 0; i < material->DiffuseTextures.size(); ++i)
 	{
-		eastl::shared_ptr<RHITexture2D>& tex = material->DiffuseTextures[i];
-		RHI::Instance->UnbindTexture2D(*tex, i);
+		int texNr = 0;
+		for (const eastl::shared_ptr<RHITexture2D>& tex : material->OwnedTextures)
+		{
+			RHI::Instance->UnbindTexture2D(*tex, texNr);
+			++texNr;
+		}
+
+		for (const eastl::weak_ptr<RHITexture2D>& tex : material->WeakTextures)
+		{
+			if (tex.expired())
+			{
+				continue;
+			}
+
+			eastl::shared_ptr<RHITexture2D>& sharedTex = tex.lock();
+			RHI::Instance->BindTexture2D(*sharedTex, texNr);
+			++texNr;
+		}
 	}
 
 	// Shadows
@@ -378,7 +403,7 @@ eastl::shared_ptr<RenderMaterial> ForwardRenderer::GetMaterial(const RenderComma
 	{
 		MaterialsManager& matManager = MaterialsManager::Get();
 		bool materialExists = false;
-		eastl::shared_ptr<RenderMaterial> depthMaterial = matManager.GetOrAddMaterial("depth_material", materialExists);
+		eastl::shared_ptr<RenderMaterial> depthMaterial = matManager.GetOrAddMaterial<DepthMaterial>("depth_material", materialExists);
 
 		if (!materialExists)
 		{
@@ -388,7 +413,7 @@ eastl::shared_ptr<RenderMaterial> ForwardRenderer::GetMaterial(const RenderComma
 			inputLayout.Push<float>(2, VertexInputType::TexCoords);
 
 			eastl::vector<ShaderSourceInput> shaders = {
-			{ "ModelWorldPosition_VS_Pos-UV-Normal_ManuallyWritten", EShaderType::Vertex },
+			{ "Depth_VS-Pos-Normal-UV", EShaderType::Vertex },
 			{ "Empty_PS", EShaderType::Fragment } };
 
 			depthMaterial->Shader = RHI::Instance->CreateShaderFromPath(shaders, inputLayout);
@@ -400,7 +425,7 @@ eastl::shared_ptr<RenderMaterial> ForwardRenderer::GetMaterial(const RenderComma
 	{
 		MaterialsManager& matManager = MaterialsManager::Get();
 		bool materialExists = false;
-		eastl::shared_ptr<RenderMaterial> depthMaterial = matManager.GetOrAddMaterial("visualise_depth_material", materialExists);
+		eastl::shared_ptr<RenderMaterial> depthMaterial = matManager.GetOrAddMaterial<RenderMaterial>("visualise_depth_material", materialExists);
 
 		if (!materialExists)
 		{
@@ -414,7 +439,7 @@ eastl::shared_ptr<RenderMaterial> ForwardRenderer::GetMaterial(const RenderComma
 			{ "VisualiseDepth_PS", EShaderType::Fragment } };
 
 			depthMaterial->Shader = RHI::Instance->CreateShaderFromPath(shaders, inputLayout);
-			depthMaterial->DiffuseTextures.push_back(ShadowRenderTexture);
+			depthMaterial->OwnedTextures.push_back(DepthRenderTexture);
 		}
 
 		return depthMaterial;
@@ -469,6 +494,11 @@ void ForwardRenderer::AddMirrorCommand(const RenderCommand & inCommand)
 {
 	// 	std::lock_guard<std::mutex> lock(RenderCommandsMutex);
 	// 	MirrorCommands.push_back(inCommand);
+}
+
+eastl::weak_ptr<RHITexture2D> ForwardRenderer::GetDepthTexture() const
+{
+	return DepthRenderTexture;
 }
 
 void ForwardRenderer::AddCommand(const RenderCommand & inCommand)

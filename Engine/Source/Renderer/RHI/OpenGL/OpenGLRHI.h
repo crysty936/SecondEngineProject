@@ -68,6 +68,9 @@ public:
 
 	virtual void UnbindFrameBuffer(const class RHIFrameBuffer& inFrameBuffer) override;
 
+
+	virtual void SetFaceCullMode(const EFaceCullMode inMode) override;
+
 private:
 	void LoadImageToTextureFromPath(RHITexture2D& inTexture, const eastl::string& inPath);
 };

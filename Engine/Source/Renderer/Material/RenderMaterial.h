@@ -41,6 +41,7 @@ public:
 public:
 	eastl::vector<BufferWithRequirements> UBuffers;
 	eastl::shared_ptr<class RHIShader> Shader;
-	// TODO: Add the other types of textures
-	eastl::vector<eastl::shared_ptr<class RHITexture2D>> DiffuseTextures;
+
+	eastl::vector<eastl::shared_ptr<class RHITexture2D>> OwnedTextures;
+	eastl::vector<eastl::weak_ptr<class RHITexture2D>> WeakTextures;
 };

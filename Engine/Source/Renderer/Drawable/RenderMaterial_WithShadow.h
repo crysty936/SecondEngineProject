@@ -3,11 +3,11 @@
 #include "EASTL/string.h"
 #include "Renderer/Material/RenderMaterial.h"
 
-class DepthMaterial : public RenderMaterial
+class RenderMaterial_WithShadow : public RenderMaterial
 {
 public:
-	DepthMaterial();
-	~DepthMaterial();
+	RenderMaterial_WithShadow();
+	~RenderMaterial_WithShadow();
 
 	virtual void SetRequiredUniforms() override;
 	virtual void SetUniforms(eastl::unordered_map<eastl::string, struct SelfRegisteringUniform>& inUniformsCache) override;

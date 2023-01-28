@@ -389,6 +389,9 @@ eastl::shared_ptr<class RHITexture2D> OpenGLRHI::CreateDepthMap(const int32_t in
  	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
  	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
+	// To use with sampler2DShadow
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+
  	constexpr float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
  	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 
@@ -879,5 +882,24 @@ void OpenGLRHI::BindFrameBuffer(const class RHIFrameBuffer& inFrameBuffer)
 void OpenGLRHI::UnbindFrameBuffer(const class RHIFrameBuffer& inFrameBuffer)
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void OpenGLRHI::SetFaceCullMode(const EFaceCullMode inMode)
+{
+	switch (inMode)
+	{
+	case EFaceCullMode::Front:
+	{
+		glCullFace(GL_FRONT);
+		break;
+	}
+	case EFaceCullMode::Back:
+	{
+		glCullFace(GL_BACK);
+		break;
+	}
+	default:
+		break;
+	}
 }
 

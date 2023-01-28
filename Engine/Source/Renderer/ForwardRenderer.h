@@ -66,6 +66,9 @@ public:
 
 	inline static ForwardRenderer& Get() { ASSERT(Instance); return *Instance; }
 
+	// Todo: Resolve hack
+	eastl::weak_ptr<class RHITexture2D> GetDepthTexture() const;
+
 private:
 	inline static ForwardRenderer* Instance = nullptr;
 

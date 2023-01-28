@@ -153,7 +153,7 @@ public:
   		if (!materialExists)
   		{
   			eastl::shared_ptr<RHITexture2D> tex = RHI::Instance->CreateTexture2D("../Data/Textures/MinecraftGrass.jpg");
-  			material->DiffuseTextures.push_back(tex);
+  			material->OwnedTextures.push_back(tex);
   
   			eastl::vector<ShaderSourceInput> shaders = {
   			{ "ModelWorldPosition_VS_Pos-UV-Normal_ManuallyWritten-Instanced", EShaderType::Vertex },

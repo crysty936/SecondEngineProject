@@ -22,8 +22,8 @@ void UniformBufferContainer::UpdateData(const ConstantBufferType inBufferType, c
 		if ((bufferSize % 16) > 0)
 		{
 			// Round size to the next 16 multiple
-			const size_t multiplier = (bufferSize / 16) + 1;
-			bufferSize = multiplier * 16;
+			const size_t multiplier = bufferSize / 16;
+			bufferSize = (multiplier + 1) * 16;
 		}
 
 		RHIBuffer = RHI::Instance->CreateUniformBuffer(bufferSize);

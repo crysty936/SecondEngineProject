@@ -7,12 +7,12 @@
 #include "Renderer/ForwardRenderer.h"
 #include "Core/EntityHelper.h"
 #include "Renderer/Drawable/SkyboxMaterial.h"
-#include "Renderer/Drawable/WithShadowMaterial.h"
 #include "glad/glad.h"
 #include "Renderer/RHI/Resources/RHIVertexBuffer.h"
 #include "Renderer/RHI/RHI.h"
 #include "Renderer/RHI/Resources/RHIIndexBuffer.h"
 #include "Renderer/Drawable//BallTestMaterial.h"
+#include "Renderer/Drawable/RenderMaterial_WithShadow.h"
 
 TriangleShape::TriangleShape() = default;
 TriangleShape::~TriangleShape() = default;
@@ -164,16 +164,16 @@ void CubeShape::CreateProxy()
   	bool materialExists = false;
   	//eastl::shared_ptr<RenderMaterial> cubeMaterial = matManager.GetOrAddMaterial<WithShadowMaterial>("cube_material", materialExists);
   	// TODO: Shadow disabled for now
-	eastl::shared_ptr<RenderMaterial> material = matManager.GetOrAddMaterial("cube_material", materialExists);
+	eastl::shared_ptr<RenderMaterial> material = matManager.GetOrAddMaterial<RenderMaterial_WithShadow>("cube_material", materialExists);
   
   	if (!materialExists)
   	{
 		eastl::shared_ptr<RHITexture2D> tex = RHI::Instance->CreateTexture2D("../Data/Textures/MinecraftGrass.jpg");
-		material->DiffuseTextures.push_back(tex);
+		material->OwnedTextures.push_back(tex);
 
 		eastl::vector<ShaderSourceInput> shaders = {
-		{ "ModelWorldPosition_VS_Pos-UV-Normal_ManuallyWritten", EShaderType::Vertex },
-		{ "BasicTex_PS", EShaderType::Fragment } };
+		{ "ModelWorldPosition_VS_Pos-UV-Normal_WithShadow_ManuallyWritten", EShaderType::Vertex },
+		{ "BasicTex_PS_WithShadow", EShaderType::Fragment } };
 
 		material->Shader = RHI::Instance->CreateShaderFromPath(shaders, inputLayout);
   	}

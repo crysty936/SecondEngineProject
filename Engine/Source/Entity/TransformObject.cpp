@@ -94,7 +94,7 @@ void TransformObject::LookAt(const glm::vec3 inTarget)
 {
 	const glm::vec3 upVec(0, 1, 0);
 
-	const glm::vec3 z_axis = glm::normalize(inTarget- GetLocation());
+	const glm::vec3 z_axis = glm::normalize(inTarget - GetLocation());
 	const glm::vec3 x_axis = glm::normalize(glm::cross(upVec, z_axis));
 	const glm::vec3 y_axis = glm::normalize(glm::cross(z_axis, x_axis));
 

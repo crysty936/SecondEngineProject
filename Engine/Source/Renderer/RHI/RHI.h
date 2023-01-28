@@ -6,6 +6,7 @@
 #include "glm/ext/vector_float3.hpp"
 #include "glm/ext/vector_float4.hpp"
 #include "glm/ext/matrix_float4x4.hpp"
+#include "Renderer/DrawType.h"
 
 enum class EShaderType
 {
@@ -89,6 +90,8 @@ public:
 	virtual void SwapBuffers() {}
 
 	virtual void ClearBuffers() {}
+
+	virtual void SetFaceCullMode(const EFaceCullMode inMode) {}
 
 	virtual void PrepareProjectionForRendering(glm::mat4& inProj) {}
 

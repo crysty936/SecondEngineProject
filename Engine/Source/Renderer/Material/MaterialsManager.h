@@ -16,7 +16,7 @@ public:
 	static MaterialsManager& Get();
 
 public:
-	// TODO: This should preferrably be removed, materials should only be added by the Asset Manager at startup once deserialization is done
+	/** In the absence of a material nodes based logic editor, material logic will be code written but parameters can be gathered from deserialized data*/
 	template<class T = RenderMaterial>
 	eastl::shared_ptr<T> GetOrAddMaterial(const eastl::string& inMaterialID, OUT bool& outAlreadyExists);
 
