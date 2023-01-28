@@ -32,13 +32,14 @@ void main()
 
 	float bias = max(0.01 * (1.0 - dot(ps_in.Normal, ps_in.DirectionalLightDirection)), 0.005);
 
-	if (closestDepth < currentDepth - bias)
+	float shadow = 0.0;
+	if ((closestDepth < currentDepth ) && currentDepth < 1.0)
 	{
-		FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+		shadow = 1.0;
 	}
 	else
 	{
-		FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+		shadow = 0.0;
 	}
 
 
@@ -50,7 +51,9 @@ void main()
 	//FragColor = vec4(closestDepth, closestDepth, closestDepth, 1.0);
 	//FragColor = vec4(currentDepth, currentDepth, currentDepth, 1.0);
 	//FragColor = vec4(test, test, test, 1.0);
+	//FragColor = vec4(shadow, shadow, shadow, 1.0);
 
 	//vec3 color = (test * texture(quadTexture, ps_in.TexCoords)).xyz;
-	//FragColor = vec4(color, 1.0);
+	vec3 color = ((1 - shadow) * texture(quadTexture, ps_in.TexCoords)).xyz;
+	FragColor = vec4(color, 1.0);
 }
