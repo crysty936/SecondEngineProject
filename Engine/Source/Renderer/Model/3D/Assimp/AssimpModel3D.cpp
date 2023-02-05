@@ -12,6 +12,7 @@
 #include "GLFW/glfw3.h"
 #include "Renderer/RHI/Resources/RHITexture.h"
 #include "Renderer/RHI/RHI.h"
+#include "Renderer/Drawable/RenderMaterial_WithShadow.h"
 
 static Transform aiMatrixToTransform(const aiMatrix4x4& inMatrix)
 {
@@ -103,8 +104,8 @@ void AssimpModel3D::ProcessNodesRecursively(const aiNode & inNode, const aiScene
 eastl::shared_ptr<RHIShader> AssimpModel3D::CreateShaders(const VertexInputLayout& inLayout) const
 {
 	eastl::vector<ShaderSourceInput> shaders = {
-		{ "ModelWorldPosition_VS_Pos-Normal-UV", EShaderType::Vertex },
-		{ "BasicTex_PS", EShaderType::Fragment } };
+		{ "ModelWorldPosition_VS_Pos-UV-Normal_WithShadow_ManuallyWritten", EShaderType::Vertex },
+		{ "BasicTex_PS_WithShadow", EShaderType::Fragment } };
 
 	return RHI::Instance->CreateShaderFromPath(shaders, inLayout);
 }
@@ -138,7 +139,7 @@ void AssimpModel3D::ProcessMesh(const aiMesh& inMesh, const aiScene& inScene, ea
 
  	MaterialsManager& matManager = MaterialsManager::Get();
  	bool materialExists = false;
- 	eastl::shared_ptr<RenderMaterial> thisMaterial = matManager.GetOrAddMaterial(eastl::string("Assimp_Material_") + inMesh.mName.data, materialExists);
+ 	eastl::shared_ptr<RenderMaterial> thisMaterial = matManager.GetOrAddMaterial<RenderMaterial_WithShadow>(eastl::string("Assimp_Material_") + inMesh.mName.data, materialExists);
  
  	if (!materialExists)
  	{
@@ -152,11 +153,6 @@ void AssimpModel3D::ProcessMesh(const aiMesh& inMesh, const aiScene& inScene, ea
 			// 		std::vector<Texture> SpecularMaps = LoadMaterialTextures(Material, aiTextureType_SPECULAR, TextureType::Specular);
 			// 		Textures.insert(Textures.end(), SpecularMaps.begin(), SpecularMaps.end());
 		}
-
-
-		eastl::vector<ShaderSourceInput> shaders = {
-		{ "ModelWorldPosition_VS_Pos-Normal-UV", EShaderType::Vertex },
-		{ "BasicTex_PS", EShaderType::Fragment } };
 
 		thisMaterial->Shader = CreateShaders(inputLayout);
  	}

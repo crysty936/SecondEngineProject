@@ -240,7 +240,7 @@ void TestGameMode::Init()
         		centerObj->SetScale(glm::vec3(100.f, 0.5f, 100.f));
  	}
 	{
-		eastl::shared_ptr<CubeShape> centerObj = BasicShapesHelpers::CreateCubeObject();
+		//eastl::shared_ptr<CubeShape> centerObj = BasicShapesHelpers::CreateCubeObject();
 
 		//eastl::shared_ptr<SquareShape> SquareTestObj = BasicShapesHelpers::CreateSquareObject();
 
@@ -249,7 +249,7 @@ void TestGameMode::Init()
 	}
 // 	{
  		eastl::shared_ptr<CubeShape> centerObj = BasicShapesHelpers::CreateCubeObject();
- 		centerObj->Move(glm::vec3(5.f, 0.f, 0.f));
+ 		centerObj->Move(glm::vec3(0.f, 0.f, 5.f));
 // 	}
  	{
 // 		for (int32_t j = 0; j < 100; ++j)
@@ -263,7 +263,14 @@ void TestGameMode::Init()
 // 		}
  	}
 
-	//eastl::shared_ptr<AssimpModel3D> shibaModel = ObjectCreation::NewObject<AssimpModel3D>("../Data/Models/Shiba/scene.gltf");
+	// Light
+	eastl::shared_ptr<LightSource> lightObj = EntityHelper::CreateObject<LightSource>();
+	lightObj->SetRelativeLocation(glm::vec3(-5.0f, 20.0f, -0.2f));
+
+
+	eastl::shared_ptr<AssimpModel3D> shibaModel = EntityHelper::CreateObject<AssimpModel3D>("../Data/Models/Shiba/scene.gltf");
+	shibaModel->SetScale(glm::vec3(10.f, 10.f, 10.f));
+	shibaModel->Move(glm::vec3(0.f, 10.f, 0.f));
 
 //  	eastl::shared_ptr<AssimpModel3D> model = EntityHelper::CreateObject<AssimpModel3D>("../Data/Models/Backpack/scene.gltf");
 //  	model->SetScale(glm::vec3(0.01f, 0.01f, 0.01f));

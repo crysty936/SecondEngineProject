@@ -29,10 +29,10 @@
 #include "Drawable/ShapesUtils/BasicShapes.h"
 
 constexpr glm::vec4 ClearColor(0.3f, 0.5f, 1.f, 0.4f);
-constexpr glm::vec3 lightPos(-15.0f, 20.0f, -1.0f);
+constexpr glm::vec3 lightPos(-5.0f, 20.0f, -0.2f);
 
-const uint32_t SHADOW_WIDTH = 8192;
-const uint32_t SHADOW_HEIGHT = 8192;
+const uint32_t SHADOW_WIDTH = 1024;
+const uint32_t SHADOW_HEIGHT = 1024;
 
 static std::mutex RenderCommandsMutex;
 static std::mutex LoadQueueMutex;
@@ -190,7 +190,7 @@ void ForwardRenderer::DrawShadowMap()
 
  	const glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
   	const float near_plane = 1.f;
-  	const float far_plane = 50.f;
+  	const float far_plane = 40.f;
   	glm::mat4 lightProjection = glm::orthoRH_ZO(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
  	RHI::Instance->PrepareProjectionForRendering(lightProjection);
 	const glm::vec3 lightDir = glm::normalize(glm::vec3(0.0f, 0.0f, 0.0f) - lightPos);

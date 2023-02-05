@@ -162,8 +162,6 @@ void CubeShape::CreateProxy()
   
   	MaterialsManager& matManager = MaterialsManager::Get();
   	bool materialExists = false;
-  	//eastl::shared_ptr<RenderMaterial> cubeMaterial = matManager.GetOrAddMaterial<WithShadowMaterial>("cube_material", materialExists);
-  	// TODO: Shadow disabled for now
 	eastl::shared_ptr<RenderMaterial> material = matManager.GetOrAddMaterial<RenderMaterial_WithShadow>("cube_material", materialExists);
   
   	if (!materialExists)
@@ -258,54 +256,53 @@ LightSource::~LightSource() = default;
 
 void LightSource::CreateProxy()
 {
-// 	const eastl::string RenderDataContainerID = "lightSourceVAO";
-// 	eastl::shared_ptr<VertexArrayObject> thisVAO{ nullptr };
-// 	ASSERT(false); // Not working with Generic renderer
-// 	//const bool existingContainer = RHI->GetOrCreateVAO(RenderDataContainerID, thisVAO);
-// 	const bool existingContainer = false;
-// 
-// 	if (!existingContainer)
-// 	{
-// 		// TODO: Buffers creation should be delegated to the renderer
-// 		OpenGLIndexBuffer ibo = OpenGLIndexBuffer{};
-// 		int32_t indicesCount = BasicShapesData::GetCubeIndicesCount();
-// 		ibo.SetIndices(BasicShapesData::GetCubeIndices(), indicesCount);
-// 
-// 		VertexBufferLayout layout = VertexBufferLayout{};
-// 		// Vertex points
-// 		layout.Push<float>(3);
-// 		// Normals
-// 		layout.Push<float>(3);
-// 		// Vertex Tex Coords
-// 		layout.Push<float>(2);
-// 
-// 		OpenGLVertexBuffer vbo = OpenGLVertexBuffer{ ibo, layout };
-// 		int32_t verticesCount = BasicShapesData::GetCubeVerticesCount();
-// 		vbo.SetData(BasicShapesData::GetCubeVertices(), verticesCount);
-// 
-// 		//thisVAO->VBuffer = vbo;// TODO
-// 	}
-// 
-// 	MaterialsManager& matManager = MaterialsManager::Get();
-// 	bool materialExists = false;
-// 	eastl::shared_ptr<RenderMaterial> cubeMaterial = matManager.GetOrAddMaterial<RenderMaterial>("light_source_material", materialExists);
-// 
-// 	if (!materialExists)
-// 	{
-// 		cubeMaterial->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/WithNormalProjectionVertexShader.glsl", "../Data/Shaders/LightSourceFragmentShader.glsl");
-// 	}
-// 
-// 	eastl::shared_ptr<MeshNode> cubeNode = eastl::make_shared<MeshNode>();
-// 	AddChild(cubeNode);
-// 
-// 	RenderCommand newCommand;
-// 	newCommand.Material = cubeMaterial;
-// 	newCommand.VAO = thisVAO;
-// 	newCommand.Parent = cubeNode;
-// 	newCommand.DrawType = EDrawCallType::DrawArrays;
-// 
-// 	ASSERT(false); // Not working with Generic renderer
-	//RHI->AddCommand(newCommand);
+	const eastl::string RenderDataContainerID = "lightVAO";
+	eastl::shared_ptr<MeshDataContainer> dataContainer{ nullptr };
+
+	const bool existingContainer = ForwardRenderer::Get().GetOrCreateContainer(RenderDataContainerID, dataContainer);
+	VertexInputLayout inputLayout;
+	// Vertex points
+	inputLayout.Push<float>(3, VertexInputType::Position);
+	// Vertex Normal
+	inputLayout.Push<float>(3, VertexInputType::Normal);
+	// Vertex Tex Coords
+	inputLayout.Push<float>(2, VertexInputType::TexCoords);
+
+	if (!existingContainer)
+	{
+		int32_t indicesCount = BasicShapesData::GetCubeIndicesCount();
+		eastl::shared_ptr<RHIIndexBuffer> ib = RHI::Instance->CreateIndexBuffer(BasicShapesData::GetCubeIndices(), indicesCount);
+
+
+		int32_t verticesCount = BasicShapesData::GetCubeVerticesCount();
+		const eastl::shared_ptr<RHIVertexBuffer> vb = RHI::Instance->CreateVertexBuffer(inputLayout, BasicShapesData::GetCubeVertices(), verticesCount, ib);
+
+		dataContainer->VBuffer = vb;
+	}
+
+	MaterialsManager& matManager = MaterialsManager::Get();
+	bool materialExists = false;
+	eastl::shared_ptr<RenderMaterial> material = matManager.GetOrAddMaterial<RenderMaterial>("light_material", materialExists);
+
+	if (!materialExists)
+	{
+		eastl::vector<ShaderSourceInput> shaders = {
+		{ "ModelWorldPosition_VS_Pos-UV-Normal_ManuallyWritten", EShaderType::Vertex },
+		{ "LightSource_PS", EShaderType::Fragment } };
+
+		material->Shader = RHI::Instance->CreateShaderFromPath(shaders, inputLayout);
+	}
+
+	eastl::shared_ptr<MeshNode> cubeNode = eastl::make_shared<MeshNode>();
+	AddChild(cubeNode);
+
+	RenderCommand newCommand;
+	newCommand.Material = material;
+	newCommand.DataContainer = dataContainer;
+	newCommand.Parent = cubeNode;
+	newCommand.DrawType = EDrawCallType::DrawElements;
+
+	ForwardRenderer::Get().AddCommand(newCommand);
 }
 
 // Mirror
