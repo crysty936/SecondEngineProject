@@ -32,20 +32,27 @@ void main()
 	vec4 lsPos = ps_in.lsMatrix * worldPos;
 
 	vec3 lsPosFinal = lsPos.xyz / lsPos.w;
+	// remap from -1..1 to 0..1
 	vec3 projCoords = lsPosFinal * 0.5 + 0.5;
 
 	//float shadowSamplerTest = texture(depthTexture, vec3(projCoords.xy, projCoords.z + 0.001));
-	float pixelLightSpaceDepth = projCoords.z;
 
 
+	float pixelLightSpaceDepth = lsPosFinal.z;
 	// 2 different ways of calculating bias 
 	//float cosTheta = clamp(dot(ps_in.Normal, ps_in.DirectionalLightDirection), 0.0, 1.0);
 	//float bias2 = 0.005 * tan(acos(cosTheta));
 	//bias2 = clamp(bias2, 0.0, 0.01);
 
 	float bias1 = max(0.005 * (1.0 - clamp(dot(ps_in.Normal, ps_in.DirectionalLightDirection), 0.0, 1.0)), 0.005);
-
 	vec2 texelSize = 1.0 / textureSize(depthTexture, 0);
+
+	//float shadow = 0.0;
+	//float textureDepth = texture(depthTexture, projCoords.xy).r;
+	//if ((pixelLightSpaceDepth - bias1 > textureDepth))
+	//{
+	//	shadow = 1.0;
+	//}
 
 	//float shadow = 0.0;
 	//for (int x = -1; x <= 1; ++x)
@@ -83,6 +90,7 @@ void main()
 	//
 
 	
+	// Vogel disk PCF
 	float shadow = 0.0;
 	if (pixelLightSpaceDepth < 1.0)
 	{
@@ -113,6 +121,6 @@ void main()
 
 
 	vec3 color = (0.8 * ((1 - shadow) * texture(quadTexture, ps_in.TexCoords).xyz)) + (0.2 * texture(quadTexture, ps_in.TexCoords).xyz);
-	//vec3 color = vec3(shadow, shadow, shadow);
+	//vec3 color = vec3(1 - shadow, 1 - shadow, 1 - shadow);
 	FragColor = vec4(color, 1.0);
 }

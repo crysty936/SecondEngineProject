@@ -258,6 +258,8 @@ OpenGLRHI::OpenGLRHI()
 
 	glDisable(GL_DEPTH_CLAMP);
 
+	glClipControl(GL_LOWER_LEFT, GL_ZERO_TO_ONE);
+
 	glDebugMessageCallback(GLUtils::GLDebugCallback, nullptr);
 
 	glFrontFace(GL_CCW);
@@ -577,10 +579,10 @@ void OpenGLRHI::PrepareProjectionForRendering(glm::mat4& inProj)
   	//inProj[3][2] *= 2.f;
 
 	// From Unreal - same thing
-	const glm::mat4 scaleMultiply = glm::scale(glm::identity<glm::mat4>(), glm::vec3(1.f, 1.f, 2.f));
-	const glm::mat4 trans = glm::translate(glm::identity<glm::mat4>(), glm::vec3(0.f, 0.f, -1.f));
-
-	inProj = trans * scaleMultiply * inProj;
+// 	const glm::mat4 scaleMultiply = glm::scale(glm::identity<glm::mat4>(), glm::vec3(1.f, 1.f, 2.f));
+// 	const glm::mat4 trans = glm::translate(glm::identity<glm::mat4>(), glm::vec3(0.f, 0.f, -1.f));
+// 
+// 	inProj = trans * scaleMultiply * inProj;
 
 	// same thing
 // 	glm::scale(inProj, glm::vec3(1.f, 1.f, 2.f));
