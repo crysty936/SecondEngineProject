@@ -13,8 +13,8 @@ void BallTestMaterial::SetUniforms(eastl::unordered_map<eastl::string, SelfRegis
 
 	inUniformsCache["LightPos"] = SelfRegisteringUniform(lightPos);
 
-	const glm::mat4& proj = inUniformsCache["projection"].Value.Value4fv;
-	const glm::mat4& view = inUniformsCache["view"].Value.Value4fv;
+	const glm::mat4& proj = inUniformsCache["projection"].GetValue<glm::mat4>();
+	const glm::mat4& view = inUniformsCache["view"].GetValue<glm::mat4>();
 
 	const glm::mat4 invProjView = glm::inverse((proj * view));
 

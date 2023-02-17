@@ -17,6 +17,16 @@ void DepthMaterial::SetRequiredUniforms()
 	};
 
 	UBuffers.push_back({ defaultUniforms, ConstantBufferType::Vertex });
+
+// 	eastl::vector<UniformWithFlag> vertexUniforms = {
+// 	{"model"}
+// 	};
+// 
+// 	UBuffers.push_back({ vertexUniforms, ConstantBufferType::Vertex });
+
+// 	eastl::vector<UniformWithFlag> defaultUniforms = {
+// 	{"model"}
+// 	};
 }
 
 void DepthMaterial::SetUniforms(eastl::unordered_map<eastl::string, struct SelfRegisteringUniform>& inUniformsCache)

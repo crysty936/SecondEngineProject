@@ -237,6 +237,7 @@ void ForwardRenderer::Init(const WindowProperties & inMainWindowProperties)
 
 	DepthFrameBuffer = RHI::Instance->CreateEmptyFrameBuffer();
 	DepthRenderTexture = RHI::Instance->CreateDepthMap(SHADOW_WIDTH, SHADOW_HEIGHT);
+	//DepthRenderTexture = RHI::Instance->CreateArrayDepthMap(SHADOW_WIDTH, SHADOW_HEIGHT, static_cast<int32_t>(shadowCascadeSplits.size() + 1));
 	RHI::Instance->AttachTextureToFramebufferDepth(*DepthFrameBuffer, *DepthRenderTexture);
 }
 
@@ -355,7 +356,7 @@ eastl::vector<glm::mat4> ForwardRenderer::CreateCascadesMatrices()
 	cascades.reserve(shadowCascadeSplits.size());
 
 	const glm::vec3 lightDir = glm::normalize(-lightPos);
-	const glm::mat4& cameraView = UniformsCache["view"].Value.Value4fv;
+	const glm::mat4& cameraView = UniformsCache["view"].GetValue<glm::mat4>();
 
 	const float windowWidth = static_cast<float>(Engine->GetMainWindow().GetProperties().Width);
 	const float windowHeight = static_cast<float>(Engine->GetMainWindow().GetProperties().Height);
@@ -398,8 +399,8 @@ void ForwardRenderer::DrawShadowMap()
 
 	if (UpdateShadowMatrices)
 	{
-		glm::mat4 cameraProj = UniformsCache["projection"].Value.Value4fv;
-		glm::mat4 cameraView = UniformsCache["view"].Value.Value4fv;
+		glm::mat4 cameraProj = UniformsCache["projection"].GetValue<glm::mat4>();
+		glm::mat4 cameraView = UniformsCache["view"].GetValue<glm::mat4>();
 
 		const glm::vec3 cameraProjCenter = RenderUtils::GetProjectionCenter(cameraProj * cameraView);
 
@@ -421,8 +422,8 @@ void ForwardRenderer::DrawShadowMap()
   		lightProjection = CreateMyOrthoLH(projBox.Min.x, projBox.Max.x, projBox.Min.y, projBox.Max.y, projBox.Min.z, projBox.Max.z); // for this, it looks correct, but obviously, the proj is reversed so depth map is incorrect
   		//lightProjection = glm::orthoLH_ZO(projBox.Min.x, projBox.Max.x, projBox.Min.y, projBox.Max.y, projBox.Min.z, projBox.Max.z); // for this, it looks correct, but obviously, the proj is reversed so depth map is incorrect
 
-
 		lsMatrices = CreateCascadesMatrices();
+		UniformsCache["lsMatrices"] = lsMatrices;
 
 		// Debug stuff
 		debugMatrixShadow = lightProjection * lightView;
@@ -662,6 +663,8 @@ eastl::shared_ptr<RenderMaterial> ForwardRenderer::GetMaterial(const RenderComma
 
 				eastl::vector<ShaderSourceInput> shaders = {
 				{ "Depth_VS-Pos-Normal-UV", EShaderType::Vertex },
+				//{ "VS_Pos-Normal-UV_Depth_Cascaded", EShaderType::Vertex },
+				//{ "GS_Depth_Cascaded", EShaderType::Vertex },
 				{ "Empty_PS", EShaderType::Fragment } };
 
 				depthMaterial->Shader = RHI::Instance->CreateShaderFromPath(shaders, inputLayout);
@@ -686,6 +689,8 @@ eastl::shared_ptr<RenderMaterial> ForwardRenderer::GetMaterial(const RenderComma
 
 				eastl::vector<ShaderSourceInput> shaders = {
 				{ "Depth_VS-Pos-Normal-UV_Instanced", EShaderType::Vertex },
+				//{ "VS_Pos-Normal-UV_Depth_Cascaded_Instanced", EShaderType::Vertex },
+				//{ "GS_Depth_Cascaded", EShaderType::Vertex },
 				{ "Empty_PS", EShaderType::Fragment } };
 
 				depthMaterial->Shader = RHI::Instance->CreateShaderFromPath(shaders, inputLayout);

@@ -433,7 +433,7 @@ eastl::shared_ptr<class RHITexture2D> OpenGLRHI::CreateArrayDepthMap(const int32
 		GL_DEPTH_COMPONENT32F,
 		inDepthMapWidth,
 		inDepthMapHeight,
-		inSize + 1,
+		inSize,
 		0,
 		GL_DEPTH_COMPONENT,
 		GL_FLOAT,
@@ -512,6 +512,11 @@ eastl::shared_ptr<class RHIFrameBuffer> OpenGLRHI::CreateEmptyFrameBuffer()
 
 void OpenGLRHI::UniformBufferUpdateData(RHIUniformBuffer& inBuffer, const void* inData, const size_t inDataSize, const int32_t inBufferNr)
 {
+	if (!(ENSURE(inDataSize != 0)))
+	{
+		return;
+	}
+
 	const GlUniformBuffer& glBuffer = static_cast<const GlUniformBuffer&>(inBuffer);
 	ASSERT(inDataSize <= glBuffer.InitSize);
 	

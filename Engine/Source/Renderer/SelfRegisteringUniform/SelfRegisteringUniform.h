@@ -2,7 +2,84 @@
 #include "glm/ext/matrix_float4x4.hpp"
 #include "EASTL/string.h"
 #include "EASTL/vector.h"
+#include "EASTL/shared_ptr.h"
 
+class IUniformData
+{
+public:
+	virtual void* GetData() = 0;
+	virtual size_t GetSize() = 0;
+};
+
+template<typename T>
+class SelfRegisteringUniformData : public IUniformData
+{
+public:
+	SelfRegisteringUniformData(const T& inData)
+	{
+		Data = inData;
+	}
+
+	virtual void* GetData() override
+	{
+		return &Data;
+	}
+
+	virtual size_t GetSize() override 
+	{
+		return sizeof(T);
+	}
+
+public:
+	T Data;
+};
+
+// Vec3 specialization
+template<>
+class SelfRegisteringUniformData<glm::vec3> : public IUniformData
+{
+public:
+	SelfRegisteringUniformData(const glm::vec3& inData)
+	{
+		Data = inData;
+	}
+
+	virtual void* GetData() override
+	{
+		return &Data;
+	}
+
+	virtual size_t GetSize() override
+	{
+		return sizeof(float) * 4; // vec3 has the same alignment as vec4 in GLSL, TODO: Test if this applies in HLSL as well
+	}
+
+public:
+	glm::vec3 Data;
+};
+
+template<typename T>
+class SelfRegisteringUniformData<eastl::vector<T>> : public IUniformData
+{
+public:
+	SelfRegisteringUniformData(const eastl::vector<T>& inData)
+	{
+		Data = inData;
+	}
+
+	virtual void* GetData() override
+	{
+		return Data.data();
+	}
+
+	virtual size_t GetSize() override
+	{
+		return sizeof(T) * Data.size();
+	}
+
+public:
+	eastl::vector<T> Data;
+};
 
 struct SelfRegisteringUniform
 {
@@ -11,7 +88,7 @@ struct SelfRegisteringUniform
 	SelfRegisteringUniform(const float inValue);
 	SelfRegisteringUniform(const glm::mat4 inValue);
 	SelfRegisteringUniform(const glm::vec3 inValue);
-	//SelfRegisteringUniform(const OpenGLTexture& inTexture);
+	SelfRegisteringUniform(const eastl::vector<glm::mat4>& inValue);
 
 	void Register(class UniformBufferContainer& inBuffer) const;
 
@@ -22,22 +99,15 @@ public:
 		Uniform1f,
 		Uniform4fv,
 		Uniform3f,
-		Texture
+		Uniform4fvArray
 	} Type;
 
-	union UniformContainer
+	template<typename T>
+	T& GetValue() 
 	{
-		UniformContainer() = default;
-		UniformContainer(const uint32_t inValue) : Value1ui{inValue}{}
-		UniformContainer(const float inValue) : Value1f{inValue}{}
-		UniformContainer(const glm::mat4 inValue) : Value4fv{inValue}{}
-		UniformContainer(const glm::vec3 inValue) : Value3f{inValue}{}
+		SelfRegisteringUniformData<T>* typedUniform = static_cast<SelfRegisteringUniformData<T>*>(Data.get());
+		return typedUniform->Data;
+	}
 
-		glm::mat4 Value4fv;
-		glm::vec3 Value3f;
-		float Value1f;
-		uint32_t Value1ui;
-		//uint32_t TextureHandle;
-	}Value;
-
+	eastl::unique_ptr<IUniformData> Data;
 };

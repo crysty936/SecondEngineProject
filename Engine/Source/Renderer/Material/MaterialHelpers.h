@@ -29,37 +29,7 @@ bool MaterialHelpers::TryGetUniformFromCache(eastl::unordered_map<eastl::string,
 	 	return false;
 	}
 	 
-	outUniform = GetUniformValue<T>((*iter).second);
+	outUniform = (*iter).second.GetValue<T>();
 
 	return true;
-}
-
-template<typename T>
-T& MaterialHelpers::GetUniformValue(SelfRegisteringUniform& inUniform)
-{
-	static_assert(false, "GetUniformValue called with unsupported value");
-}
-
-template<>
-inline glm::mat4& MaterialHelpers::GetUniformValue<glm::mat4>(SelfRegisteringUniform& inUniform)
-{
-	return inUniform.Value.Value4fv;
-}
-
-template<>
-inline glm::vec3& MaterialHelpers::GetUniformValue<glm::vec3>(SelfRegisteringUniform& inUniform)
-{
-	return inUniform.Value.Value3f;
-}
-
-template<>
-inline float& MaterialHelpers::GetUniformValue<float>(SelfRegisteringUniform& inUniform)
-{
-	return inUniform.Value.Value1f;
-}
-
-template<>
-inline uint32_t& MaterialHelpers::GetUniformValue<uint32_t>(SelfRegisteringUniform& inUniform)
-{
-	return inUniform.Value.Value1ui;
 }
