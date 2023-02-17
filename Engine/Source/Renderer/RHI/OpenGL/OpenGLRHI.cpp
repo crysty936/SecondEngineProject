@@ -258,6 +258,7 @@ OpenGLRHI::OpenGLRHI()
 
 	glDisable(GL_DEPTH_CLAMP);
 
+	// Set Z to 0..1
 	glClipControl(GL_LOWER_LEFT, GL_ZERO_TO_ONE);
 
 	glDebugMessageCallback(GLUtils::GLDebugCallback, nullptr);
@@ -267,6 +268,8 @@ OpenGLRHI::OpenGLRHI()
 
 	glGenVertexArrays(1, &GLUtils::GlobalVAOHandle);
 	glBindVertexArray(GLUtils::GlobalVAOHandle);
+
+	glPointSize(50.f);
 }
 
 OpenGLRHI::~OpenGLRHI() = default;
@@ -277,9 +280,12 @@ eastl::shared_ptr<RHIVertexBuffer> OpenGLRHI::CreateVertexBuffer(const VertexInp
 	glGenBuffers(1, &handle);
 	glBindBuffer(GL_ARRAY_BUFFER, handle);
 
-	glNamedBufferData(handle, sizeof(float) * inCount, inVertices, GL_STATIC_DRAW);
+	size_t dataSize = sizeof(float) * inCount;
+	glNamedBufferData(handle, dataSize, inVertices, GL_STATIC_DRAW);
 
 	eastl::shared_ptr<GLVertexBuffer> newBuffer = eastl::make_shared<GLVertexBuffer>(handle, inIndexBuffer, inLayout);
+	newBuffer->AllocatedSize = sizeof(float) * inCount;
+
 	return newBuffer;
 }
 
@@ -290,13 +296,16 @@ eastl::shared_ptr<RHIVertexBuffer> OpenGLRHI::CreateVertexBuffer(const VertexInp
 	glBindBuffer(GL_ARRAY_BUFFER, handle);
 
 	const int32_t verticesCount = static_cast<int32_t>(inVertices.size());
+	size_t dataSize = sizeof(Vertex) * verticesCount;
 	glNamedBufferData(handle, sizeof(Vertex) * verticesCount, inVertices.data(), GL_STATIC_DRAW);
 
 	eastl::shared_ptr<GLVertexBuffer> newBuffer = eastl::make_shared<GLVertexBuffer>(handle, inIndexBuffer, inLayout);
+	newBuffer->AllocatedSize = dataSize;
+
 	return newBuffer;
 }
 
-eastl::shared_ptr<class RHIVertexBuffer> OpenGLRHI::CreateVertexBuffer(const class VertexInputLayout& inLayout, const void* inData, const int32_t inSize, eastl::shared_ptr<class RHIIndexBuffer> inIndexBuffer /*= nullptr*/)
+eastl::shared_ptr<class RHIVertexBuffer> OpenGLRHI::CreateVertexBuffer(const class VertexInputLayout& inLayout, const void* inData, const size_t inSize, eastl::shared_ptr<class RHIIndexBuffer> inIndexBuffer /*= nullptr*/)
 {
 	uint32_t handle = 0;
 	glGenBuffers(1, &handle);
@@ -305,6 +314,8 @@ eastl::shared_ptr<class RHIVertexBuffer> OpenGLRHI::CreateVertexBuffer(const cla
 	glNamedBufferData(handle, inSize, inData, GL_STATIC_DRAW);
 
 	eastl::shared_ptr<GLVertexBuffer> newBuffer = eastl::make_shared<GLVertexBuffer>(handle, inIndexBuffer, inLayout);
+	newBuffer->AllocatedSize = inSize;
+
 	return newBuffer;
 }
 
@@ -370,7 +381,7 @@ eastl::shared_ptr<class RHITexture2D> OpenGLRHI::CreateRenderTexture()
 	newTexture->Width = windowProps.Width;
 	newTexture->Height = windowProps.Height;
 	newTexture->NrChannels = 3;
-	newTexture->TextureType = RHITextureType::RGBA;
+	newTexture->ChannelsType = ERHITextureChannelsType::RGBA;
 
 	return newTexture;
 }
@@ -402,7 +413,48 @@ eastl::shared_ptr<class RHITexture2D> OpenGLRHI::CreateDepthMap(const int32_t in
 	newTexture->Width = inWidth;
 	newTexture->Height = inHeight;
 	newTexture->NrChannels = 3;
-	newTexture->TextureType = RHITextureType::Depth;
+	newTexture->ChannelsType = ERHITextureChannelsType::Depth;
+	newTexture->TextureType = ETextureType::Default;
+
+	return newTexture;
+}
+
+eastl::shared_ptr<class RHITexture2D> OpenGLRHI::CreateArrayDepthMap(const int32_t inDepthMapWidth, const int32_t inDepthMapHeight, const int32_t inSize)
+{
+	uint32_t texHandle = 0;
+	glGenTextures(1, &texHandle);
+	eastl::shared_ptr<GLTexture2D> newTexture = eastl::make_shared<GLTexture2D>(texHandle);
+
+	glBindTexture(GL_TEXTURE_2D_ARRAY, texHandle);
+
+	glTexImage3D(
+		GL_TEXTURE_2D_ARRAY,
+		0,
+		GL_DEPTH_COMPONENT32F,
+		inDepthMapWidth,
+		inDepthMapHeight,
+		inSize + 1,
+		0,
+		GL_DEPTH_COMPONENT,
+		GL_FLOAT,
+		nullptr);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+
+	constexpr float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	glTexParameterfv(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BORDER_COLOR, borderColor);
+
+	glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
+
+	newTexture->Width = inDepthMapWidth;
+	newTexture->Height = inDepthMapHeight;
+	newTexture->NrChannels = 3;
+	newTexture->ChannelsType = ERHITextureChannelsType::Depth;
+	newTexture->TextureType = ETextureType::Array;
 
 	return newTexture;
 }
@@ -496,9 +548,23 @@ void OpenGLRHI::AttachTextureToFramebufferDepth(RHIFrameBuffer& inFrameBuffer, R
 
 	BindFrameBuffer(inFrameBuffer);
 
+	switch (tex.TextureType)
+	{
+	case ETextureType::Default:
+	{
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, tex.GlHandle, 0);
+		glBuffer.DepthStencingAttachment = tex.GlHandle;
+		break;
+	}
+	case ETextureType::Array:
+	{
+		glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, tex.GlHandle, 0);
+		break;
+	}
+	}
+
+
 	// Attach the texture to the FBO
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, tex.GlHandle, 0);
-	//glBuffer.DepthStencingAttachment = tex.GlHandle;
 
 	ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 
@@ -546,8 +612,8 @@ void OpenGLRHI::LoadImageToTextureFromPath(RHITexture2D& inTexture, const eastl:
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 	ImageLoading::FreeImageData(data);
 }
@@ -593,7 +659,7 @@ void OpenGLRHI::PrepareProjectionForRendering(glm::mat4& inProj)
 void OpenGLRHI::BindVertexBuffer(const RHIVertexBuffer& inBuffer, const bool inBindIndexBuffer)
 {
 	const GLVertexBuffer& glBuffer = static_cast<const GLVertexBuffer&>(inBuffer);
-	if (inBindIndexBuffer)
+	if (inBindIndexBuffer && glBuffer.IndexBuffer)
 	{
 		BindIndexBuffer(*(glBuffer.IndexBuffer));
 	}
@@ -659,7 +725,7 @@ void OpenGLRHI::BindTexture2D(const RHITexture2D& inTex, const int32_t inTexId)
 
 void OpenGLRHI::UnbindVertexBuffer(const RHIVertexBuffer& inBuffer, const bool inUnbindIndexBuffer)
 {
-	if (inUnbindIndexBuffer)
+	if (inUnbindIndexBuffer && inBuffer.IndexBuffer)
 	{
 		UnbindIndexBuffer(*(inBuffer.IndexBuffer));
 	}
@@ -853,19 +919,24 @@ void OpenGLRHI::DrawInstanced(const int32_t inElementsCount, const int32_t inIns
 	glDrawElementsInstanced(GL_TRIANGLES, inElementsCount, GL_UNSIGNED_INT, 0, inInstancesCount);
 }
 
+void OpenGLRHI::DrawPoints(const int32_t inCount)
+{
+	glDrawArrays(GL_POINTS, 0, inCount);
+}
+
 void OpenGLRHI::ClearTexture(const RHITexture2D& inTexture, const glm::vec4& inColor)
 {
 	const GLTexture2D& glTex = static_cast<const GLTexture2D&>(inTexture);
 
-	switch (inTexture.TextureType)
+	switch (inTexture.ChannelsType)
 	{
-	case RHITextureType::RGBA:
+	case ERHITextureChannelsType::RGBA:
 	{
 		// Set the color in the texture to ClearColor
 		glClearTexImage(glTex.GlHandle, 0, GL_RGBA, GL_FLOAT, &inColor);
 		break;
 	}
-	case RHITextureType::Depth:
+	case ERHITextureChannelsType::Depth:
 	{
 		glClearTexImage(glTex.GlHandle, 0, GL_DEPTH_COMPONENT, GL_FLOAT, &inColor);
 		break;
@@ -902,6 +973,26 @@ void OpenGLRHI::SetFaceCullMode(const EFaceCullMode inMode)
 	}
 	default:
 		break;
+	}
+}
+
+void OpenGLRHI::ClearVertexBuffer(class RHIVertexBuffer& inBuffer)
+{
+	const GLVertexBuffer& glBuffer = static_cast<const GLVertexBuffer&>(inBuffer);
+	glClearNamedBufferData(glBuffer.Handle, GL_R32UI, GL_RED, GL_FLOAT, nullptr);
+}
+
+void OpenGLRHI::UpdateVertexBufferData(class RHIVertexBuffer& inBuffer, const void* inData, const size_t inSize)
+{
+	const GLVertexBuffer& glBuffer = static_cast<const GLVertexBuffer&>(inBuffer);
+
+	if (inSize <= glBuffer.AllocatedSize)
+	{
+		glNamedBufferSubData(glBuffer.Handle, 0, inSize, inData);
+	}
+	else
+	{
+		glNamedBufferData(glBuffer.Handle, inSize, inData, GL_STATIC_DRAW);
 	}
 }
 

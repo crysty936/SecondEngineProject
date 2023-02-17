@@ -37,14 +37,15 @@ void main()
 
 	//float shadowSamplerTest = texture(depthTexture, vec3(projCoords.xy, projCoords.z + 0.001));
 
+	// No need to remap this as OpenGL is set to use 0..1 for Z
+	float pixelLightSpaceDepth = 1.0 - lsPosFinal.z; // Reversed Z
 
-	float pixelLightSpaceDepth = lsPosFinal.z;
 	// 2 different ways of calculating bias 
-	//float cosTheta = clamp(dot(ps_in.Normal, ps_in.DirectionalLightDirection), 0.0, 1.0);
-	//float bias2 = 0.005 * tan(acos(cosTheta));
-	//bias2 = clamp(bias2, 0.0, 0.01);
+	float cosTheta = clamp(dot(ps_in.Normal, ps_in.DirectionalLightDirection), 0.0, 1.0);
+	float bias2 = 0.005 * tan(acos(cosTheta));
+	bias2 = clamp(bias2, 0.0, 0.05);
 
-	float bias1 = max(0.005 * (1.0 - clamp(dot(ps_in.Normal, ps_in.DirectionalLightDirection), 0.0, 1.0)), 0.005);
+	//float bias1 = max(0.005 * (1.0 - clamp(dot(ps_in.Normal, ps_in.DirectionalLightDirection), 0.0, 1.0)), 0.005);
 	vec2 texelSize = 1.0 / textureSize(depthTexture, 0);
 
 	//float shadow = 0.0;
@@ -91,35 +92,33 @@ void main()
 
 	
 	// Vogel disk PCF
-	float shadow = 0.0;
-	if (pixelLightSpaceDepth < 1.0)
-	{
-		const int numSamples = 32;
-		float diskRadius = 4;
-
-		for (int i = 0; i < numSamples; i++)
-		{
-			float GoldenAngle = 2.39996322;
-			float angle = GoldenAngle * float(i);
-
-			float r = sqrt(float(i) + 0.5) / sqrt(float(numSamples));
-
-			vec2 u = r * vec2(sin(angle), cos(angle));
-			vec2 pos = u * diskRadius * texelSize;
-
-			float textureDepth = texture(depthTexture, projCoords.xy + pos).r;
-
-			if (pixelLightSpaceDepth - bias1 > textureDepth)
-			{
-				shadow += 1;
-			}
-		}
-
-		shadow /= numSamples;
-	}
-	
-
-
+ 	float shadow = 0.0;
+ 	if (pixelLightSpaceDepth < 1.0)
+ 	{
+ 		const int numSamples = 64;
+ 		float diskRadius = 4;
+ 
+ 		for (int i = 0; i < numSamples; i++)
+ 		{
+ 			float GoldenAngle = 2.39996322;
+ 			float angle = GoldenAngle * float(i);
+ 
+ 			float r = sqrt(float(i) + 0.5) / sqrt(float(numSamples));
+ 
+ 			vec2 u = r * vec2(sin(angle), cos(angle));
+ 			vec2 pos = u * diskRadius * texelSize;
+ 
+ 			float textureDepth = texture(depthTexture, projCoords.xy + pos).r;
+ 
+ 			if (pixelLightSpaceDepth - bias2 > textureDepth)
+ 			{
+ 				shadow += 1;
+ 			}
+ 		}
+ 
+ 		shadow /= numSamples;
+ 	}
+ 	
 	vec3 color = (0.8 * ((1 - shadow) * texture(quadTexture, ps_in.TexCoords).xyz)) + (0.2 * texture(quadTexture, ps_in.TexCoords).xyz);
 	//vec3 color = vec3(1 - shadow, 1 - shadow, 1 - shadow);
 	FragColor = vec4(color, 1.0);

@@ -42,7 +42,7 @@ public:
 
 	void DrawSkybox();
 	void DrawShadowMap();
-	void SetupBaseUniforms();
+	void SetBaseUniforms();
 	void UpdateUniforms();
 	void DrawCommands(const eastl::vector<RenderCommand>& inCommands);
 	void DrawCommand(const RenderCommand& inCommand);
@@ -69,14 +69,21 @@ public:
 	// Todo: Resolve hack
 	eastl::weak_ptr<class RHITexture2D> GetDepthTexture() const;
 
+	bool UpdateShadowMatrices = true;
+
 private:
 	inline static ForwardRenderer* Instance = nullptr;
 
 private:
+	glm::mat4 CreateCascadeMatrix(const glm::mat4& inCameraProj, const glm::mat4& inCameraView, const glm::vec3& inLightDir);
+	eastl::vector<glm::mat4> CreateCascadesMatrices();
 	void SetViewportSizeToMain();
+	void DrawDebugPoints();
+
+	friend void DrawDebugPoint(const glm::vec3& inPointLoc);
 
 private:
-	eastl::unordered_map<eastl::string, SelfRegisteringUniform> UniformsCache;
+	mutable eastl::unordered_map<eastl::string, SelfRegisteringUniform> UniformsCache;
 	eastl::vector<RenderCommand> MainCommands;
 	EDrawMode::Type CurrentDrawMode = EDrawMode::Default;
 	//eastl::queue<RenderingLoadCommand> LoadQueue;

@@ -27,12 +27,22 @@
 #include "Renderer/RHI/Resources/RHIShader.h"
 #include "Renderer/RHI/Resources/RHITexture.h"
 #include "Drawable/ShapesUtils/BasicShapes.h"
+#include "EASTL/stack.h"
+#include "Drawable/RenderMaterial_Debug.h"
+#include "DrawDebugHelpers.h"
+#include "RenderUtils.h"
+#include "Math/AABB.h"
 
 constexpr glm::vec4 ClearColor(0.3f, 0.5f, 1.f, 0.4f);
-constexpr glm::vec3 lightPos(-5.0f, 20.0f, -0.2f);
+constexpr glm::vec3 lightPos(-10.0f, 20.0f, -0.2f);
 
 const uint32_t SHADOW_WIDTH = 1024;
 const uint32_t SHADOW_HEIGHT = 1024;
+
+constexpr float CAMERA_FOV = 45.f;
+constexpr float CAMERA_NEAR = 0.1f;
+constexpr float CAMERA_FAR = 200.f;
+eastl::vector<float> shadowCascadeSplits = { CAMERA_FAR / 25.0f, CAMERA_FAR / 10.0f};
 
 static std::mutex RenderCommandsMutex;
 static std::mutex LoadQueueMutex;
@@ -71,7 +81,7 @@ ForwardRenderer::ForwardRenderer(const WindowProperties& inMainWindowProperties)
 	RHI::Instance->ClearColor(ClearColor);
 
 	// Set the default uniforms
-	SetupBaseUniforms();
+	SetBaseUniforms();
 
 
 // 	// Create the shadow map framebuffer
@@ -102,6 +112,117 @@ eastl::shared_ptr<RHITexture2D> GlobalRenderTexture = nullptr;
 eastl::shared_ptr<RHIFrameBuffer> DepthFrameBuffer = nullptr;
 eastl::shared_ptr<RHITexture2D> DepthRenderTexture = nullptr;
 
+eastl::shared_ptr<RHIVertexBuffer> DebugPointsBuffer = nullptr;
+eastl::shared_ptr<RHIVertexBuffer> DebugLinesBuffer = nullptr;
+
+ void ForwardRenderer::DrawDebugPoints()
+ {
+	 // Points
+	 {
+		 const eastl::vector<glm::vec3> debugPoints = DrawDebugManager::Get().GetPoints();
+
+		 const int32_t numPoints = static_cast<int32_t>(debugPoints.size());
+
+		 VertexInputLayout inputLayout;
+		 // Vertex points
+		 inputLayout.Push<float>(3, VertexInputType::Position);
+
+		 const size_t pointsSize = sizeof(glm::vec3) * numPoints;
+
+		 if (!DebugPointsBuffer)
+		 {
+			 DebugPointsBuffer = RHI::Instance->CreateVertexBuffer(inputLayout, debugPoints.data(), pointsSize);
+		 }
+		 else
+		 {
+			 RHI::Instance->ClearVertexBuffer(*DebugPointsBuffer);
+			 RHI::Instance->UpdateVertexBufferData(*DebugPointsBuffer, debugPoints.data(), pointsSize);
+		 }
+
+		 MaterialsManager& matManager = MaterialsManager::Get();
+		 bool materialExists = false;
+		 eastl::shared_ptr<RenderMaterial> material = matManager.GetOrAddMaterial<RenderMaterial_Debug>("debug_points_material", materialExists);
+
+		 if (!materialExists)
+		 {
+			 eastl::vector<ShaderSourceInput> shaders = {
+			 { "WorldPosition_VS_Pos_ManuallyWritten", EShaderType::Vertex },
+			 { "FlatColor_PS", EShaderType::Fragment } };
+
+			 material->Shader = RHI::Instance->CreateShaderFromPath(shaders, inputLayout);
+		 }
+
+		 constexpr bool useIndexBuffer = false;
+		 RHI::Instance->BindVertexBuffer(*DebugPointsBuffer, useIndexBuffer);
+		 RHI::Instance->BindShader(*material->Shader);
+
+		 material->ResetUniforms();
+
+		 material->SetUniforms(UniformsCache);
+		 material->BindBuffers();
+
+		 RHI::Instance->DrawPoints(numPoints);
+
+		 RHI::Instance->UnbindVertexBuffer(*DebugPointsBuffer, useIndexBuffer);
+		 material->UnbindBuffers();
+		 RHI::Instance->UnbindShader(*material->Shader);
+	 }
+
+	 // Lines
+	 {
+		 const eastl::vector<DebugLine> debugLines = DrawDebugManager::Get().GetLines();
+
+		 VertexInputLayout inputLayout;
+		 // Vertex points
+		 inputLayout.Push<float>(3, VertexInputType::Position);
+		 inputLayout.Push<float>(3, VertexInputType::Undefined);
+		 inputLayout.Push<float>(3, VertexInputType::Undefined);
+
+		 const size_t linesSize = sizeof(DebugLine) * debugLines.size();
+
+		 if (!DebugLinesBuffer)
+		 {
+			 DebugLinesBuffer = RHI::Instance->CreateVertexBuffer(inputLayout, debugLines.data(), linesSize);
+		 }
+		 else
+		 {
+			 RHI::Instance->ClearVertexBuffer(*DebugLinesBuffer);
+			 RHI::Instance->UpdateVertexBufferData(*DebugLinesBuffer, debugLines.data(), linesSize);
+		 }
+
+		 MaterialsManager& matManager = MaterialsManager::Get();
+		 bool materialExists = false;
+		 eastl::shared_ptr<RenderMaterial> material = matManager.GetOrAddMaterial<RenderMaterial_Debug>("debug_lines_material", materialExists);
+
+		 if (!materialExists)
+		 {
+			 eastl::vector<ShaderSourceInput> shaders = {
+			 { "WorldPosition_VS_Pos_Geometry_ManuallyWritten_DebugLine", EShaderType::Vertex },
+			 { "GS_DebugLines", EShaderType::Geometry },
+			 { "PS_DebugLine_Color", EShaderType::Fragment } };
+
+			 material->Shader = RHI::Instance->CreateShaderFromPath(shaders, inputLayout);
+		 }
+
+		 constexpr bool useIndexBuffer = false;
+		 RHI::Instance->BindVertexBuffer(*DebugLinesBuffer, useIndexBuffer);
+		 RHI::Instance->BindShader(*material->Shader);
+
+		 material->ResetUniforms();
+
+		 material->SetUniforms(UniformsCache);
+		 material->BindBuffers();
+
+		 RHI::Instance->DrawPoints(static_cast<int32_t>(debugLines.size()));
+
+		 RHI::Instance->UnbindVertexBuffer(*DebugLinesBuffer, useIndexBuffer);
+		 material->UnbindBuffers();
+		 RHI::Instance->UnbindShader(*material->Shader);
+	 }
+	
+	 DrawDebugManager::Get().ClearDebugData();
+}
+
 void ForwardRenderer::Init(const WindowProperties & inMainWindowProperties)
 {
 	Instance = new ForwardRenderer{ inMainWindowProperties };
@@ -127,7 +248,7 @@ void ForwardRenderer::Terminate()
 
 void ForwardRenderer::Draw()
 {
-	SetupBaseUniforms();
+	SetBaseUniforms();
 	UpdateUniforms();
 
 	DrawShadowMap();
@@ -150,9 +271,11 @@ void ForwardRenderer::Draw()
 
 // To draw the depth map
 //  	SetDrawMode(EDrawMode::DEPTH_VISUALIZE);
-//  	ScreenQuad->GetCommand().Material->DiffuseTextures.clear();
-//  	ScreenQuad->GetCommand().Material->DiffuseTextures.push_back(ShadowRenderTexture);
+//  	ScreenQuad->GetCommand().Material->WeakTextures.clear();
+//  	ScreenQuad->GetCommand().Material->WeakTextures.push_back(DepthRenderTexture);
 //  	DrawCommand(ScreenQuad->GetCommand());
+
+	DrawDebugPoints();
 
 	RHI::Instance->SwapBuffers();
 }
@@ -174,6 +297,83 @@ void ForwardRenderer::DrawSkybox()
 // 	glDepthFunc(GL_LESS);
 }
 
+glm::mat4 CreateMyOrthoRH(float left, float right, float bottom, float top, float zNear, float zFar)
+{
+	glm::mat4 Result(1);
+	Result[0][0] = 2.f / (right - left);
+	Result[1][1] = 2.f / (top - bottom);
+	Result[2][2] = 1.f / (zNear - zFar);
+	Result[3][0] = (left + right) / (left - right);
+	Result[3][1] = (top + bottom) / (bottom - top);
+	Result[3][2] = zNear / (zNear - zFar);
+
+	return Result;
+}
+
+glm::mat4 CreateMyOrthoLH(float left, float right, float bottom, float top, float zNear, float zFar)
+{
+	glm::mat4 Result(1);
+	Result[0][0] = 2.f / (right - left);
+	Result[1][1] = 2.f / (top - bottom);
+	Result[2][2] = 1.f / (zFar - zNear);
+	Result[3][0] = (left + right) / (left - right);
+	Result[3][1] = (top + bottom) / (bottom - top);
+	Result[3][2] = zNear / (zNear - zFar);
+
+	return Result;
+}
+
+glm::mat4 ForwardRenderer::CreateCascadeMatrix(const glm::mat4& inCameraProj, const glm::mat4& inCameraView, const glm::vec3& inLightDir)
+{
+	const glm::mat4 worldToCameraClip = inCameraProj * inCameraView;
+ 	const glm::vec3 cameraProjCenter = RenderUtils::GetProjectionCenter(worldToCameraClip);
+ 
+ 	// Create tight shadow projection around camera frustum
+ 	AABB projBox;
+ 	eastl::array<glm::vec3, 8> cameraProjPoints = RenderUtils::GenerateSpaceCorners(worldToCameraClip);
+ 
+	// Point light at light dir relative to center of projection
+	const glm::mat4 lightView = glm::lookAt(cameraProjCenter, cameraProjCenter + inLightDir, glm::vec3(0.0f, 1.0f, 0.0f));
+
+ 	for (const glm::vec3& point : cameraProjPoints)
+ 	{
+ 		const glm::vec4 lightSpacePoint = lightView * glm::vec4(point.x, point.y, point.z, 1.f);
+ 		projBox += glm::vec3(lightSpacePoint.x, lightSpacePoint.y, lightSpacePoint.z);
+ 	}
+ 
+	//lightProjection = glm::orthoRH_ZO(projBox.Min.x, projBox.Max.x, projBox.Min.y, projBox.Max.y, projBox.Min.z, projBox.Max.z); // non-reversed, for some reason doesn't fit right
+	//lightProjection = CreateMyOrthoRH(projBox.Min.x, projBox.Max.x, projBox.Min.y, projBox.Max.y, projBox.Min.z, projBox.Max.z); // non-reversed, for some reason doesn't fit right
+	const glm::mat4 lightProjection = CreateMyOrthoLH(projBox.Min.x, projBox.Max.x, projBox.Min.y, projBox.Max.y, projBox.Min.z, projBox.Max.z); // for this, it looks correct, but obviously, the proj is reversed so depth map is incorrect
+	//lightProjection = glm::orthoLH_ZO(projBox.Min.x, projBox.Max.x, projBox.Min.y, projBox.Max.y, projBox.Min.z, projBox.Max.z); // for this, it looks correct, but obviously, the proj is reversed so depth map is incorrect
+
+	return lightProjection * lightView;
+}
+
+eastl::vector<glm::mat4> ForwardRenderer::CreateCascadesMatrices()
+{
+	eastl::vector<glm::mat4> cascades;
+	cascades.reserve(shadowCascadeSplits.size());
+
+	const glm::vec3 lightDir = glm::normalize(-lightPos);
+	const glm::mat4& cameraView = UniformsCache["view"].Value.Value4fv;
+
+	const float windowWidth = static_cast<float>(Engine->GetMainWindow().GetProperties().Width);
+	const float windowHeight = static_cast<float>(Engine->GetMainWindow().GetProperties().Height);
+
+	for (int32_t i = 0; i < shadowCascadeSplits.size() + 1; ++i)
+	{
+		const float near = i == 0 ? CAMERA_NEAR : shadowCascadeSplits[i - 1];
+		const float far = i == 0 ? shadowCascadeSplits[i] : i == shadowCascadeSplits.size() ? CAMERA_FAR : shadowCascadeSplits[i];
+
+		const glm::mat4 cameraProj = glm::perspectiveRH_ZO(glm::radians(CAMERA_FOV), windowWidth / windowHeight, near, far);
+		const glm::mat4 worldToLightClip = CreateCascadeMatrix(cameraProj, cameraView, lightDir);
+
+		cascades.push_back(worldToLightClip);
+	}
+
+	return cascades;
+}
+
 void ForwardRenderer::DrawShadowMap()
 {
 	// Cull front face to solve Peter Panning
@@ -186,17 +386,60 @@ void ForwardRenderer::DrawShadowMap()
  	RHI::Instance->SetViewportSize(SHADOW_WIDTH, SHADOW_HEIGHT);
 	RHI::Instance->ClearTexture(*DepthRenderTexture, glm::vec4(1.f, 1.f, 1.f, 1.f));
 
-// 	//const glm::vec3 lightLoc = LightSource->GetAbsoluteTransform().Translation;
+	const glm::vec3 lightDir = glm::normalize(-lightPos);
 
- 	const glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-  	const float near_plane = 1.f;
-  	const float far_plane = 40.f;
-  	glm::mat4 lightProjection = glm::orthoRH_ZO(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+	static glm::mat4 lightView;
+	static glm::mat4 lightProjection;
+	
+	// Debug stuff
+	static glm::mat4 debugMatrixCamera;
+	static glm::mat4 debugMatrixShadow;
+	static eastl::vector<glm::mat4> lsMatrices;
+
+	if (UpdateShadowMatrices)
+	{
+		glm::mat4 cameraProj = UniformsCache["projection"].Value.Value4fv;
+		glm::mat4 cameraView = UniformsCache["view"].Value.Value4fv;
+
+		const glm::vec3 cameraProjCenter = RenderUtils::GetProjectionCenter(cameraProj * cameraView);
+
+		// Create tight shadow projection around camera frustum
+		AABB projBox;
+		eastl::array<glm::vec3, 8> cameraProjPoints = RenderUtils::GenerateSpaceCorners(cameraProj * cameraView);
+
+		// Point light at light dir relative to center of projection
+		lightView = glm::lookAt(cameraProjCenter, cameraProjCenter + lightDir, glm::vec3(0.0f, 1.0f, 0.0f));
+
+		for (const glm::vec3& point : cameraProjPoints)
+		{
+			const glm::vec4 lightSpacePoint = lightView * glm::vec4(point.x, point.y, point.z, 1.f);
+			projBox += glm::vec3(lightSpacePoint.x, lightSpacePoint.y, lightSpacePoint.z);
+		}
+
+		//lightProjection = glm::orthoRH_ZO(projBox.Min.x, projBox.Max.x, projBox.Min.y, projBox.Max.y, projBox.Min.z, projBox.Max.z); // non-reversed, for some reason doesn't fit right
+  		//lightProjection = CreateMyOrthoRH(projBox.Min.x, projBox.Max.x, projBox.Min.y, projBox.Max.y, projBox.Min.z, projBox.Max.z); // non-reversed, for some reason doesn't fit right
+  		lightProjection = CreateMyOrthoLH(projBox.Min.x, projBox.Max.x, projBox.Min.y, projBox.Max.y, projBox.Min.z, projBox.Max.z); // for this, it looks correct, but obviously, the proj is reversed so depth map is incorrect
+  		//lightProjection = glm::orthoLH_ZO(projBox.Min.x, projBox.Max.x, projBox.Min.y, projBox.Max.y, projBox.Min.z, projBox.Max.z); // for this, it looks correct, but obviously, the proj is reversed so depth map is incorrect
+
+
+		lsMatrices = CreateCascadesMatrices();
+
+		// Debug stuff
+		debugMatrixShadow = lightProjection * lightView;
+		debugMatrixCamera = cameraProj * cameraView;
+	}
+
+	for (const glm::mat4& worldToLightClip : lsMatrices)
+	{
+		DrawDebugHelpers::DrawProjection(worldToLightClip);
+	}
+
+	//DrawDebugHelpers::DrawProjection(debugMatrixShadow);
+ 	DrawDebugHelpers::DrawProjection(debugMatrixCamera);
+
  	RHI::Instance->PrepareProjectionForRendering(lightProjection);
-	const glm::vec3 lightDir = glm::normalize(glm::vec3(0.0f, 0.0f, 0.0f) - lightPos);
 
-  	UniformsCache["view"] = lightView;
-  	UniformsCache["projection"] = lightProjection;
+  	UniformsCache["lsMatrix"] = lightProjection * lightView;
   	UniformsCache["lightDir"] = lightDir;
  
 // 	RenderCommandsMutex.lock();
@@ -209,22 +452,21 @@ void ForwardRenderer::DrawShadowMap()
  	SetDrawMode(EDrawMode::Default);
 
 	// Reset projection
-	SetupBaseUniforms();
+	SetBaseUniforms();
 	UpdateUniforms();
 
  	// Reset to default
 	//RHI::Instance->SetFaceCullMode(EFaceCullMode::Back);
 }
 
-void ForwardRenderer::SetupBaseUniforms()
+void ForwardRenderer::SetBaseUniforms()
 {
 	// By default, use a D3D11 projection matrix.
-	// Note: glm is RH but uses a sneaky minus to change the handedness of the output to LH (how OpenGL is)
-	constexpr float fov = 45.f;
+	// Note: glm is RH but uses a sneaky minus to change the handedness of the output to LH (how OpenGL actually is)
 	const float windowWidth = static_cast<float>(Engine->GetMainWindow().GetProperties().Width);
 	const float windowHeight = static_cast<float>(Engine->GetMainWindow().GetProperties().Height);
 
-	glm::mat4 projection = glm::perspectiveRH_ZO(glm::radians(45.0f),  windowWidth / windowHeight, 0.1f, 1000.0f);
+	glm::mat4 projection = glm::perspectiveRH_ZO(glm::radians(CAMERA_FOV),  windowWidth / windowHeight, CAMERA_NEAR, CAMERA_FAR);
 	//glm::mat4 lightProjection = glm::orthoRH_ZO(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
 	RHI::Instance->PrepareProjectionForRendering(projection);
 
@@ -402,21 +644,59 @@ eastl::shared_ptr<RenderMaterial> ForwardRenderer::GetMaterial(const RenderComma
 	case EDrawMode::DEPTH:
 	{
 		MaterialsManager& matManager = MaterialsManager::Get();
-		bool materialExists = false;
-		eastl::shared_ptr<RenderMaterial> depthMaterial = matManager.GetOrAddMaterial<DepthMaterial>("depth_material", materialExists);
+		eastl::shared_ptr<RenderMaterial> depthMaterial;
 
-		if (!materialExists)
+		switch (inCommand.DrawType)
 		{
-			VertexInputLayout inputLayout;
-			inputLayout.Push<float>(3, VertexInputType::Position);
-			inputLayout.Push<float>(3, VertexInputType::Normal);
-			inputLayout.Push<float>(2, VertexInputType::TexCoords);
+		case EDrawCallType::DrawElements:
+		{
+			bool materialExists = false;
+			depthMaterial = matManager.GetOrAddMaterial<DepthMaterial>("depth_material", materialExists);
 
-			eastl::vector<ShaderSourceInput> shaders = {
-			{ "Depth_VS-Pos-Normal-UV", EShaderType::Vertex },
-			{ "Empty_PS", EShaderType::Fragment } };
+			if (!materialExists)
+			{
+				VertexInputLayout inputLayout;
+				inputLayout.Push<float>(3, VertexInputType::Position);
+				inputLayout.Push<float>(3, VertexInputType::Normal);
+				inputLayout.Push<float>(2, VertexInputType::TexCoords);
 
-			depthMaterial->Shader = RHI::Instance->CreateShaderFromPath(shaders, inputLayout);
+				eastl::vector<ShaderSourceInput> shaders = {
+				{ "Depth_VS-Pos-Normal-UV", EShaderType::Vertex },
+				{ "Empty_PS", EShaderType::Fragment } };
+
+				depthMaterial->Shader = RHI::Instance->CreateShaderFromPath(shaders, inputLayout);
+			}
+			break;
+		}
+		case EDrawCallType::DrawArrays:
+		{
+			ASSERT(false);
+		}
+		case EDrawCallType::DrawInstanced:
+		{
+			bool materialExists = false;
+			depthMaterial = matManager.GetOrAddMaterial<DepthMaterial>("depth_material_instanced", materialExists);
+
+			if (!materialExists)
+			{
+				VertexInputLayout inputLayout;
+				inputLayout.Push<float>(3, VertexInputType::Position);
+				inputLayout.Push<float>(3, VertexInputType::Normal);
+				inputLayout.Push<float>(2, VertexInputType::TexCoords);
+
+				eastl::vector<ShaderSourceInput> shaders = {
+				{ "Depth_VS-Pos-Normal-UV_Instanced", EShaderType::Vertex },
+				{ "Empty_PS", EShaderType::Fragment } };
+
+				depthMaterial->Shader = RHI::Instance->CreateShaderFromPath(shaders, inputLayout);
+			}
+			break;
+		}
+		default:
+		{
+			ASSERT(false);
+		}
+
 		}
 
 		return depthMaterial;
@@ -457,7 +737,7 @@ eastl::shared_ptr<RenderMaterial> ForwardRenderer::GetMaterial(const RenderComma
 // 
 // 		return outlineMaterial;
 	//}
-	 	case EDrawMode::NORMAL_VISUALIZE:
+	case EDrawMode::NORMAL_VISUALIZE:
  	{
  		MaterialsManager& matManager = MaterialsManager::Get();
  		bool materialExists = false;
@@ -471,8 +751,8 @@ eastl::shared_ptr<RenderMaterial> ForwardRenderer::GetMaterial(const RenderComma
 			inputLayout.Push<float>(2, VertexInputType::TexCoords);
 
 			eastl::vector<ShaderSourceInput> shaders = {
-			{ "ModelWorldPosition_VS_Pos-UV-Normal_Geometry_ManuallyWritten", EShaderType::Vertex },
-			{ "GeometryTest_GS", EShaderType::Geometry },
+			{ "ModelWorldPosition_VS_Pos-UV-Normal_Geometry_ManuallyWritten_NormalVisualizer", EShaderType::Vertex },
+			{ "GS_VisualizeNormals", EShaderType::Geometry },
 			{ "FlatColor_PS", EShaderType::Fragment } };
 
 			visNormalMat->Shader = RHI::Instance->CreateShaderFromPath(shaders, inputLayout);

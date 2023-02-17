@@ -14,6 +14,7 @@
 #include "Renderer/Drawable/ShapesUtils/BasicShapesData.h"
 #include "Renderer/RHI/RHI.h"
 #include "Renderer/Material/MaterialsManager.h"
+#include "Utils/InlineVector.h"
 
 TestGameMode GameMode = {};
 
@@ -121,7 +122,7 @@ public:
 		}
 
 		// Instance data
-		constexpr int32_t instancesCount = 100;
+		constexpr int32_t instancesCount = 10;
 		glm::mat4* instanceOffsets = new glm::mat4[instancesCount * instancesCount];
 
 		for (int32_t i = 0; i < instancesCount; ++i)
@@ -131,7 +132,7 @@ public:
 				glm::mat4& instanceMat = instanceOffsets[i * instancesCount + j];
 
 				instanceMat = glm::identity<glm::mat4>();
-				instanceMat = glm::translate(instanceMat, glm::vec3(2.f * i, 2.f * j, 0.f));
+				instanceMat = glm::translate(instanceMat, glm::vec3(glm::sin(0.5 * j) * 40, 10.f, glm::cos(i * 0.5 * j) * 40));
 			}
 		}
 
@@ -218,6 +219,13 @@ void TestGameMode::Init()
 
 		GameController->AddListener(createFloorAction);
 	}
+	{
+		KeyActionDelegate cameraMovementDelegate = KeyActionDelegate::CreateRaw(this, &TestGameMode::DebugProjections);
+		EInputKey createFloorKey = EInputKey::G;
+		OnKeyAction createFloorAction = { cameraMovementDelegate, createFloorKey, true };
+		GameController->AddListener(createFloorAction);
+	}
+
 	// Debug
 
 	// Scene setup
@@ -235,9 +243,9 @@ void TestGameMode::Init()
 
  	{
 // 		// Ground
-        	 	eastl::shared_ptr<CubeShape> centerObj = BasicShapesHelpers::CreateCubeObject();
-        		centerObj->Move(glm::vec3(0.f, -2.f, 0.f));
-        		centerObj->SetScale(glm::vec3(100.f, 0.5f, 100.f));
+//         	 	eastl::shared_ptr<CubeShape> centerObj = BasicShapesHelpers::CreateCubeObject();
+//         		centerObj->Move(glm::vec3(0.f, -2.f, 0.f));
+//         		centerObj->SetScale(glm::vec3(100.f, 0.5f, 100.f));
  	}
 	{
 		//eastl::shared_ptr<CubeShape> centerObj = BasicShapesHelpers::CreateCubeObject();
@@ -248,8 +256,8 @@ void TestGameMode::Init()
 		//lightObj->SetRelativeLocation(glm::vec3(10.f, 20.f, 15.f));
 	}
 // 	{
- 		eastl::shared_ptr<CubeShape> centerObj = BasicShapesHelpers::CreateCubeObject();
- 		centerObj->Move(glm::vec3(0.f, 0.f, 5.f));
+//  		eastl::shared_ptr<CubeShape> centerObj = BasicShapesHelpers::CreateCubeObject();
+//  		centerObj->Move(glm::vec3(0.f, 0.f, 5.f));
 // 	}
  	{
 // 		for (int32_t j = 0; j < 100; ++j)
@@ -267,23 +275,27 @@ void TestGameMode::Init()
 	eastl::shared_ptr<LightSource> lightObj = EntityHelper::CreateObject<LightSource>();
 	lightObj->SetRelativeLocation(glm::vec3(-5.0f, 20.0f, -0.2f));
 
+ 	eastl::shared_ptr<AssimpModel3D> shibaModel = EntityHelper::CreateObject<AssimpModel3D>("../Data/Models/Shiba/scene.gltf");
+ 	shibaModel->SetScale(glm::vec3(10.f, 10.f, 10.f));
+ 	shibaModel->Move(glm::vec3(0.f, 10.f, 0.f));
 
-	eastl::shared_ptr<AssimpModel3D> shibaModel = EntityHelper::CreateObject<AssimpModel3D>("../Data/Models/Shiba/scene.gltf");
-	shibaModel->SetScale(glm::vec3(10.f, 10.f, 10.f));
-	shibaModel->Move(glm::vec3(0.f, 10.f, 0.f));
+ 	eastl::shared_ptr<AssimpModel3D> floorModel = EntityHelper::CreateObject<AssimpModel3D>("../Data/Models/Floor/scene.gltf");
+	floorModel->Move(glm::vec3(0.f, -2.f, 0.f));
+
+
+	//eastl::shared_ptr<AssimpModel3D> sponzaModel = EntityHelper::CreateObject<AssimpModel3D>("../Data/Models/Sponza/scene.gltf");
 
 //  	eastl::shared_ptr<AssimpModel3D> model = EntityHelper::CreateObject<AssimpModel3D>("../Data/Models/Backpack/scene.gltf");
 //  	model->SetScale(glm::vec3(0.01f, 0.01f, 0.01f));
 //  	model->Move(glm::vec3(0.f, 3.f, 0.f));
 
 
-	//eastl::shared_ptr<InstancedCubeTest> instancedObj = EntityHelper::CreateObject<InstancedCubeTest>();
-// 
+	eastl::shared_ptr<InstancedCubeTest> instancedObj = EntityHelper::CreateObject<InstancedCubeTest>();
 
 
-//  	eastl::shared_ptr<InstancedAssimpModelTest> instancedObj = EntityHelper::CreateObject<InstancedAssimpModelTest>("../Data/Models/Backpack/scene.gltf");
-//  	instancedObj->SetScale(glm::vec3(0.01f, 0.01f, 0.01f));
-//  	instancedObj->Move(glm::vec3(0.f, 3.f, 0.f));
+  	//eastl::shared_ptr<InstancedAssimpModelTest> instancedObj = EntityHelper::CreateObject<InstancedAssimpModelTest>("../Data/Models/Backpack/scene.gltf");
+  	//instancedObj->SetScale(glm::vec3(0.01f, 0.01f, 0.01f));
+  	//instancedObj->Move(glm::vec3(0.f, 3.f, 0.f));
 
 
 
@@ -305,7 +317,10 @@ void TestGameMode::Init()
 //  		lightSource->SetRelativeLocation({ -2.0f, 20.0f, -1.0f });
 // 		lightSource->Rotate(20.f, glm::vec3(0.f, 1.f, 0.f));
 //  	}
+
 }
+
+constexpr float CameraSpeed = 0.4f;
 
 void TestGameMode::Tick(float inDeltaT)
 {
@@ -314,24 +329,24 @@ void TestGameMode::Tick(float inDeltaT)
 
 void TestGameMode::MoveCameraLeft()
 {
-	GameCamera->Move(MovementDirection::Left);
+	GameCamera->Move(MovementDirection::Left, CameraSpeed);
 	//GameCamera->GetRelativeTransform().Rotate(5.f, glm::vec3(0.f, 1.f, 0.f));
 }
 
 void TestGameMode::MoveCameraRight()
 {
-	GameCamera->Move(MovementDirection::Right);
+	GameCamera->Move(MovementDirection::Right, CameraSpeed);
 	//GameCamera->GetRelativeTransform().Rotate(-5.f, glm::vec3(0.f, 1.f, 0.f));
 }
 
 void TestGameMode::MoveCameraUp()
 {
-	GameCamera->Move(MovementDirection::Forward);
+	GameCamera->Move(MovementDirection::Forward, CameraSpeed);
 }
 
 void TestGameMode::MoveCameraDown()
 {
-	GameCamera->Move(MovementDirection::Back);
+	GameCamera->Move(MovementDirection::Back, CameraSpeed);
 }
 
 void TestGameMode::OnChangeDrawMode()
@@ -341,4 +356,9 @@ void TestGameMode::OnChangeDrawMode()
 	//RHI->SetDrawMode(drawMode ? EDrawMode::NORMAL : EDrawMode::DEPTH);
 
 	drawMode = !drawMode;
+}
+
+void TestGameMode::DebugProjections()
+{
+	ForwardRenderer::Get().UpdateShadowMatrices = !ForwardRenderer::Get().UpdateShadowMatrices;
 }

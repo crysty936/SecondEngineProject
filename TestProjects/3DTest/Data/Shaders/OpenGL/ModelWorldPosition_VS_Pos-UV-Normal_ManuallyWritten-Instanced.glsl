@@ -10,8 +10,6 @@ out VS_OUT
 	vec2 TexCoords;
 } vs_out;
 
-//layout(location = 0) out vec2 outTexCoords;
-
 layout(std140, binding = 0) uniform ConstantBuffer
 {
 	mat4 projection;

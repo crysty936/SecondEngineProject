@@ -1132,5 +1132,7 @@ void main()
     _GET_GL_FRAG_COORD(input.Pos);
     input.TexCoord = _in_input_TexCoord;
 
+
+
     _RETURN_( float4( 1.0, 1.0, 0.0, 1.0 ))    // Yellow
 }

@@ -33,7 +33,10 @@ public:
 public:
 	virtual eastl::shared_ptr<class RHIVertexBuffer> CreateVertexBuffer(const class VertexInputLayout& inLayout, const float* inVertices, const int32_t inCount, eastl::shared_ptr<class RHIIndexBuffer> inIndexBuffer = nullptr) { return nullptr; }
 	virtual eastl::shared_ptr<class RHIVertexBuffer> CreateVertexBuffer(const class VertexInputLayout& inLayout, const eastl::vector<Vertex>& inVertices, eastl::shared_ptr<class RHIIndexBuffer> inIndexBuffer = nullptr) { return nullptr; }
-	virtual eastl::shared_ptr<class RHIVertexBuffer> CreateVertexBuffer(const class VertexInputLayout& inLayout, const void* inData, const int32_t inSize, eastl::shared_ptr<class RHIIndexBuffer> inIndexBuffer = nullptr) { return nullptr; }
+	virtual eastl::shared_ptr<class RHIVertexBuffer> CreateVertexBuffer(const class VertexInputLayout& inLayout, const void* inData, const size_t inSize, eastl::shared_ptr<class RHIIndexBuffer> inIndexBuffer = nullptr) { return nullptr; }
+
+	virtual void ClearVertexBuffer(class RHIVertexBuffer& inBuffer) {}
+	virtual void UpdateVertexBufferData(class RHIVertexBuffer& inBuffer, const void* inData, const size_t inSize) {}
 
 	virtual eastl::shared_ptr<class RHIIndexBuffer> CreateIndexBuffer(const uint32_t* inData, uint32_t inCount) { return nullptr; }
 
@@ -80,12 +83,14 @@ public:
 
 	/** Texture with only one channel for depth */
 	virtual eastl::shared_ptr<class RHITexture2D> CreateDepthMap(const int32_t inWidth, const int32_t inHeight) { return nullptr; }
+	virtual eastl::shared_ptr<class RHITexture2D> CreateArrayDepthMap(const int32_t inDepthMapWidth, const int32_t inDepthMapHeight, const int32_t inSize) { return nullptr; }
 
 	virtual void SetViewportSize(const int32_t inWidth, const int32_t inHeight) {}
 	virtual void ClearColor(const glm::vec4 inColor) {}
 
 	virtual void DrawElements(const int32_t inElementsCount) {}
 	virtual void DrawInstanced(const int32_t inElementsCount, const int32_t inInstancesCount) {}
+	virtual void DrawPoints(const int32_t inCount) {}
 
 	virtual void SwapBuffers() {}
 

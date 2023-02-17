@@ -1,5 +1,7 @@
 #pragma once
 #include <stdint.h>
+#include "EASTL/allocator.h"
+#include "EASTL/vector.h"
 
 /**
  * Allocator that allocates inline up to a point, from which it allocates on the heap.
@@ -40,5 +42,3 @@ private:
 		void* HeapPtr = nullptr;
 	};
 };
-
-

@@ -2,7 +2,13 @@
 #include <stdint.h>
 #include "EASTL/string.h"
 
-enum class RHITextureType
+enum class ETextureType
+{
+	Default, // 2D
+	Array
+};
+
+enum class ERHITextureChannelsType
 {
 	RGBA,
 	Depth
@@ -18,5 +24,6 @@ public:
 	// TODO: Debug only
 	eastl::string SourcePath;
 
-	RHITextureType TextureType = RHITextureType::RGBA;
+	ETextureType TextureType = ETextureType::Default;
+	ERHITextureChannelsType ChannelsType = ERHITextureChannelsType::RGBA;
 };

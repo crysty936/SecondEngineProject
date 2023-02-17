@@ -14,4 +14,5 @@ public:
 public:
 	eastl::shared_ptr<RHIIndexBuffer> IndexBuffer;
 	VertexInputLayout Layout;
+	size_t AllocatedSize = 0;
 };

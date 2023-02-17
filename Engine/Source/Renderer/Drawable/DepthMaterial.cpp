@@ -21,19 +21,6 @@ void DepthMaterial::SetRequiredUniforms()
 
 void DepthMaterial::SetUniforms(eastl::unordered_map<eastl::string, struct SelfRegisteringUniform>& inUniformsCache)
 {
-	glm::mat4 view(glm::identity<glm:: mat4>());
-	bool success = MaterialHelpers::TryGetUniformFromCache<glm::mat4>(inUniformsCache, "view", view);
-
-	glm::mat4 proj(glm::identity<glm::mat4>());
-	success = MaterialHelpers::TryGetUniformFromCache(inUniformsCache, "projection", proj);
-
-	if (!success)
-	{
-		return;
-	}
-
-	inUniformsCache[lsMatrixName] = proj * view;
-
 	__super::SetUniforms(inUniformsCache);
 }
 

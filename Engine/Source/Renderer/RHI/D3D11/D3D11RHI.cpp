@@ -403,7 +403,7 @@ eastl::shared_ptr<class RHIShader> D3D11RHI::CreateShaderFromSource(const eastl:
 				"POSITION",
 				"NORMAL",
 				"TEXCOORD",
-				"InstanceData" //TODO
+				"InstanceData", //TODO
 			};
 			static_assert(static_cast<int32_t>(VertexInputType::Count) == semanticNamesCount);
 

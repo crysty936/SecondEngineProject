@@ -25,8 +25,9 @@ void RenderMaterial_WithShadow::SetUniforms(eastl::unordered_map<eastl::string, 
 
 	const eastl::weak_ptr<RHITexture2D> depthTexture = ForwardRenderer::Get().GetDepthTexture();
 	
-	if (eastl::find_if(WeakTextures.begin(), WeakTextures.end(), [depthTexture](const eastl::weak_ptr<RHITexture2D>& inPtr) {
-		return depthTexture.lock() == inPtr.lock();
+	if (eastl::find_if(WeakTextures.begin(), WeakTextures.end(), 
+		[depthTexture](const eastl::weak_ptr<RHITexture2D>& inPtr) {
+		return depthTexture.lock() == inPtr.lock(); 
 		}) != WeakTextures.end())
 	{
 		return;
