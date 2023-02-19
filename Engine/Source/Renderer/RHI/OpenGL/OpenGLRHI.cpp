@@ -439,11 +439,11 @@ eastl::shared_ptr<class RHITexture2D> OpenGLRHI::CreateArrayDepthMap(const int32
 		GL_FLOAT,
 		nullptr);
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
 	constexpr float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	glTexParameterfv(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BORDER_COLOR, borderColor);
@@ -724,8 +724,24 @@ void OpenGLRHI::BindUniformBuffer(const RHIUniformBuffer& inBuffer)
 void OpenGLRHI::BindTexture2D(const RHITexture2D& inTex, const int32_t inTexId)
 {
 	const GLTexture2D& glTex = static_cast<const GLTexture2D&>(inTex);
+
 	glActiveTexture(GL_TEXTURE0 + inTexId);
-	glBindTexture(GL_TEXTURE_2D, glTex.GlHandle);
+
+	switch (glTex.TextureType)
+	{
+	case ETextureType::Default:
+	{
+		glBindTexture(GL_TEXTURE_2D, glTex.GlHandle);
+
+		break;
+	}
+	case ETextureType::Array:
+	{
+		glBindTexture(GL_TEXTURE_2D_ARRAY, glTex.GlHandle);
+		break;
+	}
+	}
+
 }
 
 void OpenGLRHI::UnbindVertexBuffer(const RHIVertexBuffer& inBuffer, const bool inUnbindIndexBuffer)

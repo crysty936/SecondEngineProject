@@ -42,7 +42,7 @@ const uint32_t SHADOW_HEIGHT = 1024;
 constexpr float CAMERA_FOV = 45.f;
 constexpr float CAMERA_NEAR = 0.1f;
 constexpr float CAMERA_FAR = 200.f;
-eastl::vector<float> shadowCascadeSplits = { CAMERA_FAR / 25.0f, CAMERA_FAR / 10.0f};
+eastl::vector<float> shadowCascadeSplits = { CAMERA_FAR / 10.0f, CAMERA_FAR / 2.0f};
 
 static std::mutex RenderCommandsMutex;
 static std::mutex LoadQueueMutex;
@@ -236,8 +236,8 @@ void ForwardRenderer::Init(const WindowProperties & inMainWindowProperties)
 	ScreenQuad->GetCommand().Material->OwnedTextures.push_back(GlobalRenderTexture);
 
 	DepthFrameBuffer = RHI::Instance->CreateEmptyFrameBuffer();
-	DepthRenderTexture = RHI::Instance->CreateDepthMap(SHADOW_WIDTH, SHADOW_HEIGHT);
-	//DepthRenderTexture = RHI::Instance->CreateArrayDepthMap(SHADOW_WIDTH, SHADOW_HEIGHT, static_cast<int32_t>(shadowCascadeSplits.size() + 1));
+	//DepthRenderTexture = RHI::Instance->CreateDepthMap(SHADOW_WIDTH, SHADOW_HEIGHT);
+	DepthRenderTexture = RHI::Instance->CreateArrayDepthMap(SHADOW_WIDTH, SHADOW_HEIGHT, static_cast<int32_t>(shadowCascadeSplits.size() + 1));
 	RHI::Instance->AttachTextureToFramebufferDepth(*DepthFrameBuffer, *DepthRenderTexture);
 }
 
@@ -394,54 +394,32 @@ void ForwardRenderer::DrawShadowMap()
 	
 	// Debug stuff
 	static glm::mat4 debugMatrixCamera;
-	static glm::mat4 debugMatrixShadow;
 	static eastl::vector<glm::mat4> lsMatrices;
+	static glm::mat4 ShadowViewMatrix;
 
 	if (UpdateShadowMatrices)
 	{
 		glm::mat4 cameraProj = UniformsCache["projection"].GetValue<glm::mat4>();
 		glm::mat4 cameraView = UniformsCache["view"].GetValue<glm::mat4>();
 
-		const glm::vec3 cameraProjCenter = RenderUtils::GetProjectionCenter(cameraProj * cameraView);
-
-		// Create tight shadow projection around camera frustum
-		AABB projBox;
-		eastl::array<glm::vec3, 8> cameraProjPoints = RenderUtils::GenerateSpaceCorners(cameraProj * cameraView);
-
-		// Point light at light dir relative to center of projection
-		lightView = glm::lookAt(cameraProjCenter, cameraProjCenter + lightDir, glm::vec3(0.0f, 1.0f, 0.0f));
-
-		for (const glm::vec3& point : cameraProjPoints)
-		{
-			const glm::vec4 lightSpacePoint = lightView * glm::vec4(point.x, point.y, point.z, 1.f);
-			projBox += glm::vec3(lightSpacePoint.x, lightSpacePoint.y, lightSpacePoint.z);
-		}
-
-		//lightProjection = glm::orthoRH_ZO(projBox.Min.x, projBox.Max.x, projBox.Min.y, projBox.Max.y, projBox.Min.z, projBox.Max.z); // non-reversed, for some reason doesn't fit right
-  		//lightProjection = CreateMyOrthoRH(projBox.Min.x, projBox.Max.x, projBox.Min.y, projBox.Max.y, projBox.Min.z, projBox.Max.z); // non-reversed, for some reason doesn't fit right
-  		lightProjection = CreateMyOrthoLH(projBox.Min.x, projBox.Max.x, projBox.Min.y, projBox.Max.y, projBox.Min.z, projBox.Max.z); // for this, it looks correct, but obviously, the proj is reversed so depth map is incorrect
-  		//lightProjection = glm::orthoLH_ZO(projBox.Min.x, projBox.Max.x, projBox.Min.y, projBox.Max.y, projBox.Min.z, projBox.Max.z); // for this, it looks correct, but obviously, the proj is reversed so depth map is incorrect
-
-		lsMatrices = CreateCascadesMatrices();
-		UniformsCache["lsMatrices"] = lsMatrices;
-
-		// Debug stuff
-		debugMatrixShadow = lightProjection * lightView;
 		debugMatrixCamera = cameraProj * cameraView;
+		lsMatrices = CreateCascadesMatrices();
+		ShadowViewMatrix = cameraView;
+
 	}
 
 	for (const glm::mat4& worldToLightClip : lsMatrices)
 	{
 		DrawDebugHelpers::DrawProjection(worldToLightClip);
 	}
-
-	//DrawDebugHelpers::DrawProjection(debugMatrixShadow);
  	DrawDebugHelpers::DrawProjection(debugMatrixCamera);
 
  	RHI::Instance->PrepareProjectionForRendering(lightProjection);
 
-  	UniformsCache["lsMatrix"] = lightProjection * lightView;
-  	UniformsCache["lightDir"] = lightDir;
+	UniformsCache["lsMatrices"] = lsMatrices;
+	UniformsCache["DirectionalLightDirection"] = lightDir;
+	UniformsCache["ShadowViewMatrix"] = ShadowViewMatrix;
+	UniformsCache["bVisualizeMode"] = bCascadeVisualizeMode ? 1.f : 0.f;
  
 // 	RenderCommandsMutex.lock();
  	DrawCommands(MainCommands);
@@ -647,6 +625,18 @@ eastl::shared_ptr<RenderMaterial> ForwardRenderer::GetMaterial(const RenderComma
 		MaterialsManager& matManager = MaterialsManager::Get();
 		eastl::shared_ptr<RenderMaterial> depthMaterial;
 
+
+		///!! Do shader features/variants and variables with defines, example:
+		// #define SHADOW_ENABLED
+		// #define NUM_CASCADES
+		// #define CASCADED_SHADOWS
+
+		// Or some buffer uniforms could be based on defines
+		
+		// if shadow_enabled then do shadow mapping based on if Cascaded_shadows or other is defined
+		// similarly, use NUM_CASCADES or define a default if that is not defined(or crash to signal that it's missing)
+		// This means that those shader variants need to be compiled and cached first and then used, they can't be compiled any time a variable is changed
+
 		switch (inCommand.DrawType)
 		{
 		case EDrawCallType::DrawElements:
@@ -662,9 +652,9 @@ eastl::shared_ptr<RenderMaterial> ForwardRenderer::GetMaterial(const RenderComma
 				inputLayout.Push<float>(2, VertexInputType::TexCoords);
 
 				eastl::vector<ShaderSourceInput> shaders = {
-				{ "Depth_VS-Pos-Normal-UV", EShaderType::Vertex },
-				//{ "VS_Pos-Normal-UV_Depth_Cascaded", EShaderType::Vertex },
-				//{ "GS_Depth_Cascaded", EShaderType::Vertex },
+				//{ "Depth_VS-Pos-Normal-UV", EShaderType::Vertex },
+				{ "VS_Pos-Normal-UV_Depth_Cascaded", EShaderType::Vertex },
+				{ "GS_Depth_Cascaded", EShaderType::Geometry },
 				{ "Empty_PS", EShaderType::Fragment } };
 
 				depthMaterial->Shader = RHI::Instance->CreateShaderFromPath(shaders, inputLayout);
@@ -674,6 +664,7 @@ eastl::shared_ptr<RenderMaterial> ForwardRenderer::GetMaterial(const RenderComma
 		case EDrawCallType::DrawArrays:
 		{
 			ASSERT(false);
+			break;
 		}
 		case EDrawCallType::DrawInstanced:
 		{
@@ -688,9 +679,9 @@ eastl::shared_ptr<RenderMaterial> ForwardRenderer::GetMaterial(const RenderComma
 				inputLayout.Push<float>(2, VertexInputType::TexCoords);
 
 				eastl::vector<ShaderSourceInput> shaders = {
-				{ "Depth_VS-Pos-Normal-UV_Instanced", EShaderType::Vertex },
-				//{ "VS_Pos-Normal-UV_Depth_Cascaded_Instanced", EShaderType::Vertex },
-				//{ "GS_Depth_Cascaded", EShaderType::Vertex },
+				//{ "Depth_VS-Pos-Normal-UV_Instanced", EShaderType::Vertex },
+				{ "VS_Pos-Normal-UV_Depth_Cascaded_Instanced", EShaderType::Vertex },
+				{ "GS_Depth_Cascaded", EShaderType::Geometry },
 				{ "Empty_PS", EShaderType::Fragment } };
 
 				depthMaterial->Shader = RHI::Instance->CreateShaderFromPath(shaders, inputLayout);

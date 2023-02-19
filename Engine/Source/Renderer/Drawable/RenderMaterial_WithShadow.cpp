@@ -13,7 +13,10 @@ void RenderMaterial_WithShadow::SetRequiredUniforms()
 {
 	__super::SetRequiredUniforms();
 	eastl::vector<UniformWithFlag> defaultUniforms = {
-	{"lsMatrix"},
+	{"lsMatrices"},
+	{"DirectionalLightDirection"},
+	{"ShadowViewMatrix"},
+	{"bVisualizeMode"},
 	};
 
 	UBuffers.push_back({ defaultUniforms, ConstantBufferType::Vertex });

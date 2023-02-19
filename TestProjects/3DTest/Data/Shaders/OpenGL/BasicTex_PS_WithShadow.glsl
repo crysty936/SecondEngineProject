@@ -4,15 +4,17 @@ layout(location = 0) out vec4 FragColor;
 in VS_OUT
 {
 	vec2 TexCoords;
-	mat4 lsMatrix;
 	mat4 clipToWorldMatrix;
 	vec3 worldPos;
 	vec3 Normal;
 	vec3 DirectionalLightDirection;
+	mat4 ShadowViewMatrix;
+	mat4 lsMatrices[3];
+	float bVisualizeMode;
 } ps_in;
 
-layout(binding = 0) uniform sampler2D quadTexture;
-layout(binding = 1) uniform sampler2D depthTexture;
+layout(binding = 0) uniform sampler2D diffuse;
+layout(binding = 1) uniform sampler2DArray depthTexture;
 
 vec2 poissonDisk[4] = vec2[](
 	vec2(-0.94201624, -0.39906216),
@@ -29,7 +31,28 @@ void main()
 
 	vec4 worldPos = vec4(ps_in.worldPos, 1.0);
 
-	vec4 lsPos = ps_in.lsMatrix * worldPos;
+	vec4 fragPosViewSpace = ps_in.ShadowViewMatrix * worldPos;
+	float ViewSpaceDepthValue = abs(fragPosViewSpace.z);
+
+	int cascadeCount = 3;
+	float cascadePlaneDistances[3] = { 20.0, 100.0 , 200.0};
+
+	int layer = -1;
+	for (int i = 0; i < cascadeCount; ++i)
+	{
+		if (ViewSpaceDepthValue < cascadePlaneDistances[i])
+		{
+			layer = i;
+			break;
+		}
+	}
+
+	if (layer == -1)
+	{
+		layer = cascadeCount - 1;
+	}
+
+	vec4 lsPos = ps_in.lsMatrices[layer] * worldPos;
 
 	vec3 lsPosFinal = lsPos.xyz / lsPos.w;
 	// remap from -1..1 to 0..1
@@ -37,23 +60,33 @@ void main()
 
 	//float shadowSamplerTest = texture(depthTexture, vec3(projCoords.xy, projCoords.z + 0.001));
 
-	// No need to remap this as OpenGL is set to use 0..1 for Z
+	// No need to remap this to 0..1 as 0..1 matrices are being used
 	float pixelLightSpaceDepth = 1.0 - lsPosFinal.z; // Reversed Z
 
 	// 2 different ways of calculating bias 
 	float cosTheta = clamp(dot(ps_in.Normal, ps_in.DirectionalLightDirection), 0.0, 1.0);
-	float bias2 = 0.005 * tan(acos(cosTheta));
-	bias2 = clamp(bias2, 0.0, 0.05);
+	float bias = 0.005 * tan(acos(cosTheta));
+	bias = clamp(bias, 0.0, 0.05);
+	//float bias = max(0.005 * (1.0 - clamp(dot(ps_in.Normal, ps_in.DirectionalLightDirection), 0.0, 1.0)), 0.005);
+	
+	float farPlane = 200.0;
+	if (layer == cascadeCount)
+	{
+		bias *= 1 / (farPlane * 0.5f);
+	}
+	else
+	{
+		bias *= 1 / (cascadePlaneDistances[layer] * 0.5f);
+	}
 
-	//float bias1 = max(0.005 * (1.0 - clamp(dot(ps_in.Normal, ps_in.DirectionalLightDirection), 0.0, 1.0)), 0.005);
-	vec2 texelSize = 1.0 / textureSize(depthTexture, 0);
+	vec3 texelSize = 1.0 / textureSize(depthTexture, layer);
 
-	//float shadow = 0.0;
-	//float textureDepth = texture(depthTexture, projCoords.xy).r;
-	//if ((pixelLightSpaceDepth - bias1 > textureDepth))
-	//{
-	//	shadow = 1.0;
-	//}
+	float shadow = 0.0;
+	float textureDepth = texture(depthTexture, vec3(projCoords.xy, layer)).r;
+	if ((pixelLightSpaceDepth - bias > textureDepth))
+	{
+		shadow = 1.0;
+	}
 
 	//float shadow = 0.0;
 	//for (int x = -1; x <= 1; ++x)
@@ -92,34 +125,46 @@ void main()
 
 	
 	// Vogel disk PCF
- 	float shadow = 0.0;
- 	if (pixelLightSpaceDepth < 1.0)
+//   	float shadow = 0.0;
+//   	if (pixelLightSpaceDepth < 1.0)
+//   	{
+//   		const int numSamples = 64;
+//   		float diskRadius = 4;
+//   
+//   		for (int i = 0; i < numSamples; i++)
+//   		{
+//   			float GoldenAngle = 2.39996322;
+//   			float angle = GoldenAngle * float(i);
+//   
+//   			float r = sqrt(float(i) + 0.5) / sqrt(float(numSamples));
+//   
+//   			vec2 u = r * vec2(sin(angle), cos(angle));
+//   			vec2 pos = u * diskRadius * texelSize.xy;
+//   
+//   			float textureDepth = texture(depthTexture, vec3(projCoords.xy + pos, layer)).r;
+//   
+//   			if (pixelLightSpaceDepth - bias > textureDepth)
+//   			{
+//   				shadow += 1;
+//   			}
+//   		}
+//   
+//   		shadow /= numSamples;
+//   	}
+
+	vec3 color;
+ 	if (bool(ps_in.bVisualizeMode))
  	{
- 		const int numSamples = 64;
- 		float diskRadius = 4;
- 
- 		for (int i = 0; i < numSamples; i++)
- 		{
- 			float GoldenAngle = 2.39996322;
- 			float angle = GoldenAngle * float(i);
- 
- 			float r = sqrt(float(i) + 0.5) / sqrt(float(numSamples));
- 
- 			vec2 u = r * vec2(sin(angle), cos(angle));
- 			vec2 pos = u * diskRadius * texelSize;
- 
- 			float textureDepth = texture(depthTexture, projCoords.xy + pos).r;
- 
- 			if (pixelLightSpaceDepth - bias2 > textureDepth)
- 			{
- 				shadow += 1;
- 			}
- 		}
- 
- 		shadow /= numSamples;
+ 		vec3 cascadeColors[3] = { vec3(1.0, 0.0, 0.0), vec3(0.0, 1.0, 0.0), vec3(0.0, 0.0, 1.0) };
+ 		color = cascadeColors[layer];
  	}
- 	
-	vec3 color = (0.8 * ((1 - shadow) * texture(quadTexture, ps_in.TexCoords).xyz)) + (0.2 * texture(quadTexture, ps_in.TexCoords).xyz);
-	//vec3 color = vec3(1 - shadow, 1 - shadow, 1 - shadow);
+ 	else
+ 	{
+ 		color = (0.8 * ((1 - shadow) * texture(diffuse, ps_in.TexCoords).xyz)) + (0.2 * texture(diffuse, ps_in.TexCoords).xyz);
+ 		//vec3 color = vec3(shadow, shadow,shadow);
+ 		//vec3 color = vec3(textureDepth, textureDepth, textureDepth);
+ 		//vec3 color = vec3(projCoords.xy, layer);
+ 	}
+
 	FragColor = vec4(color, 1.0);
 }

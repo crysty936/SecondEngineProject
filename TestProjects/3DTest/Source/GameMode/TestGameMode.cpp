@@ -226,6 +226,13 @@ void TestGameMode::Init()
 		GameController->AddListener(createFloorAction);
 	}
 
+	{
+		KeyActionDelegate cameraMovementDelegate = KeyActionDelegate::CreateRaw(this, &TestGameMode::DebugCascadesVisualize);
+		EInputKey createFloorKey = EInputKey::T;
+		OnKeyAction createFloorAction = { cameraMovementDelegate, createFloorKey, true };
+		GameController->AddListener(createFloorAction);
+	}
+
 	// Debug
 
 	// Scene setup
@@ -281,6 +288,7 @@ void TestGameMode::Init()
 
  	eastl::shared_ptr<AssimpModel3D> floorModel = EntityHelper::CreateObject<AssimpModel3D>("../Data/Models/Floor/scene.gltf");
 	floorModel->Move(glm::vec3(0.f, -2.f, 0.f));
+	//floorModel->SetScale(glm::vec3(10.f, 1.f, 10.f));
 
 
 	//eastl::shared_ptr<AssimpModel3D> sponzaModel = EntityHelper::CreateObject<AssimpModel3D>("../Data/Models/Sponza/scene.gltf");
@@ -362,3 +370,9 @@ void TestGameMode::DebugProjections()
 {
 	ForwardRenderer::Get().UpdateShadowMatrices = !ForwardRenderer::Get().UpdateShadowMatrices;
 }
+
+void TestGameMode::DebugCascadesVisualize()
+{
+	ForwardRenderer::Get().bCascadeVisualizeMode = !ForwardRenderer::Get().bCascadeVisualizeMode;
+}
+

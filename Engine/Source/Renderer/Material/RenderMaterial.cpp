@@ -55,7 +55,7 @@ void RenderMaterial::SetUniforms(eastl::unordered_map<eastl::string, SelfRegiste
 
 			if (iter == inUniformsCache.end())
 			{
-				ENSURE_MSG(false, "Failed to find uniform with name %s in cache.");
+				ENSURE_MSG(false, "Failed to find uniform with name %s in cache.", requiredUniform.UniformName.c_str());
 				continue;
 			}
 

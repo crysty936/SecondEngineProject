@@ -70,6 +70,7 @@ public:
 	eastl::weak_ptr<class RHITexture2D> GetDepthTexture() const;
 
 	bool UpdateShadowMatrices = true;
+	bool bCascadeVisualizeMode = false;
 
 private:
 	inline static ForwardRenderer* Instance = nullptr;
