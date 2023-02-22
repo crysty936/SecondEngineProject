@@ -445,6 +445,7 @@ eastl::shared_ptr<class RHITexture2D> OpenGLRHI::CreateArrayDepthMap(const int32
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
+	//constexpr float borderColor[] = { 0.0f, 0.0f, 0.0f, 0.0f };
 	constexpr float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	glTexParameterfv(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BORDER_COLOR, borderColor);
 
