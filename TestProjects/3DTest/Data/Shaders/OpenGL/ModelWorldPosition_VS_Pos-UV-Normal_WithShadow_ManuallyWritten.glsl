@@ -13,7 +13,9 @@ out VS_OUT
 	vec3 DirectionalLightDirection;
 	mat4 ShadowViewMatrix;
 	mat4 lsMatrices[3];
-	float bVisualizeMode;
+	flat int cascadesCount;
+	flat int bVisualizeMode;
+	flat float shadowCascadeFarPlanes[4];
 } vs_out;
 
 layout(std140, binding = 0) uniform GeometryDataBuffer
@@ -26,9 +28,11 @@ layout(std140, binding = 0) uniform GeometryDataBuffer
 layout(std140, binding = 1) uniform LightDataBuffer
 {
 	mat4 lsMatrices[3];
-	vec3 DirectionalLightDirection;
 	mat4 ShadowViewMatrix;
-	float bVisualizeMode;
+	vec4 DirectionalLightDirection;
+	int cascadesCount;
+	int bVisualizeMode;
+	float shadowCascadeFarPlanes[4];
 };
 
 void main()
@@ -39,9 +43,11 @@ void main()
 	vs_out.TexCoords = inTexCoords;
 	vs_out.clipToWorldMatrix = inverse(projection * view);
 	vs_out.Normal = mat3(transpose(inverse(model))) * inNormal;
-	vs_out.DirectionalLightDirection = DirectionalLightDirection;
+	vs_out.DirectionalLightDirection = DirectionalLightDirection.xyz;
 	vs_out.ShadowViewMatrix = ShadowViewMatrix;
+	vs_out.cascadesCount = cascadesCount;
 	vs_out.bVisualizeMode = bVisualizeMode;
+	vs_out.shadowCascadeFarPlanes = shadowCascadeFarPlanes;
 
 	gl_Position = projection * view * vec4(fragPos, 1.0);
 }

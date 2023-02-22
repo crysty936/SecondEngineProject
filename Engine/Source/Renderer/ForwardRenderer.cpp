@@ -42,7 +42,7 @@ const uint32_t SHADOW_HEIGHT = 1024;
 constexpr float CAMERA_FOV = 45.f;
 constexpr float CAMERA_NEAR = 0.1f;
 constexpr float CAMERA_FAR = 200.f;
-eastl::vector<float> shadowCascadeSplits = { CAMERA_FAR / 10.0f, CAMERA_FAR / 2.0f};
+eastl::vector<float> shadowCascadeFarPlanes = { CAMERA_FAR / 10.0f, CAMERA_FAR / 2.0f, CAMERA_FAR};
 
 static std::mutex RenderCommandsMutex;
 static std::mutex LoadQueueMutex;
@@ -237,7 +237,7 @@ void ForwardRenderer::Init(const WindowProperties & inMainWindowProperties)
 
 	DepthFrameBuffer = RHI::Instance->CreateEmptyFrameBuffer();
 	//DepthRenderTexture = RHI::Instance->CreateDepthMap(SHADOW_WIDTH, SHADOW_HEIGHT);
-	DepthRenderTexture = RHI::Instance->CreateArrayDepthMap(SHADOW_WIDTH, SHADOW_HEIGHT, static_cast<int32_t>(shadowCascadeSplits.size() + 1));
+	DepthRenderTexture = RHI::Instance->CreateArrayDepthMap(SHADOW_WIDTH, SHADOW_HEIGHT, static_cast<int32_t>(shadowCascadeFarPlanes.size()));
 	RHI::Instance->AttachTextureToFramebufferDepth(*DepthFrameBuffer, *DepthRenderTexture);
 }
 
@@ -353,7 +353,7 @@ glm::mat4 ForwardRenderer::CreateCascadeMatrix(const glm::mat4& inCameraProj, co
 eastl::vector<glm::mat4> ForwardRenderer::CreateCascadesMatrices()
 {
 	eastl::vector<glm::mat4> cascades;
-	cascades.reserve(shadowCascadeSplits.size());
+	cascades.reserve(shadowCascadeFarPlanes.size());
 
 	const glm::vec3 lightDir = glm::normalize(-lightPos);
 	const glm::mat4& cameraView = UniformsCache["view"].GetValue<glm::mat4>();
@@ -361,10 +361,10 @@ eastl::vector<glm::mat4> ForwardRenderer::CreateCascadesMatrices()
 	const float windowWidth = static_cast<float>(Engine->GetMainWindow().GetProperties().Width);
 	const float windowHeight = static_cast<float>(Engine->GetMainWindow().GetProperties().Height);
 
-	for (int32_t i = 0; i < shadowCascadeSplits.size() + 1; ++i)
+	for (int32_t i = 0; i < shadowCascadeFarPlanes.size(); ++i)
 	{
-		const float near = i == 0 ? CAMERA_NEAR : shadowCascadeSplits[i - 1];
-		const float far = i == 0 ? shadowCascadeSplits[i] : i == shadowCascadeSplits.size() ? CAMERA_FAR : shadowCascadeSplits[i];
+		const float near = i == 0 ? CAMERA_NEAR : shadowCascadeFarPlanes[i - 1];
+		const float far = shadowCascadeFarPlanes[i];
 
 		const glm::mat4 cameraProj = glm::perspectiveRH_ZO(glm::radians(CAMERA_FOV), windowWidth / windowHeight, near, far);
 		const glm::mat4 worldToLightClip = CreateCascadeMatrix(cameraProj, cameraView, lightDir);
@@ -417,9 +417,13 @@ void ForwardRenderer::DrawShadowMap()
  	RHI::Instance->PrepareProjectionForRendering(lightProjection);
 
 	UniformsCache["lsMatrices"] = lsMatrices;
-	UniformsCache["DirectionalLightDirection"] = lightDir;
+	UniformsCache["DirectionalLightDirection"] = glm::vec4(lightDir.x, lightDir.y, lightDir.z, 1.0);
+	//UniformsCache["DirectionalLightDirection"] = lightDir;
 	UniformsCache["ShadowViewMatrix"] = ShadowViewMatrix;
-	UniformsCache["bVisualizeMode"] = bCascadeVisualizeMode ? 1.f : 0.f;
+	UniformsCache["bVisualizeMode"] = bCascadeVisualizeMode ? 1 : 0;
+	UniformsCache["cascadesCount"] = int32_t(shadowCascadeFarPlanes.size() + 1);
+	UniformsCache["shadowCascadeFarPlanes"] = shadowCascadeFarPlanes;
+	//UniformsCache["shadowCascadeFarPlanes"] = glm::vec4(shadowCascadeFarPlanes[0], shadowCascadeFarPlanes[1], shadowCascadeFarPlanes[2], 0.f);
  
 // 	RenderCommandsMutex.lock();
  	DrawCommands(MainCommands);

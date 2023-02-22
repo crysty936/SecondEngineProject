@@ -10,7 +10,9 @@ in VS_OUT
 	vec3 DirectionalLightDirection;
 	mat4 ShadowViewMatrix;
 	mat4 lsMatrices[3];
-	float bVisualizeMode;
+	flat int cascadesCount;
+	flat int bVisualizeMode;
+	flat float shadowCascadeFarPlanes[4];
 } ps_in;
 
 layout(binding = 0) uniform sampler2D diffuse;
@@ -30,8 +32,8 @@ float CalculateShadow()
 	vec4 fragPosViewSpace = ps_in.ShadowViewMatrix * worldPos;
 	float ViewSpaceDepthValue = abs(fragPosViewSpace.z);
 
-	int cascadeCount = 3;
-	float cascadePlaneDistances[3] = { 20.0, 100.0 , 200.0 };
+	int cascadeCount = ps_in.cascadesCount;
+	float cascadePlaneDistances[4] = ps_in.shadowCascadeFarPlanes;
 
 	int layer = -1;
 	for (int i = 0; i < cascadeCount; ++i)
@@ -161,7 +163,7 @@ void main()
  	if (bool(ps_in.bVisualizeMode))
  	{
 		// Recalculator for debug
-		int cascadeCount = 3;
+		int cascadeCount = ps_in.cascadesCount;
 		float cascadePlaneDistances[3] = { 20.0, 100.0 , 200.0 };
 		vec4 worldPos = vec4(ps_in.worldPos, 1.0);
 		vec4 fragPosViewSpace = ps_in.ShadowViewMatrix * worldPos;
@@ -192,7 +194,8 @@ void main()
  	else
  	{
  		color = (0.8 * ((1 - shadow) * texture(diffuse, ps_in.TexCoords).xyz)) + (0.2 * texture(diffuse, ps_in.TexCoords).xyz);
- 		//color = vec3(shadow, shadow,shadow);
+
+		//color = vec3(shadow, shadow,shadow);
  		//color = vec3(invTexelSize.xy, 1.0);
  		//color = vec3(textureDepth, textureDepth, textureDepth);
  		//color = vec3(projCoords.xy, layer);

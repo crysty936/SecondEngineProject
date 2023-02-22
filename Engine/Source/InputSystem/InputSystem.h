@@ -37,7 +37,7 @@ public:
 	bool CursorsTracked = false;
 	ECursorMode CurrentCursorMode = ECursorMode::Enabled;
 	glm::vec<2, int> CurrentCursorPos = {};
-	glm::vec<2, int> LastCursorPos = {};
+	glm::vec<2, int> LastMousePos = {};
 
 private:
 	void OnKeyPressedLog(EInputKey inKeyCode, EInputType inEventType);

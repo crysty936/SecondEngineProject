@@ -261,14 +261,16 @@ namespace WindowsPlatform
 		POINT pos = { inPos.x, inPos.y };
 
 		// Store the new position so it can be recognized later
-		InputSystem::Get().LastCursorPos.x = pos.x;
-		InputSystem::Get().LastCursorPos.y = pos.y;
+		InputSystem::Get().LastMousePos.x = pos.x;
+		InputSystem::Get().LastMousePos.y = pos.y;
 	// 	window->win32.lastCursorPosX = pos.x;
 	// 	window->win32.lastCursorPosY = pos.y;
 
 		ClientToScreen(inWindowHandle, &pos);
 		::SetCursorPos(pos.x, pos.y);
 	}
+
+    //static bool MouseJumpTest = false;
 
 	void DisableCursor(HWND inWindowHandle)
 	{
@@ -277,23 +279,27 @@ namespace WindowsPlatform
 
 		RECT area;
 		GetClientRect(inWindowHandle, &area);
-		int width, height;
-		width = area.right;
-		height = area.bottom;
+		const int width = area.right;
+		const int height = area.bottom;
 
-		POINT pos = { (int)width / 2, (int)height / 2 };
-		ClientToScreen(inWindowHandle, &pos);
+  		POINT pos = { (int)width / 2, (int)height / 2 };
+  		ClientToScreen(inWindowHandle, &pos);
+
+        //POINT pos = { InputSystem::Get().LastMousePos.x ,InputSystem::Get().LastMousePos.y };
 		::SetCursorPos(pos.x, pos.y);
 
 		UpdateClipRect(inWindowHandle);
 
 		ViewportMouseEnabled = true;
+
+        //MouseJumpTest = true;
 	}
 
 	void EnableCursor(HWND inWindowHandle)
 	{
 		UpdateClipRect(nullptr);
 
+		//SetCursorPos(inWindowHandle, InputSystem::Get().LastMousePos);
 		SetCursorPos(inWindowHandle, InputSystem::Get().CurrentCursorPos);
 		SetCursor(nullptr);
 
@@ -698,8 +704,15 @@ namespace WindowsPlatform
 					break;
 					// TODO: Refactor this into pointer that keeps track of what window has pointer disabled
 				}
-				const int dx = x - InputSystem::Get().LastCursorPos.x;
-				const int dy = y - InputSystem::Get().LastCursorPos.y;
+
+//                 if (MouseJumpTest)
+//                 {
+//                     MouseJumpTest = false;
+//                     return 0;
+//                 }
+
+				const int dx = x - InputSystem::Get().LastMousePos.x;
+				const int dy = y - InputSystem::Get().LastMousePos.y;
 
 				InputForwarder::ForwardMouseMove(dx, dy);
 
