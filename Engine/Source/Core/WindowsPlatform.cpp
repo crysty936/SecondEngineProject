@@ -75,7 +75,9 @@ namespace WindowsPlatform
 
 	// Input
 	EInputType KeyStates[+EInputKey::Count];
-	bool ViewportMouseEnabled = true;
+	bool bReactToMouseInput = true;
+    bool bRawMouseInput = false;
+	RAWINPUT* rawInput;
 
 	class WindowsKeysContainer
 	{
@@ -256,21 +258,17 @@ namespace WindowsPlatform
 		}
 	}
 
-	void SetCursorPos(HWND inWindowHandle, const glm::vec<2, int>& inPos)
+	void InternalSetCursorPos(HWND inWindowHandle, const glm::vec<2, int>& inPos)
 	{
 		POINT pos = { inPos.x, inPos.y };
 
 		// Store the new position so it can be recognized later
 		InputSystem::Get().LastMousePos.x = pos.x;
 		InputSystem::Get().LastMousePos.y = pos.y;
-	// 	window->win32.lastCursorPosX = pos.x;
-	// 	window->win32.lastCursorPosY = pos.y;
 
 		ClientToScreen(inWindowHandle, &pos);
 		::SetCursorPos(pos.x, pos.y);
 	}
-
-    //static bool MouseJumpTest = false;
 
 	void DisableCursor(HWND inWindowHandle)
 	{
@@ -282,28 +280,32 @@ namespace WindowsPlatform
 		const int width = area.right;
 		const int height = area.bottom;
 
-  		POINT pos = { (int)width / 2, (int)height / 2 };
-  		ClientToScreen(inWindowHandle, &pos);
-
-        //POINT pos = { InputSystem::Get().LastMousePos.x ,InputSystem::Get().LastMousePos.y };
-		::SetCursorPos(pos.x, pos.y);
+        InternalSetCursorPos(inWindowHandle, { width / 2, height / 2 });
 
 		UpdateClipRect(inWindowHandle);
 
-		ViewportMouseEnabled = true;
+		bReactToMouseInput = true;
 
-        //MouseJumpTest = true;
+        // enable raw mouse motion
+		const RAWINPUTDEVICE rid = { 0x01, 0x02, 0, inWindowHandle };
+        ENSURE_MSG(RegisterRawInputDevices(&rid, 1, sizeof(rid)), "Win32: Failed to register raw input device.");
+		bRawMouseInput = true;
+
 	}
 
 	void EnableCursor(HWND inWindowHandle)
 	{
 		UpdateClipRect(nullptr);
 
-		//SetCursorPos(inWindowHandle, InputSystem::Get().LastMousePos);
-		SetCursorPos(inWindowHandle, InputSystem::Get().CurrentCursorPos);
+		InternalSetCursorPos(inWindowHandle, InputSystem::Get().CurrentCursorPos);
 		SetCursor(nullptr);
 
-		ViewportMouseEnabled = false;
+		bReactToMouseInput = false;
+
+        // disable raw mouse motion
+        const RAWINPUTDEVICE rid = { 0x01, 0x02, RIDEV_REMOVE, NULL };
+		ENSURE_MSG(RegisterRawInputDevices(&rid, 1, sizeof(rid)), "Win32: Failed to remove raw input device.");
+        bRawMouseInput = false;
 	}
 
 	void SetCursorMode(void* inWindowHandle, const ECursorMode inMode)
@@ -339,8 +341,8 @@ namespace WindowsPlatform
 		}
 	}
 
-//#define LOG_WINMSG(MsgType) LOG_INFO("Windows Message: %s", #MsgType)
-#define LOG_WINMSG(MsgType) 
+#define LOG_WINMSG(MsgType) LOG_INFO("Windows Message: %s", #MsgType)
+//#define LOG_WINMSG(MsgType) 
 
 	LRESULT WindowMessageLoop(HWND hwnd, uint32_t msg, WPARAM wParam, LPARAM lParam)
 	{
@@ -676,7 +678,7 @@ namespace WindowsPlatform
 
 		case WM_MOUSEMOVE:
 		{
-			LOG_WINMSG(WM_MOUSEMOVE);
+			//LOG_WINMSG(WM_MOUSEMOVE);
 
 			const int x = GET_X_LPARAM(lParam);
 			const int y = GET_Y_LPARAM(lParam);
@@ -699,32 +701,20 @@ namespace WindowsPlatform
  			const ECursorMode cursorMode = inputSys.CurrentCursorMode;
 			if (cursorMode == ECursorMode::Disabled)
 			{
-				if (!ViewportMouseEnabled)
+				if (!bReactToMouseInput || bRawMouseInput)
 				{
 					break;
 					// TODO: Refactor this into pointer that keeps track of what window has pointer disabled
 				}
 
-//                 if (MouseJumpTest)
-//                 {
-//                     MouseJumpTest = false;
-//                     return 0;
-//                 }
-
 				const int dx = x - InputSystem::Get().LastMousePos.x;
 				const int dy = y - InputSystem::Get().LastMousePos.y;
 
-				InputForwarder::ForwardMouseMove(dx, dy);
-
-// 				_glfwInputCursorPos(window,
-// 					window->virtualCursorPosX + dx,
-// 					window->virtualCursorPosY + dy);
+				InputForwarder::ForwardMouseMove(InputSystem::Get().VirtualMousePos.x + dx, InputSystem::Get().VirtualMousePos.y + dy);
 			}
-			//             else
-			//                 _glfwInputCursorPos(window, x, y);
-			// 
-			//             window->win32.lastCursorPosX = x;
-			//             window->win32.lastCursorPosY = y;
+
+			InputSystem::Get().LastMousePos.x = x;
+			InputSystem::Get().LastMousePos.y = y;
 
 			return 0;
 		}
@@ -732,52 +722,54 @@ namespace WindowsPlatform
  		case WM_INPUT:
  		{
  			LOG_WINMSG(WM_INPUT);
- 			//             UINT size = 0;
- //             HRAWINPUT ri = (HRAWINPUT) lParam;
- //             RAWINPUT* data = NULL;
- //             int dx, dy;
- // 
- //             if (_glfw.win32.disabledCursorWindow != window)
- //                 break;
- //             if (!window->rawMouseMotion)
- //                 break;
- // 
- //             GetRawInputData(ri, RID_INPUT, NULL, &size, sizeof(RAWINPUTHEADER));
- //             if (size > (UINT) _glfw.win32.rawInputSize)
- //             {
- //                 free(_glfw.win32.rawInput);
- //                 _glfw.win32.rawInput = calloc(size, 1);
- //                 _glfw.win32.rawInputSize = size;
- //             }
- // 
- //             size = _glfw.win32.rawInputSize;
- //             if (GetRawInputData(ri, RID_INPUT,
- //                                 _glfw.win32.rawInput, &size,
- //                                 sizeof(RAWINPUTHEADER)) == (UINT) -1)
- //             {
- //                 _glfwInputError(GLFW_PLATFORM_ERROR,
- //                                 "Win32: Failed to retrieve raw input data");
- //                 break;
- //             }
- // 
- //             data = _glfw.win32.rawInput;
- //             if (data->data.mouse.usFlags & MOUSE_MOVE_ABSOLUTE)
- //             {
- //                 dx = data->data.mouse.lLastX - window->win32.lastCursorPosX;
- //                 dy = data->data.mouse.lLastY - window->win32.lastCursorPosY;
- //             }
- //             else
- //             {
- //                 dx = data->data.mouse.lLastX;
- //                 dy = data->data.mouse.lLastY;
- //             }
- // 
- //             _glfwInputCursorPos(window,
- //                                 window->virtualCursorPosX + dx,
- //                                 window->virtualCursorPosY + dy);
- // 
- //             window->win32.lastCursorPosX += dx;
- //             window->win32.lastCursorPosY += dy;
+			UINT size = 0;
+			HRAWINPUT ri = (HRAWINPUT)lParam;
+			RAWINPUT* data = NULL;
+			int dx, dy;
+
+            static int rawInputSize = 0;
+  
+            if (!bReactToMouseInput || !bRawMouseInput)
+            {
+                break;
+            }
+
+			GetRawInputData(ri, RID_INPUT, NULL, &size, sizeof(RAWINPUTHEADER));
+			if (size > (UINT)rawInputSize)
+			{
+				free(rawInput);
+				rawInput = (RAWINPUT*)calloc(size, 1);
+				rawInputSize = size;
+			}
+
+			size = rawInputSize;
+			if (GetRawInputData(ri, RID_INPUT,
+				rawInput, &size,
+				sizeof(RAWINPUTHEADER)) == (UINT)-1)
+			{
+				ASSERT_MSG(false, "Win32: Failed to retrieve raw input data");
+				break;
+			}
+
+			data = rawInput;
+			if (data->data.mouse.usFlags & MOUSE_MOVE_ABSOLUTE)
+			{
+				dx = data->data.mouse.lLastX - InputSystem::Get().LastMousePos.x;
+				dy = data->data.mouse.lLastY - InputSystem::Get().LastMousePos.y;
+			}
+			else
+			{
+				dx = data->data.mouse.lLastX;
+				dy = data->data.mouse.lLastY;
+			}
+
+			InputForwarder::ForwardMouseMove(InputSystem::Get().VirtualMousePos.x + dx, InputSystem::Get().VirtualMousePos.y + dy);
+
+			InputSystem::Get().LastMousePos.x += dx;
+			InputSystem::Get().LastMousePos.y += dy;
+
+            // TODO: Check if this shouldn't be reset at one moment
+
  			break;
  		}
  
@@ -1062,7 +1054,7 @@ namespace WindowsPlatform
  
  		case WM_SETCURSOR:
  		{
- 			LOG_WINMSG(WM_SETCURSOR);
+ 			//LOG_WINMSG(WM_SETCURSOR);
  
  			if (LOWORD(lParam) == HTCLIENT)
  			{
@@ -1148,7 +1140,9 @@ namespace WindowsPlatform
 
 		// Compute window rectangle dimensions based on requested client area dimensions.
 		RECT R = { 0, 0, desiredWidth, desiredHeight };
-		AdjustWindowRect(&R, WS_OVERLAPPEDWINDOW, false);
+        DWORD windowStyle = WS_OVERLAPPEDWINDOW & ~WS_SIZEBOX;
+
+		AdjustWindowRect(&R, windowStyle, false);
 		int32_t width = R.right - R.left;
 		int32_t height = R.bottom - R.top;
 
@@ -1156,7 +1150,7 @@ namespace WindowsPlatform
 			0,
 			CLASS_NAME,
 			L"Main Window",
-			WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, width, height, nullptr, nullptr, instance, nullptr);
+            windowStyle, CW_USEDEFAULT, CW_USEDEFAULT, width, height, nullptr, nullptr, instance, nullptr);
 
 		ChangeWindowMessageFilterEx(newWindow,
 			WM_DROPFILES, MSGFLT_ALLOW, NULL);
@@ -1184,6 +1178,9 @@ namespace WindowsPlatform
 
 	void InputForwarder::ForwardMouseMove(double inNewYaw, double inNewPitch)
 	{
+        InputSystem::Get().VirtualMousePos.x = inNewYaw;
+        InputSystem::Get().VirtualMousePos.y = inNewPitch;
+
 		InputSystem::MousePosChangedCallback(inNewYaw, inNewPitch);
 	}
 

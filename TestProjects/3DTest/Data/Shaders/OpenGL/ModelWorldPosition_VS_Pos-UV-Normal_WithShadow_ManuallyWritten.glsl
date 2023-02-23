@@ -15,7 +15,7 @@ out VS_OUT
 	mat4 lsMatrices[3];
 	flat int cascadesCount;
 	flat int bVisualizeMode;
-	flat float shadowCascadeFarPlanes[4];
+	flat float shadowCascadeFarPlanes[3];
 } vs_out;
 
 layout(std140, binding = 0) uniform GeometryDataBuffer
@@ -32,7 +32,7 @@ layout(std140, binding = 1) uniform LightDataBuffer
 	vec4 DirectionalLightDirection;
 	int cascadesCount;
 	int bVisualizeMode;
-	float shadowCascadeFarPlanes[4];
+	float shadowCascadeFarPlanes[3];
 };
 
 void main()

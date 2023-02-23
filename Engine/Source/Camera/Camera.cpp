@@ -87,8 +87,9 @@ void Camera::OnMousePosChanged(const float inNewYaw, const float inNewPitch)
 	MouseLastYaw = inNewYaw;
 	MouseLastPitch = inNewPitch;
 
-	LOG_INFO("Mouse yaw offset %f", yawOffset);
-	LOG_INFO("Mouse yaw %f", inNewYaw);
+// 	LOG_INFO("Mouse yaw offset %f", yawOffset);
+// 	LOG_INFO("Mouse yaw %f", inNewYaw);
+
 // 	const float sensitivity = 0.1f;
 // 
 // 	Yaw += yawOffset * sensitivity;

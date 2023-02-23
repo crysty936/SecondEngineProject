@@ -12,7 +12,7 @@ in VS_OUT
 	mat4 lsMatrices[3];
 	flat int cascadesCount;
 	flat int bVisualizeMode;
-	flat float shadowCascadeFarPlanes[4];
+	flat float shadowCascadeFarPlanes[3];
 } ps_in;
 
 layout(binding = 0) uniform sampler2D diffuse;
@@ -33,7 +33,7 @@ float CalculateShadow()
 	float ViewSpaceDepthValue = abs(fragPosViewSpace.z);
 
 	int cascadeCount = ps_in.cascadesCount;
-	float cascadePlaneDistances[4] = ps_in.shadowCascadeFarPlanes;
+	float cascadePlaneDistances[3] = ps_in.shadowCascadeFarPlanes;
 
 	int layer = -1;
 	for (int i = 0; i < cascadeCount; ++i)

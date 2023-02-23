@@ -38,6 +38,7 @@ public:
 	ECursorMode CurrentCursorMode = ECursorMode::Enabled;
 	glm::vec<2, int> CurrentCursorPos = {};
 	glm::vec<2, int> LastMousePos = {};
+	glm::vec<2, double> VirtualMousePos = {};
 
 private:
 	void OnKeyPressedLog(EInputKey inKeyCode, EInputType inEventType);
