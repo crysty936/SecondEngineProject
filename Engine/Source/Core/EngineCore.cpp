@@ -39,7 +39,7 @@ void EngineCore::Init()
 	Engine->MainWindow = eastl::make_unique<WindowsWindow>();
 
 	// Hide Cursor for input
-	InputSystem::Get().SetCursorMode(Engine->MainWindow->GetHandle(), ECursorMode::Disabled);
+	InputSystem::Get().SetCursorMode(ECursorMode::Disabled, Engine->MainWindow->GetHandle());
 
 	SceneManager::Init();
 

@@ -21,6 +21,7 @@ public:
 	void OnChangeDrawMode();
 	void DebugProjections();
 	void DebugCascadesVisualize();
+	void DebugCursorMode();
 private:
 	eastl::shared_ptr<class Camera> GameCamera = nullptr;
 	eastl::unique_ptr<class Controller> GameController = nullptr;

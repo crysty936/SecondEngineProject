@@ -23,7 +23,7 @@ void InputSystem::MousePosChangedCallback(const double inNewYaw, const double in
 	const float pitchFloat = static_cast<float>(inNewPitch);
 
 	Instance->OnMouseMovedDelegate.Invoke(yawFloat, pitchFloat);
-	LOG_INFO("Mouse Pos Changed Callback with Yaw: %f and Pitch: %f", inNewYaw, inNewPitch);
+	//LOG_INFO("Mouse Pos Changed Callback with Yaw: %f and Pitch: %f", inNewYaw, inNewPitch);
 }
 
 void InputSystem::MouseScrollCallback(double xoffset, double yoffset)
@@ -50,8 +50,13 @@ void InputSystem::PollEvents()
 	WindowsPlatform::PoolMessages();
 }
 
-void InputSystem::SetCursorMode(void* inWindowHandle, const ECursorMode inMode)
+void InputSystem::SetCursorMode(const ECursorMode inMode, void* inWindowHandle)
 {
+	if (!inWindowHandle)
+	{
+		inWindowHandle = Engine->GetMainWindow().GetHandle();
+	}
+
 	CurrentCursorMode = inMode;
 	WindowsPlatform::SetCursorMode(inWindowHandle, inMode);
 }

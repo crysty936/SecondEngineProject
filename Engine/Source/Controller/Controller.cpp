@@ -50,25 +50,29 @@ void Controller::ExecuteCallbacks()
 
 void Controller::OnKeyInputReceived(EInputKey inKeyCode, EInputType inEventType)
 {
- 	if (inKeyCode == EInputKey::Escape)
- 	{
- 		Engine->StopEngine();
- 	}
+//  	if (inKeyCode == EInputKey::Escape)
+//  	{
+//  		Engine->StopEngine();
+//  	}
 
-	// 	switch (inEventType)
-	// 	{
-	// 	case InputEventType::InputPress:
-	// 		LOG_INFO("Press detected");
-	// 		break;
-	// 
-	// 	case InputEventType::InputRelease:
-	// 		LOG_INFO("Release detected");
-	// 		break;
-	// 
-	// 	case InputEventType::InputRepeat:
-	// 		LOG_INFO("Repeat detected");
-	// 		break;
-	// 	}
+#if 0
+	switch (inEventType)
+	{
+	case EInputType::InputPress:
+	 	LOG_INFO("Press detected");
+	 	break;
+	 
+	case EInputType::InputRelease:
+	 	LOG_INFO("Release detected");
+	 	break;
+	 
+	case EInputType::InputRepeat:
+	 	LOG_INFO("Repeat detected");
+	 	break;
+	}
+#endif
+
+
 
 	KeyStates[inKeyCode] = inEventType;
 }

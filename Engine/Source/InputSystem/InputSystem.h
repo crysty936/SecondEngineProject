@@ -31,7 +31,7 @@ public:
 	inline MousePosDelegate& OnMouseMoved() { return OnMouseMovedDelegate; }
 	inline MouseScrollDelegate& OnMouseScroll() { return OnMouseScrollDelegate; }
 
-	void SetCursorMode(void* inWindowHandle, const ECursorMode inMode);
+	void SetCursorMode(const ECursorMode inMode, void* inWindowHandle = nullptr);
 
 	bool OngoingFrameAction = false;
 	bool CursorsTracked = false;

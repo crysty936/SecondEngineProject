@@ -233,6 +233,14 @@ void TestGameMode::Init()
 		GameController->AddListener(createFloorAction);
 	}
 
+	{
+		KeyActionDelegate cameraMovementDelegate = KeyActionDelegate::CreateRaw(this, &TestGameMode::DebugCursorMode);
+		EInputKey createFloorKey = EInputKey::Q;
+		OnKeyAction createFloorAction = { cameraMovementDelegate, createFloorKey, true };
+		GameController->AddListener(createFloorAction);
+	}
+
+
 	// Debug
 
 	// Scene setup
@@ -375,4 +383,15 @@ void TestGameMode::DebugCascadesVisualize()
 {
 	ForwardRenderer::Get().bCascadeVisualizeMode = !ForwardRenderer::Get().bCascadeVisualizeMode;
 }
+
+void TestGameMode::DebugCursorMode()
+{
+	static bool test = true;
+
+	const ECursorMode mode = test ? ECursorMode::Enabled : ECursorMode::Disabled;
+	InputSystem::Get().SetCursorMode(mode);
+
+	test = !test;
+}
+
 

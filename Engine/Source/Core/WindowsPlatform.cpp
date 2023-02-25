@@ -1,3 +1,8 @@
+
+#ifndef UNICODE
+#define UNICODE
+#endif
+
 #include "Core/WindowsPlatform.h"
 #include <windows.h>
 #include <WinUser.h>
@@ -226,6 +231,8 @@ namespace WindowsPlatform
 
 	void UpdateClipRect(HWND inWindowHandle)
 	{
+        LOG_INFO("Cursor Clip Rect updated.")
+
 		if (inWindowHandle)
 		{
 			RECT clipRect;
@@ -273,7 +280,7 @@ namespace WindowsPlatform
 	void DisableCursor(HWND inWindowHandle)
 	{
 		GetCursorPos(inWindowHandle, InputSystem::Get().CurrentCursorPos);
-		SetCursor(NULL);
+		SetCursor(nullptr);
 
 		RECT area;
 		GetClientRect(inWindowHandle, &area);
@@ -291,37 +298,65 @@ namespace WindowsPlatform
         ENSURE_MSG(RegisterRawInputDevices(&rid, 1, sizeof(rid)), "Win32: Failed to register raw input device.");
 		bRawMouseInput = true;
 
+		LOG_INFO("Disabled cursor.");
 	}
 
 	void EnableCursor(HWND inWindowHandle)
 	{
+		// disable raw mouse motion
+		const RAWINPUTDEVICE rid = { 0x01, 0x02, RIDEV_REMOVE, nullptr };
+		ENSURE_MSG(RegisterRawInputDevices(&rid, 1, sizeof(rid)), "Win32: Failed to remove raw input device.");
+		bRawMouseInput = false;
+
 		UpdateClipRect(nullptr);
 
 		InternalSetCursorPos(inWindowHandle, InputSystem::Get().CurrentCursorPos);
-		SetCursor(nullptr);
+
+        // Enable mouse icon
+		SetCursor(LoadCursorW(nullptr, IDC_ARROW));
+		InputSystem::Get().CursorsTracked = false;
 
 		bReactToMouseInput = false;
 
-        // disable raw mouse motion
-        const RAWINPUTDEVICE rid = { 0x01, 0x02, RIDEV_REMOVE, NULL };
-		ENSURE_MSG(RegisterRawInputDevices(&rid, 1, sizeof(rid)), "Win32: Failed to remove raw input device.");
-        bRawMouseInput = false;
+		LOG_INFO("Enabled cursor.");
 	}
 
 	void SetCursorMode(void* inWindowHandle, const ECursorMode inMode)
 	{
-		if (inMode == ECursorMode::Disabled)
-		{
+        switch (inMode)
+        {
+        case ECursorMode::Enabled:
+        {
+            EnableCursor(static_cast<HWND>(inWindowHandle));
+            break;
+        }
+        case ECursorMode::Hidden:
+        {
+
+            break;
+        }
+        case ECursorMode::Disabled:
+        {
 			if (IsWindowFocused(static_cast<HWND>(inWindowHandle)))
 			{
 				DisableCursor(static_cast<HWND>(inWindowHandle));
 			}
-		}
-		//else if (_glfw.win32.disabledCursorWindow == window)
-			//enableCursor(window);
-		//else if (cursorInContentArea(window))
-			//updateCursorImage(window);
+            break;
+        }
+        }
 	}
+
+    void UpdateCursorImage(HWND inWindowHandle)
+    {
+        if (InputSystem::Get().CurrentCursorMode == ECursorMode::Enabled)
+        {
+			SetCursor(LoadCursorW(nullptr, IDC_ARROW));
+        }
+        else
+        {
+            SetCursor(nullptr);
+        }
+    }
 
 	void SetWindowsWindowText(const eastl::wstring& inText)
 	{
@@ -678,7 +713,7 @@ namespace WindowsPlatform
 
 		case WM_MOUSEMOVE:
 		{
-			//LOG_WINMSG(WM_MOUSEMOVE);
+			//LOG_WINMSG(WM_MOUSEMOVE); // Spamming
 
 			const int x = GET_X_LPARAM(lParam);
 			const int y = GET_Y_LPARAM(lParam);
@@ -692,9 +727,7 @@ namespace WindowsPlatform
  				tme.hwndTrack = hwnd;
  				TrackMouseEvent(&tme);
  
- 				//window->win32.cursorTracked = GLFW_TRUE;
  				InputSystem::Get().CursorsTracked = true;
- 				//_glfwInputCursorEnter(window, GLFW_TRUE);
  			}
  
  			const InputSystem& inputSys = InputSystem::Get();
@@ -721,7 +754,8 @@ namespace WindowsPlatform
 
  		case WM_INPUT:
  		{
- 			LOG_WINMSG(WM_INPUT);
+ 			//LOG_WINMSG(WM_INPUT); // Spam
+
 			UINT size = 0;
 			HRAWINPUT ri = (HRAWINPUT)lParam;
 			RAWINPUT* data = NULL;
@@ -777,7 +811,7 @@ namespace WindowsPlatform
  		{
  			LOG_WINMSG(WM_MOUSELEAVE);
  			InputSystem::Get().CursorsTracked = false;
- 			//             window->win32.cursorTracked = GLFW_FALSE;
+
  //             _glfwInputCursorEnter(window, GLFW_FALSE);
  			return 0;
  		}
@@ -1054,14 +1088,12 @@ namespace WindowsPlatform
  
  		case WM_SETCURSOR:
  		{
- 			//LOG_WINMSG(WM_SETCURSOR);
+ 			LOG_WINMSG(WM_SETCURSOR);
  
  			if (LOWORD(lParam) == HTCLIENT)
  			{
- 				SetCursor(NULL);
+                UpdateCursorImage(hwnd);
  				return true;
- 				//updateCursorImage(window);
- 				//return TRUE;
  			}
  
  			break;
