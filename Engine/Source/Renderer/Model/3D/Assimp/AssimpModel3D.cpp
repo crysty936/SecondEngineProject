@@ -8,8 +8,6 @@
 #include "Renderer/ForwardRenderer.h"
 #include "Renderer/RenderingPrimitives.h"
 #include "Renderer/RHI/Resources/MeshDataContainer.h"
-#include "glad/glad.h"
-#include "GLFW/glfw3.h"
 #include "Renderer/RHI/Resources/RHITexture.h"
 #include "Renderer/RHI/RHI.h"
 #include "Renderer/Drawable/RenderMaterial_WithShadow.h"
@@ -217,7 +215,6 @@ void AssimpModel3D::ProcessMesh(const aiMesh& inMesh, const aiScene& inScene, ea
 eastl::vector<eastl::shared_ptr<RHITexture2D>> AssimpModel3D::LoadMaterialTextures(const aiMaterial& inMat, const aiTextureType& inAssimpTexType)
 {
 	eastl::vector<eastl::shared_ptr<RHITexture2D>> textures;
-	const uint32_t texureBaseNr = GL_TEXTURE0;
 	const uint32_t texturesCount = inMat.GetTextureCount(inAssimpTexType);
 
 	for (uint32_t i = 0; i < texturesCount; ++i)

@@ -9,21 +9,25 @@ project(SecondEngineProject VERSION 1.0)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-set( PLUGINSDIR "Plugins" CACHE INTERNAL "")
-
-add_subdirectory(Plugins/glfw-3.3.4)
-# add the glfw lib to the linking process so that the includes are added.
-list(APPEND extra_libs glfw)
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 # add Glad
 add_subdirectory(Plugins/glad)
 list(APPEND extra_libs glad)
 
+# EASTL
 add_subdirectory(Plugins/EASTL)
 list(APPEND extra_libs EASTL)
 
+# ASSIMP
 add_subdirectory(Plugins/assimp)
 list(APPEND extra_libs assimp)
+
+# Add stb_image
+list(APPEND EXTRA_INCLUDES "${CMAKE_CURRENT_LIST_DIR}/Plugins/stb_image/")
+
+# Add GLM
+list(APPEND EXTRA_INCLUDES "${CMAKE_CURRENT_LIST_DIR}/Plugins/glm/")
 
 # Rendering API's libs
 list(APPEND extra_libs opengl32.lib)
@@ -32,12 +36,6 @@ list(APPEND extra_libs d3dcompiler.lib)
 
 # used to add all .cpp and .h files under source
 file(GLOB_RECURSE source_files CONFIGURE_DEPENDS "${CMAKE_CURRENT_LIST_DIR}/Engine/*.cpp" "${CMAKE_CURRENT_LIST_DIR}/Engine/*.h")
-
-# Add stb_image
-list(APPEND EXTRA_INCLUDES "${CMAKE_CURRENT_LIST_DIR}/Plugins/stb_image/")
-
-# Add GLM
-list(APPEND EXTRA_INCLUDES "${CMAKE_CURRENT_LIST_DIR}/Plugins/glm/")
 
 # used to create filters for all files one to one with their folder structure
 source_group(TREE ${CMAKE_CURRENT_LIST_DIR} FILES ${source_files})
@@ -66,35 +64,37 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 # Do not create GMock project
 option(BUILD_GMOCK OFF)
 
-ADD_SUBDIRECTORY(Plugins/googletest-main)
 
-enable_testing()
+# Google Test
 
-include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
+# ADD_SUBDIRECTORY(Plugins/googletest-main)
 
-include(GoogleTest)
+# enable_testing()
 
-list(APPEND source_files UnitTests/test.cpp)
+# include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 
-# Remove the original entry point so that the test one takes it's place
-get_filename_component(full_path_test_cpp ${CMAKE_CURRENT_SOURCE_DIR}/Engine/Source/Core/EntryPoint.cpp ABSOLUTE)
+# include(GoogleTest)
 
-list(REMOVE_ITEM source_files "${full_path_test_cpp}")
-add_executable(EngineTests ${source_files})
+# list(APPEND source_files UnitTests/test.cpp)
 
-target_include_directories(EngineTests PUBLIC
-                           "${PROJECT_BINARY_DIR}"
-                           ${EXTRA_INCLUDES}
-                           )
+# # Remove the original entry point so that the test one takes it's place
+# get_filename_component(full_path_test_cpp ${CMAKE_CURRENT_SOURCE_DIR}/Engine/Source/Core/EntryPoint.cpp ABSOLUTE)
+
+# list(REMOVE_ITEM source_files "${full_path_test_cpp}")
+# add_executable(EngineTests ${source_files})
+
+# target_include_directories(EngineTests PUBLIC
+                           # "${PROJECT_BINARY_DIR}"
+                           # ${EXTRA_INCLUDES}
+                           # )
 
 
 
-target_link_libraries(EngineTests PUBLIC gtest gtest_main ${extra_libs})
+# target_link_libraries(EngineTests PUBLIC gtest gtest_main ${extra_libs})
 
-gtest_discover_tests(EngineTests)
-
+# gtest_discover_tests(EngineTests)
 
 # Group Plugins in a separate folder
-set_target_properties(	glfw glad EASTL assimp gtest gtest_main EngineTests EAStdC EAAssert EAThread
+set_target_properties(	glad EASTL assimp EAStdC EAAssert EAThread
 						PROPERTIES
 						FOLDER "Plugins")		  

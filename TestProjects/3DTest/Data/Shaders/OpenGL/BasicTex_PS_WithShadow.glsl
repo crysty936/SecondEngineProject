@@ -30,7 +30,7 @@ float CalculateShadow()
 {
 	vec4 worldPos = vec4(ps_in.worldPos, 1.0);
 	vec4 fragPosViewSpace = ps_in.ShadowViewMatrix * worldPos;
-	float ViewSpaceDepthValue = abs(fragPosViewSpace.z);
+	float ViewSpaceDepthValue = -fragPosViewSpace.z; // Reverse z
 
 	int cascadeCount = ps_in.cascadesCount;
 	float cascadePlaneDistances[3] = ps_in.shadowCascadeFarPlanes;
@@ -159,14 +159,14 @@ void main()
 	//FragColor = vec4(vec3(depthValue), 1.0);
 	float shadow = CalculateShadow();
 
+	vec4 worldPos = vec4(ps_in.worldPos, 1.0);
+	vec4 fragPosViewSpace = ps_in.ShadowViewMatrix * worldPos;
 	vec3 color;
- 	if (bool(ps_in.bVisualizeMode))
+ 	if (bool(ps_in.bVisualizeMode) && -fragPosViewSpace.z > 0) 
  	{
-		// Recalculator for debug
+		// Recalculated for debug
 		int cascadeCount = ps_in.cascadesCount;
-		float cascadePlaneDistances[3] = { 20.0, 100.0 , 200.0 };
-		vec4 worldPos = vec4(ps_in.worldPos, 1.0);
-		vec4 fragPosViewSpace = ps_in.ShadowViewMatrix * worldPos;
+		float cascadePlaneDistances[3] = ps_in.shadowCascadeFarPlanes;
 		float ViewSpaceDepthValue = abs(fragPosViewSpace.z);
 
 		int layer = -1;
