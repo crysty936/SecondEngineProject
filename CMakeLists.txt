@@ -11,6 +11,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
+// Make sure all dll's are copied to the executable folder
+set (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+
 # add Glad
 add_subdirectory(Plugins/glad)
 list(APPEND extra_libs glad)
@@ -40,7 +44,7 @@ file(GLOB_RECURSE source_files CONFIGURE_DEPENDS "${CMAKE_CURRENT_LIST_DIR}/Engi
 # used to create filters for all files one to one with their folder structure
 source_group(TREE ${CMAKE_CURRENT_LIST_DIR} FILES ${source_files})
 
-add_library(SecondEngineProject ${source_files})
+add_library(SecondEngineProject STATIC ${source_files})
 
 target_link_libraries(SecondEngineProject PUBLIC ${extra_libs})
 

@@ -16,7 +16,7 @@
 #include "Renderer/Material/MaterialsManager.h"
 #include "Utils/InlineVector.h"
 
-TestGameMode GameMode = {};
+TestGameMode GGameMode = {};
 
 TestGameMode::TestGameMode() = default;
 TestGameMode::~TestGameMode() = default;
