@@ -11,9 +11,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-// Make sure all dll's are copied to the executable folder
-set (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
-set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+# Make sure all dll's are copied to the executable folder
+#set (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+#set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
 # add Glad
 add_subdirectory(Plugins/glad)
@@ -32,6 +32,10 @@ list(APPEND EXTRA_INCLUDES "${CMAKE_CURRENT_LIST_DIR}/Plugins/stb_image/")
 
 # Add GLM
 list(APPEND EXTRA_INCLUDES "${CMAKE_CURRENT_LIST_DIR}/Plugins/glm/")
+
+# Add ImGui
+add_subdirectory(Plugins/imgui)
+list(APPEND extra_libs imgui)
 
 # Rendering API's libs
 list(APPEND extra_libs opengl32.lib)
@@ -99,6 +103,6 @@ option(BUILD_GMOCK OFF)
 # gtest_discover_tests(EngineTests)
 
 # Group Plugins in a separate folder
-set_target_properties(	glad EASTL assimp EAStdC EAAssert EAThread
+set_target_properties(	glad EASTL assimp EAStdC EAAssert EAThread imgui
 						PROPERTIES
 						FOLDER "Plugins")		  

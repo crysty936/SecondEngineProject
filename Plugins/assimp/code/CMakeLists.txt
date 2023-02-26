@@ -1375,3 +1375,12 @@ if (ASSIMP_COVERALLS)
         ON                 # If we should upload.
         "${PROJECT_SOURCE_DIR}/cmake-modules/") # (Optional) Alternate project cmake module path.
 ENDIF()
+
+add_custom_command(TARGET assimp POST_BUILD        # Adds a post-build event to Assimp
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
+        "$(TargetDir)$(TargetFileName)"      # <--this is in-file
+        ${CMAKE_BINARY_DIR})                 # <--this is out-file path
+
+
+
+
