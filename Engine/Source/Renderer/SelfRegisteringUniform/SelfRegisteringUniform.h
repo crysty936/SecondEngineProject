@@ -4,15 +4,20 @@
 #include "EASTL/vector.h"
 #include "EASTL/shared_ptr.h"
 #include "Renderer/RHI/Resources/UniformBufferContainer.h"
+#include "Core/EngineUtils.h"
 
 class IUniformData
 {
 public:
-	virtual void SelfRegister(UniformBufferContainer& inBufferContainer) = 0;
+	virtual void SelfRegister(UniformBufferContainer& inBufferContainer, const size_t inRequiredCount) = 0;
 
 private:
 	virtual void* GetData() = 0;
+	/** Equal to GetElementSize for non array members*/
 	virtual size_t GetSize() = 0;
+
+	/** Equal to sizeof(T) */
+	virtual size_t GetElementSize() = 0;
 };
 
 template<typename T>
@@ -31,11 +36,15 @@ public:
 
 	virtual size_t GetSize() override 
 	{
+		return GetElementSize();
+	}
+
+	virtual size_t GetElementSize() override
+	{
 		return sizeof(T);
 	}
 
-
-	virtual void SelfRegister(UniformBufferContainer& inBufferContainer) override
+	virtual void SelfRegister(UniformBufferContainer& inBufferContainer, const size_t inRequiredCount) override
 	{
 		inBufferContainer.AddData(GetData(), GetSize());
 	}
@@ -62,12 +71,17 @@ public:
 
 	virtual size_t GetSize() override
 	{
-		return sizeof(float) * 4; // Align to 16 bytes
+		return GetElementSize();
 	}
 
-	virtual void SelfRegister(UniformBufferContainer& inBufferContainer) override
+	virtual void SelfRegister(UniformBufferContainer& inBufferContainer, const size_t inRequiredCount) override
 	{
 		inBufferContainer.AddData(GetData(), GetSize());
+	}
+
+	virtual size_t GetElementSize() override
+	{
+		return sizeof(float) * 4; // Align to 16 bytes
 	}
 
 public:
@@ -91,13 +105,21 @@ public:
 
 	virtual size_t GetSize() override
 	{
-		return sizeof(T) * Data.size();
+		return GetElementSize() * Data.size();
 	}
 
-	virtual void SelfRegister(UniformBufferContainer& inBufferContainer) override
+	virtual size_t GetElementSize() override
+	{
+		return sizeof(T);
+	}
+
+	virtual void SelfRegister(UniformBufferContainer& inBufferContainer, const size_t inRequiredCount) override
 	{
 		// Each element in an array has a base aligment of 4 * 4 = 16 bytes ( vec4 )
 
+		ASSERT(Data.size() <= inRequiredCount);
+
+		const int32_t paddingElementsCount = static_cast<int32_t>(inRequiredCount - Data.size());
 		if (sizeof(T) < 16)
 		{
 			// Each element is smaller than the required number, add one by one and let the buffer container align them
@@ -107,14 +129,26 @@ public:
  				//memcpy(&newData[16 - sizeof(T)], &Element, sizeof(T));
 				//inBufferContainer.AddData(&newData, 16, false);
 
-				inBufferContainer.AddData(&Element, sizeof(T), true);
+				inBufferContainer.AddData(&Element, GetElementSize(), true);
 			}
 
-			return;
+			// Add empty to fill the array
+			for (int32_t i = 0; i < paddingElementsCount; ++i)
+			{
+				inBufferContainer.AddData(nullptr, GetElementSize(), true);
+			}
 		}
+		else
+		{
+			// Elements have the right alignment, add all of them at once
+			inBufferContainer.AddData(GetData(), GetSize());
 
-		// Elements have the right alignment, add all of them at once
-		inBufferContainer.AddData(GetData(), GetSize());
+			// Add empty to fill the array
+			for (int32_t i = 0; i < paddingElementsCount; ++i)
+			{
+				inBufferContainer.AddData(nullptr, GetElementSize());
+			}
+		}
 	}
 
 public:
@@ -133,7 +167,7 @@ struct SelfRegisteringUniform
 	SelfRegisteringUniform(const eastl::vector<float>& inValue);
 	SelfRegisteringUniform(const eastl::vector<glm::mat4>& inValue);
 
-	void Register(class UniformBufferContainer& inBuffer) const;
+	void Register(class UniformBufferContainer& inBuffer, const size_t inRequiredCount) const;
 
 public:
 	enum class UniformType

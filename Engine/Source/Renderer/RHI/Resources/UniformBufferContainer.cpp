@@ -28,7 +28,11 @@ void UniformBufferContainer::AddData(const void* inData, const size_t inSize, co
 		UniformsCache.resize(Counter + finalSize);
 	}
 
-	memcpy(&UniformsCache[Counter], inData, inSize);
+	// Allow adding of padding
+	if (inData)
+	{
+		memcpy(&UniformsCache[Counter], inData, inSize);
+	}
 	Counter += finalSize;
 }
 

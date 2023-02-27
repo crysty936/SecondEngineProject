@@ -8,9 +8,10 @@
 
 struct UniformWithFlag
 {
-	UniformWithFlag(const eastl::string& inName) : UniformName{ inName } {}
+	UniformWithFlag(const eastl::string& inName, size_t inCount = 0) : UniformName{ inName }, RequiredCount{inCount} {}
 	eastl::string UniformName;
 	bool IsSet = false;
+	size_t RequiredCount = 0; // For array members
 };
 
 struct BufferWithRequirements

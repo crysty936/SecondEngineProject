@@ -44,7 +44,8 @@ const uint32_t SHADOW_HEIGHT = 1024;
 constexpr float CAMERA_FOV = 45.f;
 constexpr float CAMERA_NEAR = 0.1f;
 constexpr float CAMERA_FAR = 200.f;
-eastl::vector<float> shadowCascadeFarPlanes = { CAMERA_FAR / 10.0f, CAMERA_FAR / 2.0f, CAMERA_FAR};
+//eastl::vector<float> shadowCascadeFarPlanes = { CAMERA_FAR / 10.0f, CAMERA_FAR / 2.0f, CAMERA_FAR};
+eastl::vector<float> shadowCascadeFarPlanes = { CAMERA_FAR};
 
 static std::mutex RenderCommandsMutex;
 static std::mutex LoadQueueMutex;
@@ -419,13 +420,12 @@ void ForwardRenderer::DrawShadowMap()
  	RHI::Instance->PrepareProjectionForRendering(lightProjection);
 
 	UniformsCache["lsMatrices"] = lsMatrices;
-	UniformsCache["DirectionalLightDirection"] = glm::vec4(lightDir.x, lightDir.y, lightDir.z, 1.0);
-	//UniformsCache["DirectionalLightDirection"] = lightDir;
+	//UniformsCache["DirectionalLightDirection"] = glm::vec4(lightDir.x, lightDir.y, lightDir.z, 1.0);
+	UniformsCache["DirectionalLightDirection"] = lightDir;
 	UniformsCache["ShadowViewMatrix"] = ShadowViewMatrix;
 	UniformsCache["bVisualizeMode"] = bCascadeVisualizeMode ? 1 : 0;
-	UniformsCache["cascadesCount"] = int32_t(shadowCascadeFarPlanes.size() + 1);
+	UniformsCache["cascadesCount"] = int32_t(shadowCascadeFarPlanes.size());
 	UniformsCache["shadowCascadeFarPlanes"] = shadowCascadeFarPlanes;
-	//UniformsCache["shadowCascadeFarPlanes"] = glm::vec4(shadowCascadeFarPlanes[0], shadowCascadeFarPlanes[1], shadowCascadeFarPlanes[2], 0.f);
  
 // 	RenderCommandsMutex.lock();
  	DrawCommands(MainCommands);

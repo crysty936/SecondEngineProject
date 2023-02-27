@@ -60,7 +60,7 @@ void RenderMaterial::SetUniforms(eastl::unordered_map<eastl::string, SelfRegiste
 			}
 
 			const SelfRegisteringUniform& selfRegisteringUniform = (*iter).second;
-			selfRegisteringUniform.Register(buffer.BufferContainer);
+			selfRegisteringUniform.Register(buffer.BufferContainer, requiredUniform.RequiredCount);
 			requiredUniform.IsSet = true;
 		}
 

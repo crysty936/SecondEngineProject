@@ -29,8 +29,8 @@ SelfRegisteringUniform::SelfRegisteringUniform(const eastl::vector<glm::mat4>& i
 	: Type{ UniformType::Uniform4fvArray }, Data{ eastl::make_unique<SelfRegisteringUniformData<eastl::vector<glm::mat4>>>(inValue) } {}
 
 
-void SelfRegisteringUniform::Register(UniformBufferContainer& inBuffer) const
+void SelfRegisteringUniform::Register(UniformBufferContainer& inBuffer, const size_t inRequiredCount) const
 {
-	Data->SelfRegister(inBuffer);
+	Data->SelfRegister(inBuffer, inRequiredCount);
 }
 

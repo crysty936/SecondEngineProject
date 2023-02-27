@@ -25,7 +25,7 @@ void DepthMaterial::SetRequiredUniforms()
 	UBuffers.push_back({ vertexUniforms, ConstantBufferType::Vertex });
 
 	eastl::vector<UniformWithFlag> geometryUniforms = {
-	{"lsMatrices"}
+	{"lsMatrices", 3}
 	};
 
 	UBuffers.push_back({ geometryUniforms, ConstantBufferType::Geometry });
