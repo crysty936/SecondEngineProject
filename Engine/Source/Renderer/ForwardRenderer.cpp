@@ -44,8 +44,8 @@ const uint32_t SHADOW_HEIGHT = 1024;
 constexpr float CAMERA_FOV = 45.f;
 constexpr float CAMERA_NEAR = 0.1f;
 constexpr float CAMERA_FAR = 200.f;
-//eastl::vector<float> shadowCascadeFarPlanes = { CAMERA_FAR / 10.0f, CAMERA_FAR / 2.0f, CAMERA_FAR};
-eastl::vector<float> shadowCascadeFarPlanes = { CAMERA_FAR};
+eastl::vector<float> shadowCascadeFarPlanes = { CAMERA_FAR / 10.0f, CAMERA_FAR / 2.0f, CAMERA_FAR};
+//eastl::vector<float> shadowCascadeFarPlanes = { CAMERA_FAR};
 
 static std::mutex RenderCommandsMutex;
 static std::mutex LoadQueueMutex;
@@ -301,19 +301,6 @@ void ForwardRenderer::DrawSkybox()
 // 	glDepthFunc(GL_LESS);
 }
 
-glm::mat4 CreateMyOrthoRH(float left, float right, float bottom, float top, float zNear, float zFar)
-{
-	glm::mat4 Result(1);
-	Result[0][0] = 2.f / (right - left);
-	Result[1][1] = 2.f / (top - bottom);
-	Result[2][2] = 1.f / (zNear - zFar);
-	Result[3][0] = (left + right) / (left - right);
-	Result[3][1] = (top + bottom) / (bottom - top);
-	Result[3][2] = zNear / (zNear - zFar);
-
-	return Result;
-}
-
 glm::mat4 CreateMyOrthoLH(float left, float right, float bottom, float top, float zNear, float zFar)
 {
 	glm::mat4 Result(1);
@@ -337,7 +324,7 @@ glm::mat4 ForwardRenderer::CreateCascadeMatrix(const glm::mat4& inCameraProj, co
  	eastl::array<glm::vec3, 8> cameraProjPoints = RenderUtils::GenerateSpaceCorners(worldToCameraClip);
  
 	// Point light at light dir relative to center of projection
-	const glm::mat4 lightView = glm::lookAt(cameraProjCenter, cameraProjCenter + inLightDir, glm::vec3(0.0f, 1.0f, 0.0f));
+	const glm::mat4 lightView = glm::lookAtLH(cameraProjCenter, cameraProjCenter + inLightDir, glm::vec3(0.0f, 1.0f, 0.0f));
 
  	for (const glm::vec3& point : cameraProjPoints)
  	{
@@ -345,10 +332,7 @@ glm::mat4 ForwardRenderer::CreateCascadeMatrix(const glm::mat4& inCameraProj, co
  		projBox += glm::vec3(lightSpacePoint.x, lightSpacePoint.y, lightSpacePoint.z);
  	}
  
-	//lightProjection = glm::orthoRH_ZO(projBox.Min.x, projBox.Max.x, projBox.Min.y, projBox.Max.y, projBox.Min.z, projBox.Max.z); // non-reversed, for some reason doesn't fit right
-	//lightProjection = CreateMyOrthoRH(projBox.Min.x, projBox.Max.x, projBox.Min.y, projBox.Max.y, projBox.Min.z, projBox.Max.z); // non-reversed, for some reason doesn't fit right
-	const glm::mat4 lightProjection = CreateMyOrthoLH(projBox.Min.x, projBox.Max.x, projBox.Min.y, projBox.Max.y, projBox.Min.z, projBox.Max.z); // for this, it looks correct, but obviously, the proj is reversed so depth map is incorrect
-	//lightProjection = glm::orthoLH_ZO(projBox.Min.x, projBox.Max.x, projBox.Min.y, projBox.Max.y, projBox.Min.z, projBox.Max.z); // for this, it looks correct, but obviously, the proj is reversed so depth map is incorrect
+	const glm::mat4 lightProjection = glm::orthoLH_ZO(projBox.Min.x, projBox.Max.x, projBox.Min.y, projBox.Max.y, projBox.Min.z, projBox.Max.z);
 
 	return lightProjection * lightView;
 }

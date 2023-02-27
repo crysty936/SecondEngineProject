@@ -22,6 +22,8 @@ public:
 	void DebugProjections();
 	void DebugCascadesVisualize();
 	void DebugCursorMode();
+	void BoostCameraSpeed();
+
 private:
 	eastl::shared_ptr<class Camera> GameCamera = nullptr;
 	eastl::unique_ptr<class Controller> GameController = nullptr;

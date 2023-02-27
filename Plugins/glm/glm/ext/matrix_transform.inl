@@ -112,8 +112,8 @@ namespace glm
 		Result[0][2] =-f.x;
 		Result[1][2] =-f.y;
 		Result[2][2] =-f.z;
-		Result[3][0] =-dot(s, eye);
-		Result[3][1] =-dot(u, eye);
+		Result[3][0] = -dot(s, eye);
+		Result[3][1] = -dot(u, eye);
 		Result[3][2] = dot(f, eye);
 		return Result;
 	}

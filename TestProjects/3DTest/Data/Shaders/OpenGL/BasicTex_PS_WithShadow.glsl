@@ -59,7 +59,7 @@ float CalculateShadow()
 	//float shadowSamplerTest = texture(depthTexture, vec3(projCoords.xy, projCoords.z + 0.001));
 
 	// No need to remap this to 0..1 as 0..1 matrices are being used
-	float pixelLightSpaceDepth = 1.0 - lsPosFinal.z; // Reversed Z
+	float pixelLightSpaceDepth = lsPosFinal.z; // Reversed Z
 
 	// 2 different ways of calculating bias 
 	float cosTheta = clamp(dot(ps_in.Normal, ps_in.DirectionalLightDirection), 0.0, 1.0);
@@ -162,12 +162,12 @@ void main()
 	vec4 worldPos = vec4(ps_in.worldPos, 1.0);
 	vec4 fragPosViewSpace = ps_in.ShadowViewMatrix * worldPos;
 	vec3 color;
- 	if (bool(ps_in.bVisualizeMode) && -fragPosViewSpace.z > 0) 
+ 	if (bool(ps_in.bVisualizeMode) && fragPosViewSpace.z > 0) 
  	{
 		// Recalculated for debug
 		int cascadeCount = ps_in.cascadesCount;
 		float cascadePlaneDistances[3] = ps_in.shadowCascadeFarPlanes;
-		float ViewSpaceDepthValue = abs(fragPosViewSpace.z);
+		float ViewSpaceDepthValue = fragPosViewSpace.z;
 
 		int layer = -1;
 		for (int i = 0; i < cascadeCount; ++i)

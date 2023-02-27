@@ -240,6 +240,14 @@ void TestGameMode::Init()
 		GameController->AddListener(createFloorAction);
 	}
 
+	{
+		KeyActionDelegate cameraMovementDelegate = KeyActionDelegate::CreateRaw(this, &TestGameMode::BoostCameraSpeed);
+		EInputKey createFloorKey = EInputKey::LeftShift;
+		OnKeyAction createFloorAction = { cameraMovementDelegate, createFloorKey, true };
+		GameController->AddListener(createFloorAction);
+	}
+
+
 
 	// Debug
 
@@ -336,7 +344,7 @@ void TestGameMode::Init()
 
 }
 
-constexpr float CameraSpeed = 0.4f;
+float CameraSpeed = 0.4f;
 
 void TestGameMode::Tick(float inDeltaT)
 {
@@ -393,5 +401,24 @@ void TestGameMode::DebugCursorMode()
 
 	test = !test;
 }
+
+
+void TestGameMode::BoostCameraSpeed()
+{
+	static bool boostOn = false;
+
+	if (boostOn)
+	{
+		CameraSpeed = 0.4f;
+	}
+	else
+	{
+		CameraSpeed = 10.f;
+	}
+
+	boostOn = !boostOn;
+
+}
+
 
 

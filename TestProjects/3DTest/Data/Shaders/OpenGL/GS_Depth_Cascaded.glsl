@@ -12,7 +12,7 @@ void main()
 	{
 		gl_Position =
 			worldToLightClipMatrices[gl_InvocationID] * gl_in[i].gl_Position;
-		gl_Position.z = 1 - gl_Position.z;
+		gl_Position.z = gl_Position.z;
 
 		if (gl_Position.z < 0.0)
 		{
