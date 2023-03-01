@@ -258,7 +258,7 @@ OpenGLRHI::OpenGLRHI()
 
 	glDisable(GL_DEPTH_CLAMP);
 
-	// Set Z to 0..1
+	// Set Z to 0-1
 	glClipControl(GL_LOWER_LEFT, GL_ZERO_TO_ONE);
 
 	glDebugMessageCallback(GLUtils::GLDebugCallback, nullptr);

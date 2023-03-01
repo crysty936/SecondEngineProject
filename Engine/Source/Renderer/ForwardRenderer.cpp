@@ -33,8 +33,6 @@
 #include "RenderUtils.h"
 #include "Math/AABB.h"
 
-//#include "imgui.h"
-
 constexpr glm::vec4 ClearColor(0.3f, 0.5f, 1.f, 0.4f);
 constexpr glm::vec3 lightPos(-10.0f, 20.0f, -0.2f);
 
@@ -280,8 +278,6 @@ void ForwardRenderer::Draw()
 //  	DrawCommand(ScreenQuad->GetCommand());
 
 	DrawDebugPoints();
-
-	RHI::Instance->SwapBuffers();
 }
 
 void ForwardRenderer::DrawSkybox()
@@ -395,11 +391,16 @@ void ForwardRenderer::DrawShadowMap()
 
 	}
 
-	for (const glm::mat4& worldToLightClip : lsMatrices)
+	constexpr bool drawDebug = false;
+
+	if (drawDebug)
 	{
-		DrawDebugHelpers::DrawProjection(worldToLightClip);
+		for (const glm::mat4& worldToLightClip : lsMatrices)
+		{
+			DrawDebugHelpers::DrawProjection(worldToLightClip);
+		}
+ 		DrawDebugHelpers::DrawProjection(debugMatrixCamera);
 	}
- 	DrawDebugHelpers::DrawProjection(debugMatrixCamera);
 
  	RHI::Instance->PrepareProjectionForRendering(lightProjection);
 

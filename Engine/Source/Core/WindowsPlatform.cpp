@@ -14,6 +14,12 @@
 #include <atlwin.h>
 #include "EASTL/string.h"
 
+#include "imgui.h"
+#include "backends/imgui_impl_win32.h"
+#include "backends/imgui_impl_opengl3.h"
+
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
 // Wrapper over Windows.h functionality
 namespace WindowsPlatform
 {
@@ -362,6 +368,35 @@ namespace WindowsPlatform
 	{
 		SetWindowTextW(static_cast<HWND>(Engine->GetMainWindow().GetHandle()), inText.c_str());
 	}
+
+	void InitImGUI()
+	{
+		IMGUI_CHECKVERSION();
+		ImGui::CreateContext();
+		ImGuiIO& io = ImGui::GetIO(); (void)io;
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+		io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+		ImGui::StyleColorsDark();
+
+		ImGuiStyle& style = ImGui::GetStyle();
+		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+		{
+			style.WindowRounding = 0.0f;
+			style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+		}
+
+
+
+		ImGui_ImplWin32_Init(static_cast<HWND>(Engine->GetMainWindow().GetHandle()));
+		ImGui_ImplOpenGL3_Init("#version 420");
+
+
+
+
+
+	}
+
 	// Message Loop
 
 	void PoolMessages()
@@ -381,6 +416,10 @@ namespace WindowsPlatform
 
 	LRESULT WindowMessageLoop(HWND hwnd, uint32_t msg, WPARAM wParam, LPARAM lParam)
 	{
+
+		if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wParam, lParam))
+			return true;
+
 		// Forward hwnd on because we can get messages (e.g., WM_CREATE)
 		// before CreateWindow returns, and thus before mhMainWnd is valid.
 
@@ -1215,6 +1254,8 @@ namespace WindowsPlatform
 
 		InputSystem::MousePosChangedCallback(inNewYaw, inNewPitch);
 	}
+
+
 
 
 }
