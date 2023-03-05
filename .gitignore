@@ -343,3 +343,6 @@ healthchecksdb
 #Build Folders
 [Bb]uild/
 [Ee]ngineBuild/
+
+#Weirdly included submodule foldrs
+EASTL/

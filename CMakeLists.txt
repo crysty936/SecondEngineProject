@@ -103,6 +103,6 @@ option(BUILD_GMOCK OFF)
 # gtest_discover_tests(EngineTests)
 
 # Group Plugins in a separate folder
-set_target_properties(	glad EASTL assimp EAStdC EAAssert EAThread imgui
+set_target_properties(	glad assimp imgui EASTL EAStdC EAAssert EAThread 
 						PROPERTIES
 						FOLDER "Plugins")		  
