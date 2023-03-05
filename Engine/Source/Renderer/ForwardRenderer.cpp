@@ -32,6 +32,8 @@
 #include "DrawDebugHelpers.h"
 #include "RenderUtils.h"
 #include "Math/AABB.h"
+#include "imgui.h"
+#include "backends/imgui_impl_opengl3.h"
 
 constexpr glm::vec4 ClearColor(0.3f, 0.5f, 1.f, 0.4f);
 constexpr glm::vec3 lightPos(-10.0f, 20.0f, -0.2f);
@@ -278,6 +280,26 @@ void ForwardRenderer::Draw()
 //  	DrawCommand(ScreenQuad->GetCommand());
 
 	DrawDebugPoints();
+
+
+	ImGui::Render();
+
+	// 	ImGuiIO& io = ImGui::GetIO();
+	// 	(void)io;
+	// 	glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
+	// 	glClear(GL_COLOR_BUFFER_BIT);
+
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+	// Update and Render additional Platform Windows
+	if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+	{
+		ImGui::UpdatePlatformWindows();
+		ImGui::RenderPlatformWindowsDefault();
+	}
+
+
+	RHI::Instance->SwapBuffers();
+
 }
 
 void ForwardRenderer::DrawSkybox()

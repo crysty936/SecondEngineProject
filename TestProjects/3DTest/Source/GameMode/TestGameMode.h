@@ -29,6 +29,7 @@ private:
 	eastl::unique_ptr<class Controller> GameController = nullptr;
 
 
+	eastl::shared_ptr<class AssimpModel3D> AssimpModel;
 	EntityPtr Object;
 	EntityPtr YObject;
 	EntityPtr ZObject;

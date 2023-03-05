@@ -17,6 +17,7 @@
 #include "imgui.h"
 #include "backends/imgui_impl_win32.h"
 #include "backends/imgui_impl_opengl3.h"
+#include "Renderer/RHI/OpenGL/OpenGLRHI.h"
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -369,7 +370,7 @@ namespace WindowsPlatform
 		SetWindowTextW(static_cast<HWND>(Engine->GetMainWindow().GetHandle()), inText.c_str());
 	}
 
-	void InitImGUI()
+	void InitImGUI(void* handle)
 	{
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
@@ -386,15 +387,8 @@ namespace WindowsPlatform
 			style.Colors[ImGuiCol_WindowBg].w = 1.0f;
 		}
 
-
-
-		ImGui_ImplWin32_Init(static_cast<HWND>(Engine->GetMainWindow().GetHandle()));
+        ImGui_ImplWin32_InitForOpenGL(static_cast<HWND>(Engine->GetMainWindow().GetHandle()), handle);
 		ImGui_ImplOpenGL3_Init("#version 420");
-
-
-
-
-
 	}
 
 	// Message Loop

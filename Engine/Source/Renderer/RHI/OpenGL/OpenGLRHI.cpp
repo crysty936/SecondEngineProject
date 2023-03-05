@@ -15,6 +15,9 @@
 #include "Renderer/RHI/OpenGL/Resources/GLTexture2D.h"
 #include "glm/ext/matrix_transform.hpp"
 #include "Resources/GLFrameBuffer.h"
+#include "Core/WindowsPlatform.h"
+#include "imgui.h"
+#include "backends/imgui_impl_opengl3.h"
 
 namespace GLUtils
 {
@@ -28,6 +31,10 @@ namespace GLUtils
 #define WGL_CONTEXT_PROFILE_MASK_ARB              0x9126
 
 #define WGL_CONTEXT_CORE_PROFILE_BIT_ARB          0x00000001
+#define WGL_CONTEXT_FLAGS_ARB 0x2094
+#define WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB 0x00000002
+#define WGL_CONTEXT_DEBUG_BIT_ARB 0x00000001
+
 
 	typedef BOOL WINAPI wglChoosePixelFormatARB_type(HDC hdc, const int* piAttribIList, const FLOAT* pfAttribFList, UINT nMaxFormats, int* piFormats, UINT* nNumFormats);
 
@@ -191,33 +198,40 @@ namespace GLUtils
 		UINT num_formats;
 		wglChoosePixelFormatARB(real_dc, pixel_format_attribs, 0, 1, &pixel_format, &num_formats);
 		if (!num_formats) {
-			ASSERT_MSG(false, "Failed to set the OpenGL 3.3 pixel format.");
+			ASSERT_MSG(false, "Failed to set the OpenGL pixel format.");
 		}
 
 		PIXELFORMATDESCRIPTOR pfd;
 		DescribePixelFormat(real_dc, pixel_format, sizeof(pfd), &pfd);
 		if (!SetPixelFormat(real_dc, pixel_format, &pfd)) {
-			ASSERT_MSG(false, "Failed to set the OpenGL 3.3 pixel format.");
+			ASSERT_MSG(false, "Failed to set the OpenGL pixel format.");
 		}
 
-		// Specify that we want to create an OpenGL 3.3 core profile context
-		int gl33_attribs[] = {
+		// Specify that we want to create an OpenGL 4.2 core profile context
+		int gl42_attribs[] = {
 			WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
 			WGL_CONTEXT_MINOR_VERSION_ARB, 2,
 			WGL_CONTEXT_PROFILE_MASK_ARB,  WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
+#ifdef _DEBUG
+			//WGL_CONTEXT_DEBUG_BIT_ARB,
+#endif
+			//
+			WGL_CONTEXT_FLAGS_ARB,
+			WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB,
+
 			0,
 		};
 
-		HGLRC gl33_context = wglCreateContextAttribsARB(real_dc, 0, gl33_attribs);
-		if (!gl33_context) {
-			ASSERT_MSG(false, "Failed to create OpenGL 3.3 context.");
+		HGLRC gl42_context = wglCreateContextAttribsARB(real_dc, 0, gl42_attribs);
+		if (!gl42_context) {
+			ASSERT_MSG(false, "Failed to create OpenGL 4.2 context.");
 		}
 
-		if (!wglMakeCurrent(real_dc, gl33_context)) {
-			ASSERT_MSG(false, "Failed to activate OpenGL 3.3 rendering context.");
+		if (!wglMakeCurrent(real_dc, gl42_context)) {
+			ASSERT_MSG(false, "Failed to activate OpenGL 4.2 rendering context.");
 		}
 
-		return gl33_context;
+		return gl42_context;
 	}
 
 	static glProc getProcAddressGLWindows(const char* procname)
@@ -239,6 +253,8 @@ OpenGLRHI::OpenGLRHI()
 	GLUtils::gldc = GetDC(static_cast<HWND>(Engine->GetMainWindow().GetHandle()));
 	HGLRC glrc = GLUtils::init_opengl(GLUtils::gldc);
 
+	WindowsPlatform::InitImGUI(glrc);
+	
 	const bool gladSuccess = gladLoadGLLoader((GLADloadproc)GLUtils::getProcAddressGLWindows) == 1;
 	ASSERT(gladSuccess);
 

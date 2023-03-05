@@ -298,9 +298,9 @@ void TestGameMode::Init()
 	eastl::shared_ptr<LightSource> lightObj = EntityHelper::CreateObject<LightSource>();
 	lightObj->SetRelativeLocation(glm::vec3(-5.0f, 20.0f, -0.2f));
 
- 	eastl::shared_ptr<AssimpModel3D> shibaModel = EntityHelper::CreateObject<AssimpModel3D>("../Data/Models/Shiba/scene.gltf");
- 	shibaModel->SetScale(glm::vec3(10.f, 10.f, 10.f));
- 	shibaModel->Move(glm::vec3(0.f, 10.f, 0.f));
+	AssimpModel = eastl::shared_ptr<AssimpModel3D>(EntityHelper::CreateObject<AssimpModel3D>("../Data/Models/Shiba/scene.gltf"));
+	AssimpModel->SetScale(glm::vec3(10.f, 10.f, 10.f));
+	AssimpModel->Move(glm::vec3(0.f, 10.f, 0.f));
 
  	eastl::shared_ptr<AssimpModel3D> floorModel = EntityHelper::CreateObject<AssimpModel3D>("../Data/Models/Floor/scene.gltf");
 	floorModel->Move(glm::vec3(0.f, -2.f, 0.f));
@@ -349,7 +349,10 @@ float CameraSpeed = 0.4f;
 void TestGameMode::Tick(float inDeltaT)
 {
 	GameController->ExecuteCallbacks();
+
+	AssimpModel->Rotate(0.1f, glm::vec3(1.f, 0.f, 0.f));
 }
+
 
 void TestGameMode::MoveCameraLeft()
 {
