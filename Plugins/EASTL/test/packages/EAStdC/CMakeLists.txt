@@ -21,6 +21,10 @@ include(CommonCppFlags)
 file(GLOB EASTDC_SOURCES "source/*.cpp")
 add_library(EAStdC ${EASTDC_SOURCES})
 
+if(EASTDC_BUILD_TESTS)
+    add_subdirectory(test)
+endif()
+
 #-------------------------------------------------------------------------------------------
 # Defines
 #-------------------------------------------------------------------------------------------

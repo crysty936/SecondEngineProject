@@ -709,10 +709,8 @@ namespace eastl
 				try
 				{
 			#endif
-					for (; first != last; ++first, ++currentDest) 
-					{
+					for(; first != last; ++first, ++currentDest)
 						::new((void*)eastl::addressof(*currentDest)) value_type(eastl::move(*first)); // If value_type has a move constructor then it will be used here.
-					}
 			#if EASTL_EXCEPTIONS_ENABLED
 				}
 				catch(...)
@@ -1683,6 +1681,41 @@ namespace eastl
 		static pointer pointer_to(typename eastl::conditional<eastl::is_void<element_type>::value, void, element_type>::type& r) EA_NOEXCEPT
 			{ return eastl::addressof(r); } // 20.6.3.2: if element_type is (possibly cv-qualified) void, the type of r is unspecified; otherwise, it is T&.
 	};
+
+	///////////////////////////////////////////////////////////////////////
+	// to_address
+	//
+	// Helper that call the customization point in pointer_traits<T>::to_address for retrieving the address of a pointer.
+	// This is useful if you are using fancy-pointers.
+	///////////////////////////////////////////////////////////////////////
+
+	namespace Internal
+	{
+		template <class T>
+		using detect_pointer_traits_to_address = decltype(eastl::pointer_traits<T>::to_address(eastl::declval<const T&>()));
+
+		template <class T>
+		using result_detect_pointer_traits_to_address = eastl::is_detected<detect_pointer_traits_to_address, T>;
+	}
+
+	template<class T>
+	EA_CPP14_CONSTEXPR T* to_address(T* p) noexcept
+	{
+		static_assert(!eastl::is_function<T>::value, "Cannot call to_address with a function pointer. C++20 20.2.4.1 - Pointer conversion.");
+		return p;
+	}
+
+	template <class Ptr, typename eastl::enable_if<Internal::result_detect_pointer_traits_to_address<Ptr>::value, int>::type = 0>
+	EA_CPP14_CONSTEXPR auto to_address(const Ptr& ptr) noexcept -> decltype(eastl::pointer_traits<Ptr>::to_address(ptr))
+	{
+		return eastl::pointer_traits<Ptr>::to_address(ptr);
+	}
+
+	template <class Ptr, typename eastl::enable_if<!Internal::result_detect_pointer_traits_to_address<Ptr>::value, int>::type = 0>
+	EA_CPP14_CONSTEXPR auto to_address(const Ptr& ptr) noexcept -> decltype(to_address(ptr.operator->()))
+	{
+		return to_address(ptr.operator->());
+	}
 
 } // namespace eastl
 

@@ -64,12 +64,6 @@ namespace eastl
 		const char* get_name() const;
 		void        set_name(const char* pName);
 
-		// Begin: Cristian
-		// Allow support for inline allocator by allowing allocators to say how much the capacity should grow
-
-		static eastl_size_t GetNewCapacity(eastl_size_t currentCapacity);
-
-		// End: Cristian
 	protected:
 		#if EASTL_NAME_ENABLED
 			const char* mpName; // Debug name, used to track memory.
@@ -77,8 +71,9 @@ namespace eastl
 	};
 
 	bool operator==(const allocator& a, const allocator& b);
+#if !defined(EA_COMPILER_HAS_THREE_WAY_COMPARISON)
 	bool operator!=(const allocator& a, const allocator& b);
-
+#endif
 
 
 	/// dummy_allocator
@@ -103,8 +98,9 @@ namespace eastl
 	};
 
 	inline bool operator==(const dummy_allocator&, const dummy_allocator&) { return true;  }
+#if !defined(EA_COMPILER_HAS_THREE_WAY_COMPARISON)
 	inline bool operator!=(const dummy_allocator&, const dummy_allocator&) { return false; }
-
+#endif
 
 
 	/// Defines a static default allocator which is constant across all types.
@@ -232,15 +228,8 @@ namespace eastl
 			#endif
 		}
 
-		// Begin: Cristian
-	    // Allow support for inline allocator by allowing allocators to say how much the capacity should grow
-	    inline eastl_size_t allocator::GetNewCapacity(eastl_size_t currentCapacity) 
-		{
-		    return (currentCapacity > 0) ? (2 * currentCapacity) : 1;
-		}
-	    // End: Cristian
 
-	    inline void* allocator::allocate(size_t n, int flags)
+		inline void* allocator::allocate(size_t n, int flags)
 		{
 			#if EASTL_NAME_ENABLED
 				#define pName mpName
@@ -312,12 +301,12 @@ namespace eastl
 			return true; // All allocators are considered equal, as they merely use global new/delete.
 		}
 
-
+#if !defined(EA_COMPILER_HAS_THREE_WAY_COMPARISON)
 		inline bool operator!=(const allocator&, const allocator&)
 		{
 			return false; // All allocators are considered equal, as they merely use global new/delete.
 		}
-
+#endif
 
 	} // namespace eastl
 
