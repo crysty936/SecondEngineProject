@@ -105,7 +105,7 @@ eastl::shared_ptr<RHIShader> AssimpModel3D::CreateShaders(const VertexInputLayou
 		{ "ModelWorldPosition_VS_Pos-UV-Normal_WithShadow_ManuallyWritten", EShaderType::Vertex },
 		{ "BasicTex_PS_WithShadow", EShaderType::Fragment } };
 
-	return RHI::Instance->CreateShaderFromPath(shaders, inLayout);
+	return RHI::Get()->CreateShaderFromPath(shaders, inLayout);
 }
 
 void AssimpModel3D::AddAdditionalBuffers(eastl::shared_ptr<MeshDataContainer>& inDataContainer) const
@@ -196,9 +196,9 @@ void AssimpModel3D::ProcessMesh(const aiMesh& inMesh, const aiScene& inScene, ea
 		}
 
 		const int32_t indicesCount = static_cast<int32_t>(indices.size());
-		eastl::shared_ptr<RHIIndexBuffer> ib = RHI::Instance->CreateIndexBuffer(indices.data(), indicesCount);
+		eastl::shared_ptr<RHIIndexBuffer> ib = RHI::Get()->CreateIndexBuffer(indices.data(), indicesCount);
 		const int32_t verticesCount = static_cast<int32_t>(vertices.size());
-		const eastl::shared_ptr<RHIVertexBuffer> vb = RHI::Instance->CreateVertexBuffer(inputLayout, vertices, ib);
+		const eastl::shared_ptr<RHIVertexBuffer> vb = RHI::Get()->CreateVertexBuffer(inputLayout, vertices, ib);
 
 		dataContainer->VBuffer = vb;
 	}
@@ -226,7 +226,7 @@ eastl::vector<eastl::shared_ptr<RHITexture2D>> AssimpModel3D::LoadMaterialTextur
 		if (!IsTextureLoaded(Str.C_Str(), tex))
 		{
 			const eastl::string path = ModelDir + eastl::string("/") + eastl::string(Str.C_Str());
-			tex = RHI::Instance->CreateTexture2D(path);
+			tex = RHI::Get()->CreateTexture2D(path);
 			tex->SourcePath = eastl::string(Str.C_Str());
 			LoadedTextures.push_back(tex);
 		}

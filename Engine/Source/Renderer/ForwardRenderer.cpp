@@ -33,7 +33,6 @@
 #include "RenderUtils.h"
 #include "Math/AABB.h"
 #include "imgui.h"
-#include "backends/imgui_impl_opengl3.h"
 
 constexpr glm::vec4 ClearColor(0.3f, 0.5f, 1.f, 0.4f);
 constexpr glm::vec3 lightPos(-10.0f, 20.0f, -0.2f);
@@ -81,7 +80,7 @@ ForwardRenderer::ForwardRenderer(const WindowProperties& inMainWindowProperties)
 {
 	SetViewportSizeToMain();
 
-	RHI::Instance->ClearColor(ClearColor);
+	RHI::Get()->ClearColor(ClearColor);
 
 	// Set the default uniforms
 	SetBaseUniforms();
@@ -134,12 +133,12 @@ eastl::shared_ptr<RHIVertexBuffer> DebugLinesBuffer = nullptr;
 
 		 if (!DebugPointsBuffer)
 		 {
-			 DebugPointsBuffer = RHI::Instance->CreateVertexBuffer(inputLayout, debugPoints.data(), pointsSize);
+			 DebugPointsBuffer = RHI::Get()->CreateVertexBuffer(inputLayout, debugPoints.data(), pointsSize);
 		 }
 		 else
 		 {
-			 RHI::Instance->ClearVertexBuffer(*DebugPointsBuffer);
-			 RHI::Instance->UpdateVertexBufferData(*DebugPointsBuffer, debugPoints.data(), pointsSize);
+			 RHI::Get()->ClearVertexBuffer(*DebugPointsBuffer);
+			 RHI::Get()->UpdateVertexBufferData(*DebugPointsBuffer, debugPoints.data(), pointsSize);
 		 }
 
 		 MaterialsManager& matManager = MaterialsManager::Get();
@@ -152,23 +151,23 @@ eastl::shared_ptr<RHIVertexBuffer> DebugLinesBuffer = nullptr;
 			 { "WorldPosition_VS_Pos_ManuallyWritten", EShaderType::Vertex },
 			 { "FlatColor_PS", EShaderType::Fragment } };
 
-			 material->Shader = RHI::Instance->CreateShaderFromPath(shaders, inputLayout);
+			 material->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
 		 }
 
 		 constexpr bool useIndexBuffer = false;
-		 RHI::Instance->BindVertexBuffer(*DebugPointsBuffer, useIndexBuffer);
-		 RHI::Instance->BindShader(*material->Shader);
+		 RHI::Get()->BindVertexBuffer(*DebugPointsBuffer, useIndexBuffer);
+		 RHI::Get()->BindShader(*material->Shader);
 
 		 material->ResetUniforms();
 
 		 material->SetUniforms(UniformsCache);
 		 material->BindBuffers();
 
-		 RHI::Instance->DrawPoints(numPoints);
+		 RHI::Get()->DrawPoints(numPoints);
 
-		 RHI::Instance->UnbindVertexBuffer(*DebugPointsBuffer, useIndexBuffer);
+		 RHI::Get()->UnbindVertexBuffer(*DebugPointsBuffer, useIndexBuffer);
 		 material->UnbindBuffers();
-		 RHI::Instance->UnbindShader(*material->Shader);
+		 RHI::Get()->UnbindShader(*material->Shader);
 	 }
 
 	 // Lines
@@ -185,12 +184,12 @@ eastl::shared_ptr<RHIVertexBuffer> DebugLinesBuffer = nullptr;
 
 		 if (!DebugLinesBuffer)
 		 {
-			 DebugLinesBuffer = RHI::Instance->CreateVertexBuffer(inputLayout, debugLines.data(), linesSize);
+			 DebugLinesBuffer = RHI::Get()->CreateVertexBuffer(inputLayout, debugLines.data(), linesSize);
 		 }
 		 else
 		 {
-			 RHI::Instance->ClearVertexBuffer(*DebugLinesBuffer);
-			 RHI::Instance->UpdateVertexBufferData(*DebugLinesBuffer, debugLines.data(), linesSize);
+			 RHI::Get()->ClearVertexBuffer(*DebugLinesBuffer);
+			 RHI::Get()->UpdateVertexBufferData(*DebugLinesBuffer, debugLines.data(), linesSize);
 		 }
 
 		 MaterialsManager& matManager = MaterialsManager::Get();
@@ -204,23 +203,23 @@ eastl::shared_ptr<RHIVertexBuffer> DebugLinesBuffer = nullptr;
 			 { "GS_DebugLines", EShaderType::Geometry },
 			 { "PS_DebugLine_Color", EShaderType::Fragment } };
 
-			 material->Shader = RHI::Instance->CreateShaderFromPath(shaders, inputLayout);
+			 material->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
 		 }
 
 		 constexpr bool useIndexBuffer = false;
-		 RHI::Instance->BindVertexBuffer(*DebugLinesBuffer, useIndexBuffer);
-		 RHI::Instance->BindShader(*material->Shader);
+		 RHI::Get()->BindVertexBuffer(*DebugLinesBuffer, useIndexBuffer);
+		 RHI::Get()->BindShader(*material->Shader);
 
 		 material->ResetUniforms();
 
 		 material->SetUniforms(UniformsCache);
 		 material->BindBuffers();
 
-		 RHI::Instance->DrawPoints(static_cast<int32_t>(debugLines.size()));
+		 RHI::Get()->DrawPoints(static_cast<int32_t>(debugLines.size()));
 
-		 RHI::Instance->UnbindVertexBuffer(*DebugLinesBuffer, useIndexBuffer);
+		 RHI::Get()->UnbindVertexBuffer(*DebugLinesBuffer, useIndexBuffer);
 		 material->UnbindBuffers();
-		 RHI::Instance->UnbindShader(*material->Shader);
+		 RHI::Get()->UnbindShader(*material->Shader);
 	 }
 	
 	 DrawDebugManager::Get().ClearDebugData();
@@ -230,18 +229,18 @@ void ForwardRenderer::Init(const WindowProperties & inMainWindowProperties)
 {
 	Instance = new ForwardRenderer{ inMainWindowProperties };
 
-	GlobalFrameBuffer = RHI::Instance->CreateDepthStencilFrameBuffer();
-	GlobalRenderTexture = RHI::Instance->CreateRenderTexture();
-	RHI::Instance->AttachTextureToFramebufferColor(*GlobalFrameBuffer, *GlobalRenderTexture);
+	GlobalFrameBuffer = RHI::Get()->CreateDepthStencilFrameBuffer();
+	GlobalRenderTexture = RHI::Get()->CreateRenderTexture();
+	RHI::Get()->AttachTextureToFramebufferColor(*GlobalFrameBuffer, *GlobalRenderTexture);
 
 	ScreenQuad = EntityHelper::CreateObject<FullScreenQuad>(GlobalRenderTexture);
 	ScreenQuad->CreateCommand();
 	ScreenQuad->GetCommand().Material->OwnedTextures.push_back(GlobalRenderTexture);
 
-	DepthFrameBuffer = RHI::Instance->CreateEmptyFrameBuffer();
+	DepthFrameBuffer = RHI::Get()->CreateEmptyFrameBuffer();
 	//DepthRenderTexture = RHI::Instance->CreateDepthMap(SHADOW_WIDTH, SHADOW_HEIGHT);
-	DepthRenderTexture = RHI::Instance->CreateArrayDepthMap(SHADOW_WIDTH, SHADOW_HEIGHT, static_cast<int32_t>(shadowCascadeFarPlanes.size()));
-	RHI::Instance->AttachTextureToFramebufferDepth(*DepthFrameBuffer, *DepthRenderTexture);
+	DepthRenderTexture = RHI::Get()->CreateArrayDepthMap(SHADOW_WIDTH, SHADOW_HEIGHT, static_cast<int32_t>(shadowCascadeFarPlanes.size()));
+	RHI::Get()->AttachTextureToFramebufferDepth(*DepthFrameBuffer, *DepthRenderTexture);
 }
 
 void ForwardRenderer::Terminate()
@@ -258,7 +257,7 @@ void ForwardRenderer::Draw()
 	DrawShadowMap();
 
 	// Clear default framebuffer buffers
-	RHI::Instance->ClearBuffers();
+	RHI::Get()->ClearBuffers();
 
 	//RHI::Instance->BindFrameBuffer(*GlobalFrameBuffer);
 	//RHI::Instance->ClearTexture(*GlobalRenderTexture, glm::vec4(0.f, 0.f, 0.f, 1.f));
@@ -280,26 +279,11 @@ void ForwardRenderer::Draw()
 //  	DrawCommand(ScreenQuad->GetCommand());
 
 	DrawDebugPoints();
+}
 
-
-	ImGui::Render();
-
-	// 	ImGuiIO& io = ImGui::GetIO();
-	// 	(void)io;
-	// 	glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
-	// 	glClear(GL_COLOR_BUFFER_BIT);
-
-	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-	// Update and Render additional Platform Windows
-	if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-	{
-		ImGui::UpdatePlatformWindows();
-		ImGui::RenderPlatformWindowsDefault();
-	}
-
-
-	RHI::Instance->SwapBuffers();
-
+void ForwardRenderer::Present()
+{
+	RHI::Get()->SwapBuffers();
 }
 
 void ForwardRenderer::DrawSkybox()
@@ -385,12 +369,12 @@ void ForwardRenderer::DrawShadowMap()
 	// Cull front face to solve Peter Panning
 	//RHI::Instance->SetFaceCullMode(EFaceCullMode::Front);
 
-	RHI::Instance->BindFrameBuffer(*DepthFrameBuffer);
-	RHI::Instance->ClearBuffers();
+	RHI::Get()->BindFrameBuffer(*DepthFrameBuffer);
+	RHI::Get()->ClearBuffers();
 
  	SetDrawMode(EDrawMode::DEPTH);
- 	RHI::Instance->SetViewportSize(SHADOW_WIDTH, SHADOW_HEIGHT);
-	RHI::Instance->ClearTexture(*DepthRenderTexture, glm::vec4(1.f, 1.f, 1.f, 1.f));
+ 	RHI::Get()->SetViewportSize(SHADOW_WIDTH, SHADOW_HEIGHT);
+	RHI::Get()->ClearTexture(*DepthRenderTexture, glm::vec4(1.f, 1.f, 1.f, 1.f));
 
 	const glm::vec3 lightDir = glm::normalize(-lightPos);
 
@@ -424,7 +408,7 @@ void ForwardRenderer::DrawShadowMap()
  		DrawDebugHelpers::DrawProjection(debugMatrixCamera);
 	}
 
- 	RHI::Instance->PrepareProjectionForRendering(lightProjection);
+ 	RHI::Get()->PrepareProjectionForRendering(lightProjection);
 
 	UniformsCache["lsMatrices"] = lsMatrices;
 	//UniformsCache["DirectionalLightDirection"] = glm::vec4(lightDir.x, lightDir.y, lightDir.z, 1.0);
@@ -438,7 +422,7 @@ void ForwardRenderer::DrawShadowMap()
  	DrawCommands(MainCommands);
 // 	RenderCommandsMutex.unlock();
 
-	RHI::Instance->UnbindFrameBuffer(*DepthFrameBuffer);
+	RHI::Get()->UnbindFrameBuffer(*DepthFrameBuffer);
 
  	SetViewportSizeToMain();
  	SetDrawMode(EDrawMode::Default);
@@ -460,7 +444,7 @@ void ForwardRenderer::SetBaseUniforms()
 
 	glm::mat4 projection = glm::perspectiveRH_ZO(glm::radians(CAMERA_FOV),  windowWidth / windowHeight, CAMERA_NEAR, CAMERA_FAR);
 	//glm::mat4 lightProjection = glm::orthoRH_ZO(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
-	RHI::Instance->PrepareProjectionForRendering(projection);
+	RHI::Get()->PrepareProjectionForRendering(projection);
 
 	UniformsCache["projection"] = projection;
 }
@@ -518,16 +502,16 @@ void ForwardRenderer::DrawCommand(const RenderCommand& inCommand)
 		return;
 	}
 
-	RHI::Instance->BindVertexBuffer(*(dataContainer->VBuffer));
+	RHI::Get()->BindVertexBuffer(*(dataContainer->VBuffer));
 
 	// Additional vertex data buffers
   	for (const eastl::shared_ptr<RHIVertexBuffer>& additionalBuffer : dataContainer->AdditionalBuffers)
   	{
   		constexpr bool bindIndexBuffer = false;
-  		RHI::Instance->BindVertexBuffer(*(additionalBuffer), bindIndexBuffer);
+  		RHI::Get()->BindVertexBuffer(*(additionalBuffer), bindIndexBuffer);
   	}
 
-	RHI::Instance->BindShader(*(material->Shader));
+	RHI::Get()->BindShader(*(material->Shader));
 
 	material->ResetUniforms();
 
@@ -537,7 +521,7 @@ void ForwardRenderer::DrawCommand(const RenderCommand& inCommand)
 		int texNr = 0;
 		for (const eastl::shared_ptr<RHITexture2D>& tex : material->OwnedTextures)
 		{
-			RHI::Instance->BindTexture2D(*tex, texNr);
+			RHI::Get()->BindTexture2D(*tex, texNr);
 			++texNr;
 		}
 
@@ -550,7 +534,7 @@ void ForwardRenderer::DrawCommand(const RenderCommand& inCommand)
 
 			eastl::shared_ptr<RHITexture2D>& sharedTex = tex.lock();
 
-			RHI::Instance->BindTexture2D(*sharedTex, texNr);
+			RHI::Get()->BindTexture2D(*sharedTex, texNr);
 			++texNr;
 		}
 	}
@@ -570,7 +554,7 @@ void ForwardRenderer::DrawCommand(const RenderCommand& inCommand)
 	{
 	case EDrawCallType::DrawElements:
 	{
-		RHI::Instance->DrawElements(indicesCount);
+		RHI::Get()->DrawElements(indicesCount);
 
 		break;
 	}
@@ -581,7 +565,7 @@ void ForwardRenderer::DrawCommand(const RenderCommand& inCommand)
 	}
 	case EDrawCallType::DrawInstanced:
 	{
-		RHI::Instance->DrawInstanced(indicesCount, inCommand.InstancesCount);
+		RHI::Get()->DrawInstanced(indicesCount, inCommand.InstancesCount);
 		break;
 	}
 	}
@@ -593,13 +577,13 @@ void ForwardRenderer::DrawCommand(const RenderCommand& inCommand)
 //  		RHI::Instance->UnbindVertexBuffer(*(additionalBuffer), unbindIndexBuffer);
 //  	}
 
-	RHI::Instance->UnbindVertexBuffer(*(dataContainer->VBuffer));
+	RHI::Get()->UnbindVertexBuffer(*(dataContainer->VBuffer));
 
 	{
 		int texNr = 0;
 		for (const eastl::shared_ptr<RHITexture2D>& tex : material->OwnedTextures)
 		{
-			RHI::Instance->UnbindTexture2D(*tex, texNr);
+			RHI::Get()->UnbindTexture2D(*tex, texNr);
 			++texNr;
 		}
 
@@ -611,7 +595,7 @@ void ForwardRenderer::DrawCommand(const RenderCommand& inCommand)
 			}
 
 			eastl::shared_ptr<RHITexture2D>& sharedTex = tex.lock();
-			RHI::Instance->BindTexture2D(*sharedTex, texNr);
+			RHI::Get()->BindTexture2D(*sharedTex, texNr);
 			++texNr;
 		}
 	}
@@ -622,7 +606,7 @@ void ForwardRenderer::DrawCommand(const RenderCommand& inCommand)
 	//
 
 	material->UnbindBuffers();
-	RHI::Instance->UnbindShader(*(material->Shader));
+	RHI::Get()->UnbindShader(*(material->Shader));
 }
 
 eastl::shared_ptr<RenderMaterial> ForwardRenderer::GetMaterial(const RenderCommand& inCommand) const
@@ -670,7 +654,7 @@ eastl::shared_ptr<RenderMaterial> ForwardRenderer::GetMaterial(const RenderComma
 				{ "GS_Depth_Cascaded", EShaderType::Geometry },
 				{ "Empty_PS", EShaderType::Fragment } };
 
-				depthMaterial->Shader = RHI::Instance->CreateShaderFromPath(shaders, inputLayout);
+				depthMaterial->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
 			}
 			break;
 		}
@@ -697,7 +681,7 @@ eastl::shared_ptr<RenderMaterial> ForwardRenderer::GetMaterial(const RenderComma
 				{ "GS_Depth_Cascaded", EShaderType::Geometry },
 				{ "Empty_PS", EShaderType::Fragment } };
 
-				depthMaterial->Shader = RHI::Instance->CreateShaderFromPath(shaders, inputLayout);
+				depthMaterial->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
 			}
 			break;
 		}
@@ -727,7 +711,7 @@ eastl::shared_ptr<RenderMaterial> ForwardRenderer::GetMaterial(const RenderComma
 			{ "UnchangedPosition_VS_Pos-UV_ManuallyWritten", EShaderType::Vertex },
 			{ "VisualiseDepth_PS", EShaderType::Fragment } };
 
-			depthMaterial->Shader = RHI::Instance->CreateShaderFromPath(shaders, inputLayout);
+			depthMaterial->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
 			depthMaterial->OwnedTextures.push_back(DepthRenderTexture);
 		}
 
@@ -764,7 +748,7 @@ eastl::shared_ptr<RenderMaterial> ForwardRenderer::GetMaterial(const RenderComma
 			{ "GS_VisualizeNormals", EShaderType::Geometry },
 			{ "FlatColor_PS", EShaderType::Fragment } };
 
-			visNormalMat->Shader = RHI::Instance->CreateShaderFromPath(shaders, inputLayout);
+			visNormalMat->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
  		}
  
  		return visNormalMat;
@@ -853,6 +837,6 @@ void ForwardRenderer::SetViewportSizeToMain()
 {
 	const WindowsWindow& currentWindow = Engine->GetMainWindow();
 	const WindowProperties& props = currentWindow.GetProperties();
-	RHI::Instance->SetViewportSize(props.Width, props.Height);
+	RHI::Get()->SetViewportSize(props.Width, props.Height);
 }
 

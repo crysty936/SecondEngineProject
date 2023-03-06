@@ -11,8 +11,6 @@
 #include "Window/WindowsWindow.h"
 #include "Renderer/RHI/RHI.h"
 #include "Renderer/ForwardRenderer.h"
-
-#include "backends/imgui_impl_opengl3.h"
 #include "backends/imgui_impl_win32.h"
 #include "imgui.h"
 
@@ -48,7 +46,10 @@ void EngineCore::Init()
 	SceneManager::Init();
 
 	MaterialsManager::Init();
+
 	RHI::Init();
+	RHI::Get()->ImGuiInit();
+
 	ForwardRenderer::Init();
 
 	TimersManager::Init();
@@ -58,7 +59,6 @@ void EngineCore::Init()
 	// After initializing all engine subsystems, Game Mode init is called
 	Engine->CurrentGameMode->Init();
 	SceneManager::Get().GetCurrentScene().InitObjects();
-
 }
 
 void EngineCore::Terminate()
@@ -112,19 +112,30 @@ void EngineCore::Run()
 		// Tick Timers
 		TimersManager::Get().TickTimers(CurrentDeltaT);
 
- 		ImGui_ImplOpenGL3_NewFrame();
+		RHI::Get()->ImGuiBeginFrame();
  		ImGui_ImplWin32_NewFrame();
  		ImGui::NewFrame();
  
  		bool showDemo = true;
  		ImGui::ShowDemoWindow(&showDemo);
  
- 
  		SceneManager::Get().GetCurrentScene().TickObjects(CurrentDeltaT);
  		CurrentGameMode->Tick(CurrentDeltaT);
 
  		ForwardRenderer::Get().Draw();
 
+		// Draw ImGui
+		ImGui::Render();
+		RHI::Get()->ImGuiRenderDrawData();
+
+		// Update and Render additional Platform Windows
+		if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+		{
+			ImGui::UpdatePlatformWindows();
+			ImGui::RenderPlatformWindowsDefault();
+		}
+
+		ForwardRenderer::Get().Present();
 
 		CheckShouldCloseWindow();
 	}

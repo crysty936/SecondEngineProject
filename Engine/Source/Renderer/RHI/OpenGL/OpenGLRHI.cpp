@@ -251,10 +251,8 @@ OpenGLRHI::OpenGLRHI()
 	GLUtils::openglInstance = LoadLibraryA("opengl32.dll");
 	ASSERT(GLUtils::openglInstance);
 	GLUtils::gldc = GetDC(static_cast<HWND>(Engine->GetMainWindow().GetHandle()));
-	HGLRC glrc = GLUtils::init_opengl(GLUtils::gldc);
+	GLContext = GLUtils::init_opengl(GLUtils::gldc);
 
-	WindowsPlatform::InitImGUI(glrc);
-	
 	const bool gladSuccess = gladLoadGLLoader((GLADloadproc)GLUtils::getProcAddressGLWindows) == 1;
 	ASSERT(gladSuccess);
 
@@ -1012,6 +1010,21 @@ void OpenGLRHI::SetFaceCullMode(const EFaceCullMode inMode)
 	default:
 		break;
 	}
+}
+
+void OpenGLRHI::ImGuiInit()
+{
+	WindowsPlatform::InitImGUIOpenGL(GLContext);
+}
+
+void OpenGLRHI::ImGuiBeginFrame()
+{
+	ImGui_ImplOpenGL3_NewFrame();
+}
+
+void OpenGLRHI::ImGuiRenderDrawData()
+{
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
 void OpenGLRHI::ClearVertexBuffer(class RHIVertexBuffer& inBuffer)

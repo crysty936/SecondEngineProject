@@ -24,7 +24,7 @@ namespace WindowsPlatform
 	void* CreateWindowsWindow(const int32_t desiredWidth, const int32_t desiredHeight);
 	void SetCursorMode(void* inWindowHandle, const ECursorMode inMode);
 	void SetWindowsWindowText(const eastl::wstring& inText);
-	void InitImGUI(void* handle);
+	void InitImGUIOpenGL(void* handle);
 	void DrawImGUIAdditionalWindows();
 
 	class InputForwarder

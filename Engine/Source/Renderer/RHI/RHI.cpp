@@ -22,5 +22,5 @@ void RHI::Init()
 
 void RHI::Terminate()
 {
-	delete Instance;
+	delete Get();
 }

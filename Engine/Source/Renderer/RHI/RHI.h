@@ -100,6 +100,12 @@ public:
 
 	virtual void PrepareProjectionForRendering(glm::mat4& inProj) {}
 
+	// ImGui
+	virtual void ImGuiInit() {}
+	virtual void ImGuiBeginFrame() {}
+	virtual void ImGuiRenderDrawData() {}
+
 public:
 	inline static class RHI* Instance = nullptr;
+	static class RHI* Get() { return Instance; }
 };

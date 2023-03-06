@@ -370,7 +370,7 @@ namespace WindowsPlatform
 		SetWindowTextW(static_cast<HWND>(Engine->GetMainWindow().GetHandle()), inText.c_str());
 	}
 
-	void InitImGUI(void* handle)
+	void InitImGUIOpenGL(void* handle)
 	{
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();

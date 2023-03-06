@@ -34,11 +34,11 @@ void TriangleShape::CreateProxy()
 	{
  		const int32_t indicesCount = BasicShapesData::GetTriangleIndicesCount();
 
-		eastl::shared_ptr<RHIIndexBuffer> ib = RHI::Instance->CreateIndexBuffer(BasicShapesData::GetTriangleIndices(), indicesCount);
+		eastl::shared_ptr<RHIIndexBuffer> ib = RHI::Get()->CreateIndexBuffer(BasicShapesData::GetTriangleIndices(), indicesCount);
 
 
  		const int32_t verticesCount = BasicShapesData::GetTriangleVerticesCount();
-		const eastl::shared_ptr<RHIVertexBuffer> vb = RHI::Instance->CreateVertexBuffer(inputLayout, BasicShapesData::GetTriangleVertices(), verticesCount, ib);
+		const eastl::shared_ptr<RHIVertexBuffer> vb = RHI::Get()->CreateVertexBuffer(inputLayout, BasicShapesData::GetTriangleVertices(), verticesCount, ib);
 
 		dataContainer->VBuffer = vb;
 	}
@@ -57,7 +57,7 @@ void TriangleShape::CreateProxy()
 		eastl::vector<ShaderSourceInput> shaders = {
 		{ "ModelWorldPositionVertexShader", EShaderType::Vertex },
 		{ "FlatColorPixelShader", EShaderType::Fragment } };
-		material->Shader = RHI::Instance->CreateShaderFromPath(shaders, inputLayout);
+		material->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
 	}
 
 	RenderCommand newCommand;
@@ -89,11 +89,11 @@ void SquareShape::CreateProxy()
 	if (!existingContainer)
  	{
  		int32_t indicesCount = BasicShapesData::GetSquareIndicesCount();
-		eastl::shared_ptr<RHIIndexBuffer> ib = RHI::Instance->CreateIndexBuffer(BasicShapesData::GetSquareIndices(), indicesCount);
+		eastl::shared_ptr<RHIIndexBuffer> ib = RHI::Get()->CreateIndexBuffer(BasicShapesData::GetSquareIndices(), indicesCount);
 
  
  		int32_t verticesCount = BasicShapesData::GetSquareVerticesCount();
-		const eastl::shared_ptr<RHIVertexBuffer> vb = RHI::Instance->CreateVertexBuffer(inputLayout, BasicShapesData::GetSquareVertices(), verticesCount, ib);
+		const eastl::shared_ptr<RHIVertexBuffer> vb = RHI::Get()->CreateVertexBuffer(inputLayout, BasicShapesData::GetSquareVertices(), verticesCount, ib);
 
 		dataContainer->VBuffer = vb;
 	}
@@ -109,7 +109,7 @@ void SquareShape::CreateProxy()
 		//{ "GeometryTest_GS", EShaderType::Geometry },
 		{ "FlatColor_PS", EShaderType::Fragment } };
 
-		material->Shader = RHI::Instance->CreateShaderFromPath(shaders, inputLayout);
+		material->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
 	}
  
  	RenderCommand newCommand;
@@ -151,11 +151,11 @@ void CubeShape::CreateProxy()
  	if (!existingContainer)
   	{
 		int32_t indicesCount = BasicShapesData::GetCubeIndicesCount();
-		eastl::shared_ptr<RHIIndexBuffer> ib = RHI::Instance->CreateIndexBuffer(BasicShapesData::GetCubeIndices(), indicesCount);
+		eastl::shared_ptr<RHIIndexBuffer> ib = RHI::Get()->CreateIndexBuffer(BasicShapesData::GetCubeIndices(), indicesCount);
 
 
 		int32_t verticesCount = BasicShapesData::GetCubeVerticesCount();
-		const eastl::shared_ptr<RHIVertexBuffer> vb = RHI::Instance->CreateVertexBuffer(inputLayout, BasicShapesData::GetCubeVertices(), verticesCount, ib);
+		const eastl::shared_ptr<RHIVertexBuffer> vb = RHI::Get()->CreateVertexBuffer(inputLayout, BasicShapesData::GetCubeVertices(), verticesCount, ib);
 
 		dataContainer->VBuffer = vb;
   	}
@@ -166,14 +166,14 @@ void CubeShape::CreateProxy()
   
   	if (!materialExists)
   	{
-		eastl::shared_ptr<RHITexture2D> tex = RHI::Instance->CreateTexture2D("../Data/Textures/MinecraftGrass.jpg");
+		eastl::shared_ptr<RHITexture2D> tex = RHI::Get()->CreateTexture2D("../Data/Textures/MinecraftGrass.jpg");
 		material->OwnedTextures.push_back(tex);
 
 		eastl::vector<ShaderSourceInput> shaders = {
 		{ "ModelWorldPosition_VS_Pos-UV-Normal_WithShadow_ManuallyWritten", EShaderType::Vertex },
 		{ "BasicTex_PS_WithShadow", EShaderType::Fragment } };
 
-		material->Shader = RHI::Instance->CreateShaderFromPath(shaders, inputLayout);
+		material->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
   	}
   
   	eastl::shared_ptr<MeshNode> cubeNode = eastl::make_shared<MeshNode>();
@@ -271,11 +271,11 @@ void LightSource::CreateProxy()
 	if (!existingContainer)
 	{
 		int32_t indicesCount = BasicShapesData::GetCubeIndicesCount();
-		eastl::shared_ptr<RHIIndexBuffer> ib = RHI::Instance->CreateIndexBuffer(BasicShapesData::GetCubeIndices(), indicesCount);
+		eastl::shared_ptr<RHIIndexBuffer> ib = RHI::Get()->CreateIndexBuffer(BasicShapesData::GetCubeIndices(), indicesCount);
 
 
 		int32_t verticesCount = BasicShapesData::GetCubeVerticesCount();
-		const eastl::shared_ptr<RHIVertexBuffer> vb = RHI::Instance->CreateVertexBuffer(inputLayout, BasicShapesData::GetCubeVertices(), verticesCount, ib);
+		const eastl::shared_ptr<RHIVertexBuffer> vb = RHI::Get()->CreateVertexBuffer(inputLayout, BasicShapesData::GetCubeVertices(), verticesCount, ib);
 
 		dataContainer->VBuffer = vb;
 	}
@@ -290,7 +290,7 @@ void LightSource::CreateProxy()
 		{ "ModelWorldPosition_VS_Pos-UV-Normal_ManuallyWritten", EShaderType::Vertex },
 		{ "LightSource_PS", EShaderType::Fragment } };
 
-		material->Shader = RHI::Instance->CreateShaderFromPath(shaders, inputLayout);
+		material->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
 	}
 
 	eastl::shared_ptr<MeshNode> cubeNode = eastl::make_shared<MeshNode>();
@@ -401,11 +401,11 @@ void FullScreenQuad::CreateCommand()
 	if (!existingContainer)
 	{
 		int32_t indicesCount = BasicShapesData::GetSquareIndicesCount();
-		eastl::shared_ptr<RHIIndexBuffer> ib = RHI::Instance->CreateIndexBuffer(BasicShapesData::GetSquareIndices(), indicesCount);
+		eastl::shared_ptr<RHIIndexBuffer> ib = RHI::Get()->CreateIndexBuffer(BasicShapesData::GetSquareIndices(), indicesCount);
 
 
 		int32_t verticesCount = BasicShapesData::GetSquareVerticesCount();
-		const eastl::shared_ptr<RHIVertexBuffer> vb = RHI::Instance->CreateVertexBuffer(inputLayout, BasicShapesData::GetSquareVertices(), verticesCount, ib);
+		const eastl::shared_ptr<RHIVertexBuffer> vb = RHI::Get()->CreateVertexBuffer(inputLayout, BasicShapesData::GetSquareVertices(), verticesCount, ib);
 
 		dataContainer->VBuffer = vb;
 	}
@@ -420,7 +420,7 @@ void FullScreenQuad::CreateCommand()
 		{ "UnchangedPosition_VS_Pos-UV_ManuallyWritten", EShaderType::Vertex },
 		{ "BasicTex_PS", EShaderType::Fragment } };
 
-		material->Shader = RHI::Instance->CreateShaderFromPath(shaders, inputLayout);
+		material->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
 	}
 
 	QuadCommand.Material = material;

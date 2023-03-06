@@ -49,11 +49,11 @@ void UniformBufferContainer::UpdateData(const ConstantBufferType inBufferType, c
 			bufferSize = (multiplier + 1) * 16;
 		}
 
-		RHIBuffer = RHI::Instance->CreateUniformBuffer(bufferSize);
+		RHIBuffer = RHI::Get()->CreateUniformBuffer(bufferSize);
 		RHIBuffer->BType = inBufferType;
 	}
 
-	RHI::Instance->UniformBufferUpdateData(*RHIBuffer, UniformsCache.data(), UniformsCache.size(), inBufferNr);
+	RHI::Get()->UniformBufferUpdateData(*RHIBuffer, UniformsCache.data(), UniformsCache.size(), inBufferNr);
 }
 
 void UniformBufferContainer::Clear()
@@ -64,10 +64,10 @@ void UniformBufferContainer::Clear()
 
 void UniformBufferContainer::Bind()
 {
-	RHI::Instance->BindUniformBuffer(*RHIBuffer);
+	RHI::Get()->BindUniformBuffer(*RHIBuffer);
 }
 
 void UniformBufferContainer::Unbind()
 {
-	RHI::Instance->UnbindUniformBuffer(*RHIBuffer);
+	RHI::Get()->UnbindUniformBuffer(*RHIBuffer);
 }

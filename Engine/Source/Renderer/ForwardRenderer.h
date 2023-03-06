@@ -39,6 +39,7 @@ public:
 	static void Init(const WindowProperties& inMainWindowProperties = {});
 	static void Terminate();
 	void Draw();
+	void Present();
 
 	void DrawSkybox();
 	void DrawShadowMap();

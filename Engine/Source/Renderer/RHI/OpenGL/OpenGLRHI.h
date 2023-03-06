@@ -77,7 +77,12 @@ public:
 	virtual void SetFaceCullMode(const EFaceCullMode inMode) override;
 
 
+	void ImGuiInit() override;
+	void ImGuiBeginFrame() override;
+	void ImGuiRenderDrawData() override;
 
 private:
 	void LoadImageToTextureFromPath(RHITexture2D& inTexture, const eastl::string& inPath);
+
+	void* GLContext = nullptr;
 };
