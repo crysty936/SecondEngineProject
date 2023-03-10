@@ -341,6 +341,9 @@ glm::mat4 ForwardRenderer::CreateCascadeMatrix(const glm::mat4& inCameraProj, co
 
 eastl::vector<glm::mat4> ForwardRenderer::CreateCascadesMatrices()
 {
+
+
+
 	eastl::vector<glm::mat4> cascades;
 	cascades.reserve(shadowCascadeFarPlanes.size());
 

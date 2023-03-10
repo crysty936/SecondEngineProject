@@ -330,11 +330,15 @@ namespace WindowsPlatform
 
 	void SetCursorMode(void* inWindowHandle, const ECursorMode inMode)
 	{
-        switch (inMode)
+		ImGuiIO& io = ImGui::GetIO();
+
+		switch (inMode)
         {
         case ECursorMode::Enabled:
         {
-            EnableCursor(static_cast<HWND>(inWindowHandle));
+			EnableCursor(static_cast<HWND>(inWindowHandle));
+            io.EnableCursor();
+
             break;
         }
         case ECursorMode::Hidden:
@@ -347,6 +351,7 @@ namespace WindowsPlatform
 			if (IsWindowFocused(static_cast<HWND>(inWindowHandle)))
 			{
 				DisableCursor(static_cast<HWND>(inWindowHandle));
+                io.DisableCursor();
 			}
             break;
         }

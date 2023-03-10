@@ -40,15 +40,15 @@ void EngineCore::Init()
 	// Create Main Window
 	Engine->MainWindow = eastl::make_unique<WindowsWindow>();
 
-	// Hide Cursor for input
-	InputSystem::Get().SetCursorMode(ECursorMode::Disabled, Engine->MainWindow->GetHandle());
-
 	SceneManager::Init();
 
 	MaterialsManager::Init();
 
 	RHI::Init();
 	RHI::Get()->ImGuiInit();
+
+	// Hide Cursor for input
+	InputSystem::Get().SetCursorMode(ECursorMode::Disabled, Engine->MainWindow->GetHandle());
 
 	ForwardRenderer::Init();
 
@@ -65,11 +65,12 @@ void EngineCore::Terminate()
 {
 	TimersManager::Terminate();
 	ForwardRenderer::Terminate();
+	InputSystem::Terminate();
+
 	RHI::Terminate();
 	MaterialsManager::Terminate();
 
 	SceneManager::Terminate();
-	InputSystem::Terminate();
 
 	ASSERT(Engine);
 	delete Engine;
