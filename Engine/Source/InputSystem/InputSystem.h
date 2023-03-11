@@ -7,10 +7,7 @@
 #include "CursorMode.h"
 #include "Core/WindowsPlatform.h"
 #include "Core/EngineCore.h"
-
-using KeyDelegate = MulticastDelegate<EInputKey, EInputType>;
-using MousePosDelegate = MulticastDelegate<float, float>;
-using MouseScrollDelegate = MulticastDelegate<float>;
+#include "InputDelegates.h"
 
 class InputSystem
 {
@@ -27,9 +24,9 @@ public:
 	static inline InputSystem& Get() { ASSERT(Instance); return *Instance; }
 
 	/** Callbacks for others to tie into */
-	inline KeyDelegate& OnKeyInput() { return OnKeyInputDelegate; }
-	inline MousePosDelegate& OnMouseMoved() { return OnMouseMovedDelegate; }
-	inline MouseScrollDelegate& OnMouseScroll() { return OnMouseScrollDelegate; }
+	KeyDelegate& GetOnKeyInputDel();
+	MousePosDelegate& GetOnMouseMovedDel();
+	MouseScrollDelegate& GetOnMouseScrollDel();
 
 	void SetCursorMode(const ECursorMode inMode, void* inWindowHandle = nullptr);
 
@@ -46,6 +43,11 @@ private:
 	static void MousePosChangedCallback(const double inNewYaw, const double inNewPitch);
 	static void MouseScrollCallback(double xoffset, double yoffset);
 
+	// Specialized versions for the editor layer
+// 	KeyDelegate& Editor_GetOnKeyInputDel();
+// 	MousePosDelegate& Editor_GetOnMouseMovedDel();
+// 	MouseScrollDelegate& Editor_GetOnMouseScrollDel();
+
 private:
 	static InputSystem* Instance;
 	static uint16_t KeyCodes[512];
@@ -55,5 +57,7 @@ private:
 	MousePosDelegate OnMouseMovedDelegate;
 	MouseScrollDelegate OnMouseScrollDelegate;
 
-	friend class WindowsPlatform::InputForwarder;
+	friend void WindowsPlatform::ForwardKeyInput(const EInputKey inKey, const EInputType inAction);
+	friend void WindowsPlatform::ForwardMouseMoveInput(double inNewYaw, double inNewPitch);
+	friend class Editor;
 };

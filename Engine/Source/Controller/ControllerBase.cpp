@@ -1,16 +1,10 @@
-#include "Controller.h"
+#include "ControllerBase.h"
 #include "Core/EngineCore.h"
 
-Controller::Controller()
-{
-	InputSystem::Get().OnKeyInput().BindRaw(this, &Controller::OnKeyInputReceived);
-	InputSystem::Get().OnMouseMoved().BindRaw(this, &Controller::OnMouseMoveInputReceived);
-	InputSystem::Get().OnMouseScroll().BindRaw(this, &Controller::OnMouseScrollInputReceived);
-}
+ControllerBase::ControllerBase() = default;
+ControllerBase::~ControllerBase() = default;
 
-Controller::~Controller() = default;
-
-void Controller::ExecuteCallbacks()
+void ControllerBase::ExecuteCallbacks()
 {
 	if (bMouseScrolled)
 	{
@@ -45,10 +39,34 @@ void Controller::ExecuteCallbacks()
 
 			listener.Del.Execute();
 		}
+		else if (KeyStates[listener.RequiredKey] == EInputType::InputRelease)
+		{
+			if (listener.ReleasedDel.IsBound())
+			{
+				listener.ReleasedDel.Execute();
+			}
+		}
+	}
+
+	// Consume all Input Release states
+	eastl::unordered_map<EInputKey, EInputType>::iterator it = KeyStates.begin();
+	while (it != KeyStates.end())
+	{
+		if (it->second == EInputType::InputRelease)
+		{
+			it->second = EInputType::None;
+		}
+
+		++it;
 	}
 }
 
-void Controller::OnKeyInputReceived(EInputKey inKeyCode, EInputType inEventType)
+void ControllerBase::AddListener(OnKeyAction& inKeyAction)
+{
+	KeyListeners.push_back(inKeyAction);
+}
+
+void ControllerBase::OnKeyInputReceived(EInputKey inKeyCode, EInputType inEventType)
 {
 //  	if (inKeyCode == EInputKey::Escape)
 //  	{
@@ -77,14 +95,14 @@ void Controller::OnKeyInputReceived(EInputKey inKeyCode, EInputType inEventType)
 	KeyStates[inKeyCode] = inEventType;
 }
 
-void Controller::OnMouseMoveInputReceived(const float inNewYaw, const float inNewPitch)
+void ControllerBase::OnMouseMoveInputReceived(const float inNewYaw, const float inNewPitch)
 {
 	bMouseMoved = true;
 	NewYaw = inNewYaw;
 	NewPitch = inNewPitch;
 }
 
-void Controller::OnMouseScrollInputReceived(const float inNewY)
+void ControllerBase::OnMouseScrollInputReceived(const float inNewY)
 {
 	bMouseScrolled = true;
 	NewMouseScrollOffset = inNewY;

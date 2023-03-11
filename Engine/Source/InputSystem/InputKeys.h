@@ -137,12 +137,16 @@ enum class EInputKey : int16_t
 	RightAlt = 346,
 	RightSuper = 347,
 	Menu = 348,
-	Count = 349
+	Count = 349,
+
+	/* Mouse */
+	MouseLeft = 350,
+	MouseRight = 351
 };
 
 inline std::ostream& operator<<(std::ostream& os, EInputKey keyCode)
 {
-	os << static_cast<int32_t>(keyCode);
+	os << static_cast<int16_t>(keyCode);
 	return os;
 }
 
@@ -153,4 +157,4 @@ inline std::ostream& operator<<(std::ostream& os, EInputKey keyCode)
 // 	return static_cast<std::underlying_type_t<T>>(e);
 // }
 
-inline constexpr unsigned operator+ (const EInputKey inKey) { return static_cast<uint16_t>(inKey); }
+inline constexpr int16_t operator+ (const EInputKey inKey) { return static_cast<int16_t>(inKey); }

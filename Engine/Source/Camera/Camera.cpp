@@ -1,5 +1,5 @@
 #include "Camera/Camera.h"
-#include "Controller/Controller.h"
+#include "Controller/ControllerBase.h"
 #include "glm/gtc/type_ptr.hpp"
 #include "Logger/Logger.h"
 #include "Entity/TransformObject.h"
@@ -57,7 +57,7 @@ void Camera::Move(MovementDirection inDirection, const float inSpeed)
 }
 
 
-void Camera::SetMovementDelegates(Controller& inController)
+void Camera::SetMovementDelegates(ControllerBase& inController)
 {
 	inController.OnMouseMoved().BindRaw(this, &Camera::OnMousePosChanged);
 	inController.OnMouseScroll().BindRaw(this, &Camera::OnMouseScrollChanged);
@@ -202,7 +202,8 @@ glm::mat4 Camera::GetLookAt()
 
 	//return lookAt;
 
-	// This is not a look at! This is a view matrix(everything relative to camera)
+	// This is not a LookAt! This is a view matrix(everything relative to camera)
+	// LookAt is created by making a basis matrix using 3 created axes based on forward and up
 
 	const glm::mat4 inverse = glm::inverse(GetAbsoluteTransform().GetMatrix());
 

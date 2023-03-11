@@ -21,7 +21,7 @@ public:
 	virtual void Tick(const float inDeltaT) override;
 	
 	void Move(MovementDirection inDirection, const float inSpeed = 0.1f);
-	void SetMovementDelegates(class Controller& inController);
+	void SetMovementDelegates(class ControllerBase& inController);
 	void OnMouseScrollChanged(const float inNewY);
 	glm::mat4 GetLookAt();
 

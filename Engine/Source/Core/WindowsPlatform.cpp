@@ -18,6 +18,7 @@
 #include "backends/imgui_impl_win32.h"
 #include "backends/imgui_impl_opengl3.h"
 #include "Renderer/RHI/OpenGL/OpenGLRHI.h"
+#include "imgui_internal.h"
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -396,6 +397,19 @@ namespace WindowsPlatform
 		ImGui_ImplOpenGL3_Init("#version 420");
 	}
 
+	void ForwardKeyInput(const EInputKey inKey, const EInputType inAction)
+	{
+		InputSystem::KeyCallback(inKey, inAction);
+	}
+
+	void ForwardMouseMoveInput(double inNewYaw, double inNewPitch)
+	{
+		InputSystem::Get().VirtualMousePos.x = inNewYaw;
+		InputSystem::Get().VirtualMousePos.y = inNewPitch;
+
+		InputSystem::MousePosChangedCallback(inNewYaw, inNewPitch);
+	}
+
 	// Message Loop
 
 	void PoolMessages()
@@ -416,8 +430,33 @@ namespace WindowsPlatform
 	LRESULT WindowMessageLoop(HWND hwnd, uint32_t msg, WPARAM wParam, LPARAM lParam)
 	{
 
+        if (GImGui)
+        {
+            if (!ImGui::GetIO().WantCaptureMouse)
+            {
+                if (ImGui::IsMouseClicked(ImGuiMouseButton_Right) || ImGui::IsMouseClicked(ImGuiMouseButton_Middle))
+                {
+                    ImGui::FocusWindow(NULL);
+                }
+            }
+        }
+
 		if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wParam, lParam))
 			return true;
+
+
+        if (GImGui)
+        {
+            const ImGuiIO& io = ImGui::GetIO();
+
+		    // Don't treat inputs when ImGui window has focus
+	
+
+			if (io.WantCaptureMouse || io.WantCaptureKeyboard)
+			{
+                return true;
+            }
+        }
 
 		// Forward hwnd on because we can get messages (e.g., WM_CREATE)
 		// before CreateWindow returns, and thus before mhMainWnd is valid.
@@ -686,8 +725,8 @@ namespace WindowsPlatform
   			}
   			else
   			{
-  				InputForwarder::ForwardKey(key, action);
-  			}
+                ForwardKeyInput(key, action);
+			}
   
   			break;
   		}
@@ -702,50 +741,54 @@ namespace WindowsPlatform
  		case WM_XBUTTONUP:
  		{
  			LOG_WINMSG(WM_LBUTTONDOWN - WM_RBUTTONDOWN - WM_MBUTTONDOWN - WM_XBUTTONDOWN - WM_LBUTTONUP - WM_RBUTTONUP - WM_MBUTTONUP - WM_XBUTTONUP);
- 			//             int i, button, action;
- // 
- //             if (uMsg == WM_LBUTTONDOWN || uMsg == WM_LBUTTONUP)
- //                 button = GLFW_MOUSE_BUTTON_LEFT;
- //             else if (uMsg == WM_RBUTTONDOWN || uMsg == WM_RBUTTONUP)
- //                 button = GLFW_MOUSE_BUTTON_RIGHT;
- //             else if (uMsg == WM_MBUTTONDOWN || uMsg == WM_MBUTTONUP)
- //                 button = GLFW_MOUSE_BUTTON_MIDDLE;
- //             else if (GET_XBUTTON_WPARAM(wParam) == XBUTTON1)
- //                 button = GLFW_MOUSE_BUTTON_4;
- //             else
- //                 button = GLFW_MOUSE_BUTTON_5;
- // 
- //             if (uMsg == WM_LBUTTONDOWN || uMsg == WM_RBUTTONDOWN ||
- //                 uMsg == WM_MBUTTONDOWN || uMsg == WM_XBUTTONDOWN)
- //             {
- //                 action = GLFW_PRESS;
- //             }
- //             else
- //                 action = GLFW_RELEASE;
- // 
- //             for (i = 0;  i <= GLFW_MOUSE_BUTTON_LAST;  i++)
- //             {
- //                 if (window->mouseButtons[i] == GLFW_PRESS)
- //                     break;
- //             }
- // 
- //             if (i > GLFW_MOUSE_BUTTON_LAST)
- //                 SetCapture(hWnd);
- // 
- //             _glfwInputMouseClick(window, button, action, getKeyMods());
- // 
- //             for (i = 0;  i <= GLFW_MOUSE_BUTTON_LAST;  i++)
- //             {
- //                 if (window->mouseButtons[i] == GLFW_PRESS)
- //                     break;
- //             }
- // 
- //             if (i > GLFW_MOUSE_BUTTON_LAST)
- //                 ReleaseCapture();
- // 
- //             if (uMsg == WM_XBUTTONDOWN || uMsg == WM_XBUTTONUP)
- //                 return TRUE;
- 
+            EInputKey inputKey;
+            EInputType inputType;
+ 			//int i, button, action;
+  
+            if (msg == WM_LBUTTONDOWN || msg == WM_LBUTTONUP)
+                inputKey = EInputKey::MouseLeft;
+            else if (msg == WM_RBUTTONDOWN || msg == WM_RBUTTONUP)
+                inputKey = EInputKey::MouseRight;
+//             else if (msg == WM_MBUTTONDOWN || msg == WM_MBUTTONUP)
+//                 button = GLFW_MOUSE_BUTTON_MIDDLE;
+//             else if (GET_XBUTTON_WPARAM(wParam) == XBUTTON1)
+//                 button = GLFW_MOUSE_BUTTON_4;
+//             else
+//                 button = GLFW_MOUSE_BUTTON_5;
+  
+			if (msg == WM_LBUTTONDOWN || msg == WM_RBUTTONDOWN ||
+				msg == WM_MBUTTONDOWN || msg == WM_XBUTTONDOWN)
+			{
+				inputType = EInputType::InputPress;
+			}
+			else
+			{
+				inputType = EInputType::InputRelease;
+			}
+
+			for (int32_t i = +EInputKey::MouseLeft; i <= +EInputKey::MouseRight; i++)
+			{
+				//if (window->mouseButtons[i] == GLFW_PRESS)
+					//break;
+			}
+
+			//if (i > GLFW_MOUSE_BUTTON_LAST)
+				SetCapture(hwnd);
+
+                ForwardKeyInput(inputKey, inputType);
+
+// 			for (i = 0; i <= GLFW_MOUSE_BUTTON_LAST; i++)
+// 			{
+// 				if (window->mouseButtons[i] == GLFW_PRESS)
+// 					break;
+// 			}
+
+			//if (i > GLFW_MOUSE_BUTTON_LAST)
+				ReleaseCapture();
+
+			if (msg == WM_XBUTTONDOWN || msg == WM_XBUTTONUP)
+				return TRUE;
+
  			return 0;
  		}
 
@@ -781,7 +824,7 @@ namespace WindowsPlatform
 				const int dx = x - InputSystem::Get().LastMousePos.x;
 				const int dy = y - InputSystem::Get().LastMousePos.y;
 
-				InputForwarder::ForwardMouseMove(InputSystem::Get().VirtualMousePos.x + dx, InputSystem::Get().VirtualMousePos.y + dy);
+                ForwardMouseMoveInput(InputSystem::Get().VirtualMousePos.x + dx, InputSystem::Get().VirtualMousePos.y + dy);
 			}
 
 			InputSystem::Get().LastMousePos.x = x;
@@ -835,7 +878,7 @@ namespace WindowsPlatform
 				dy = data->data.mouse.lLastY;
 			}
 
-			InputForwarder::ForwardMouseMove(InputSystem::Get().VirtualMousePos.x + dx, InputSystem::Get().VirtualMousePos.y + dy);
+            ForwardMouseMoveInput(InputSystem::Get().VirtualMousePos.x + dx, InputSystem::Get().VirtualMousePos.y + dy);
 
 			InputSystem::Get().LastMousePos.x += dx;
 			InputSystem::Get().LastMousePos.y += dy;
@@ -1240,21 +1283,4 @@ namespace WindowsPlatform
 
 		return newWindow;
 	}
-
-	void InputForwarder::ForwardKey(const EInputKey inKey, const EInputType inAction)
-	{
-		InputSystem::KeyCallback(inKey, inAction);
-	}
-
-	void InputForwarder::ForwardMouseMove(double inNewYaw, double inNewPitch)
-	{
-        InputSystem::Get().VirtualMousePos.x = inNewYaw;
-        InputSystem::Get().VirtualMousePos.y = inNewPitch;
-
-		InputSystem::MousePosChangedCallback(inNewYaw, inNewPitch);
-	}
-
-
-
-
 }

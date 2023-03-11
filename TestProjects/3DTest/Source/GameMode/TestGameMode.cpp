@@ -3,7 +3,7 @@
 #include "Scene/SceneManager.h"
 #include "Scene/Scene.h"
 #include "Renderer/Drawable/ShapesUtils/BasicShapes.h"
-#include "Controller/Controller.h"
+#include "Controller/ControllerBase.h"
 #include "glm/common.hpp"
 #include <stdlib.h>
 #include "Renderer/Model/3D/Assimp/AssimpModel3D.h"
@@ -179,83 +179,15 @@ public:
 
 void TestGameMode::Init()
 {
-	GameController = eastl::make_unique<Controller>();
+	//Controller = eastl::make_unique<GameController>(); // TODO: Do this on a pre-game init or something
 
-	// Debug
-	{
-		KeyActionDelegate cameraMovementDelegate = KeyActionDelegate::CreateRaw(this, &TestGameMode::MoveCameraLeft);
-		EInputKey createFloorKey = EInputKey::A;
-		OnKeyAction createFloorAction = { cameraMovementDelegate, createFloorKey, false };
-		GameController->AddListener(createFloorAction);
-	}
-
-	{
-		KeyActionDelegate cameraMovementDelegate = KeyActionDelegate::CreateRaw(this, &TestGameMode::MoveCameraRight);
-		EInputKey createFloorKey = EInputKey::D;
-		OnKeyAction createFloorAction = { cameraMovementDelegate, createFloorKey, false };
-
-		GameController->AddListener(createFloorAction);
-	}
-
-	{
-		KeyActionDelegate cameraMovementDelegate = KeyActionDelegate::CreateRaw(this, &TestGameMode::MoveCameraUp);
-		EInputKey createFloorKey = EInputKey::W;
-		OnKeyAction createFloorAction = { cameraMovementDelegate, createFloorKey, false };
-		GameController->AddListener(createFloorAction);
-	}
-
-	{
-		KeyActionDelegate cameraMovementDelegate = KeyActionDelegate::CreateRaw(this, &TestGameMode::MoveCameraDown);
-		EInputKey createFloorKey = EInputKey::S;
-		OnKeyAction createFloorAction = { cameraMovementDelegate, createFloorKey, false };
-
-		GameController->AddListener(createFloorAction);
-	}
-
-	{
-		KeyActionDelegate cameraMovementDelegate = KeyActionDelegate::CreateRaw(this, &TestGameMode::OnChangeDrawMode);
-		EInputKey createFloorKey = EInputKey::F;
-		OnKeyAction createFloorAction = { cameraMovementDelegate, createFloorKey, true };
-
-		GameController->AddListener(createFloorAction);
-	}
-	{
-		KeyActionDelegate cameraMovementDelegate = KeyActionDelegate::CreateRaw(this, &TestGameMode::DebugProjections);
-		EInputKey createFloorKey = EInputKey::G;
-		OnKeyAction createFloorAction = { cameraMovementDelegate, createFloorKey, true };
-		GameController->AddListener(createFloorAction);
-	}
-
-	{
-		KeyActionDelegate cameraMovementDelegate = KeyActionDelegate::CreateRaw(this, &TestGameMode::DebugCascadesVisualize);
-		EInputKey createFloorKey = EInputKey::T;
-		OnKeyAction createFloorAction = { cameraMovementDelegate, createFloorKey, true };
-		GameController->AddListener(createFloorAction);
-	}
-
-	{
-		KeyActionDelegate cameraMovementDelegate = KeyActionDelegate::CreateRaw(this, &TestGameMode::DebugCursorMode);
-		EInputKey createFloorKey = EInputKey::Q;
-		OnKeyAction createFloorAction = { cameraMovementDelegate, createFloorKey, true };
-		GameController->AddListener(createFloorAction);
-	}
-
-	{
-		KeyActionDelegate cameraMovementDelegate = KeyActionDelegate::CreateRaw(this, &TestGameMode::BoostCameraSpeed);
-		EInputKey createFloorKey = EInputKey::LeftShift;
-		OnKeyAction createFloorAction = { cameraMovementDelegate, createFloorKey, true };
-		GameController->AddListener(createFloorAction);
-	}
-
-
-
-	// Debug
-
-	// Scene setup
+	// TODO: // This should normally be done by the scene loader so game mode only gets accessed when game starts
+	// 
+	// Scene setup 
 	SceneManager& sManager = SceneManager::Get();
 	Scene& currentScene = sManager.GetCurrentScene();
 	GameCamera = currentScene.CurrentCamera;
-	GameCamera->SetMovementDelegates(*GameController);
+	//GameCamera->SetMovementDelegates(*Controller);
 
 	// Push camera back a bit
 	if (TransformObjPtr parentShared = GameCamera->GetParent().lock())
@@ -344,84 +276,9 @@ void TestGameMode::Init()
 
 }
 
-float CameraSpeed = 0.4f;
-
 void TestGameMode::Tick(float inDeltaT)
 {
-	GameController->ExecuteCallbacks();
+	//Controller->ExecuteCallbacks();
 
 	AssimpModel->Rotate(0.1f, glm::vec3(1.f, 0.f, 0.f));
 }
-
-
-void TestGameMode::MoveCameraLeft()
-{
-	GameCamera->Move(MovementDirection::Left, CameraSpeed);
-	//GameCamera->GetRelativeTransform().Rotate(5.f, glm::vec3(0.f, 1.f, 0.f));
-}
-
-void TestGameMode::MoveCameraRight()
-{
-	GameCamera->Move(MovementDirection::Right, CameraSpeed);
-	//GameCamera->GetRelativeTransform().Rotate(-5.f, glm::vec3(0.f, 1.f, 0.f));
-}
-
-void TestGameMode::MoveCameraUp()
-{
-	GameCamera->Move(MovementDirection::Forward, CameraSpeed);
-}
-
-void TestGameMode::MoveCameraDown()
-{
-	GameCamera->Move(MovementDirection::Back, CameraSpeed);
-}
-
-void TestGameMode::OnChangeDrawMode()
-{
-	static bool drawMode = false;
-
-	//RHI->SetDrawMode(drawMode ? EDrawMode::NORMAL : EDrawMode::DEPTH);
-
-	drawMode = !drawMode;
-}
-
-void TestGameMode::DebugProjections()
-{
-	ForwardRenderer::Get().UpdateShadowMatrices = !ForwardRenderer::Get().UpdateShadowMatrices;
-}
-
-void TestGameMode::DebugCascadesVisualize()
-{
-	ForwardRenderer::Get().bCascadeVisualizeMode = !ForwardRenderer::Get().bCascadeVisualizeMode;
-}
-
-void TestGameMode::DebugCursorMode()
-{
-	static bool test = true;
-
-	const ECursorMode mode = test ? ECursorMode::Enabled : ECursorMode::Disabled;
-	InputSystem::Get().SetCursorMode(mode);
-
-	test = !test;
-}
-
-
-void TestGameMode::BoostCameraSpeed()
-{
-	static bool boostOn = false;
-
-	if (boostOn)
-	{
-		CameraSpeed = 0.4f;
-	}
-	else
-	{
-		CameraSpeed = 10.f;
-	}
-
-	boostOn = !boostOn;
-
-}
-
-
-

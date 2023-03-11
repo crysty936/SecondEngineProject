@@ -170,7 +170,8 @@ namespace GLUtils
 		}
 		case GL_DEBUG_SEVERITY_NOTIFICATION:
 		{
-			LOG_INFO("OpenGL Info: %s", inMessage);
+			// Avert spam until logger supports levels
+			//LOG_INFO("OpenGL Info: %s", inMessage);
 
 			break;
 		}

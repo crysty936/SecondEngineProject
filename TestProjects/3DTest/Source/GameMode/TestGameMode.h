@@ -3,6 +3,7 @@
 #include "EASTL/shared_ptr.h"
 #include "EASTL/vector.h"
 #include "Entity/Entity.h"
+#include "Controller/GameController.h"
 
 class TestGameMode : public GameModeBase
 {
@@ -26,7 +27,7 @@ public:
 
 private:
 	eastl::shared_ptr<class Camera> GameCamera = nullptr;
-	eastl::unique_ptr<class Controller> GameController = nullptr;
+	eastl::unique_ptr<class GameController> Controller = nullptr;
 
 
 	eastl::shared_ptr<class AssimpModel3D> AssimpModel;

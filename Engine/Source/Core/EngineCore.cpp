@@ -13,6 +13,7 @@
 #include "Renderer/ForwardRenderer.h"
 #include "backends/imgui_impl_win32.h"
 #include "imgui.h"
+#include "Editor/Editor.h"
 
 constexpr float IdealFrameRate = 60.f;
 constexpr float IdealFrameTime = 1.0f / IdealFrameRate;
@@ -33,7 +34,7 @@ EngineCore::~EngineCore() = default;
 void EngineCore::Init()
 {
 	Engine = new EngineCore{};
-	Engine->CurrentGameMode = GameModeBase::Get();
+	//Engine->CurrentGameMode = GameModeBase::Get();
 
 	InputSystem::Init();
 
@@ -56,13 +57,20 @@ void EngineCore::Init()
 
 	//SceneManager::Get().LoadScene();
 
-	// After initializing all engine subsystems, Game Mode init is called
-	Engine->CurrentGameMode->Init();
-	SceneManager::Get().GetCurrentScene().InitObjects();
+	// TODO [Editor-Game Separation]: Only if compiled with editor
+	Editor::Init();
+
+	// After initializing all engine subsystems, Game Mode init is called 
+	// TODO [Editor-Game Separation]: This should be initialized like this only when editor is missing otherwise by the editor
+	//Engine->CurrentGameMode->Init();
+	//SceneManager::Get().GetCurrentScene().InitObjects();
 }
 
 void EngineCore::Terminate()
 {
+	// TODO [Editor-Game Separation]: Only if compiled with editor
+	Editor::Terminate();
+
 	TimersManager::Terminate();
 	ForwardRenderer::Terminate();
 	InputSystem::Terminate();
@@ -121,11 +129,16 @@ void EngineCore::Run()
  		ImGui::ShowDemoWindow(&showDemo);
  
  		SceneManager::Get().GetCurrentScene().TickObjects(CurrentDeltaT);
- 		CurrentGameMode->Tick(CurrentDeltaT);
+
+		// TODO [Editor-Game Separation]: If editor is not present
+ 		//CurrentGameMode->Tick(CurrentDeltaT); 
+
+		GEditor->Tick(CurrentDeltaT);
 
  		ForwardRenderer::Get().Draw();
 
 		// Draw ImGui
+		ImGui::EndFrame();
 		ImGui::Render();
 		RHI::Get()->ImGuiRenderDrawData();
 

@@ -17,7 +17,7 @@ WindowsWindow::WindowsWindow(const bool Init, const WindowProperties& inProperti
 	ShowWindow(static_cast<HWND>(WindowHandle), SW_SHOW);
 	UpdateWindow(static_cast<HWND>(WindowHandle));
 
-	InputSystem::Get().OnKeyInput().BindRaw(this, &WindowsWindow::OnKeyInput);
+	InputSystem::Get().GetOnKeyInputDel().BindRaw(this, &WindowsWindow::OnKeyInput);
 }
 
 WindowsWindow::~WindowsWindow()

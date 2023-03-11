@@ -27,11 +27,7 @@ namespace WindowsPlatform
 	void InitImGUIOpenGL(void* handle);
 	void DrawImGUIAdditionalWindows();
 
-	class InputForwarder
-	{
-	public:
-		static void ForwardKey(const EInputKey inKey, const EInputType inAction);
-		static void ForwardMouseMove(double inNewYaw, double inNewPitch);
-	};
+	void ForwardKeyInput(const EInputKey inKey, const EInputType inAction);
+	void ForwardMouseMoveInput(double inNewYaw, double inNewPitch);
 
 }

@@ -156,7 +156,7 @@ public:
 
 	inline bool IsBound() const
 	{
-		return GetFuncContainer()->IsBound();
+		return GetFuncContainer() ? GetFuncContainer()->IsBound() : false;
 	}
 
 private:

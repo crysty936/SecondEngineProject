@@ -11,22 +11,23 @@ using KeyActionDelegate = Delegate<void>;
 struct OnKeyAction
 {
 	KeyActionDelegate Del{};
+	KeyActionDelegate ReleasedDel{};
 	EInputKey RequiredKey{};
 	bool Once{ false };
 };
 
-class Controller
+class ControllerBase
 {
 public:
-	Controller();
-	virtual ~Controller();
+	ControllerBase();
+	virtual ~ControllerBase();
 
-	void ExecuteCallbacks();
-	inline void AddListener(OnKeyAction& inKeyAction) { KeyListeners.push_back(inKeyAction); }
+	virtual void ExecuteCallbacks();
+	void AddListener(OnKeyAction& inKeyAction);
 	inline MouseScrollDelegate& OnMouseScroll() { return OnMouseScrollDelegate; }
 	inline MousePosDelegate& OnMouseMoved() { return OnMouseMovedDelegate; }
 
-private:
+protected:
 	void OnKeyInputReceived(EInputKey inKeyCode, EInputType inEventType);
 	void OnMouseMoveInputReceived(const float inNewYaw, const float inNewPitch);
 	void OnMouseScrollInputReceived(const float inNewY);

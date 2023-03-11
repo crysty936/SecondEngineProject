@@ -50,6 +50,21 @@ void InputSystem::PollEvents()
 	WindowsPlatform::PoolMessages();
 }
 
+KeyDelegate& InputSystem::GetOnKeyInputDel()
+{
+	return OnKeyInputDelegate;
+}
+
+MousePosDelegate& InputSystem::GetOnMouseMovedDel()
+{
+	return OnMouseMovedDelegate;
+}
+
+MouseScrollDelegate& InputSystem::GetOnMouseScrollDel()
+{
+	return OnMouseScrollDelegate;
+}
+
 void InputSystem::SetCursorMode(const ECursorMode inMode, void* inWindowHandle)
 {
 	if (!inWindowHandle)
