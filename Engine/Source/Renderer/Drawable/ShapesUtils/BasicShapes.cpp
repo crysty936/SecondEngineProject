@@ -105,9 +105,9 @@ void SquareShape::CreateProxy()
  	if (!materialExists)
  	{
 		eastl::vector<ShaderSourceInput> shaders = {
-		{ "ModelWorldPosition_VS_Pos-UV", EShaderType::Vertex },
+		{ "VS_Pos-UV", EShaderType::Vertex },
 		//{ "GeometryTest_GS", EShaderType::Geometry },
-		{ "FlatColor_PS", EShaderType::Fragment } };
+		{ "PS_FlatColor", EShaderType::Fragment } };
 
 		material->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
 	}
@@ -167,11 +167,11 @@ void CubeShape::CreateProxy()
   	if (!materialExists)
   	{
 		eastl::shared_ptr<RHITexture2D> tex = RHI::Get()->CreateTexture2D("../Data/Textures/MinecraftGrass.jpg");
-		material->OwnedTextures.push_back(tex);
+		material->DiffuseMaps.push_back(tex);
 
 		eastl::vector<ShaderSourceInput> shaders = {
-		{ "ModelWorldPosition_VS_Pos-UV-Normal_WithShadow_ManuallyWritten", EShaderType::Vertex },
-		{ "BasicTex_PS_WithShadow", EShaderType::Fragment } };
+		{ "VS_Pos-UV-Normal_WithShadow", EShaderType::Vertex },
+		{ "PS_BasicTex_WithShadow", EShaderType::Fragment } };
 
 		material->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
   	}
@@ -287,8 +287,8 @@ void LightSource::CreateProxy()
 	if (!materialExists)
 	{
 		eastl::vector<ShaderSourceInput> shaders = {
-		{ "ModelWorldPosition_VS_Pos-UV-Normal_ManuallyWritten", EShaderType::Vertex },
-		{ "LightSource_PS", EShaderType::Fragment } };
+		{ "VS_Pos-UV-Normal", EShaderType::Vertex },
+		{ "PS_LightSource", EShaderType::Fragment } };
 
 		material->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
 	}
@@ -417,8 +417,8 @@ void FullScreenQuad::CreateCommand()
 	if (!materialExists)
 	{
 		eastl::vector<ShaderSourceInput> shaders = {
-		{ "UnchangedPosition_VS_Pos-UV_ManuallyWritten", EShaderType::Vertex },
-		{ "BasicTex_PS", EShaderType::Fragment } };
+		{ "VS_Pos-UV_UnchangedPosition", EShaderType::Vertex },
+		{ "PS_BasicTex", EShaderType::Fragment } };
 
 		material->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
 	}

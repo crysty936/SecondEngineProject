@@ -33,8 +33,8 @@ protected:
 	virtual eastl::shared_ptr<RHIShader> CreateShaders(const class VertexInputLayout& inLayout) const override
 	{
 		eastl::vector<ShaderSourceInput> shaders = {
-		{ "ModelWorldPosition_VS_Pos-UV-Normal_ManuallyWritten-Instanced", EShaderType::Vertex },
-		{ "BasicTex_PS", EShaderType::Fragment } };
+		{ "VS_Pos-UV-Normal_Instanced", EShaderType::Vertex },
+		{ "PS_BasicTex", EShaderType::Fragment } };
 
 		return RHI::Instance->CreateShaderFromPath(shaders, inLayout);
 	}
@@ -154,11 +154,11 @@ public:
   		if (!materialExists)
   		{
   			eastl::shared_ptr<RHITexture2D> tex = RHI::Instance->CreateTexture2D("../Data/Textures/MinecraftGrass.jpg");
-  			material->OwnedTextures.push_back(tex);
+  			material->DiffuseMaps.push_back(tex);
   
   			eastl::vector<ShaderSourceInput> shaders = {
-  			{ "ModelWorldPosition_VS_Pos-UV-Normal_ManuallyWritten-Instanced", EShaderType::Vertex },
-  			{ "BasicTex_PS", EShaderType::Fragment } };
+  			{ "VS_Pos-UV-Normal_Instanced", EShaderType::Vertex },
+  			{ "PS_BasicTex", EShaderType::Fragment } };
   
   			material->Shader = RHI::Instance->CreateShaderFromPath(shaders, inputLayout);
   		}
@@ -230,9 +230,9 @@ void TestGameMode::Init()
 	eastl::shared_ptr<LightSource> lightObj = EntityHelper::CreateObject<LightSource>();
 	lightObj->SetRelativeLocation(glm::vec3(-5.0f, 20.0f, -0.2f));
 
-	AssimpModel = eastl::shared_ptr<AssimpModel3D>(EntityHelper::CreateObject<AssimpModel3D>("../Data/Models/Shiba/scene.gltf"));
-	AssimpModel->SetScale(glm::vec3(10.f, 10.f, 10.f));
-	AssimpModel->Move(glm::vec3(0.f, 10.f, 0.f));
+// 	AssimpModel = eastl::shared_ptr<AssimpModel3D>(EntityHelper::CreateObject<AssimpModel3D>("../Data/Models/Shiba/scene.gltf"));
+// 	AssimpModel->SetScale(glm::vec3(10.f, 10.f, 10.f));
+// 	AssimpModel->Move(glm::vec3(0.f, 10.f, 0.f));
 
  	eastl::shared_ptr<AssimpModel3D> floorModel = EntityHelper::CreateObject<AssimpModel3D>("../Data/Models/Floor/scene.gltf");
 	floorModel->Move(glm::vec3(0.f, -2.f, 0.f));
@@ -280,5 +280,5 @@ void TestGameMode::Tick(float inDeltaT)
 {
 	//Controller->ExecuteCallbacks();
 
-	AssimpModel->Rotate(0.1f, glm::vec3(1.f, 0.f, 0.f));
+	//AssimpModel->Rotate(0.1f, glm::vec3(1.f, 0.f, 0.f));
 }

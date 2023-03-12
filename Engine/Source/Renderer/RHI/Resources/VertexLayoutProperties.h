@@ -16,6 +16,8 @@ enum class VertexInputType : uint32_t
 	Position,
 	Normal,
 	TexCoords,
+	Tangent,
+	Bitangent,
 	InstanceData,
 	Count
 };

@@ -396,13 +396,15 @@ eastl::shared_ptr<class RHIShader> D3D11RHI::CreateShaderFromSource(const eastl:
 			ASSERT(!FAILED(hr));
 
 
-			constexpr int32_t semanticNamesCount = 5;
+			constexpr int32_t semanticNamesCount = 7;
 			// This is 1 : 1 with VertexInputType!
 			static constexpr char* semanticsName[semanticNamesCount] = {
 				"",
 				"POSITION",
 				"NORMAL",
 				"TEXCOORD",
+				"Tangent", //TODO
+				"Bitangent" //TODO
 				"InstanceData", //TODO
 			};
 			static_assert(static_cast<int32_t>(VertexInputType::Count) == semanticNamesCount);

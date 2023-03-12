@@ -163,8 +163,8 @@ void ForwardRenderer::SetBaseUniforms()
 		 if (!materialExists)
 		 {
 			 eastl::vector<ShaderSourceInput> shaders = {
-			 { "WorldPosition_VS_Pos_ManuallyWritten", EShaderType::Vertex },
-			 { "FlatColor_PS", EShaderType::Fragment } };
+			 { "VS_Pos_ManuallyWritten_DebugPoints", EShaderType::Vertex },
+			 { "PS_FlatColor", EShaderType::Fragment } };
 
 			 material->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
 		 }
@@ -214,7 +214,7 @@ void ForwardRenderer::SetBaseUniforms()
 		 if (!materialExists)
 		 {
 			 eastl::vector<ShaderSourceInput> shaders = {
-			 { "WorldPosition_VS_Pos_Geometry_ManuallyWritten_DebugLine", EShaderType::Vertex },
+			 { "VS_Pos_Geometry_ManuallyWritten_DebugLine", EShaderType::Vertex },
 			 { "GS_DebugLines", EShaderType::Geometry },
 			 { "PS_DebugLine_Color", EShaderType::Fragment } };
 
@@ -250,7 +250,7 @@ void ForwardRenderer::Init(const WindowProperties & inMainWindowProperties)
 
 	ScreenQuad = EntityHelper::CreateObject<FullScreenQuad>(GlobalRenderTexture);
 	ScreenQuad->CreateCommand();
-	ScreenQuad->GetCommand().Material->OwnedTextures.push_back(GlobalRenderTexture);
+	ScreenQuad->GetCommand().Material->DiffuseMaps.push_back(GlobalRenderTexture);
 
 	DepthFrameBuffer = RHI::Get()->CreateEmptyFrameBuffer();
 	//DepthRenderTexture = RHI::Instance->CreateDepthMap(SHADOW_WIDTH, SHADOW_HEIGHT);
@@ -545,13 +545,19 @@ void ForwardRenderer::DrawCommand(const RenderCommand& inCommand)
 
 	{
 		int texNr = 0;
-		for (const eastl::shared_ptr<RHITexture2D>& tex : material->OwnedTextures)
+		for (const eastl::shared_ptr<RHITexture2D>& tex : material->DiffuseMaps)
 		{
 			RHI::Get()->BindTexture2D(*tex, texNr);
 			++texNr;
 		}
 
-		for (const eastl::weak_ptr<RHITexture2D>& tex : material->WeakTextures)
+		for (const eastl::shared_ptr<RHITexture2D>& tex : material->NormalMaps)
+		{
+			RHI::Get()->BindTexture2D(*tex, texNr);
+			++texNr;
+		}
+
+		for (const eastl::weak_ptr<RHITexture2D>& tex : material->ExternalTextures)
 		{
 			if (tex.expired())
 			{
@@ -607,13 +613,19 @@ void ForwardRenderer::DrawCommand(const RenderCommand& inCommand)
 
 	{
 		int texNr = 0;
-		for (const eastl::shared_ptr<RHITexture2D>& tex : material->OwnedTextures)
+		for (const eastl::shared_ptr<RHITexture2D>& tex : material->DiffuseMaps)
 		{
 			RHI::Get()->UnbindTexture2D(*tex, texNr);
 			++texNr;
 		}
 
-		for (const eastl::weak_ptr<RHITexture2D>& tex : material->WeakTextures)
+		for (const eastl::shared_ptr<RHITexture2D>& tex : material->NormalMaps)
+		{
+			RHI::Get()->UnbindTexture2D(*tex, texNr);
+			++texNr;
+		}
+
+		for (const eastl::weak_ptr<RHITexture2D>& tex : material->ExternalTextures)
 		{
 			if (tex.expired())
 			{
@@ -675,10 +687,10 @@ eastl::shared_ptr<RenderMaterial> ForwardRenderer::GetMaterial(const RenderComma
 				inputLayout.Push<float>(2, VertexInputType::TexCoords);
 
 				eastl::vector<ShaderSourceInput> shaders = {
-				//{ "Depth_VS-Pos-Normal-UV", EShaderType::Vertex },
+				//{ "VS-Pos-Normal-UV_Instanced_Depth", EShaderType::Vertex },
 				{ "VS_Pos-Normal-UV_Depth_Cascaded", EShaderType::Vertex },
 				{ "GS_Depth_Cascaded", EShaderType::Geometry },
-				{ "Empty_PS", EShaderType::Fragment } };
+				{ "PS_Empty", EShaderType::Fragment } };
 
 				depthMaterial->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
 			}
@@ -705,7 +717,7 @@ eastl::shared_ptr<RenderMaterial> ForwardRenderer::GetMaterial(const RenderComma
 				//{ "Depth_VS-Pos-Normal-UV_Instanced", EShaderType::Vertex },
 				{ "VS_Pos-Normal-UV_Depth_Cascaded_Instanced", EShaderType::Vertex },
 				{ "GS_Depth_Cascaded", EShaderType::Geometry },
-				{ "Empty_PS", EShaderType::Fragment } };
+				{ "PS_Empty", EShaderType::Fragment } };
 
 				depthMaterial->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
 			}
@@ -734,11 +746,11 @@ eastl::shared_ptr<RenderMaterial> ForwardRenderer::GetMaterial(const RenderComma
 			inputLayout.Push<float>(2, VertexInputType::TexCoords);
 
 			eastl::vector<ShaderSourceInput> shaders = {
-			{ "UnchangedPosition_VS_Pos-UV_ManuallyWritten", EShaderType::Vertex },
-			{ "VisualiseDepth_PS", EShaderType::Fragment } };
+			{ "VS_Pos-UV_UnchangedPosition", EShaderType::Vertex },
+			{ "PS_VisualiseDepth", EShaderType::Fragment } };
 
 			depthMaterial->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
-			depthMaterial->OwnedTextures.push_back(DepthRenderTexture);
+			depthMaterial->DiffuseMaps.push_back(DepthRenderTexture);
 		}
 
 		return depthMaterial;
@@ -770,9 +782,9 @@ eastl::shared_ptr<RenderMaterial> ForwardRenderer::GetMaterial(const RenderComma
 			inputLayout.Push<float>(2, VertexInputType::TexCoords);
 
 			eastl::vector<ShaderSourceInput> shaders = {
-			{ "ModelWorldPosition_VS_Pos-UV-Normal_Geometry_ManuallyWritten_NormalVisualizer", EShaderType::Vertex },
+			{ "VS_Pos-UV-Normal_Geometry_NormalVisualize", EShaderType::Vertex },
 			{ "GS_VisualizeNormals", EShaderType::Geometry },
-			{ "FlatColor_PS", EShaderType::Fragment } };
+			{ "PS_FlatColor", EShaderType::Fragment } };
 
 			visNormalMat->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
  		}

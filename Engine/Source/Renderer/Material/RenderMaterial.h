@@ -43,6 +43,9 @@ public:
 	eastl::vector<BufferWithRequirements> UBuffers;
 	eastl::shared_ptr<class RHIShader> Shader;
 
-	eastl::vector<eastl::shared_ptr<class RHITexture2D>> OwnedTextures;
-	eastl::vector<eastl::weak_ptr<class RHITexture2D>> WeakTextures;
+	eastl::vector<eastl::shared_ptr<class RHITexture2D>> DiffuseMaps;
+	eastl::vector<eastl::shared_ptr<class RHITexture2D>> NormalMaps;
+
+
+	eastl::vector<eastl::weak_ptr<class RHITexture2D>> ExternalTextures;
 };

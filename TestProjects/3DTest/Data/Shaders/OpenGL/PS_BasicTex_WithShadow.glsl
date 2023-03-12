@@ -16,7 +16,8 @@ in VS_OUT
 } ps_in;
 
 layout(binding = 0) uniform sampler2D diffuse;
-layout(binding = 1) uniform sampler2DArray depthTexture;
+layout(binding = 1) uniform sampler2D normal;
+layout(binding = 2) uniform sampler2DArray depthTexture;
 
 vec2 poissonDisk[4] = vec2[](
 	vec2(-0.94201624, -0.39906216),

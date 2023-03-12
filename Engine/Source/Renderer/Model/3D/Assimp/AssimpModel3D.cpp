@@ -102,8 +102,8 @@ void AssimpModel3D::ProcessNodesRecursively(const aiNode & inNode, const aiScene
 eastl::shared_ptr<RHIShader> AssimpModel3D::CreateShaders(const VertexInputLayout& inLayout) const
 {
 	eastl::vector<ShaderSourceInput> shaders = {
-		{ "ModelWorldPosition_VS_Pos-UV-Normal_WithShadow_ManuallyWritten", EShaderType::Vertex },
-		{ "BasicTex_PS_WithShadow", EShaderType::Fragment } };
+		{ "VS_Pos-UV-Normal-Tangent-Bitangent_Model_WorldPosition_WithShadow", EShaderType::Vertex },
+		{ "PS_BasicTex_WithShadow", EShaderType::Fragment } };
 
 	return RHI::Get()->CreateShaderFromPath(shaders, inLayout);
 }
@@ -134,6 +134,10 @@ void AssimpModel3D::ProcessMesh(const aiMesh& inMesh, const aiScene& inScene, ea
 	inputLayout.Push<float>(3, VertexInputType::Normal);
 	// Vertex Tex Coords
 	inputLayout.Push<float>(2, VertexInputType::TexCoords);
+	// Tangent
+	inputLayout.Push<float>(3, VertexInputType::Tangent);
+	// Bitangent
+	inputLayout.Push<float>(3, VertexInputType::Bitangent);
 
  	MaterialsManager& matManager = MaterialsManager::Get();
  	bool materialExists = false;
@@ -146,10 +150,13 @@ void AssimpModel3D::ProcessMesh(const aiMesh& inMesh, const aiScene& inScene, ea
 		{
 			aiMaterial* Material = inScene.mMaterials[inMesh.mMaterialIndex];
 			eastl::vector<eastl::shared_ptr<RHITexture2D>> diffuseMaps = LoadMaterialTextures(*Material, aiTextureType_DIFFUSE);
-			thisMaterial->OwnedTextures.insert(thisMaterial->OwnedTextures.end(), eastl::make_move_iterator(diffuseMaps.begin()), eastl::make_move_iterator(diffuseMaps.end()));
+			thisMaterial->DiffuseMaps.insert(thisMaterial->DiffuseMaps.end(), eastl::make_move_iterator(diffuseMaps.begin()), eastl::make_move_iterator(diffuseMaps.end()));
 
 			// 		std::vector<Texture> SpecularMaps = LoadMaterialTextures(Material, aiTextureType_SPECULAR, TextureType::Specular);
 			// 		Textures.insert(Textures.end(), SpecularMaps.begin(), SpecularMaps.end());
+
+			eastl::vector<eastl::shared_ptr<RHITexture2D>> normalMaps = LoadMaterialTextures(*Material, aiTextureType_NORMALS);
+			thisMaterial->NormalMaps.insert(thisMaterial->NormalMaps.end(), eastl::make_move_iterator(normalMaps.begin()), eastl::make_move_iterator(normalMaps.end()));
 		}
 
 		thisMaterial->Shader = CreateShaders(inputLayout);
@@ -169,8 +176,13 @@ void AssimpModel3D::ProcessMesh(const aiMesh& inMesh, const aiScene& inScene, ea
 			Vertex vert;
 			const aiVector3D& aiVertex = inMesh.mVertices[i];
 			const aiVector3D& aiNormal = inMesh.mNormals[i];
+			const aiVector3D& aiTangent = inMesh.mTangents[i];
+			const aiVector3D& aiBitangent = inMesh.mBitangents[i];
+
 			vert.Position = glm::vec3(aiVertex.x, aiVertex.y, aiVertex.z);
 			vert.Normal = glm::vec3(aiNormal.x, aiNormal.y, aiNormal.z);
+			vert.Tangent = glm::vec3(aiTangent.x, aiTangent.y, aiTangent.z);
+			vert.Bitangent = glm::vec3(aiBitangent.x, aiBitangent.y, aiBitangent.z);
 
 			if (inMesh.mTextureCoords[0])
 			{
