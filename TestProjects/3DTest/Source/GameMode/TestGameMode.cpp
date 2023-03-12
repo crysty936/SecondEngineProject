@@ -15,6 +15,7 @@
 #include "Renderer/RHI/RHI.h"
 #include "Renderer/Material/MaterialsManager.h"
 #include "Utils/InlineVector.h"
+#include "Renderer/Drawable/RenderMaterial_WithLighting.h"
 
 TestGameMode GGameMode = {};
 
@@ -87,7 +88,7 @@ protected:
 };
 
 // Instanced textured cube
-class InstancedCubeTest : public CubeShape
+class InstancedCubeTest : public Model3D
 {
 public:
 	InstancedCubeTest() = default;
@@ -154,7 +155,7 @@ public:
   		if (!materialExists)
   		{
   			eastl::shared_ptr<RHITexture2D> tex = RHI::Instance->CreateTexture2D("../Data/Textures/MinecraftGrass.jpg");
-  			material->DiffuseMaps.push_back(tex);
+  			material->OwnedTextures.push_back(tex);
   
   			eastl::vector<ShaderSourceInput> shaders = {
   			{ "VS_Pos-UV-Normal_Instanced", EShaderType::Vertex },
@@ -174,6 +175,77 @@ public:
 		newCommand.InstancesCount = instancesCount * instancesCount;
   
   		ForwardRenderer::Get().AddCommand(newCommand);
+	}
+};
+
+class ParallaxQuad : public Model3D
+{
+public:
+	ParallaxQuad() = default;
+	virtual ~ParallaxQuad() = default;
+
+	virtual void CreateProxy() override
+	{
+		const eastl::string RenderDataContainerID = "ParallaxQuadContainer";
+		eastl::shared_ptr<MeshDataContainer> dataContainer;
+
+		const bool existingContainer = ForwardRenderer::Get().GetOrCreateContainer(RenderDataContainerID, dataContainer);
+		VertexInputLayout inputLayout;
+
+		// Vertex points
+		inputLayout.Push<float>(3, VertexInputType::Position);
+		// Vertex Normal
+		inputLayout.Push<float>(3, VertexInputType::Normal);
+		// Vertex Tex Coords
+		inputLayout.Push<float>(2, VertexInputType::TexCoords);
+ 		// Tangent
+ 		inputLayout.Push<float>(3, VertexInputType::Tangent);
+ 		// Bitangent
+ 		inputLayout.Push<float>(3, VertexInputType::Bitangent);
+
+		if (!existingContainer)
+		{
+			int32_t indicesCount = BasicShapesData::GetTBNQuadIndicesCount();
+			eastl::shared_ptr<RHIIndexBuffer> ib = RHI::Instance->CreateIndexBuffer(BasicShapesData::GetTBNQuadIndices(), indicesCount);
+
+
+			int32_t verticesCount = BasicShapesData::GetTBNQuadVerticesCount();
+			const eastl::shared_ptr<RHIVertexBuffer> vb = RHI::Instance->CreateVertexBuffer(inputLayout, BasicShapesData::GetTBNQuadVertices(), verticesCount, ib);
+
+			dataContainer->VBuffer = vb;
+		}
+
+		MaterialsManager& matManager = MaterialsManager::Get();
+		bool materialExists = false;
+		eastl::shared_ptr<RenderMaterial> material = matManager.GetOrAddMaterial<RenderMaterial_WithLighting>("parallax_quad_material", materialExists);
+
+		if (!materialExists)
+		{
+			eastl::shared_ptr<RHITexture2D> diffMap = RHI::Instance->CreateTexture2D("../Data/Textures/Parallax/bricks.jpg");
+			eastl::shared_ptr<RHITexture2D> normalMap = RHI::Instance->CreateTexture2D("../Data/Textures/Parallax/bricks_normal.jpg");
+			eastl::shared_ptr<RHITexture2D> heightMap = RHI::Instance->CreateTexture2D("../Data/Textures/Parallax/bricks_disp.jpg");
+
+			material->OwnedTextures.push_back(diffMap);
+			material->OwnedTextures.push_back(normalMap);
+			material->OwnedTextures.push_back(heightMap);
+
+			eastl::vector<ShaderSourceInput> shaders = {
+			{ "VS_Pos-UV-Normal-Tangent-Bitangent_Model_WorldPosition", EShaderType::Vertex },
+			{ "PS_ParallaxTest", EShaderType::Fragment } };
+
+			material->Shader = RHI::Instance->CreateShaderFromPath(shaders, inputLayout);
+		}
+
+		eastl::shared_ptr<MeshNode> cubeNode = eastl::make_shared<MeshNode>();
+		AddChild(cubeNode);
+
+		RenderCommand newCommand;
+		newCommand.Material = material;
+		newCommand.DataContainer = dataContainer;
+		newCommand.Parent = cubeNode;
+		newCommand.DrawType = EDrawCallType::DrawElements;
+
+		ForwardRenderer::Get().AddCommand(newCommand);
 	}
 };
 
@@ -238,6 +310,8 @@ void TestGameMode::Init()
 	FloorModel->Move(glm::vec3(0.f, -2.f, 0.f));
 	//floorModel->SetScale(glm::vec3(10.f, 1.f, 10.f));
 
+
+	eastl::shared_ptr<ParallaxQuad> quad = EntityHelper::CreateObject<ParallaxQuad>();
 
 	//eastl::shared_ptr<AssimpModel3D> sponzaModel = EntityHelper::CreateObject<AssimpModel3D>("../Data/Models/Sponza/scene.gltf");
 

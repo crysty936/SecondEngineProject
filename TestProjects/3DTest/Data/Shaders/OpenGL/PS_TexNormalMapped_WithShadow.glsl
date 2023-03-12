@@ -209,17 +209,20 @@ void main()
 	}
 	else
  	{
+		mat3 WorldToTangent = transpose(ps_in.TangentToWorld);
+
 		vec3 ambientColor = texture(DiffuseMap, ps_in.TexCoords).xyz;
 		float shadowModifier = 1 - shadow;
 
 		vec3 mapNormal = texture(NormalMap, ps_in.TexCoords).xyz;
 		mapNormal = mapNormal * 2.0 - 1.0;
-		vec3 wsNormal = normalize(ps_in.TangentToWorld * mapNormal);
-		float diffPower = max(dot(wsNormal, -ps_in.DirectionalLightDirection), 0.3);
+		//vec3 wsNormal = normalize(ps_in.TangentToWorld * mapNormal);
+		vec3 tsLightDir = normalize(WorldToTangent * ps_in.DirectionalLightDirection);
+		float diffPower = max(dot(mapNormal, tsLightDir), 0.3);
 
 		vec3 dirLightColor = diffPower * texture(DiffuseMap, ps_in.TexCoords).xyz;
 
- 		color = (dirLightColor) + 0.2 * ambientColor;
+ 		color = (shadowModifier * dirLightColor) + 0.2 * ambientColor;
  	}
 
 	FragColor = vec4(color, 1.0);

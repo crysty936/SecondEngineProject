@@ -71,6 +71,42 @@ int32_t BasicShapesData::GetQuadIndicesCount()
 
 // ~Quad
 
+// TBN Quad
+const float TBNQuadVertices[] = {
+// Position, Normal, UV, Tangent, BiTangent
+ 1.f,  1.f, 0.0f,  0.0, 0.0, 1.0, 1.f, 1.f, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, // top right
+-1.f,  1.f, 0.0f,  0.0, 0.0, 1.0, 0.f, 1.f, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0,  // top left 
+ 1.f, -1.f, 0.0f,  0.0, 0.0, 1.0, 1.f, 0.f, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, // bottom right
+-1.f, -1.f, 0.0f,  0.0, 0.0, 1.0, 0.f, 0.f, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0 // bottom left
+};
+
+const uint32_t TBNQuadIndices[] = {
+	0, 1, 2,   // first triangle
+	1, 3, 2    // second triangle
+};
+
+const float* BasicShapesData::GetTBNQuadVertices()
+{
+	return TBNQuadVertices;
+}
+
+const uint32_t* BasicShapesData::GetTBNQuadIndices()
+{
+	return TBNQuadIndices;
+}
+
+int32_t BasicShapesData::GetTBNQuadVerticesCount()
+{
+	return sizeof(TBNQuadVertices) / sizeof(float);
+}
+
+int32_t BasicShapesData::GetTBNQuadIndicesCount()
+{
+	return sizeof(TBNQuadIndices) / sizeof(uint32_t);
+}
+
+// ~Quad
+
 // Square
 // CCW Vertices with secondary diagonal split drawing
 const float SquareVertices[] = {

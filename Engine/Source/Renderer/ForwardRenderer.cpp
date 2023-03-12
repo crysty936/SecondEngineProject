@@ -250,7 +250,7 @@ void ForwardRenderer::Init(const WindowProperties & inMainWindowProperties)
 
 	ScreenQuad = EntityHelper::CreateObject<FullScreenQuad>(GlobalRenderTexture);
 	ScreenQuad->CreateCommand();
-	ScreenQuad->GetCommand().Material->DiffuseMaps.push_back(GlobalRenderTexture);
+	ScreenQuad->GetCommand().Material->OwnedTextures.push_back(GlobalRenderTexture);
 
 	DepthFrameBuffer = RHI::Get()->CreateEmptyFrameBuffer();
 	//DepthRenderTexture = RHI::Instance->CreateDepthMap(SHADOW_WIDTH, SHADOW_HEIGHT);
@@ -450,7 +450,7 @@ void ForwardRenderer::DrawShadowMap()
  	RHI::Get()->PrepareProjectionForRendering(lightProjection);
 
 	UniformsCache["lsMatrices"] = lsMatrices;
-	UniformsCache["DirectionalLightDirection"] = lightDir;
+	UniformsCache["DirectionalLightDirection"] = -lightDir;
 	UniformsCache["ShadowCameraViewMatrix"] = ShadowCameraViewMatrix;
 	UniformsCache["bShadowVisualizeMode"] = bCascadeVisualizeMode ? 1 : 0;
 	UniformsCache["bNormalVisualizeMode"] = bNormalVisualizeMode ? 1 : 0;
@@ -547,13 +547,7 @@ void ForwardRenderer::DrawCommand(const RenderCommand& inCommand)
 
 	{
 		int texNr = 0;
-		for (const eastl::shared_ptr<RHITexture2D>& tex : material->DiffuseMaps)
-		{
-			RHI::Get()->BindTexture2D(*tex, texNr);
-			++texNr;
-		}
-
-		for (const eastl::shared_ptr<RHITexture2D>& tex : material->NormalMaps)
+		for (const eastl::shared_ptr<RHITexture2D>& tex : material->OwnedTextures)
 		{
 			RHI::Get()->BindTexture2D(*tex, texNr);
 			++texNr;
@@ -615,13 +609,7 @@ void ForwardRenderer::DrawCommand(const RenderCommand& inCommand)
 
 	{
 		int texNr = 0;
-		for (const eastl::shared_ptr<RHITexture2D>& tex : material->DiffuseMaps)
-		{
-			RHI::Get()->UnbindTexture2D(*tex, texNr);
-			++texNr;
-		}
-
-		for (const eastl::shared_ptr<RHITexture2D>& tex : material->NormalMaps)
+		for (const eastl::shared_ptr<RHITexture2D>& tex : material->OwnedTextures)
 		{
 			RHI::Get()->UnbindTexture2D(*tex, texNr);
 			++texNr;
@@ -752,7 +740,7 @@ eastl::shared_ptr<RenderMaterial> ForwardRenderer::GetMaterial(const RenderComma
 			{ "PS_VisualiseDepth", EShaderType::Fragment } };
 
 			depthMaterial->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
-			depthMaterial->DiffuseMaps.push_back(DepthRenderTexture);
+			depthMaterial->OwnedTextures.push_back(DepthRenderTexture);
 		}
 
 		return depthMaterial;

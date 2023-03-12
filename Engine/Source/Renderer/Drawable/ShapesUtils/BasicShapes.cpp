@@ -167,7 +167,7 @@ void CubeShape::CreateProxy()
   	if (!materialExists)
   	{
 		eastl::shared_ptr<RHITexture2D> tex = RHI::Get()->CreateTexture2D("../Data/Textures/MinecraftGrass.jpg");
-		material->DiffuseMaps.push_back(tex);
+		material->OwnedTextures.push_back(tex);
 
 		eastl::vector<ShaderSourceInput> shaders = {
 		{ "VS_Pos-UV-Normal_WithShadow", EShaderType::Vertex },

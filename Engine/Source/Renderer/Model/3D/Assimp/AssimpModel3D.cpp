@@ -150,13 +150,13 @@ void AssimpModel3D::ProcessMesh(const aiMesh& inMesh, const aiScene& inScene, ea
 		{
 			aiMaterial* Material = inScene.mMaterials[inMesh.mMaterialIndex];
 			eastl::vector<eastl::shared_ptr<RHITexture2D>> diffuseMaps = LoadMaterialTextures(*Material, aiTextureType_DIFFUSE);
-			thisMaterial->DiffuseMaps.insert(thisMaterial->DiffuseMaps.end(), eastl::make_move_iterator(diffuseMaps.begin()), eastl::make_move_iterator(diffuseMaps.end()));
+			thisMaterial->OwnedTextures.insert(thisMaterial->OwnedTextures.end(), eastl::make_move_iterator(diffuseMaps.begin()), eastl::make_move_iterator(diffuseMaps.end()));
 
 			// 		std::vector<Texture> SpecularMaps = LoadMaterialTextures(Material, aiTextureType_SPECULAR, TextureType::Specular);
 			// 		Textures.insert(Textures.end(), SpecularMaps.begin(), SpecularMaps.end());
 
 			eastl::vector<eastl::shared_ptr<RHITexture2D>> normalMaps = LoadMaterialTextures(*Material, aiTextureType_NORMALS);
-			thisMaterial->NormalMaps.insert(thisMaterial->NormalMaps.end(), eastl::make_move_iterator(normalMaps.begin()), eastl::make_move_iterator(normalMaps.end()));
+			thisMaterial->OwnedTextures.insert(thisMaterial->OwnedTextures.end(), eastl::make_move_iterator(normalMaps.begin()), eastl::make_move_iterator(normalMaps.end()));
 		}
 
 		thisMaterial->Shader = CreateShaders(inputLayout);

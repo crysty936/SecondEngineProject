@@ -25,6 +25,12 @@ namespace BasicShapesData
 	int32_t GetQuadVerticesCount();
 	int32_t GetQuadIndicesCount();
 
+	// TBN Quad
+	const float* GetTBNQuadVertices();
+	const uint32_t* GetTBNQuadIndices();
+	int32_t GetTBNQuadVerticesCount();
+	int32_t GetTBNQuadIndicesCount();
+
 	// Cube
 	const float* GetCubeVertices();
 	const uint32_t* GetCubeIndices();

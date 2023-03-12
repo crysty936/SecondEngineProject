@@ -295,11 +295,11 @@ eastl::shared_ptr<RHIVertexBuffer> OpenGLRHI::CreateVertexBuffer(const VertexInp
 	glGenBuffers(1, &handle);
 	glBindBuffer(GL_ARRAY_BUFFER, handle);
 
-	size_t dataSize = sizeof(float) * inCount;
+	const size_t dataSize = sizeof(float) * inCount;
 	glNamedBufferData(handle, dataSize, inVertices, GL_STATIC_DRAW);
 
 	eastl::shared_ptr<GLVertexBuffer> newBuffer = eastl::make_shared<GLVertexBuffer>(handle, inIndexBuffer, inLayout);
-	newBuffer->AllocatedSize = sizeof(float) * inCount;
+	newBuffer->AllocatedSize = dataSize;
 
 	return newBuffer;
 }
@@ -310,9 +310,8 @@ eastl::shared_ptr<RHIVertexBuffer> OpenGLRHI::CreateVertexBuffer(const VertexInp
 	glGenBuffers(1, &handle);
 	glBindBuffer(GL_ARRAY_BUFFER, handle);
 
-	const int32_t verticesCount = static_cast<int32_t>(inVertices.size());
-	size_t dataSize = sizeof(Vertex) * verticesCount;
-	glNamedBufferData(handle, sizeof(Vertex) * verticesCount, inVertices.data(), GL_STATIC_DRAW);
+	size_t dataSize = sizeof(Vertex) * inVertices.size();
+	glNamedBufferData(handle, dataSize, inVertices.data(), GL_STATIC_DRAW);
 
 	eastl::shared_ptr<GLVertexBuffer> newBuffer = eastl::make_shared<GLVertexBuffer>(handle, inIndexBuffer, inLayout);
 	newBuffer->AllocatedSize = dataSize;
