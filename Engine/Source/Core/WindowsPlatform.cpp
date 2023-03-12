@@ -430,33 +430,17 @@ namespace WindowsPlatform
 	LRESULT WindowMessageLoop(HWND hwnd, uint32_t msg, WPARAM wParam, LPARAM lParam)
 	{
 
-        if (GImGui)
-        {
-            if (!ImGui::GetIO().WantCaptureMouse)
-            {
-                if (ImGui::IsMouseClicked(ImGuiMouseButton_Right) || ImGui::IsMouseClicked(ImGuiMouseButton_Middle))
-                {
-                    ImGui::FocusWindow(NULL);
-                }
-            }
-        }
-
 		if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wParam, lParam))
 			return true;
 
-
-        if (GImGui)
-        {
-            const ImGuiIO& io = ImGui::GetIO();
-
-		    // Don't treat inputs when ImGui window has focus
-	
-
-			if (io.WantCaptureMouse || io.WantCaptureKeyboard)
+        // Don't treat input if mouse is over ImGui window
+		if (GImGui)
+		{
+			if (GImGui->HoveredWindow)
 			{
                 return true;
-            }
-        }
+			}
+		}
 
 		// Forward hwnd on because we can get messages (e.g., WM_CREATE)
 		// before CreateWindow returns, and thus before mhMainWnd is valid.
