@@ -14,7 +14,7 @@ void RenderMaterial_WithShadow::SetRequiredUniforms()
 	__super::SetRequiredUniforms();
 	eastl::vector<UniformWithFlag> defaultUniforms = {
 	{"lsMatrices", 3},
-	{"ShadowViewMatrix"},
+	{"ShadowCameraViewMatrix"},
 	{"DirectionalLightDirection"},
 	{"cascadesCount"},
 	{"bVisualizeMode"},

@@ -90,6 +90,7 @@ private:
 	EDrawMode::Type CurrentDrawMode = EDrawMode::Default;
 	//eastl::queue<RenderingLoadCommand> LoadQueue;
 	eastl::unordered_map<eastl::string, eastl::shared_ptr<class MeshDataContainer>> RenderDataContainerMap;
+	int32_t CascadesCount = 3;
 };
 
 extern const uint32_t SHADOW_WIDTH;

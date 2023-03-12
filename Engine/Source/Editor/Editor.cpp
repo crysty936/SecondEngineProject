@@ -84,19 +84,6 @@ void Editor::Internal_PostInit()
 
 		Controller->AddListener(action);
 	}
-	{
-		KeyActionDelegate del = KeyActionDelegate::CreateRaw(this, &Editor::DebugProjections);
-		EInputKey key = EInputKey::G;
-		OnKeyAction action = { del, {}, key, true };
-		Controller->AddListener(action);
-	}
-
-	{
-		KeyActionDelegate del = KeyActionDelegate::CreateRaw(this, &Editor::DebugCascadesVisualize);
-		EInputKey key = EInputKey::T;
-		OnKeyAction action = { del, {}, key, true };
-		Controller->AddListener(action);
-	}
 
 	{
 		KeyActionDelegate del = KeyActionDelegate::CreateRaw(this, &Editor::DebugCursorMode);
@@ -107,7 +94,7 @@ void Editor::Internal_PostInit()
 
 	{
 		KeyActionDelegate del = KeyActionDelegate::CreateRaw(this, &Editor::BoostCameraSpeed);
-		EInputKey key = EInputKey::LeftShift;
+		EInputKey key = EInputKey::V;
 		OnKeyAction action = { del, {}, key, true };
 		Controller->AddListener(action);
 	}
@@ -175,16 +162,6 @@ void Editor::OnChangeDrawMode()
 	//RHI->SetDrawMode(drawMode ? EDrawMode::NORMAL : EDrawMode::DEPTH);
 
 	drawMode = !drawMode;
-}
-
-void Editor::DebugProjections()
-{
-	ForwardRenderer::Get().UpdateShadowMatrices = !ForwardRenderer::Get().UpdateShadowMatrices;
-}
-
-void Editor::DebugCascadesVisualize()
-{
-	ForwardRenderer::Get().bCascadeVisualizeMode = !ForwardRenderer::Get().bCascadeVisualizeMode;
 }
 
 static bool mouseTest = false;

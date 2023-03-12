@@ -8,7 +8,7 @@ in VS_OUT
 	vec3 worldPos;
 	vec3 Normal;
 	vec3 DirectionalLightDirection;
-	mat4 ShadowViewMatrix;
+	mat4 ShadowCameraViewMatrix;
 	mat4 lsMatrices[3];
 	flat int cascadesCount;
 	flat int bVisualizeMode;
@@ -29,8 +29,8 @@ vec2 poissonDisk[4] = vec2[](
 float CalculateShadow()
 {
 	vec4 worldPos = vec4(ps_in.worldPos, 1.0);
-	vec4 fragPosViewSpace = ps_in.ShadowViewMatrix * worldPos;
-	float ViewSpaceDepthValue = -fragPosViewSpace.z; // Reverse z
+	vec4 fragPosViewSpace = ps_in.ShadowCameraViewMatrix * worldPos;
+	float ViewSpaceDepthValue = -fragPosViewSpace.z;
 
 	int cascadeCount = ps_in.cascadesCount;
 	float cascadePlaneDistances[3] = ps_in.shadowCascadeFarPlanes;
@@ -59,7 +59,7 @@ float CalculateShadow()
 	//float shadowSamplerTest = texture(depthTexture, vec3(projCoords.xy, projCoords.z + 0.001));
 
 	// No need to remap this to 0..1 as 0..1 matrices are being used
-	float pixelLightSpaceDepth = lsPosFinal.z; // Reversed Z
+	float pixelLightSpaceDepth = lsPosFinal.z;
 
 	// 2 different ways of calculating bias 
 	float cosTheta = clamp(dot(ps_in.Normal, ps_in.DirectionalLightDirection), 0.0, 1.0);
@@ -160,36 +160,42 @@ void main()
 	float shadow = CalculateShadow();
 
 	vec4 worldPos = vec4(ps_in.worldPos, 1.0);
-	vec4 fragPosViewSpace = ps_in.ShadowViewMatrix * worldPos;
+	vec4 fragPosViewSpace = ps_in.ShadowCameraViewMatrix * worldPos;
 	vec3 color;
- 	if (bool(ps_in.bVisualizeMode) && fragPosViewSpace.z > 0) 
+ 	if (bool(ps_in.bVisualizeMode)) 
  	{
 		// Recalculated for debug
 		int cascadeCount = ps_in.cascadesCount;
 		float cascadePlaneDistances[3] = ps_in.shadowCascadeFarPlanes;
-		float ViewSpaceDepthValue = fragPosViewSpace.z;
+		float ViewSpaceDepthValue = -fragPosViewSpace.z;
 
 		int layer = -1;
-		for (int i = 0; i < cascadeCount; ++i)
+		if (ViewSpaceDepthValue > 0.0)
 		{
-			if (ViewSpaceDepthValue < cascadePlaneDistances[i])
+			for (int i = 0; i < cascadeCount; ++i)
 			{
-				layer = i;
-				break;
+				if (ViewSpaceDepthValue < cascadePlaneDistances[i])
+				{
+					layer = i;
+					break;
+				}
 			}
 		}
 
-		if (layer == -1)
+		if (layer != -1)
 		{
-			layer = cascadeCount - 1;
+ 			vec3 cascadeColors[3] = { 
+				vec3(1.0, 0.0, 0.0),	// red
+				vec3(0.0, 1.0, 0.0),	// green
+				vec3(0.0, 0.0, 1.0) };	// blue
+
+ 			color = cascadeColors[layer];
+
 		}
-
- 		vec3 cascadeColors[3] = { 
-			vec3(1.0, 0.0, 0.0),	// red
-			vec3(0.0, 1.0, 0.0),	// green
-			vec3(0.0, 0.0, 1.0) };	// blue
-
- 		color = cascadeColors[layer];
+		else
+		{
+			color = vec3(0.0, 0.0, 0.0); // Outside of any available cascade
+		}
  	}
  	else
  	{

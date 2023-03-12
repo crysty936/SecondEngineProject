@@ -125,9 +125,8 @@ void EngineCore::Run()
  		ImGui_ImplWin32_NewFrame();
  		ImGui::NewFrame();
  
- 		bool showDemo = true;
- 		ImGui::ShowDemoWindow(&showDemo);
- 
+ 		//ImGui::ShowDemoWindow();
+
  		SceneManager::Get().GetCurrentScene().TickObjects(CurrentDeltaT);
 
 		// TODO [Editor-Game Separation]: If editor is not present
@@ -142,7 +141,7 @@ void EngineCore::Run()
 		ImGui::Render();
 		RHI::Get()->ImGuiRenderDrawData();
 
-		// Update and Render additional Platform Windows
+		// Update and Render additional Platform windows
 		if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 		{
 			ImGui::UpdatePlatformWindows();

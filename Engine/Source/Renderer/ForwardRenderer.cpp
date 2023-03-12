@@ -117,6 +117,21 @@ eastl::shared_ptr<RHITexture2D> DepthRenderTexture = nullptr;
 eastl::shared_ptr<RHIVertexBuffer> DebugPointsBuffer = nullptr;
 eastl::shared_ptr<RHIVertexBuffer> DebugLinesBuffer = nullptr;
 
+void ForwardRenderer::SetBaseUniforms()
+{
+	// By default, use a D3D11 projection matrix.
+	// Note: glm is RH but uses a sneaky minus to change the handedness of the output to LH (how OpenGL actually is)
+	const float windowWidth = static_cast<float>(Engine->GetMainWindow().GetProperties().Width);
+	const float windowHeight = static_cast<float>(Engine->GetMainWindow().GetProperties().Height);
+
+	glm::mat4 projection = glm::perspectiveRH_ZO(glm::radians(CAMERA_FOV), windowWidth / windowHeight, CAMERA_NEAR, CAMERA_FAR);
+	//glm::mat4 lightProjection = glm::orthoRH_ZO(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+	RHI::Get()->PrepareProjectionForRendering(projection);
+
+	UniformsCache["projection"] = projection;
+}
+
+
  void ForwardRenderer::DrawDebugPoints()
  {
 	 // Points
@@ -251,6 +266,8 @@ void ForwardRenderer::Terminate()
 
 void ForwardRenderer::Draw()
 {
+	ImGui::Begin("Renderer settings");
+
 	SetBaseUniforms();
 	UpdateUniforms();
 
@@ -279,6 +296,8 @@ void ForwardRenderer::Draw()
 //  	DrawCommand(ScreenQuad->GetCommand());
 
 	DrawDebugPoints();
+
+	ImGui::End();
 }
 
 void ForwardRenderer::Present()
@@ -341,11 +360,8 @@ glm::mat4 ForwardRenderer::CreateCascadeMatrix(const glm::mat4& inCameraProj, co
 
 eastl::vector<glm::mat4> ForwardRenderer::CreateCascadesMatrices()
 {
-
-
-
 	eastl::vector<glm::mat4> cascades;
-	cascades.reserve(shadowCascadeFarPlanes.size());
+	cascades.reserve(CascadesCount);
 
 	const glm::vec3 lightDir = glm::normalize(-lightPos);
 	const glm::mat4& cameraView = UniformsCache["view"].GetValue<glm::mat4>();
@@ -353,7 +369,7 @@ eastl::vector<glm::mat4> ForwardRenderer::CreateCascadesMatrices()
 	const float windowWidth = static_cast<float>(Engine->GetMainWindow().GetProperties().Width);
 	const float windowHeight = static_cast<float>(Engine->GetMainWindow().GetProperties().Height);
 
-	for (int32_t i = 0; i < shadowCascadeFarPlanes.size(); ++i)
+	for (int32_t i = 0; i < CascadesCount; ++i)
 	{
 		const float near = i == 0 ? CAMERA_NEAR : shadowCascadeFarPlanes[i - 1];
 		const float far = shadowCascadeFarPlanes[i];
@@ -369,6 +385,11 @@ eastl::vector<glm::mat4> ForwardRenderer::CreateCascadesMatrices()
 
 void ForwardRenderer::DrawShadowMap()
 {
+	ImGui::SeparatorText("Shadow");
+
+	ImGui::Checkbox("Update Shadow Matrices", &UpdateShadowMatrices);
+	ImGui::Checkbox("Visualize Cascades", &bCascadeVisualizeMode);
+
 	// Cull front face to solve Peter Panning
 	//RHI::Instance->SetFaceCullMode(EFaceCullMode::Front);
 
@@ -387,38 +408,54 @@ void ForwardRenderer::DrawShadowMap()
 	// Debug stuff
 	static glm::mat4 debugMatrixCamera;
 	static eastl::vector<glm::mat4> lsMatrices;
-	static glm::mat4 ShadowViewMatrix;
+	static glm::mat4 ShadowCameraViewMatrix;
 
 	if (UpdateShadowMatrices)
 	{
+		// Set cascades far
+		shadowCascadeFarPlanes.clear();
+		for (int32_t i = 0; i < CascadesCount; ++i)
+		{
+			shadowCascadeFarPlanes.push_back(CAMERA_FAR / (CascadesCount - i));
+		}
+
 		glm::mat4 cameraProj = UniformsCache["projection"].GetValue<glm::mat4>();
 		glm::mat4 cameraView = UniformsCache["view"].GetValue<glm::mat4>();
 
 		debugMatrixCamera = cameraProj * cameraView;
 		lsMatrices = CreateCascadesMatrices();
-		ShadowViewMatrix = cameraView;
-
+		ShadowCameraViewMatrix = cameraView;
 	}
 
-	constexpr bool drawDebug = false;
+	static bool DebugDrawPojections = false;
+	ImGui::Checkbox("Visualize Shadow Projections", &DebugDrawPojections);
 
-	if (drawDebug)
+	if (DebugDrawPojections)
 	{
 		for (const glm::mat4& worldToLightClip : lsMatrices)
 		{
 			DrawDebugHelpers::DrawProjection(worldToLightClip);
 		}
+	}
+
+	static bool DebugDrawShadowCameraProjection = false;
+	ImGui::Checkbox("Visualize Shadow Camera Projection", &DebugDrawShadowCameraProjection);
+
+	if (DebugDrawShadowCameraProjection)
+	{
  		DrawDebugHelpers::DrawProjection(debugMatrixCamera);
 	}
 
  	RHI::Get()->PrepareProjectionForRendering(lightProjection);
 
 	UniformsCache["lsMatrices"] = lsMatrices;
-	//UniformsCache["DirectionalLightDirection"] = glm::vec4(lightDir.x, lightDir.y, lightDir.z, 1.0);
 	UniformsCache["DirectionalLightDirection"] = lightDir;
-	UniformsCache["ShadowViewMatrix"] = ShadowViewMatrix;
+	UniformsCache["ShadowCameraViewMatrix"] = ShadowCameraViewMatrix;
 	UniformsCache["bVisualizeMode"] = bCascadeVisualizeMode ? 1 : 0;
-	UniformsCache["cascadesCount"] = int32_t(shadowCascadeFarPlanes.size());
+
+	ImGui::DragInt("Shadow Cascades", &CascadesCount, 0.02f, 0, 3, "%d", ImGuiSliderFlags_AlwaysClamp);
+
+	UniformsCache["cascadesCount"] = CascadesCount;
 	UniformsCache["shadowCascadeFarPlanes"] = shadowCascadeFarPlanes;
  
 // 	RenderCommandsMutex.lock();
@@ -436,20 +473,6 @@ void ForwardRenderer::DrawShadowMap()
 
  	// Reset to default
 	//RHI::Instance->SetFaceCullMode(EFaceCullMode::Back);
-}
-
-void ForwardRenderer::SetBaseUniforms()
-{
-	// By default, use a D3D11 projection matrix.
-	// Note: glm is RH but uses a sneaky minus to change the handedness of the output to LH (how OpenGL actually is)
-	const float windowWidth = static_cast<float>(Engine->GetMainWindow().GetProperties().Width);
-	const float windowHeight = static_cast<float>(Engine->GetMainWindow().GetProperties().Height);
-
-	glm::mat4 projection = glm::perspectiveRH_ZO(glm::radians(CAMERA_FOV),  windowWidth / windowHeight, CAMERA_NEAR, CAMERA_FAR);
-	//glm::mat4 lightProjection = glm::orthoRH_ZO(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
-	RHI::Get()->PrepareProjectionForRendering(projection);
-
-	UniformsCache["projection"] = projection;
 }
 
 void ForwardRenderer::UpdateUniforms()

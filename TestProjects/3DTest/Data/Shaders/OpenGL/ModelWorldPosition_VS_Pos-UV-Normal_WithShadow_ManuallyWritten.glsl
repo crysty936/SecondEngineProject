@@ -11,7 +11,7 @@ out VS_OUT
 	vec3 worldPos;
 	vec3 Normal;
 	vec3 DirectionalLightDirection;
-	mat4 ShadowViewMatrix;
+	mat4 ShadowCameraViewMatrix;
 	mat4 lsMatrices[3];
 	flat int cascadesCount;
 	flat int bVisualizeMode;
@@ -28,7 +28,7 @@ layout(std140, binding = 0) uniform GeometryDataBuffer
 layout(std140, binding = 1) uniform LightDataBuffer
 {
 	mat4 lsMatrices[3];
-	mat4 ShadowViewMatrix;
+	mat4 ShadowCameraViewMatrix;
 	vec4 DirectionalLightDirection;
 	int cascadesCount;
 	int bVisualizeMode;
@@ -44,7 +44,7 @@ void main()
 	vs_out.clipToWorldMatrix = inverse(projection * view);
 	vs_out.Normal = mat3(transpose(inverse(model))) * inNormal;
 	vs_out.DirectionalLightDirection = DirectionalLightDirection.xyz;
-	vs_out.ShadowViewMatrix = ShadowViewMatrix;
+	vs_out.ShadowCameraViewMatrix = ShadowCameraViewMatrix;
 	vs_out.cascadesCount = cascadesCount;
 	vs_out.bVisualizeMode = bVisualizeMode;
 	vs_out.shadowCascadeFarPlanes = shadowCascadeFarPlanes;

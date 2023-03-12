@@ -22,8 +22,6 @@
      void MoveCameraUp();
      void MoveCameraDown();
      void OnChangeDrawMode();
-     void DebugProjections();
-     void DebugCascadesVisualize();
      void DebugCursorMode();
      void BoostCameraSpeed();
      void OnMouseRightPressed();
