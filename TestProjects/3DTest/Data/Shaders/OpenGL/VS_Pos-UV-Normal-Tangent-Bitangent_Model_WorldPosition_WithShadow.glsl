@@ -3,8 +3,8 @@
 layout(location = 0) in vec3 inPosition;
 layout(location = 1) in vec3 inNormal;
 layout(location = 2) in vec2 inTexCoords;
-layout(location = 3) in vec2 inTangent;
-layout(location = 4) in vec2 inBitangent;
+layout(location = 3) in vec3 inTangent;
+layout(location = 4) in vec3 inBitangent;
 
 out VS_OUT
 {
@@ -12,11 +12,13 @@ out VS_OUT
 	mat4 clipToWorldMatrix;
 	vec3 worldPos;
 	vec3 Normal;
-	vec3 DirectionalLightDirection;
+	mat3 TangentToWorld;
+	flat vec3 DirectionalLightDirection;
 	mat4 ShadowCameraViewMatrix;
 	mat4 lsMatrices[3];
 	flat int cascadesCount;
-	flat int bVisualizeMode;
+	flat int bShadowVisualizeMode;
+	flat int bNormalVisualizeMode;
 	flat float shadowCascadeFarPlanes[3];
 } vs_out;
 
@@ -33,7 +35,8 @@ layout(std140, binding = 1) uniform ShadowDataBuffer
 	mat4 ShadowCameraViewMatrix;
 	vec4 DirectionalLightDirection;
 	int cascadesCount;
-	int bVisualizeMode;
+	int bShadowVisualizeMode;
+	int bNormalVisualizeMode;
 	float shadowCascadeFarPlanes[3];
 };
 
@@ -48,8 +51,14 @@ void main()
 	vs_out.DirectionalLightDirection = DirectionalLightDirection.xyz;
 	vs_out.ShadowCameraViewMatrix = ShadowCameraViewMatrix;
 	vs_out.cascadesCount = cascadesCount;
-	vs_out.bVisualizeMode = bVisualizeMode;
+	vs_out.bShadowVisualizeMode = bShadowVisualizeMode;
+	vs_out.bNormalVisualizeMode = bNormalVisualizeMode;
 	vs_out.shadowCascadeFarPlanes = shadowCascadeFarPlanes;
+
+	vec3 T = normalize(vec3(model * vec4(inTangent, 0.0)));
+	vec3 B = normalize(vec3(model * vec4(inBitangent, 0.0)));
+	vec3 N = normalize(vec3(model * vec4(inNormal, 0.0)));
+	vs_out.TangentToWorld = mat3(T, B, N);
 
 	gl_Position = projection * view * vec4(fragPos, 1.0);
 }

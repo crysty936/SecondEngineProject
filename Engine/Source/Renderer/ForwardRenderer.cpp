@@ -389,6 +389,7 @@ void ForwardRenderer::DrawShadowMap()
 
 	ImGui::Checkbox("Update Shadow Matrices", &UpdateShadowMatrices);
 	ImGui::Checkbox("Visualize Cascades", &bCascadeVisualizeMode);
+	ImGui::Checkbox("Visualize Normals", &bNormalVisualizeMode);
 
 	// Cull front face to solve Peter Panning
 	//RHI::Instance->SetFaceCullMode(EFaceCullMode::Front);
@@ -451,7 +452,8 @@ void ForwardRenderer::DrawShadowMap()
 	UniformsCache["lsMatrices"] = lsMatrices;
 	UniformsCache["DirectionalLightDirection"] = lightDir;
 	UniformsCache["ShadowCameraViewMatrix"] = ShadowCameraViewMatrix;
-	UniformsCache["bVisualizeMode"] = bCascadeVisualizeMode ? 1 : 0;
+	UniformsCache["bShadowVisualizeMode"] = bCascadeVisualizeMode ? 1 : 0;
+	UniformsCache["bNormalVisualizeMode"] = bNormalVisualizeMode ? 1 : 0;
 
 	ImGui::DragInt("Shadow Cascades", &CascadesCount, 0.02f, 0, 3, "%d", ImGuiSliderFlags_AlwaysClamp);
 

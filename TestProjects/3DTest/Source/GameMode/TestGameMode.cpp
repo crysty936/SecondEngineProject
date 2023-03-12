@@ -234,8 +234,8 @@ void TestGameMode::Init()
 // 	AssimpModel->SetScale(glm::vec3(10.f, 10.f, 10.f));
 // 	AssimpModel->Move(glm::vec3(0.f, 10.f, 0.f));
 
- 	eastl::shared_ptr<AssimpModel3D> floorModel = EntityHelper::CreateObject<AssimpModel3D>("../Data/Models/Floor/scene.gltf");
-	floorModel->Move(glm::vec3(0.f, -2.f, 0.f));
+	FloorModel = EntityHelper::CreateObject<AssimpModel3D>("../Data/Models/Floor/scene.gltf");
+	FloorModel->Move(glm::vec3(0.f, -2.f, 0.f));
 	//floorModel->SetScale(glm::vec3(10.f, 1.f, 10.f));
 
 
@@ -281,4 +281,6 @@ void TestGameMode::Tick(float inDeltaT)
 	//Controller->ExecuteCallbacks();
 
 	//AssimpModel->Rotate(0.1f, glm::vec3(1.f, 0.f, 0.f));
+
+	//FloorModel->Rotate(0.1f, glm::vec3(1.f, 0.f, 0.f));
 }

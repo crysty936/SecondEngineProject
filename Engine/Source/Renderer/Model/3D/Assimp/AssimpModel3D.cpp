@@ -103,7 +103,7 @@ eastl::shared_ptr<RHIShader> AssimpModel3D::CreateShaders(const VertexInputLayou
 {
 	eastl::vector<ShaderSourceInput> shaders = {
 		{ "VS_Pos-UV-Normal-Tangent-Bitangent_Model_WorldPosition_WithShadow", EShaderType::Vertex },
-		{ "PS_BasicTex_WithShadow", EShaderType::Fragment } };
+		{ "PS_TexNormalMapped_WithShadow", EShaderType::Fragment } };
 
 	return RHI::Get()->CreateShaderFromPath(shaders, inLayout);
 }

@@ -72,6 +72,7 @@ public:
 
 	bool UpdateShadowMatrices = true;
 	bool bCascadeVisualizeMode = false;
+	bool bNormalVisualizeMode = false;
 
 private:
 	inline static ForwardRenderer* Instance = nullptr;

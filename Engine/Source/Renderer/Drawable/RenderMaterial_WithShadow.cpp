@@ -17,7 +17,8 @@ void RenderMaterial_WithShadow::SetRequiredUniforms()
 	{"ShadowCameraViewMatrix"},
 	{"DirectionalLightDirection"},
 	{"cascadesCount"},
-	{"bVisualizeMode"},
+	{"bShadowVisualizeMode"},
+	{"bNormalVisualizeMode"},
 	{"shadowCascadeFarPlanes", 3},
 	};
 
