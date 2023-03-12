@@ -13,6 +13,9 @@ void RenderMaterial_WithLighting::SetRequiredUniforms()
 	eastl::vector<UniformWithFlag> defaultUniforms = {
 	{"DirectionalLightDirection"},
 	{"bNormalVisualizeMode"},
+	{"bUseNormalMapping"},
+	{"ParallaxHeightScale"},
+	{"ViewPos"},
 	};
 
 	UBuffers.push_back({ defaultUniforms, ConstantBufferType::Vertex });

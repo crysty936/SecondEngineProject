@@ -10,11 +10,15 @@ out VS_OUT
 {
 	vec2 TexCoords;
 	mat4 clipToWorldMatrix;
-	vec3 worldPos;
+	vec3 FragWorldPos;
+	vec3 FragTangentPos;
 	vec3 Normal;
 	mat3 WorldToTangent;
-	flat vec3 DirectionalLightDirection;
+	flat vec3 DirectionalLightDirectionTS;
 	flat int bNormalVisualizeMode;
+	flat int bUseNormalMapping;
+	flat float ParallaxHeightScale;
+	vec3 TSViewPos;
 } vs_out;
 
 layout(std140, binding = 0) uniform GeometryDataBuffer
@@ -28,17 +32,21 @@ layout(std140, binding = 1) uniform ShadowDataBuffer
 {
 	vec4 DirectionalLightDirection;
 	int bNormalVisualizeMode;
+	int bUseNormalMapping;
+	float ParallaxHeightScale;
+	vec3 ViewPos;
 };
 
 void main()
 {
 	vec3 fragPos = vec3(model * vec4(inPosition, 1.0));
-	vs_out.worldPos = fragPos;
+	vs_out.FragWorldPos = fragPos;
 	vs_out.TexCoords = inTexCoords;
 	vs_out.clipToWorldMatrix = inverse(projection * view);
 	vs_out.Normal = mat3(transpose(inverse(model))) * inNormal;
-	vs_out.DirectionalLightDirection = DirectionalLightDirection.xyz;
 	vs_out.bNormalVisualizeMode = bNormalVisualizeMode;
+	vs_out.bUseNormalMapping = bUseNormalMapping;
+	vs_out.ParallaxHeightScale = ParallaxHeightScale;
 
 	//// Gram - Schmidt process
 	//// https://learnopengl.com/Advanced-Lighting/Normal-Mapping
@@ -49,6 +57,10 @@ void main()
 	// then retrieve perpendicular vector B with the cross product of T and N
 	vec3 B = cross(N, T);
 	vs_out.WorldToTangent = transpose(mat3(T, B, N));
+
+	vs_out.TSViewPos = vs_out.WorldToTangent * ViewPos;
+	vs_out.FragTangentPos = vs_out.WorldToTangent * fragPos;
+	vs_out.DirectionalLightDirectionTS = vs_out.WorldToTangent * DirectionalLightDirection.xyz;
 
 	gl_Position = projection * view * vec4(fragPos, 1.0);
 }

@@ -273,6 +273,8 @@ void ForwardRenderer::Draw()
 
 	DrawShadowMap();
 
+	SetupLightingConstants();
+
 	// Clear default framebuffer buffers
 	RHI::Get()->ClearBuffers();
 
@@ -303,6 +305,26 @@ void ForwardRenderer::Draw()
 void ForwardRenderer::Present()
 {
 	RHI::Get()->SwapBuffers();
+}
+
+void ForwardRenderer::SetupLightingConstants()
+{
+	ImGui::Checkbox("Visualize Normals", &bNormalVisualizeMode);
+	ImGui::Checkbox("Use Normal Mapping", &bUseNormalMapping);
+
+	ImGui::DragFloat("Parallax Height Scale", &ParallaxHeightScale, 0.01f, 0.f, 1.f, "%f", ImGuiSliderFlags_AlwaysClamp);
+	UniformsCache["ParallaxHeightScale"] = ParallaxHeightScale;
+
+	UniformsCache["bNormalVisualizeMode"] = bNormalVisualizeMode ? 1 : 0;
+	UniformsCache["bUseNormalMapping"] = bUseNormalMapping ? 1 : 0;
+
+	glm::vec3 cameraPos = SceneManager::Get().GetCurrentScene().CurrentCamera->GetAbsoluteTransform().Translation;
+
+	UniformsCache["ViewPos"] = cameraPos;
+
+	const glm::vec3 lightDir = glm::normalize(-lightPos);
+	UniformsCache["DirectionalLightDirection"] = lightDir;
+
 }
 
 void ForwardRenderer::DrawSkybox()
@@ -389,7 +411,6 @@ void ForwardRenderer::DrawShadowMap()
 
 	ImGui::Checkbox("Update Shadow Matrices", &UpdateShadowMatrices);
 	ImGui::Checkbox("Visualize Cascades", &bCascadeVisualizeMode);
-	ImGui::Checkbox("Visualize Normals", &bNormalVisualizeMode);
 
 	// Cull front face to solve Peter Panning
 	//RHI::Instance->SetFaceCullMode(EFaceCullMode::Front);
@@ -400,8 +421,6 @@ void ForwardRenderer::DrawShadowMap()
  	SetDrawMode(EDrawMode::DEPTH);
  	RHI::Get()->SetViewportSize(SHADOW_WIDTH, SHADOW_HEIGHT);
 	RHI::Get()->ClearTexture(*DepthRenderTexture, glm::vec4(1.f, 1.f, 1.f, 1.f));
-
-	const glm::vec3 lightDir = glm::normalize(-lightPos);
 
 	static glm::mat4 lightView;
 	static glm::mat4 lightProjection;
@@ -450,10 +469,8 @@ void ForwardRenderer::DrawShadowMap()
  	RHI::Get()->PrepareProjectionForRendering(lightProjection);
 
 	UniformsCache["lsMatrices"] = lsMatrices;
-	UniformsCache["DirectionalLightDirection"] = -lightDir;
 	UniformsCache["ShadowCameraViewMatrix"] = ShadowCameraViewMatrix;
 	UniformsCache["bShadowVisualizeMode"] = bCascadeVisualizeMode ? 1 : 0;
-	UniformsCache["bNormalVisualizeMode"] = bNormalVisualizeMode ? 1 : 0;
 
 	ImGui::DragInt("Shadow Cascades", &CascadesCount, 0.02f, 0, 3, "%d", ImGuiSliderFlags_AlwaysClamp);
 

@@ -41,6 +41,23 @@ public:
 	void Draw();
 	void Present();
 
+	inline static ForwardRenderer& Get() { ASSERT(Instance); return *Instance; }
+	void AddCommand(const RenderCommand& inCommand);
+	void AddCommands(eastl::vector<RenderCommand> inCommands);
+	void SetDrawMode(const EDrawMode::Type inDrawMode);
+	void AddRenderLoadCommand(const RenderingLoadCommand& inCommand);
+
+	/**
+	 * return: bool, true if the RenderDataContainer was already present and is initialized, false otherwise
+	 * outContainer: newly created or existing cached Container
+	 */
+	bool GetOrCreateContainer(const eastl::string& inInstanceName, OUT eastl::shared_ptr<MeshDataContainer>& outContainer);
+
+	// Todo: Fix hack
+	eastl::weak_ptr<class RHITexture2D> GetDepthTexture() const;
+
+private:
+	void SetupLightingConstants();
 	void DrawSkybox();
 	void DrawShadowMap();
 	void SetBaseUniforms();
@@ -49,49 +66,32 @@ public:
 	void DrawCommand(const RenderCommand& inCommand);
 	eastl::shared_ptr<RenderMaterial> GetMaterial(const RenderCommand& inCommand) const;
 	void SetVSyncEnabled(const bool inEnabled);
-	static void LoadTexture();
-	void AddCommand(const RenderCommand& inCommand);
-	void AddCommands(eastl::vector<RenderCommand> inCommands);
-	void SetDrawMode(const EDrawMode::Type inDrawMode);
-	void AddRenderLoadCommand(const RenderingLoadCommand& inCommand);
 
-	//inline eastl::queue<RenderingLoadCommand>& GetLoadQueue() { return LoadQueue; }
-
-	/**
-	 * return: bool, true if the RenderDataContainer was already present and is initialized, false otherwise
-	 * outContainer: newly created or existing cached Container
-	 */
-	bool GetOrCreateContainer(const eastl::string& inInstanceName, OUT eastl::shared_ptr<MeshDataContainer>& outContainer);
-	void AddMirrorCommand(const RenderCommand& inCommand);
-	//inline void SetSkyboxCommand(RenderCommand inSkyboxCommand) { MainSkyboxCommand = inSkyboxCommand; }
-
-	inline static ForwardRenderer& Get() { ASSERT(Instance); return *Instance; }
-
-	// Todo: Resolve hack
-	eastl::weak_ptr<class RHITexture2D> GetDepthTexture() const;
-
-	bool UpdateShadowMatrices = true;
-	bool bCascadeVisualizeMode = false;
-	bool bNormalVisualizeMode = false;
-
-private:
-	inline static ForwardRenderer* Instance = nullptr;
-
-private:
 	glm::mat4 CreateCascadeMatrix(const glm::mat4& inCameraProj, const glm::mat4& inCameraView, const glm::vec3& inLightDir);
 	eastl::vector<glm::mat4> CreateCascadesMatrices();
 	void SetViewportSizeToMain();
 	void DrawDebugPoints();
 
+	//inline eastl::queue<RenderingLoadCommand>& GetLoadQueue() { return LoadQueue; }
+
+	void AddMirrorCommand(const RenderCommand& inCommand);
+	//inline void SetSkyboxCommand(RenderCommand inSkyboxCommand) { MainSkyboxCommand = inSkyboxCommand; }
+
 	friend void DrawDebugPoint(const glm::vec3& inPointLoc);
 
 private:
+	inline static ForwardRenderer* Instance = nullptr;
 	mutable eastl::unordered_map<eastl::string, SelfRegisteringUniform> UniformsCache;
 	eastl::vector<RenderCommand> MainCommands;
 	EDrawMode::Type CurrentDrawMode = EDrawMode::Default;
 	//eastl::queue<RenderingLoadCommand> LoadQueue;
 	eastl::unordered_map<eastl::string, eastl::shared_ptr<class MeshDataContainer>> RenderDataContainerMap;
 	int32_t CascadesCount = 3;
+	bool UpdateShadowMatrices = true;
+	bool bCascadeVisualizeMode = false;
+	bool bNormalVisualizeMode = false;
+	bool bUseNormalMapping = true;
+	float ParallaxHeightScale = 0.1f;
 };
 
 extern const uint32_t SHADOW_WIDTH;
