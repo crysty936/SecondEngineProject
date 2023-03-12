@@ -55,9 +55,14 @@ void main()
 	vs_out.bNormalVisualizeMode = bNormalVisualizeMode;
 	vs_out.shadowCascadeFarPlanes = shadowCascadeFarPlanes;
 
+	// Gram - Schmidt process
+	// https://learnopengl.com/Advanced-Lighting/Normal-Mapping
 	vec3 T = normalize(vec3(model * vec4(inTangent, 0.0)));
-	vec3 B = normalize(vec3(model * vec4(inBitangent, 0.0)));
 	vec3 N = normalize(vec3(model * vec4(inNormal, 0.0)));
+	// re-orthogonalize T with respect to N
+	T = normalize(T - dot(T, N) * N);
+	// then retrieve perpendicular vector B with the cross product of T and N
+	vec3 B = cross(N, T);
 	vs_out.TangentToWorld = mat3(T, B, N);
 
 	gl_Position = projection * view * vec4(fragPos, 1.0);
