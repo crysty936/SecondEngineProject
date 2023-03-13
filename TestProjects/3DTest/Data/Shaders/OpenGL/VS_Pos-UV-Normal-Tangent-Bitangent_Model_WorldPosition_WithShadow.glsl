@@ -19,6 +19,8 @@ out VS_OUT
 	flat int cascadesCount;
 	flat int bShadowVisualizeMode;
 	flat int bNormalVisualizeMode;
+	flat int bUseNormalMapping;
+	flat int bUseShadows;
 	flat float shadowCascadeFarPlanes[3];
 } vs_out;
 
@@ -37,6 +39,8 @@ layout(std140, binding = 1) uniform ShadowDataBuffer
 	int cascadesCount;
 	int bShadowVisualizeMode;
 	int bNormalVisualizeMode;
+	int bUseNormalMapping;
+	int bUseShadows;
 	float shadowCascadeFarPlanes[3];
 };
 
@@ -53,7 +57,9 @@ void main()
 	vs_out.cascadesCount = cascadesCount;
 	vs_out.bShadowVisualizeMode = bShadowVisualizeMode;
 	vs_out.bNormalVisualizeMode = bNormalVisualizeMode;
+	vs_out.bUseNormalMapping = bUseNormalMapping;
 	vs_out.shadowCascadeFarPlanes = shadowCascadeFarPlanes;
+	vs_out.bUseShadows = bUseShadows;
 
 	// Gram - Schmidt process
 	// https://learnopengl.com/Advanced-Lighting/Normal-Mapping

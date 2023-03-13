@@ -14,6 +14,8 @@ in VS_OUT
 	flat int cascadesCount;
 	flat int bShadowVisualizeMode;
 	flat int bNormalVisualizeMode;
+	flat int bUseNormalMapping;
+	flat int bUseShadows;
 	flat float shadowCascadeFarPlanes[3];
 } ps_in;
 
@@ -209,20 +211,34 @@ void main()
 	}
 	else
  	{
-		mat3 WorldToTangent = transpose(ps_in.TangentToWorld);
+		if (!bool(ps_in.bUseShadows))
+		{
+			shadow = 0.0;
+		}
 
-		vec3 ambientColor = texture(DiffuseMap, ps_in.TexCoords).xyz;
+		// modify to 0 = fully shadowed, 1 = fully lit
 		float shadowModifier = 1 - shadow;
 
-		vec3 mapNormal = texture(NormalMap, ps_in.TexCoords).xyz;
-		mapNormal = mapNormal * 2.0 - 1.0;
-		//vec3 wsNormal = normalize(ps_in.TangentToWorld * mapNormal);
-		vec3 tsLightDir = normalize(WorldToTangent * ps_in.DirectionalLightDirection);
-		float diffPower = max(dot(mapNormal, tsLightDir), 0.3);
+		vec3 ambientColor = texture(DiffuseMap, ps_in.TexCoords).xyz;
+		if (bool(ps_in.bUseNormalMapping))
+		{
+			mat3 WorldToTangent = transpose(ps_in.TangentToWorld);
 
-		vec3 dirLightColor = diffPower * texture(DiffuseMap, ps_in.TexCoords).xyz;
+			vec2 glMappedTexCoords = vec2(ps_in.TexCoords.x, 1.0 - ps_in.TexCoords.y);
+			vec3 mapNormal = texture(NormalMap, ps_in.TexCoords).xyz;
+			mapNormal = mapNormal * 2.0 - 1.0;
+			//vec3 wsNormal = normalize(ps_in.TangentToWorld * mapNormal);
+			vec3 tsLightDir = normalize(WorldToTangent * ps_in.DirectionalLightDirection);
+			float diffPower = max(dot(mapNormal, tsLightDir), 0.3);
 
- 		color = (shadowModifier * dirLightColor) + 0.2 * ambientColor;
+			vec3 dirLightColor = diffPower * texture(DiffuseMap, ps_in.TexCoords).xyz;
+
+			color = (shadowModifier * dirLightColor) + 0.2 * ambientColor;
+		}
+		else
+		{
+			color = (0.8 * shadowModifier * ambientColor) + (0.2 * ambientColor);
+		}
  	}
 
 	FragColor = vec4(color, 1.0);

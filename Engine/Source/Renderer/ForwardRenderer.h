@@ -88,9 +88,11 @@ private:
 	eastl::unordered_map<eastl::string, eastl::shared_ptr<class MeshDataContainer>> RenderDataContainerMap;
 	int32_t CascadesCount = 3;
 	bool UpdateShadowMatrices = true;
+	bool bUseShadows = true;
 	bool bCascadeVisualizeMode = false;
 	bool bNormalVisualizeMode = false;
 	bool bUseNormalMapping = true;
+	bool bUseParallaxMapping = true;
 	float ParallaxHeightScale = 0.1f;
 };
 

@@ -19,6 +19,8 @@ void RenderMaterial_WithShadow::SetRequiredUniforms()
 	{"cascadesCount"},
 	{"bShadowVisualizeMode"},
 	{"bNormalVisualizeMode"},
+	{"bUseNormalMapping"},
+	{"bUseShadows"},
 	{"shadowCascadeFarPlanes", 3},
 	};
 

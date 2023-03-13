@@ -35,16 +35,15 @@
 #include "imgui.h"
 
 constexpr glm::vec4 ClearColor(0.3f, 0.5f, 1.f, 0.4f);
-constexpr glm::vec3 lightPos(-10.0f, 20.0f, -0.2f);
 
 const uint32_t SHADOW_WIDTH = 1024;
 const uint32_t SHADOW_HEIGHT = 1024;
 
 constexpr float CAMERA_FOV = 45.f;
 constexpr float CAMERA_NEAR = 0.1f;
-constexpr float CAMERA_FAR = 200.f;
+constexpr float CAMERA_FAR = 40000.f;
+constexpr int32_t MAX_CASCADES_COUNT = 3;
 eastl::vector<float> shadowCascadeFarPlanes = { CAMERA_FAR / 10.0f, CAMERA_FAR / 2.0f, CAMERA_FAR};
-//eastl::vector<float> shadowCascadeFarPlanes = { CAMERA_FAR};
 
 static std::mutex RenderCommandsMutex;
 static std::mutex LoadQueueMutex;
@@ -254,7 +253,7 @@ void ForwardRenderer::Init(const WindowProperties & inMainWindowProperties)
 
 	DepthFrameBuffer = RHI::Get()->CreateEmptyFrameBuffer();
 	//DepthRenderTexture = RHI::Instance->CreateDepthMap(SHADOW_WIDTH, SHADOW_HEIGHT);
-	DepthRenderTexture = RHI::Get()->CreateArrayDepthMap(SHADOW_WIDTH, SHADOW_HEIGHT, static_cast<int32_t>(shadowCascadeFarPlanes.size()));
+	DepthRenderTexture = RHI::Get()->CreateArrayDepthMap(SHADOW_WIDTH, SHADOW_HEIGHT, MAX_CASCADES_COUNT);
 	RHI::Get()->AttachTextureToFramebufferDepth(*DepthFrameBuffer, *DepthRenderTexture);
 }
 
@@ -307,23 +306,28 @@ void ForwardRenderer::Present()
 	RHI::Get()->SwapBuffers();
 }
 
+static glm::vec3 LightDir = glm::vec3(-0.5f, -0.5f, 0.f);
+
 void ForwardRenderer::SetupLightingConstants()
 {
 	ImGui::Checkbox("Visualize Normals", &bNormalVisualizeMode);
 	ImGui::Checkbox("Use Normal Mapping", &bUseNormalMapping);
+	ImGui::Checkbox("Use Parallax Mapping", &bUseParallaxMapping);
 
 	ImGui::DragFloat("Parallax Height Scale", &ParallaxHeightScale, 0.01f, 0.f, 1.f, "%f", ImGuiSliderFlags_AlwaysClamp);
 	UniformsCache["ParallaxHeightScale"] = ParallaxHeightScale;
 
 	UniformsCache["bNormalVisualizeMode"] = bNormalVisualizeMode ? 1 : 0;
 	UniformsCache["bUseNormalMapping"] = bUseNormalMapping ? 1 : 0;
+	UniformsCache["bUseParallaxMapping"] = bUseParallaxMapping ? 1 : 0;
 
 	glm::vec3 cameraPos = SceneManager::Get().GetCurrentScene().CurrentCamera->GetAbsoluteTransform().Translation;
 
 	UniformsCache["ViewPos"] = cameraPos;
 
-	const glm::vec3 lightDir = glm::normalize(-lightPos);
-	UniformsCache["DirectionalLightDirection"] = lightDir;
+	ImGui::InputFloat3("Light Dir", &LightDir.x);
+
+	UniformsCache["DirectionalLightDirection"] = glm::normalize(-LightDir);
 
 }
 
@@ -385,7 +389,7 @@ eastl::vector<glm::mat4> ForwardRenderer::CreateCascadesMatrices()
 	eastl::vector<glm::mat4> cascades;
 	cascades.reserve(CascadesCount);
 
-	const glm::vec3 lightDir = glm::normalize(-lightPos);
+	const glm::vec3 lightDir = glm::normalize(LightDir);
 	const glm::mat4& cameraView = UniformsCache["view"].GetValue<glm::mat4>();
 
 	const float windowWidth = static_cast<float>(Engine->GetMainWindow().GetProperties().Width);
@@ -411,6 +415,8 @@ void ForwardRenderer::DrawShadowMap()
 
 	ImGui::Checkbox("Update Shadow Matrices", &UpdateShadowMatrices);
 	ImGui::Checkbox("Visualize Cascades", &bCascadeVisualizeMode);
+	ImGui::Checkbox("Use Shadows", &bUseShadows);
+	UniformsCache["bUseShadows"] = bUseShadows;
 
 	// Cull front face to solve Peter Panning
 	//RHI::Instance->SetFaceCullMode(EFaceCullMode::Front);
@@ -436,7 +442,16 @@ void ForwardRenderer::DrawShadowMap()
 		shadowCascadeFarPlanes.clear();
 		for (int32_t i = 0; i < CascadesCount; ++i)
 		{
-			shadowCascadeFarPlanes.push_back(CAMERA_FAR / (CascadesCount - i));
+			float cascadeFar = CAMERA_FAR / (CascadesCount - i);
+
+			// Hack: Keep first cascade with far as max 100 always
+			// TODO: Fix this with a proper distribution function
+			if (i == 0)
+			{
+				cascadeFar = glm::min(100.f, cascadeFar);
+			}
+
+			shadowCascadeFarPlanes.push_back(cascadeFar);
 		}
 
 		glm::mat4 cameraProj = UniformsCache["projection"].GetValue<glm::mat4>();
@@ -525,6 +540,11 @@ void ForwardRenderer::DrawCommands(const eastl::vector<RenderCommand>& inCommand
 	{
 		for (const RenderCommand& renderCommand : inCommands)
 		{
+			if (CurrentDrawMode == EDrawMode::DEPTH && !renderCommand.Material->bCastShadow)
+			{
+				continue;
+			}
+
 			DrawCommand(renderCommand);
 		}
 	}
@@ -583,12 +603,6 @@ void ForwardRenderer::DrawCommand(const RenderCommand& inCommand)
 			++texNr;
 		}
 	}
-	// Shadows
-	//
-	//ShadowBufferTex->Bind(i);
-	//
-	//GlobalRHI->UniformsCache["ShadowMap"] = uint32_t(i);
-	//GlobalRHI->UniformsCache["LightPos"] = lightPos;
 
 	const uint32_t indicesCount = dataContainer->VBuffer->GetIndicesCount();
 
@@ -644,11 +658,6 @@ void ForwardRenderer::DrawCommand(const RenderCommand& inCommand)
 			++texNr;
 		}
 	}
-
-	// Shadows
-	//
-	//ShadowBufferTex->Unbind(i);
-	//
 
 	material->UnbindBuffers();
 	RHI::Get()->UnbindShader(*(material->Shader));

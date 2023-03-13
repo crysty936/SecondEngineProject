@@ -300,7 +300,8 @@ void TestGameMode::Init()
 
 	// Light
 	eastl::shared_ptr<LightSource> lightObj = EntityHelper::CreateObject<LightSource>();
-	lightObj->SetRelativeLocation(glm::vec3(-5.0f, 20.0f, -0.2f));
+	lightObj->SetRelativeLocation(glm::vec3(1000, 20000.0f, -1000.f));
+	lightObj->SetScale(glm::vec3(100.f, 100.f, 100.f));
 
 // 	AssimpModel = eastl::shared_ptr<AssimpModel3D>(EntityHelper::CreateObject<AssimpModel3D>("../Data/Models/Shiba/scene.gltf"));
 // 	AssimpModel->SetScale(glm::vec3(10.f, 10.f, 10.f));
@@ -311,7 +312,8 @@ void TestGameMode::Init()
 	//floorModel->SetScale(glm::vec3(10.f, 1.f, 10.f));
 
 
-	eastl::shared_ptr<ParallaxQuad> quad = EntityHelper::CreateObject<ParallaxQuad>();
+	Quad = EntityHelper::CreateObject<ParallaxQuad>();
+	Quad->Rotate(90.f, glm::vec3(-1.f, 0.f, 0.f));
 
 	//eastl::shared_ptr<AssimpModel3D> sponzaModel = EntityHelper::CreateObject<AssimpModel3D>("../Data/Models/Sponza/scene.gltf");
 
@@ -357,4 +359,6 @@ void TestGameMode::Tick(float inDeltaT)
 	//AssimpModel->Rotate(0.1f, glm::vec3(1.f, 0.f, 0.f));
 
 	//FloorModel->Rotate(0.1f, glm::vec3(1.f, 0.f, 0.f));
+
+	//Quad->Rotate(0.1f, glm::vec3(-1.f, 0.f, 0.f));
 }

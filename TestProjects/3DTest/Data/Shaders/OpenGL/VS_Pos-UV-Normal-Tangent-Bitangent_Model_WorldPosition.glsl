@@ -17,6 +17,7 @@ out VS_OUT
 	flat vec3 DirectionalLightDirectionTS;
 	flat int bNormalVisualizeMode;
 	flat int bUseNormalMapping;
+	flat int bUseParallaxMapping;
 	flat float ParallaxHeightScale;
 	vec3 TSViewPos;
 } vs_out;
@@ -33,6 +34,7 @@ layout(std140, binding = 1) uniform ShadowDataBuffer
 	vec4 DirectionalLightDirection;
 	int bNormalVisualizeMode;
 	int bUseNormalMapping;
+	int bUseParallaxMapping;
 	float ParallaxHeightScale;
 	vec3 ViewPos;
 };
@@ -46,6 +48,7 @@ void main()
 	vs_out.Normal = mat3(transpose(inverse(model))) * inNormal;
 	vs_out.bNormalVisualizeMode = bNormalVisualizeMode;
 	vs_out.bUseNormalMapping = bUseNormalMapping;
+	vs_out.bUseParallaxMapping = bUseParallaxMapping;
 	vs_out.ParallaxHeightScale = ParallaxHeightScale;
 
 	//// Gram - Schmidt process

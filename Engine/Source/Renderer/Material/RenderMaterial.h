@@ -46,4 +46,6 @@ public:
 	eastl::vector<eastl::shared_ptr<class RHITexture2D>> OwnedTextures;
 
 	eastl::vector<eastl::weak_ptr<class RHITexture2D>> ExternalTextures;
+
+	bool bCastShadow = true;
 };

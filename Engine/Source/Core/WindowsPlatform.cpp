@@ -424,8 +424,12 @@ namespace WindowsPlatform
 		}
 	}
 
+
+#if 0
 #define LOG_WINMSG(MsgType) LOG_INFO("Windows Message: %s", #MsgType)
-//#define LOG_WINMSG(MsgType) 
+#else
+#define LOG_WINMSG(MsgType) 
+#endif
 
 	LRESULT WindowMessageLoop(HWND hwnd, uint32_t msg, WPARAM wParam, LPARAM lParam)
 	{

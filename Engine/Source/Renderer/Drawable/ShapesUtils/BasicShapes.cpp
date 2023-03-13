@@ -296,6 +296,8 @@ void LightSource::CreateProxy()
 	eastl::shared_ptr<MeshNode> cubeNode = eastl::make_shared<MeshNode>();
 	AddChild(cubeNode);
 
+	material->bCastShadow = false;
+
 	RenderCommand newCommand;
 	newCommand.Material = material;
 	newCommand.DataContainer = dataContainer;

@@ -14,6 +14,7 @@ void RenderMaterial_WithLighting::SetRequiredUniforms()
 	{"DirectionalLightDirection"},
 	{"bNormalVisualizeMode"},
 	{"bUseNormalMapping"},
+	{"bUseParallaxMapping"},
 	{"ParallaxHeightScale"},
 	{"ViewPos"},
 	};
