@@ -321,9 +321,13 @@ void ForwardRenderer::SetupLightingConstants()
 	UniformsCache["bUseNormalMapping"] = bUseNormalMapping ? 1 : 0;
 	UniformsCache["bUseParallaxMapping"] = bUseParallaxMapping ? 1 : 0;
 
-	glm::vec3 cameraPos = SceneManager::Get().GetCurrentScene().CurrentCamera->GetAbsoluteTransform().Translation;
+	const glm::vec3 cameraPos = SceneManager::Get().GetCurrentScene().CurrentCamera->GetAbsoluteTransform().Translation;
+
+	const glm::vec3 forward = glm::vec3(0.f, 0.f, 1.f);
+	const glm::vec3 cameraForward = SceneManager::Get().GetCurrentScene().CurrentCamera->GetAbsoluteTransform().Rotation * forward;
 
 	UniformsCache["ViewPos"] = cameraPos;
+	UniformsCache["ViewDir"] = cameraForward;
 
 	ImGui::InputFloat3("Light Dir", &LightDir.x);
 
@@ -444,7 +448,7 @@ void ForwardRenderer::DrawShadowMap()
 		{
 			float cascadeFar = CAMERA_FAR / (CascadesCount - i);
 
-			// Hack: Keep first cascade with far as max 100 always
+			// Hack: Keep first cascade with far = max 100 always
 			// TODO: Fix this with a proper distribution function
 			if (i == 0)
 			{

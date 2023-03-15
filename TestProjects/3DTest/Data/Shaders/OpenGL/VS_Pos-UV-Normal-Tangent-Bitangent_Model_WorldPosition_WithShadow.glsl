@@ -11,6 +11,7 @@ out VS_OUT
 	vec2 TexCoords;
 	mat4 clipToWorldMatrix;
 	vec3 worldPos;
+	vec3 viewPos;
 	vec3 Normal;
 	mat3 TangentToWorld;
 	flat vec3 DirectionalLightDirection;
@@ -44,6 +45,11 @@ layout(std140, binding = 1) uniform ShadowDataBuffer
 	float shadowCascadeFarPlanes[3];
 };
 
+layout(std140, binding = 2) uniform LightingDataBuffer
+{
+	vec3 viewPos;
+};
+
 void main()
 {
 	vec3 fragPos = vec3(model * vec4(inPosition, 1.0));
@@ -60,6 +66,7 @@ void main()
 	vs_out.bUseNormalMapping = bUseNormalMapping;
 	vs_out.shadowCascadeFarPlanes = shadowCascadeFarPlanes;
 	vs_out.bUseShadows = bUseShadows;
+	vs_out.viewPos = viewPos;
 
 	// Gram - Schmidt process
 	// https://learnopengl.com/Advanced-Lighting/Normal-Mapping

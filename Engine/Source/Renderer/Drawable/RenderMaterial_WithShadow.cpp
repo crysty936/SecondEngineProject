@@ -25,6 +25,14 @@ void RenderMaterial_WithShadow::SetRequiredUniforms()
 	};
 
 	UBuffers.push_back({ defaultUniforms, ConstantBufferType::Vertex });
+
+
+	eastl::vector<UniformWithFlag> LightingUniforms = {
+		{"ViewPos"},
+	};
+
+	UBuffers.push_back({ LightingUniforms, ConstantBufferType::Vertex });
+
 }
 
 void RenderMaterial_WithShadow::SetUniforms(eastl::unordered_map<eastl::string, struct SelfRegisteringUniform>& inUniformsCache)

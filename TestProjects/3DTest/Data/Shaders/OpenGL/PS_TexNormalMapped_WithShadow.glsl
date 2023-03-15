@@ -6,6 +6,7 @@ in VS_OUT
 	vec2 TexCoords;
 	mat4 clipToWorldMatrix;
 	vec3 worldPos;
+	vec3 viewPos;
 	vec3 Normal;
 	mat3 TangentToWorld;
 	flat vec3 DirectionalLightDirection;
@@ -158,6 +159,21 @@ float CalculateShadow()
 	return shadow;
 }
 
+vec3 CalcDirLight(vec3 lightDir, vec3 normal, vec3 viewDir)
+{
+	// diffuse shading
+	float diff = max(dot(normal, lightDir), 0.0);
+	// specular shading
+	vec3 reflectDir = reflect(-lightDir, normal);
+	float spec = pow(max(dot(viewDir, reflectDir), 0.0), 0.5);
+	// combine results
+	vec3 ambient = vec3(texture(DiffuseMap, ps_in.TexCoords));
+	vec3 diffuse = diff * vec3(texture(DiffuseMap, ps_in.TexCoords));
+	vec3 specular = spec * vec3(0.2, 0.2, 0.2);
+
+	return (ambient + diffuse + specular);
+}
+
 void main()
 {
 	//float depthValue = texture(quadTexture, inTexCoords).r;
@@ -227,13 +243,13 @@ void main()
 			vec2 glMappedTexCoords = vec2(ps_in.TexCoords.x, 1.0 - ps_in.TexCoords.y);
 			vec3 mapNormal = texture(NormalMap, ps_in.TexCoords).xyz;
 			mapNormal = mapNormal * 2.0 - 1.0;
-			//vec3 wsNormal = normalize(ps_in.TangentToWorld * mapNormal);
 			vec3 tsLightDir = normalize(WorldToTangent * ps_in.DirectionalLightDirection);
 			float diffPower = max(dot(mapNormal, tsLightDir), 0.3);
 
 			vec3 dirLightColor = diffPower * texture(DiffuseMap, ps_in.TexCoords).xyz;
 
-			color = (shadowModifier * dirLightColor) + 0.2 * ambientColor;
+			vec3 wsNormal = normalize(ps_in.TangentToWorld * mapNormal);
+			color = shadowModifier * CalcDirLight(ps_in.DirectionalLightDirection, wsNormal, normalize(ps_in.viewPos - ps_in.worldPos));
 		}
 		else
 		{

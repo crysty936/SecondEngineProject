@@ -23,11 +23,10 @@ layout(binding = 2) uniform sampler2D DispMap;
 
 vec2 OcclusionParallaxMapping(vec2 texCoords, vec3 viewDir, out float finalDepth)
 {
-	const float minLayers = 16.0;
-	const float maxLayers = 64.0;
+	const float minLayers = 8.0;
+	const float maxLayers = 32.0;
 	float numSamples = mix(maxLayers, minLayers, max(dot(vec3(0.0, 0.0, 1.0), viewDir), 0.0));
 
-	//const float numSamples = 32;
 	const float layerDepth = 1.0 / numSamples;
 
 	float currentLayerDepth = 0.0;
