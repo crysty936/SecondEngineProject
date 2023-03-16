@@ -16,6 +16,7 @@
 #include "Renderer/Material/MaterialsManager.h"
 #include "Utils/InlineVector.h"
 #include "Renderer/Drawable/RenderMaterial_WithLighting.h"
+#include "Renderer/Drawable/RenderMaterial_Billboard.h"
 
 TestGameMode GGameMode = {};
 
@@ -158,8 +159,8 @@ public:
   			material->OwnedTextures.push_back(tex);
   
   			eastl::vector<ShaderSourceInput> shaders = {
-  			{ "VS_Pos-UV-Normal_Instanced", EShaderType::Vertex },
-  			{ "PS_BasicTex", EShaderType::Fragment } };
+  			{ "Pos-UV-Normal_BasicTex_Instanced/VS_Pos-UV-Normal_Instanced", EShaderType::Vertex },
+  			{ "Pos-UV-Normal_BasicTex_Instanced/PS_BasicTex", EShaderType::Fragment } };
   
   			material->Shader = RHI::Instance->CreateShaderFromPath(shaders, inputLayout);
   		}
@@ -249,6 +250,68 @@ public:
 	}
 };
 
+class BillboardQuad : public Model3D
+{
+public:
+	BillboardQuad() = default;
+	virtual ~BillboardQuad() = default;
+
+	virtual void CreateProxy() override
+	{
+		const eastl::string RenderDataContainerID = "BillboardQuadContainer";
+		eastl::shared_ptr<MeshDataContainer> dataContainer;
+
+		const bool existingContainer = ForwardRenderer::Get().GetOrCreateContainer(RenderDataContainerID, dataContainer);
+		VertexInputLayout inputLayout;
+
+		// Vertex points
+		inputLayout.Push<float>(3, VertexInputType::Position);
+		// Vertex Tex Coords
+		inputLayout.Push<float>(2, VertexInputType::TexCoords);
+
+		if (!existingContainer)
+		{
+			int32_t indicesCount = BasicShapesData::GetQuadIndicesCount();
+			eastl::shared_ptr<RHIIndexBuffer> ib = RHI::Instance->CreateIndexBuffer(BasicShapesData::GetQuadIndices(), indicesCount);
+
+
+			int32_t verticesCount = BasicShapesData::GetQuadVerticesCount();
+			const eastl::shared_ptr<RHIVertexBuffer> vb = RHI::Instance->CreateVertexBuffer(inputLayout, BasicShapesData::GetQuadVertices(), verticesCount, ib);
+
+			dataContainer->VBuffer = vb;
+		}
+
+		MaterialsManager& matManager = MaterialsManager::Get();
+		bool materialExists = false;
+		eastl::shared_ptr<RenderMaterial> material = matManager.GetOrAddMaterial<RenderMaterial_Billboard>("billboard_quad_material", materialExists);
+
+		if (!materialExists)
+		{
+			eastl::shared_ptr<RHITexture2D> diffMap = RHI::Instance->CreateTexture2D("../Data/Textures/MinecraftGrass.jpg");
+
+			material->OwnedTextures.push_back(diffMap);
+
+			eastl::vector<ShaderSourceInput> shaders = {
+			{ "Pos-UV_BasicTex_Billboard/VS_Pos-UV_Billboard", EShaderType::Vertex },
+			{ "Pos-UV_BasicTex_Billboard/PS_BasicTex", EShaderType::Fragment } };
+
+			material->Shader = RHI::Instance->CreateShaderFromPath(shaders, inputLayout);
+		}
+
+		eastl::shared_ptr<MeshNode> billboardNode = eastl::make_shared<MeshNode>();
+		AddChild(billboardNode);
+
+		RenderCommand newCommand;
+		newCommand.Material = material;
+		newCommand.DataContainer = dataContainer;
+		newCommand.Parent = billboardNode;
+		newCommand.DrawType = EDrawCallType::DrawElements;
+
+		ForwardRenderer::Get().AddCommand(newCommand);
+	}
+};
+
+
 void TestGameMode::Init()
 {
 	//Controller = eastl::make_unique<GameController>(); // TODO: Do this on a pre-game init or something
@@ -311,9 +374,13 @@ void TestGameMode::Init()
 	FloorModel->Move(glm::vec3(0.f, -2.f, 0.f));
 	//floorModel->SetScale(glm::vec3(10.f, 1.f, 10.f));
 
+	//TransformObjPtr concreteFloor = EntityHelper::CreateObject<AssimpModel3D>("../Data/Models/ConcreteFloor/Source/plane.fbx");
+	TransformObjPtr concreteFloor = EntityHelper::CreateObject<AssimpModel3D>("../Data/Models/ConcreteFloorGLTF/scene.gltf");
+	concreteFloor->Move(glm::vec3(5.f, 0.f, 0.f));
 
-	Quad = EntityHelper::CreateObject<ParallaxQuad>();
-	Quad->Rotate(90.f, glm::vec3(-1.f, 0.f, 0.f));
+
+	//Quad = EntityHelper::CreateObject<ParallaxQuad>();
+	//Quad->Rotate(90.f, glm::vec3(-1.f, 0.f, 0.f));
 
 	//eastl::shared_ptr<AssimpModel3D> sponzaModel = EntityHelper::CreateObject<AssimpModel3D>("../Data/Models/Sponza/scene.gltf");
 
@@ -323,6 +390,11 @@ void TestGameMode::Init()
 
 
 	eastl::shared_ptr<InstancedCubeTest> instancedObj = EntityHelper::CreateObject<InstancedCubeTest>();
+
+	Billboard = EntityHelper::CreateObject<BillboardQuad>();
+
+
+
 
 
   	//eastl::shared_ptr<InstancedAssimpModelTest> instancedObj = EntityHelper::CreateObject<InstancedAssimpModelTest>("../Data/Models/Backpack/scene.gltf");
@@ -361,4 +433,6 @@ void TestGameMode::Tick(float inDeltaT)
 	//FloorModel->Rotate(0.1f, glm::vec3(1.f, 0.f, 0.f));
 
 	//Quad->Rotate(0.1f, glm::vec3(-1.f, 0.f, 0.f));
+
+	//Billboard->LookAt(GameCamera->GetAbsoluteTransform().Translation);
 }

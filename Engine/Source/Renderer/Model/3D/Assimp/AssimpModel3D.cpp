@@ -120,7 +120,7 @@ RenderCommand AssimpModel3D::CreateRenderCommand(eastl::shared_ptr<RenderMateria
 	newCommand.Parent = inParent;
 	newCommand.DataContainer = inDataContainer;
 	newCommand.DrawType = EDrawCallType::DrawElements;
-	newCommand.DrawPasses = static_cast<EDrawMode::Type>(EDrawMode::Default | EDrawMode::NORMAL_VISUALIZE);
+	newCommand.DrawPasses = static_cast<EDrawMode::Type>(EDrawMode::Default /*| EDrawMode::NORMAL_VISUALIZE*/);
 
 	return newCommand;
 }

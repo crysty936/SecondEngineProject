@@ -33,6 +33,7 @@ private:
 	eastl::shared_ptr<class AssimpModel3D> AssimpModel;
 	eastl::shared_ptr<class AssimpModel3D> FloorModel;
 	TransformObjPtr Quad;
+	TransformObjPtr Billboard;
 	EntityPtr Object;
 	EntityPtr YObject;
 	EntityPtr ZObject;

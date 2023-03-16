@@ -50,6 +50,7 @@ struct DrawDebugHelpers
 {
 	static void DrawDebugPoint(const glm::vec3 inPoint);
 	static void DrawDebugLine(const DebugLine& inLine);
+	static void DrawDebugLine(const glm::vec3& inStart, const glm::vec3& inEnd, const glm::vec3& inColor);
 	static void DrawProjectionPoints(const glm::mat4& inProj);
 	static void DrawLinesArray(const eastl::vector<glm::vec3>& inLinesPoints, const glm::vec3& inColor = glm::vec3(0.5f, 0.5f, 0.f));
 	static void DrawBoxArray(eastl::array<glm::vec3, 8> inArray, const glm::vec3& inColor = glm::vec3(0.5f, 0.5f, 0.f));

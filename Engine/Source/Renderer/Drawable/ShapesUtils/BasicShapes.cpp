@@ -419,8 +419,8 @@ void FullScreenQuad::CreateCommand()
 	if (!materialExists)
 	{
 		eastl::vector<ShaderSourceInput> shaders = {
-		{ "VS_Pos-UV_UnchangedPosition", EShaderType::Vertex },
-		{ "PS_BasicTex", EShaderType::Fragment } };
+		{ "Pos-UV_BasicTex/VS_Pos-UV_UnchangedPosition", EShaderType::Vertex },
+		{ "Pos-UV_BasicTex/PS_BasicTex", EShaderType::Fragment } };
 
 		material->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
 	}

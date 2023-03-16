@@ -19,6 +19,11 @@ void DrawDebugHelpers::DrawDebugLine(const DebugLine& inLine)
 	DrawDebugManager::Get().AddDebugLine(inLine);
 }
 
+void DrawDebugHelpers::DrawDebugLine(const glm::vec3& inStart, const glm::vec3& inEnd, const glm::vec3& inColor)
+{
+	DrawDebugLine({inStart, inEnd, inColor});
+}
+
 void DrawDebugHelpers::DrawProjectionPoints(const glm::mat4& inProj)
 {
 	eastl::array<glm::vec3, 8> projPoints = RenderUtils::GenerateSpaceCorners(inProj, 0.f, 1.f);

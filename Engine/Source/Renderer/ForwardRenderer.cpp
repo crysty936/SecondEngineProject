@@ -128,12 +128,7 @@ void ForwardRenderer::SetBaseUniforms()
 	UniformsCache["DirectionalLightCascadedShadowTexture"] = DirectionalLightCascadedShadowTexture;
 }
 
- void ForwardRenderer::DrawDebugPoints()
-{
-
-}
-
-void ForwardRenderer::Init(const WindowProperties & inMainWindowProperties)
+void ForwardRenderer::Init(const WindowProperties& inMainWindowProperties)
 {
 	Instance = new ForwardRenderer{ inMainWindowProperties };
 
@@ -222,8 +217,13 @@ void ForwardRenderer::SetupLightingConstants()
 	const glm::vec3 forward = glm::vec3(0.f, 0.f, 1.f);
 	const glm::vec3 cameraForward = SceneManager::Get().GetCurrentScene().CurrentCamera->GetAbsoluteTransform().Rotation * forward;
 
-	UniformsCache["ViewPos"] = cameraPos;
-	UniformsCache["ViewDir"] = cameraForward;
+	static bool bUpdateViewPosDir = true;
+	ImGui::Checkbox("Update View Pos Dir", &bUpdateViewPosDir);
+	if (bUpdateViewPosDir)
+	{
+		UniformsCache["ViewPos"] = cameraPos;
+		UniformsCache["ViewDir"] = cameraForward;
+	}
 
 	ImGui::InputFloat3("Light Dir", &LightDir.x);
 
@@ -481,6 +481,7 @@ void ForwardRenderer::DrawCommand(const RenderCommand& inCommand)
 	material->ResetUniforms();
 
 	UniformsCache["model"] = parent->GetModelMatrix();
+	UniformsCache["ObjPos"] = parent->GetAbsoluteTransform().Translation;
 
 	{
 		int texNr = 0;

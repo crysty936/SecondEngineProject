@@ -69,7 +69,6 @@ private:
 	glm::mat4 CreateCascadeMatrix(const glm::mat4& inCameraProj, const glm::mat4& inCameraView, const glm::vec3& inLightDir);
 	eastl::vector<glm::mat4> CreateCascadesMatrices();
 	void SetViewportSizeToMain();
-	void DrawDebugPoints();
 
 	//inline eastl::queue<RenderingLoadCommand>& GetLoadQueue() { return LoadQueue; }
 
