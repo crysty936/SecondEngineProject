@@ -13,7 +13,11 @@ struct DebugLine
 
 class DrawDebugManager
 {
+
 public:
+	static void Draw();
+
+private:
 	static DrawDebugManager& Get()
 	{
 		static DrawDebugManager Instance;
@@ -28,24 +32,27 @@ private:
 	const eastl::vector<glm::vec3>& GetPoints() const { return DebugPoints; }
 	const eastl::vector<DebugLine>& GetLines() const { return DebugLines; }
 	
-	void ClearDebugData() 
+	inline void ClearDebugData() 
 	{ 
 		DebugPoints.clear();
 		DebugLines.clear();
 	}
 
-	friend class ForwardRenderer;
 private:
 	eastl::vector<glm::vec3> DebugPoints;
 	eastl::vector<DebugLine> DebugLines;
+
+	friend class ForwardRenderer;
+	friend struct DrawDebugHelpers;
 };
 
-namespace DrawDebugHelpers
+struct DrawDebugHelpers
 {
-	void DrawDebugPoint(const glm::vec3 inPoint);
-	void DrawDebugLine(const DebugLine& inLine);
-	void DrawProjectionPoints(const glm::mat4& inProj);
-	void DrawLinesArray(const eastl::vector<glm::vec3>& inLinesPoints, const glm::vec3& inColor = glm::vec3(0.5f, 0.5f, 0.f));
-	void DrawBoxArray(eastl::array<glm::vec3, 8> inArray, const glm::vec3& inColor = glm::vec3(0.5f, 0.5f, 0.f));
-	void DrawProjection(const glm::mat4& inProj);
-}
+	static void DrawDebugPoint(const glm::vec3 inPoint);
+	static void DrawDebugLine(const DebugLine& inLine);
+	static void DrawProjectionPoints(const glm::mat4& inProj);
+	static void DrawLinesArray(const eastl::vector<glm::vec3>& inLinesPoints, const glm::vec3& inColor = glm::vec3(0.5f, 0.5f, 0.f));
+	static void DrawBoxArray(eastl::array<glm::vec3, 8> inArray, const glm::vec3& inColor = glm::vec3(0.5f, 0.5f, 0.f));
+	static void DrawProjection(const glm::mat4& inProj);
+};
+

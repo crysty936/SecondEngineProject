@@ -41,7 +41,7 @@ const uint32_t SHADOW_HEIGHT = 1024;
 
 constexpr float CAMERA_FOV = 45.f;
 constexpr float CAMERA_NEAR = 0.1f;
-constexpr float CAMERA_FAR = 40000.f;
+constexpr float CAMERA_FAR = 50000.f;
 constexpr int32_t MAX_CASCADES_COUNT = 3;
 eastl::vector<float> shadowCascadeFarPlanes = { CAMERA_FAR / 10.0f, CAMERA_FAR / 2.0f, CAMERA_FAR};
 
@@ -111,10 +111,7 @@ eastl::shared_ptr<RHIFrameBuffer> GlobalFrameBuffer = nullptr;
 eastl::shared_ptr<RHITexture2D> GlobalRenderTexture = nullptr;
 
 eastl::shared_ptr<RHIFrameBuffer> DepthFrameBuffer = nullptr;
-eastl::shared_ptr<RHITexture2D> DepthRenderTexture = nullptr;
-
-eastl::shared_ptr<RHIVertexBuffer> DebugPointsBuffer = nullptr;
-eastl::shared_ptr<RHIVertexBuffer> DebugLinesBuffer = nullptr;
+eastl::shared_ptr<RHITexture2D> DirectionalLightCascadedShadowTexture = nullptr;
 
 void ForwardRenderer::SetBaseUniforms()
 {
@@ -128,115 +125,12 @@ void ForwardRenderer::SetBaseUniforms()
 	RHI::Get()->PrepareProjectionForRendering(projection);
 
 	UniformsCache["projection"] = projection;
+	UniformsCache["DirectionalLightCascadedShadowTexture"] = DirectionalLightCascadedShadowTexture;
 }
 
-
  void ForwardRenderer::DrawDebugPoints()
- {
-	 // Points
-	 {
-		 const eastl::vector<glm::vec3> debugPoints = DrawDebugManager::Get().GetPoints();
+{
 
-		 const int32_t numPoints = static_cast<int32_t>(debugPoints.size());
-
-		 VertexInputLayout inputLayout;
-		 // Vertex points
-		 inputLayout.Push<float>(3, VertexInputType::Position);
-
-		 const size_t pointsSize = sizeof(glm::vec3) * numPoints;
-
-		 if (!DebugPointsBuffer)
-		 {
-			 DebugPointsBuffer = RHI::Get()->CreateVertexBuffer(inputLayout, debugPoints.data(), pointsSize);
-		 }
-		 else
-		 {
-			 RHI::Get()->ClearVertexBuffer(*DebugPointsBuffer);
-			 RHI::Get()->UpdateVertexBufferData(*DebugPointsBuffer, debugPoints.data(), pointsSize);
-		 }
-
-		 MaterialsManager& matManager = MaterialsManager::Get();
-		 bool materialExists = false;
-		 eastl::shared_ptr<RenderMaterial> material = matManager.GetOrAddMaterial<RenderMaterial_Debug>("debug_points_material", materialExists);
-
-		 if (!materialExists)
-		 {
-			 eastl::vector<ShaderSourceInput> shaders = {
-			 { "VS_Pos_ManuallyWritten_DebugPoints", EShaderType::Vertex },
-			 { "PS_FlatColor", EShaderType::Fragment } };
-
-			 material->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
-		 }
-
-		 constexpr bool useIndexBuffer = false;
-		 RHI::Get()->BindVertexBuffer(*DebugPointsBuffer, useIndexBuffer);
-		 RHI::Get()->BindShader(*material->Shader);
-
-		 material->ResetUniforms();
-
-		 material->SetUniforms(UniformsCache);
-		 material->BindBuffers();
-
-		 RHI::Get()->DrawPoints(numPoints);
-
-		 RHI::Get()->UnbindVertexBuffer(*DebugPointsBuffer, useIndexBuffer);
-		 material->UnbindBuffers();
-		 RHI::Get()->UnbindShader(*material->Shader);
-	 }
-
-	 // Lines
-	 {
-		 const eastl::vector<DebugLine> debugLines = DrawDebugManager::Get().GetLines();
-
-		 VertexInputLayout inputLayout;
-		 // Vertex points
-		 inputLayout.Push<float>(3, VertexInputType::Position);
-		 inputLayout.Push<float>(3, VertexInputType::Undefined);
-		 inputLayout.Push<float>(3, VertexInputType::Undefined);
-
-		 const size_t linesSize = sizeof(DebugLine) * debugLines.size();
-
-		 if (!DebugLinesBuffer)
-		 {
-			 DebugLinesBuffer = RHI::Get()->CreateVertexBuffer(inputLayout, debugLines.data(), linesSize);
-		 }
-		 else
-		 {
-			 RHI::Get()->ClearVertexBuffer(*DebugLinesBuffer);
-			 RHI::Get()->UpdateVertexBufferData(*DebugLinesBuffer, debugLines.data(), linesSize);
-		 }
-
-		 MaterialsManager& matManager = MaterialsManager::Get();
-		 bool materialExists = false;
-		 eastl::shared_ptr<RenderMaterial> material = matManager.GetOrAddMaterial<RenderMaterial_Debug>("debug_lines_material", materialExists);
-
-		 if (!materialExists)
-		 {
-			 eastl::vector<ShaderSourceInput> shaders = {
-			 { "VS_Pos_Geometry_ManuallyWritten_DebugLine", EShaderType::Vertex },
-			 { "GS_DebugLines", EShaderType::Geometry },
-			 { "PS_DebugLine_Color", EShaderType::Fragment } };
-
-			 material->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
-		 }
-
-		 constexpr bool useIndexBuffer = false;
-		 RHI::Get()->BindVertexBuffer(*DebugLinesBuffer, useIndexBuffer);
-		 RHI::Get()->BindShader(*material->Shader);
-
-		 material->ResetUniforms();
-
-		 material->SetUniforms(UniformsCache);
-		 material->BindBuffers();
-
-		 RHI::Get()->DrawPoints(static_cast<int32_t>(debugLines.size()));
-
-		 RHI::Get()->UnbindVertexBuffer(*DebugLinesBuffer, useIndexBuffer);
-		 material->UnbindBuffers();
-		 RHI::Get()->UnbindShader(*material->Shader);
-	 }
-	
-	 DrawDebugManager::Get().ClearDebugData();
 }
 
 void ForwardRenderer::Init(const WindowProperties & inMainWindowProperties)
@@ -253,8 +147,8 @@ void ForwardRenderer::Init(const WindowProperties & inMainWindowProperties)
 
 	DepthFrameBuffer = RHI::Get()->CreateEmptyFrameBuffer();
 	//DepthRenderTexture = RHI::Instance->CreateDepthMap(SHADOW_WIDTH, SHADOW_HEIGHT);
-	DepthRenderTexture = RHI::Get()->CreateArrayDepthMap(SHADOW_WIDTH, SHADOW_HEIGHT, MAX_CASCADES_COUNT);
-	RHI::Get()->AttachTextureToFramebufferDepth(*DepthFrameBuffer, *DepthRenderTexture);
+	DirectionalLightCascadedShadowTexture = RHI::Get()->CreateArrayDepthMap(SHADOW_WIDTH, SHADOW_HEIGHT, MAX_CASCADES_COUNT);
+	RHI::Get()->AttachTextureToFramebufferDepth(*DepthFrameBuffer, *DirectionalLightCascadedShadowTexture);
 }
 
 void ForwardRenderer::Terminate()
@@ -296,7 +190,9 @@ void ForwardRenderer::Draw()
 //  	ScreenQuad->GetCommand().Material->WeakTextures.push_back(DepthRenderTexture);
 //  	DrawCommand(ScreenQuad->GetCommand());
 
-	DrawDebugPoints();
+
+	// Draw debug primitives
+	DrawDebugManager::Draw();
 
 	ImGui::End();
 }
@@ -430,7 +326,7 @@ void ForwardRenderer::DrawShadowMap()
 
  	SetDrawMode(EDrawMode::DEPTH);
  	RHI::Get()->SetViewportSize(SHADOW_WIDTH, SHADOW_HEIGHT);
-	RHI::Get()->ClearTexture(*DepthRenderTexture, glm::vec4(1.f, 1.f, 1.f, 1.f));
+	RHI::Get()->ClearTexture(*DirectionalLightCascadedShadowTexture, glm::vec4(1.f, 1.f, 1.f, 1.f));
 
 	static glm::mat4 lightView;
 	static glm::mat4 lightProjection;
@@ -770,7 +666,7 @@ eastl::shared_ptr<RenderMaterial> ForwardRenderer::GetMaterial(const RenderComma
 			{ "PS_VisualiseDepth", EShaderType::Fragment } };
 
 			depthMaterial->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
-			depthMaterial->OwnedTextures.push_back(DepthRenderTexture);
+			depthMaterial->OwnedTextures.push_back(DirectionalLightCascadedShadowTexture);
 		}
 
 		return depthMaterial;
@@ -825,11 +721,6 @@ void ForwardRenderer::AddMirrorCommand(const RenderCommand & inCommand)
 {
 	// 	std::lock_guard<std::mutex> lock(RenderCommandsMutex);
 	// 	MirrorCommands.push_back(inCommand);
-}
-
-eastl::weak_ptr<RHITexture2D> ForwardRenderer::GetDepthTexture() const
-{
-	return DepthRenderTexture;
 }
 
 void ForwardRenderer::AddCommand(const RenderCommand & inCommand)

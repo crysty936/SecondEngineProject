@@ -314,6 +314,27 @@ aiReturn aiGetMaterialString(const aiMaterial *pMat,
 
 // ------------------------------------------------------------------------------------------------
 // Get the number of textures on a particular texture stack
+unsigned int aiGetMaterialTotalTextureCount(const C_STRUCT aiMaterial *pMat) {
+    ai_assert(pMat != nullptr);
+
+    // Textures are always stored with ascending indices (ValidateDS provides a check, so we don't need to do it again)
+    unsigned int num = 0;
+    for (unsigned int i = 0; i < pMat->mNumProperties; ++i) {
+        aiMaterialProperty *prop = pMat->mProperties[i];
+
+        if (prop /* just a sanity check ... */
+                && 0 == strcmp(prop->mKey.data, _AI_MATKEY_TEXTURE_BASE)) {
+
+            const aiTextureType texType = static_cast<aiTextureType>(prop->mSemantic);
+
+            ++num;
+        }
+    }
+    return num;
+}
+
+// ------------------------------------------------------------------------------------------------
+// Get the number of textures on a particular texture stack
 unsigned int aiGetMaterialTextureCount(const C_STRUCT aiMaterial *pMat, C_ENUM aiTextureType type) {
     ai_assert(pMat != nullptr);
 

@@ -53,8 +53,7 @@ public:
 	 */
 	bool GetOrCreateContainer(const eastl::string& inInstanceName, OUT eastl::shared_ptr<MeshDataContainer>& outContainer);
 
-	// Todo: Fix hack
-	eastl::weak_ptr<class RHITexture2D> GetDepthTexture() const;
+	inline eastl::unordered_map<eastl::string, SelfRegisteringUniform>& GetUniformsCache() const { return UniformsCache; };
 
 private:
 	void SetupLightingConstants();
@@ -75,7 +74,6 @@ private:
 	//inline eastl::queue<RenderingLoadCommand>& GetLoadQueue() { return LoadQueue; }
 
 	void AddMirrorCommand(const RenderCommand& inCommand);
-	//inline void SetSkyboxCommand(RenderCommand inSkyboxCommand) { MainSkyboxCommand = inSkyboxCommand; }
 
 	friend void DrawDebugPoint(const glm::vec3& inPointLoc);
 

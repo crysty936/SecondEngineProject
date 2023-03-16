@@ -155,6 +155,11 @@ void AssimpModel3D::ProcessMesh(const aiMesh& inMesh, const aiScene& inScene, ea
 			// 		std::vector<Texture> SpecularMaps = LoadMaterialTextures(Material, aiTextureType_SPECULAR, TextureType::Specular);
 			// 		Textures.insert(Textures.end(), SpecularMaps.begin(), SpecularMaps.end());
 
+			uint32_t totalTextureCount = aiGetMaterialTotalTextureCount(Material);
+
+//  			eastl::vector<eastl::shared_ptr<RHITexture2D>> specMap = LoadMaterialTextures(*Material, aiTextureType_UNKNOWN);
+// 			thisMaterial->OwnedTextures.insert(thisMaterial->OwnedTextures.end(), eastl::make_move_iterator(specMap.begin()), eastl::make_move_iterator(specMap.end()));
+
 			eastl::vector<eastl::shared_ptr<RHITexture2D>> normalMaps = LoadMaterialTextures(*Material, aiTextureType_NORMALS);
 			thisMaterial->OwnedTextures.insert(thisMaterial->OwnedTextures.end(), eastl::make_move_iterator(normalMaps.begin()), eastl::make_move_iterator(normalMaps.end()));
 		}

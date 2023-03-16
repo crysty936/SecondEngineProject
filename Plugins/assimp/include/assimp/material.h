@@ -1610,6 +1610,11 @@ ASSIMP_API C_ENUM aiReturn aiGetMaterialString(const C_STRUCT aiMaterial *pMat,
 ASSIMP_API unsigned int aiGetMaterialTextureCount(const C_STRUCT aiMaterial *pMat,
         C_ENUM aiTextureType type);
 
+// Cristian: Begin
+ASSIMP_API unsigned int aiGetMaterialTotalTextureCount(const C_STRUCT aiMaterial *pMat);
+
+// Cristian: End
+
 // ---------------------------------------------------------------------------
 /** @brief Helper function to get all values pertaining to a particular
  *  texture slot from a material structure.

@@ -2,6 +2,12 @@
 #include "Utils/InlineVector.h"
 #include "ForwardRenderer.h"
 #include "RenderUtils.h"
+#include "RHI/RHI.h"
+#include "Material/MaterialsManager.h"
+#include "Drawable/RenderMaterial_Debug.h"
+
+eastl::shared_ptr<RHIVertexBuffer> DebugPointsBuffer = nullptr;
+eastl::shared_ptr<RHIVertexBuffer> DebugLinesBuffer = nullptr;
 
 void DrawDebugHelpers::DrawDebugPoint(const glm::vec3 inPoint)
 {
@@ -92,6 +98,114 @@ void DrawDebugHelpers::DrawProjection(const glm::mat4& inProj)
 {
 	eastl::array<glm::vec3, 8> projCorners = RenderUtils::GenerateSpaceCorners(inProj, 0.f, 1.f);
 	DrawBoxArray(projCorners, glm::vec3(1.f, 0.f, 0.f));
+}
+
+void DrawDebugManager::Draw()
+{
+	// Points
+	{
+		const eastl::vector<glm::vec3> debugPoints = Get().GetPoints();
+
+		const int32_t numPoints = static_cast<int32_t>(debugPoints.size());
+
+		VertexInputLayout inputLayout;
+		// Vertex points
+		inputLayout.Push<float>(3, VertexInputType::Position);
+
+		const size_t pointsSize = sizeof(glm::vec3) * numPoints;
+
+		if (!DebugPointsBuffer)
+		{
+			DebugPointsBuffer = RHI::Get()->CreateVertexBuffer(inputLayout, debugPoints.data(), pointsSize);
+		}
+		else
+		{
+			RHI::Get()->ClearVertexBuffer(*DebugPointsBuffer);
+			RHI::Get()->UpdateVertexBufferData(*DebugPointsBuffer, debugPoints.data(), pointsSize);
+		}
+
+		MaterialsManager& matManager = MaterialsManager::Get();
+		bool materialExists = false;
+		eastl::shared_ptr<RenderMaterial> material = matManager.GetOrAddMaterial<RenderMaterial_Debug>("debug_points_material", materialExists);
+
+		if (!materialExists)
+		{
+			eastl::vector<ShaderSourceInput> shaders = {
+			{ "VS_Pos_ManuallyWritten_DebugPoints", EShaderType::Vertex },
+			{ "PS_FlatColor", EShaderType::Fragment } };
+
+			material->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
+		}
+
+		constexpr bool useIndexBuffer = false;
+		RHI::Get()->BindVertexBuffer(*DebugPointsBuffer, useIndexBuffer);
+		RHI::Get()->BindShader(*material->Shader);
+
+		material->ResetUniforms();
+
+		material->SetUniforms(ForwardRenderer::Get().GetUniformsCache());
+		material->BindBuffers();
+
+		RHI::Get()->DrawPoints(numPoints);
+
+		RHI::Get()->UnbindVertexBuffer(*DebugPointsBuffer, useIndexBuffer);
+		material->UnbindBuffers();
+		RHI::Get()->UnbindShader(*material->Shader);
+	}
+
+	// Lines
+	{
+		const eastl::vector<DebugLine> debugLines = Get().GetLines();
+
+		VertexInputLayout inputLayout;
+		// Vertex points
+		inputLayout.Push<float>(3, VertexInputType::Position);
+		inputLayout.Push<float>(3, VertexInputType::Undefined);
+		inputLayout.Push<float>(3, VertexInputType::Undefined);
+
+		const size_t linesSize = sizeof(DebugLine) * debugLines.size();
+
+		if (!DebugLinesBuffer)
+		{
+			DebugLinesBuffer = RHI::Get()->CreateVertexBuffer(inputLayout, debugLines.data(), linesSize);
+		}
+		else
+		{
+			RHI::Get()->ClearVertexBuffer(*DebugLinesBuffer);
+			RHI::Get()->UpdateVertexBufferData(*DebugLinesBuffer, debugLines.data(), linesSize);
+		}
+
+		MaterialsManager& matManager = MaterialsManager::Get();
+		bool materialExists = false;
+		eastl::shared_ptr<RenderMaterial> material = matManager.GetOrAddMaterial<RenderMaterial_Debug>("debug_lines_material", materialExists);
+
+		if (!materialExists)
+		{
+			eastl::vector<ShaderSourceInput> shaders = {
+			{ "VS_Pos_Geometry_ManuallyWritten_DebugLine", EShaderType::Vertex },
+			{ "GS_DebugLines", EShaderType::Geometry },
+			{ "PS_DebugLine_Color", EShaderType::Fragment } };
+
+			material->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
+		}
+
+		constexpr bool useIndexBuffer = false;
+		RHI::Get()->BindVertexBuffer(*DebugLinesBuffer, useIndexBuffer);
+		RHI::Get()->BindShader(*material->Shader);
+
+		material->ResetUniforms();
+
+		material->SetUniforms(ForwardRenderer::Get().GetUniformsCache());
+		material->BindBuffers();
+
+		RHI::Get()->DrawPoints(static_cast<int32_t>(debugLines.size()));
+
+		RHI::Get()->UnbindVertexBuffer(*DebugLinesBuffer, useIndexBuffer);
+		material->UnbindBuffers();
+		RHI::Get()->UnbindShader(*material->Shader);
+	}
+
+	Get().ClearDebugData();
 }
 
 void DrawDebugManager::AddDebugPoint(const glm::vec3& inPoint)

@@ -39,7 +39,7 @@ void RenderMaterial_WithShadow::SetUniforms(eastl::unordered_map<eastl::string, 
 {
 	__super::SetUniforms(inUniformsCache);
 
-	const eastl::weak_ptr<RHITexture2D> depthTexture = ForwardRenderer::Get().GetDepthTexture();
+	const eastl::weak_ptr<RHITexture2D> depthTexture = inUniformsCache["DirectionalLightCascadedShadowTexture"].GetValue<eastl::shared_ptr<RHITexture2D>>();
 	
 	if (eastl::find_if(ExternalTextures.begin(), ExternalTextures.end(), 
 		[depthTexture](const eastl::weak_ptr<RHITexture2D>& inPtr) {
@@ -49,6 +49,6 @@ void RenderMaterial_WithShadow::SetUniforms(eastl::unordered_map<eastl::string, 
 		return;
 	}
 
-	ExternalTextures.push_back(ForwardRenderer::Get().GetDepthTexture());
+	ExternalTextures.push_back(depthTexture);
 }
 

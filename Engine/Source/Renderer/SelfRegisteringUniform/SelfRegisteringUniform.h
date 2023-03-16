@@ -5,6 +5,7 @@
 #include "EASTL/shared_ptr.h"
 #include "Renderer/RHI/Resources/UniformBufferContainer.h"
 #include "Core/EngineUtils.h"
+#include "Renderer/RHI/Resources/RHITexture.h"
 
 class IUniformData
 {
@@ -155,17 +156,51 @@ public:
 	eastl::vector<T> Data;
 };
 
+// shared_ptr specialization
+// These are supposed to be just data holders to be used in specific forms, not self-registering
+template<typename T>
+class SelfRegisteringUniformData<eastl::shared_ptr<T>> : public IUniformData
+{
+public:
+	SelfRegisteringUniformData(const eastl::shared_ptr<T>& inData)
+	{
+		Data = inData;
+	}
+
+	virtual void* GetData() override
+	{
+		return nullptr;
+	}
+
+	virtual size_t GetSize() override
+	{
+		return GetElementSize();
+	}
+
+	virtual void SelfRegister(UniformBufferContainer& inBufferContainer, const size_t inRequiredCount) override
+	{}
+
+	virtual size_t GetElementSize() override
+	{
+		return sizeof(T);
+	}
+
+public:
+	eastl::shared_ptr<T> Data;
+};
+
 struct SelfRegisteringUniform
 {
 	SelfRegisteringUniform();
 	SelfRegisteringUniform(const int32_t inValue);
 	SelfRegisteringUniform(const uint32_t inValue);
 	SelfRegisteringUniform(const float inValue);
-	SelfRegisteringUniform(const glm::mat4 inValue);
-	SelfRegisteringUniform(const glm::vec3 inValue);
-	SelfRegisteringUniform(const glm::vec4 inValue);
+	SelfRegisteringUniform(const glm::mat4& inValue);
+	SelfRegisteringUniform(const glm::vec3& inValue);
+	SelfRegisteringUniform(const glm::vec4& inValue);
 	SelfRegisteringUniform(const eastl::vector<float>& inValue);
 	SelfRegisteringUniform(const eastl::vector<glm::mat4>& inValue);
+	SelfRegisteringUniform(const eastl::shared_ptr<RHITexture2D>& inValue);
 
 	void Register(class UniformBufferContainer& inBuffer, const size_t inRequiredCount) const;
 
@@ -179,7 +214,8 @@ public:
 		Uniform3f,
 		Uniform4f,
 		UniformfArray,
-		Uniform4fvArray
+		Uniform4fvArray,
+		UniformTexture,
 	} Type;
 
 	template<typename T>
