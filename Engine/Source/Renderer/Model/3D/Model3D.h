@@ -9,12 +9,14 @@
 
 struct MeshNode : public DrawableObject
 {
+	MeshNode(const eastl::string& inName);
+	virtual ~MeshNode() = default;
 	//eastl::vector<Mesh3D> Meshes; // Not used as the meshes are stored as Transform Children
 };
 
 class Model3D : public TransformObject , public IDrawableContainer
 {
 public:
-	Model3D();
+	Model3D(const eastl::string& inModelName);
 	virtual ~Model3D();
 };

@@ -4,7 +4,10 @@
 #include "Logger/Logger.h"
 #include "Entity/TransformObject.h"
 
-Camera::Camera() = default;
+Camera::Camera()
+	: Entity("Camera") 
+{}
+
 Camera::~Camera() = default;
 
 void Camera::Init()

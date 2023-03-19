@@ -8,7 +8,7 @@
 class AssimpModel3D : public Model3D
 {
 public:
-	AssimpModel3D(const eastl::string& inPath);
+	AssimpModel3D(const eastl::string& inPath, const eastl::string& inName);
 	virtual ~AssimpModel3D();
 
 	virtual void CreateProxy() override;

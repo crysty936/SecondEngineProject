@@ -2,7 +2,8 @@
 
 int32_t Entity::Entities = 0;
 
-Entity::Entity() = default;
+Entity::Entity(const eastl::string& inEntityName)
+	: TransformObject(inEntityName) {}
 Entity::~Entity() = default;
 
 void Entity::Init()

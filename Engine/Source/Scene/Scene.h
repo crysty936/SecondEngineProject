@@ -21,10 +21,14 @@ public:
 	void TickObjects(float inDeltaT);
 	void InitObjects();
 	void AddObject(TransformObjPtr inObj);
+	
+
+	void DisplayObjects();
 
 private:
 	void RecursivelyTickObjects(float inDeltaT, eastl::vector<TransformObjPtr>& inObjects);
 	void RecursivelyInitObjects(eastl::vector<TransformObjPtr>& inObjects);
+	void RecursivelyDisplayObjects(eastl::vector<TransformObjPtr>& inObjects, const bool inDisplayNode);
 
 public:
 	eastl::vector<TransformObjPtr> Objects;

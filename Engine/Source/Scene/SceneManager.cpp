@@ -14,7 +14,7 @@ SceneManager::SceneManager()
 	CurrentScene->CurrentCamera = eastl::make_shared<Camera>();
 
 	// !Trying to copy the gameplay engine tactic to see if it works
-	EntityPtr CameraParent = eastl::make_shared<Entity>();
+	EntityPtr CameraParent = eastl::make_shared<Entity>("Camera Parent");
 	CameraParent->AddChild(CurrentScene->CurrentCamera);
 	CurrentScene->AddObject(CameraParent);
 }

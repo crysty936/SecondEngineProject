@@ -137,7 +137,7 @@ void ForwardRenderer::Init(const WindowProperties& inMainWindowProperties)
 	GlobalRenderTexture = RHI::Get()->CreateRenderTexture();
 	RHI::Get()->AttachTextureToFramebufferColor(*GlobalFrameBuffer, *GlobalRenderTexture);
 
-	ScreenQuad = EntityHelper::CreateObject<FullScreenQuad>(GlobalRenderTexture);
+	ScreenQuad = EntityHelper::CreateObject<FullScreenQuad>(GlobalRenderTexture, "Global Renderer Screen Quad");
 	ScreenQuad->CreateCommand();
 	ScreenQuad->GetCommand().Material->OwnedTextures.push_back(GlobalRenderTexture);
 

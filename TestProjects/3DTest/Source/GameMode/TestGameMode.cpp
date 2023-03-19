@@ -27,8 +27,8 @@ TestGameMode::~TestGameMode() = default;
 class InstancedAssimpModelTest : public AssimpModel3D
 {
 public:
-	InstancedAssimpModelTest(const eastl::string& inPath)
-		: AssimpModel3D(inPath) {}
+	InstancedAssimpModelTest(const eastl::string& inPath, const eastl::string& inName)
+		: AssimpModel3D(inPath, inName) {}
 	virtual ~InstancedAssimpModelTest() = default;
 
 protected:
@@ -92,7 +92,11 @@ protected:
 class InstancedCubeTest : public Model3D
 {
 public:
-	InstancedCubeTest() = default;
+	InstancedCubeTest(const eastl::string& inName)
+		: Model3D(inName)
+	{
+
+	}
 	virtual ~InstancedCubeTest() = default;
 
 	virtual void CreateProxy() override
@@ -165,7 +169,7 @@ public:
   			material->Shader = RHI::Instance->CreateShaderFromPath(shaders, inputLayout);
   		}
   
-  		eastl::shared_ptr<MeshNode> cubeNode = eastl::make_shared<MeshNode>();
+  		eastl::shared_ptr<MeshNode> cubeNode = eastl::make_shared<MeshNode>("Cube Mesh");
   		AddChild(cubeNode);
   
   		RenderCommand newCommand;
@@ -237,7 +241,7 @@ public:
 			material->Shader = RHI::Instance->CreateShaderFromPath(shaders, inputLayout);
 		}
 
-		eastl::shared_ptr<MeshNode> cubeNode = eastl::make_shared<MeshNode>();
+		eastl::shared_ptr<MeshNode> cubeNode = eastl::make_shared<MeshNode>("Mesh");
 		AddChild(cubeNode);
 
 		RenderCommand newCommand;
@@ -298,7 +302,7 @@ public:
 			material->Shader = RHI::Instance->CreateShaderFromPath(shaders, inputLayout);
 		}
 
-		eastl::shared_ptr<MeshNode> billboardNode = eastl::make_shared<MeshNode>();
+		eastl::shared_ptr<MeshNode> billboardNode = eastl::make_shared<MeshNode>("Mesh");
 		AddChild(billboardNode);
 
 		RenderCommand newCommand;
@@ -366,11 +370,11 @@ void TestGameMode::Init()
 // 	lightObj->SetRelativeLocation(glm::vec3(1000, 20000.0f, -1000.f));
 // 	lightObj->SetScale(glm::vec3(100.f, 100.f, 100.f));
 
-  	AssimpModel = eastl::shared_ptr<AssimpModel3D>(EntityHelper::CreateObject<AssimpModel3D>("../Data/Models/Shiba/scene.gltf"));
+  	AssimpModel = eastl::shared_ptr<AssimpModel3D>(EntityHelper::CreateObject<AssimpModel3D>("../Data/Models/Shiba/scene.gltf", "Shiba"));
   	AssimpModel->SetScale(glm::vec3(10.f, 10.f, 10.f));
   	AssimpModel->Move(glm::vec3(0.f, 10.f, 0.f));
 
-	FloorModel = EntityHelper::CreateObject<AssimpModel3D>("../Data/Models/Floor/scene.gltf");
+	FloorModel = EntityHelper::CreateObject<AssimpModel3D>("../Data/Models/Floor/scene.gltf", "Floor");
 	FloorModel->Move(glm::vec3(0.f, -2.f, 0.f));
 	//floorModel->SetScale(glm::vec3(10.f, 1.f, 10.f));
 
@@ -389,7 +393,7 @@ void TestGameMode::Init()
 //  	model->Move(glm::vec3(0.f, 3.f, 0.f));
 
 
-	eastl::shared_ptr<InstancedCubeTest> instancedObj = EntityHelper::CreateObject<InstancedCubeTest>();
+	eastl::shared_ptr<InstancedCubeTest> instancedObj = EntityHelper::CreateObject<InstancedCubeTest>("Instaned Cubes");
 	//TransformObjPtr concreteFloor = EntityHelper::CreateObject<AssimpModel3D>("../Data/Models/ConcreteFloorGLTF/scene.gltf");
 	//Billboard = EntityHelper::CreateObject<BillboardQuad>();
 

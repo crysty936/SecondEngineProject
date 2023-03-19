@@ -14,7 +14,11 @@
 #include "Renderer/Drawable//BallTestMaterial.h"
 #include "Renderer/Drawable/RenderMaterial_WithShadow.h"
 
-TriangleShape::TriangleShape() = default;
+TriangleShape::TriangleShape(const eastl::string& inName)
+	: DrawableObject(inName)
+{
+
+}
 TriangleShape::~TriangleShape() = default;
 
 void TriangleShape::CreateProxy()
@@ -70,7 +74,11 @@ void TriangleShape::CreateProxy()
 }
 
 
-SquareShape::SquareShape() = default;
+SquareShape::SquareShape(const eastl::string& inName)
+	: DrawableObject(inName)
+{
+
+}
 SquareShape::~SquareShape() = default;
 
 void SquareShape::CreateProxy()
@@ -121,17 +129,11 @@ void SquareShape::CreateProxy()
 	ForwardRenderer::Get().AddCommand(newCommand);
 }
 
-eastl::shared_ptr<SquareShape> BasicShapesHelpers::CreateSquareObject(eastl::string inTexturePath)
+CubeShape::CubeShape(const eastl::string& inName)
+	: Model3D(inName)
 {
-	return EntityHelper::CreateObject<SquareShape>();
-}
 
-eastl::shared_ptr<CubeShape> BasicShapesHelpers::CreateCubeObject()
-{
-	return EntityHelper::CreateObject<CubeShape>();
 }
-
-CubeShape::CubeShape() = default;
 CubeShape::~CubeShape() = default;
 
 void CubeShape::CreateProxy()
@@ -176,7 +178,7 @@ void CubeShape::CreateProxy()
 		material->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
   	}
   
-  	eastl::shared_ptr<MeshNode> cubeNode = eastl::make_shared<MeshNode>();
+  	eastl::shared_ptr<MeshNode> cubeNode = eastl::make_shared<MeshNode>("Cube Mesh");
   	AddChild(cubeNode);
   
 	RenderCommand newCommand;
@@ -188,7 +190,11 @@ void CubeShape::CreateProxy()
 	ForwardRenderer::Get().AddCommand(newCommand);
 }
 
-Skybox::Skybox() = default;
+Skybox::Skybox(const eastl::string& inName)
+	: Model3D(inName)
+{
+
+}
 Skybox::~Skybox() = default;
 
 void Skybox::CreateProxy()
@@ -251,7 +257,11 @@ void Skybox::CreateProxy()
 	//RHI->SetSkyboxCommand(newCommand);
 }
 
-LightSource::LightSource() = default;
+LightSource::LightSource(const eastl::string& inName)
+	: Model3D(inName)
+{
+
+}
 LightSource::~LightSource() = default;
 
 void LightSource::CreateProxy()
@@ -293,7 +303,7 @@ void LightSource::CreateProxy()
 		material->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
 	}
 
-	eastl::shared_ptr<MeshNode> cubeNode = eastl::make_shared<MeshNode>();
+	eastl::shared_ptr<MeshNode> cubeNode = eastl::make_shared<MeshNode>("Light Mesh");
 	AddChild(cubeNode);
 
 	material->bCastShadow = false;
@@ -309,7 +319,11 @@ void LightSource::CreateProxy()
 
 // Mirror
 
-MirrorQuad::MirrorQuad() = default;
+MirrorQuad::MirrorQuad(const eastl::string& inName)
+	: DrawableObject(inName)
+{
+
+}
 MirrorQuad::~MirrorQuad() = default;
 
 void MirrorQuad::CreateProxy()
@@ -376,8 +390,8 @@ public:
 	{}
 };
 
-FullScreenQuad::FullScreenQuad(eastl::shared_ptr<RHITexture2D>& inTexture)
-	: DrawableObject()
+FullScreenQuad::FullScreenQuad(eastl::shared_ptr<RHITexture2D>& inTexture, const eastl::string& inName)
+	: DrawableObject(inName)
 {
 }
 FullScreenQuad::~FullScreenQuad() = default;

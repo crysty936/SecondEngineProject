@@ -2,6 +2,7 @@
 #include "Math/Transform.h"
 #include "EASTL/shared_ptr.h"
 #include "EASTL/vector.h"
+#include "EASTL/string.h"
 
 using TransformObjPtr = eastl::shared_ptr<class TransformObject>;
 /// <summary>
@@ -11,7 +12,7 @@ using TransformObjPtr = eastl::shared_ptr<class TransformObject>;
 class TransformObject : public eastl::enable_shared_from_this<TransformObject>
 {
 public:
-	TransformObject();
+	TransformObject(const eastl::string& inName);
 	virtual ~TransformObject();
 
 	inline void AddChild(TransformObjPtr inTransfObj) { inTransfObj->SetParent(shared_from_this()); }
@@ -56,6 +57,8 @@ protected:
 	mutable bool TransfDirty{ true };
 	eastl::weak_ptr<TransformObject> Parent{};
 	eastl::vector<TransformObjPtr> Children{};
+
+	eastl::string Name;
 
 	friend class Scene;
 };

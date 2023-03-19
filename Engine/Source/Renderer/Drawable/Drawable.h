@@ -5,7 +5,7 @@
 class DrawableObject : public TransformObject
 {
 public:
-	DrawableObject();
+	DrawableObject(const eastl::string& inDrawableName);
 	virtual ~DrawableObject();
 
 	virtual glm::mat4 GetModelMatrix() const { return GetAbsoluteTransform().GetMatrix(); }

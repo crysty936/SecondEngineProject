@@ -1,6 +1,9 @@
 #include "TransformObject.h"
 
-TransformObject::TransformObject() = default;
+TransformObject::TransformObject(const eastl::string& inName)
+	: Name{inName}
+{}
+
 TransformObject::~TransformObject() = default;
 
 void TransformObject::SetParent(TransformObjPtr& inParent)

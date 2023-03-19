@@ -128,6 +128,7 @@ void EngineCore::Run()
  		//ImGui::ShowDemoWindow();
 
  		SceneManager::Get().GetCurrentScene().TickObjects(CurrentDeltaT);
+ 		SceneManager::Get().GetCurrentScene().DisplayObjects();
 
 		// TODO [Editor-Game Separation]: If editor is not present
  		//CurrentGameMode->Tick(CurrentDeltaT); 

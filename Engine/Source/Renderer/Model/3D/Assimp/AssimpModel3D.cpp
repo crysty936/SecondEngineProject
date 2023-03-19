@@ -26,8 +26,8 @@ static Transform aiMatrixToTransform(const aiMatrix4x4& inMatrix)
 	return Transform(translation, rotation, scaling);
 }
 
-AssimpModel3D::AssimpModel3D(const eastl::string& inPath)
-	: ModelPath{ inPath }
+AssimpModel3D::AssimpModel3D(const eastl::string& inPath, const eastl::string& inName)
+	: Model3D(inName), ModelPath{ inPath }
 {}
 
 AssimpModel3D::~AssimpModel3D() = default;
@@ -71,7 +71,7 @@ eastl::shared_ptr<MeshNode> AssimpModel3D::LoadData(OUT eastl::vector<RenderComm
 
 	ModelDir = ModelPath.substr(0, ModelPath.find_last_of('/'));
 
-	eastl::shared_ptr<MeshNode> newNode = eastl::make_shared<MeshNode>();
+	eastl::shared_ptr<MeshNode> newNode = eastl::make_shared<MeshNode>("RootNode");
 	newNode->SetRelTransform(aiMatrixToTransform(scene->mRootNode->mTransformation));
 	ProcessNodesRecursively(*scene->mRootNode, *scene, newNode, outCommands);
 
@@ -91,7 +91,7 @@ void AssimpModel3D::ProcessNodesRecursively(const aiNode & inNode, const aiScene
 	for (uint32_t i = 0; i < inNode.mNumChildren; ++i)
 	{
 		const aiNode& nextAiNode = *inNode.mChildren[i];
-		eastl::shared_ptr<MeshNode> newNode = eastl::make_shared<MeshNode>();
+		eastl::shared_ptr<MeshNode> newNode = eastl::make_shared<MeshNode>(nextAiNode.mName.C_Str());
 		newNode->SetRelTransform(aiMatrixToTransform(nextAiNode.mTransformation));
 
 		ProcessNodesRecursively(nextAiNode, inScene, newNode, outCommands);
@@ -237,7 +237,7 @@ void AssimpModel3D::ProcessMesh(const aiMesh& inMesh, const aiScene& inScene, ea
 
 	AddAdditionalBuffers(dataContainer);
 
-	eastl::shared_ptr<MeshNode> newMesh = eastl::make_shared<MeshNode>();
+	eastl::shared_ptr<MeshNode> newMesh = eastl::make_shared<MeshNode>(inMesh.mName.C_Str());
 	inCurrentNode->AddChild(newMesh);
 
 	RenderCommand newCommand = CreateRenderCommand(thisMaterial, inCurrentNode, dataContainer);

@@ -1,4 +1,8 @@
 #include "Renderer/Drawable/Drawable.h"
 
-DrawableObject::DrawableObject() = default;
+DrawableObject::DrawableObject(const eastl::string& inDrawableName)
+	: TransformObject(inDrawableName)
+{
+
+}
 DrawableObject::~DrawableObject() = default;

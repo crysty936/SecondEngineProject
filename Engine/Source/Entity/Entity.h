@@ -14,7 +14,7 @@ using EntityIterator = eastl::vector<eastl::shared_ptr<class Entity>>::iterator;
 class Entity : public TransformObject
 {
 public:
-	Entity();
+	Entity(const eastl::string& inEntityName);
 	virtual ~Entity();
 
 	virtual void Init();

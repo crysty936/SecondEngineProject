@@ -3,18 +3,10 @@
 #include "Renderer/Model/3D/Model3D.h"
 #include "../../RenderCommand.h"
 
-class BasicShapesHelpers
-{
-public:
-	// 	static eastl::shared_ptr<class IDrawable> CreateTriangleObject(eastl::string inTexturePath = {});
-	static eastl::shared_ptr<class SquareShape> CreateSquareObject(eastl::string inTexturePath = {});
-	static eastl::shared_ptr<class CubeShape> CreateCubeObject();
-};
-
 class TriangleShape : public DrawableObject, public IDrawableContainer
 {
 public:
-	TriangleShape();
+	TriangleShape(const eastl::string& inName);
 	virtual ~TriangleShape();
 
 	void CreateProxy() override;
@@ -23,7 +15,7 @@ public:
  class SquareShape : public DrawableObject, public IDrawableContainer
  {
  public:
- 	SquareShape();
+ 	SquareShape(const eastl::string& inName);
  	virtual ~SquareShape();
 
 	void CreateProxy() override;
@@ -32,7 +24,7 @@ public:
 class CubeShape : public Model3D
 {
 public:
-	CubeShape();
+	CubeShape(const eastl::string& inName);
 	virtual ~CubeShape();
 
 	virtual void CreateProxy() override;
@@ -41,7 +33,7 @@ public:
 class Skybox : public Model3D
 {
 public:
-	Skybox();
+	Skybox(const eastl::string& inName);
 	virtual ~Skybox();
 
 	virtual void CreateProxy() override;
@@ -50,7 +42,7 @@ public:
 class LightSource : public Model3D
 {
 public:
-	LightSource();
+	LightSource(const eastl::string& inName);
 	virtual ~LightSource();
 
 	virtual void CreateProxy() override;
@@ -59,7 +51,7 @@ public:
 class MirrorQuad : public DrawableObject, public IDrawableContainer
 {
 public:
-	MirrorQuad();
+	MirrorQuad(const eastl::string& inName);
 	virtual ~MirrorQuad();
 
 	void CreateProxy() override;
@@ -68,7 +60,7 @@ public:
 class FullScreenQuad : public DrawableObject, public IDrawableContainer
 {
 public:
-	FullScreenQuad(eastl::shared_ptr<RHITexture2D>& inTexture);
+	FullScreenQuad(eastl::shared_ptr<RHITexture2D>& inTexture, const eastl::string& inName);
 	virtual ~FullScreenQuad();
 
 	void CreateProxy() override;
