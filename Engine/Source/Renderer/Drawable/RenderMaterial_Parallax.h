@@ -3,11 +3,11 @@
 #include "EASTL/string.h"
 #include "Renderer/Material/RenderMaterial.h"
 
-class RenderMaterial_WithLighting : public RenderMaterial
+class RenderMaterial_Parallax : public RenderMaterial
 {
 public:
-	RenderMaterial_WithLighting();
-	~RenderMaterial_WithLighting();
+	RenderMaterial_Parallax();
+	~RenderMaterial_Parallax();
 
 	virtual void SetRequiredUniforms() override;
 };

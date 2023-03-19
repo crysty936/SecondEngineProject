@@ -76,10 +76,14 @@ public:
 
 	virtual void SetFaceCullMode(const EFaceCullMode inMode) override;
 
+	void ReadBufferData(const RHIBufferBase& inBuffer, const size_t inOffset, const size_t inSize, void* outData) override;
 
+	// ImGui
 	void ImGuiInit() override;
 	void ImGuiBeginFrame() override;
 	void ImGuiRenderDrawData() override;
+
+
 
 private:
 	void LoadImageToTextureFromPath(RHITexture2D& inTexture, const eastl::string& inPath);

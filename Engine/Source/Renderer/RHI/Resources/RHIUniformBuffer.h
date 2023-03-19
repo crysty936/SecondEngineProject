@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-enum class ConstantBufferType
+enum class ConstantBufferBinding
 {
 	Vertex,
 	Geometry,
@@ -17,5 +17,5 @@ public:
 
 public:
 	const size_t InitSize = 0;
-	ConstantBufferType BType = ConstantBufferType::Vertex;
+	ConstantBufferBinding BType = ConstantBufferBinding::Vertex;
 };

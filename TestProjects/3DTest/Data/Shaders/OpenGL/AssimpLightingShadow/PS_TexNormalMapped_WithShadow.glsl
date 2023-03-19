@@ -1,13 +1,23 @@
 #extension GL_ARB_separate_shader_objects : enable
 layout(location = 0) out vec4 FragColor;
 
+struct PointLight {
+	vec3 position;
+
+	float linear;
+	float quadratic;
+
+	vec3 ambient;
+	vec3 diffuse;
+	vec3 specular;
+};
+
 in VS_OUT
 {
 	vec2 TexCoords;
 	mat4 clipToWorldMatrix;
 	vec3 worldPos;
-	vec3 viewPos;
-	vec3 Normal;
+	vec3 VertexNormal;
 	mat3 TangentToWorld;
 } ps_in;
 
@@ -18,7 +28,14 @@ layout(std140, binding = 1) uniform ShadowDataBuffer
 	vec4 DirectionalLightDirection;
 	int cascadesCount;
 	float shadowCascadeFarPlanes[3];
-};
+} shadowBuffer;
+
+layout(std140, binding = 2) uniform LightingDataBuffer
+{
+	vec3 viewPos;
+	PointLight test[3];
+	int bHasNormalMap;
+} lightDataBuffer;
 
 layout(std140, binding = 3) uniform DebugDataBuffer
 {
@@ -26,7 +43,8 @@ layout(std140, binding = 3) uniform DebugDataBuffer
 	int bNormalVisualizeMode;
 	int bUseNormalMapping;
 	int bUseShadows;
-};
+} debugBuffer;
+
 
 layout(binding = 0) uniform sampler2D DiffuseMap;
 layout(binding = 1) uniform sampler2D NormalMap;
@@ -43,11 +61,11 @@ vec2 poissonDisk[4] = vec2[](
 float CalculateShadow()
 {
 	vec4 worldPos = vec4(ps_in.worldPos, 1.0);
-	vec4 fragPosViewSpace = ShadowDataBuffer.ShadowCameraViewMatrix * worldPos;
+	vec4 fragPosViewSpace = shadowBuffer.ShadowCameraViewMatrix * worldPos;
 	float ViewSpaceDepthValue = -fragPosViewSpace.z;
 
-	int cascadeCount = ShadowDataBuffer.cascadesCount;
-	float cascadePlaneDistances[3] = ShadowDataBuffer.shadowCascadeFarPlanes;
+	int cascadeCount = shadowBuffer.cascadesCount;
+	float cascadePlaneDistances[3] = shadowBuffer.shadowCascadeFarPlanes;
 
 	int layer = -1;
 	for (int i = 0; i < cascadeCount; ++i)
@@ -64,7 +82,7 @@ float CalculateShadow()
 		layer = cascadeCount - 1;
 	}
 
-	vec4 lsPos = ShadowDataBuffer.lsMatrices[layer] * worldPos;
+	vec4 lsPos = shadowBuffer.lsMatrices[layer] * worldPos;
 
 	vec3 lsPosFinal = lsPos.xyz / lsPos.w;
 	// remap from -1..1 to 0..1
@@ -76,7 +94,7 @@ float CalculateShadow()
 	float pixelLightSpaceDepth = lsPosFinal.z;
 
 	// 2 different ways of calculating bias 
-	float cosTheta = clamp(dot(ps_in.Normal, ShadowDataBuffer.DirectionalLightDirection.xyz), 0.0, 1.0);
+	float cosTheta = clamp(dot(ps_in.VertexNormal, shadowBuffer.DirectionalLightDirection.xyz), 0.0, 1.0);
 	float bias = 0.005 * tan(acos(cosTheta));
 	bias = clamp(bias, 0.0, 0.05);
 	//float bias = max(0.005 * (1.0 - clamp(dot(ps_in.Normal, ShadowDataBuffer.DirectionalLightDirection.xyz), 0.0, 1.0)), 0.005);
@@ -93,50 +111,50 @@ float CalculateShadow()
 
 	vec3 invTexelSize = 1.0 / textureSize(depthTexture, 0); // all layers have the same size, third parameter does not determine layer, it determines mip
 
-// 	float shadow = 0.0;
-	//float textureDepth = texture(depthTexture, vec3(projCoords.xy, layer)).r;
-// 	if ((pixelLightSpaceDepth - bias > textureDepth))
-// 	{
-// 		shadow = 1.0;
-// 	}
+	// 	float shadow = 0.0;
+		//float textureDepth = texture(depthTexture, vec3(projCoords.xy, layer)).r;
+	// 	if ((pixelLightSpaceDepth - bias > textureDepth))
+	// 	{
+	// 		shadow = 1.0;
+	// 	}
 
-	//float shadow = 0.0;
-	//for (int x = -1; x <= 1; ++x)
-	//{
-	//	for (int y = -1; y <= 1; ++y)
-	//	{
-	//		float textureDepth = texture(depthTexture, projCoords.xy + vec2(x, y) * invTexelSize).r;
-	//		shadow += pixelLightSpaceDepth - bias1 > textureDepth ? 1.0 : 0.0;
-	//	}
-	//}
-	//shadow /= 9.0;
+		//float shadow = 0.0;
+		//for (int x = -1; x <= 1; ++x)
+		//{
+		//	for (int y = -1; y <= 1; ++y)
+		//	{
+		//		float textureDepth = texture(depthTexture, projCoords.xy + vec2(x, y) * invTexelSize).r;
+		//		shadow += pixelLightSpaceDepth - bias1 > textureDepth ? 1.0 : 0.0;
+		//	}
+		//}
+		//shadow /= 9.0;
 
-	//float shadow = 0.0;
-	//float textureDepth = texture(depthTexture, projCoords.xy).r;
-	//if (pixelLightSpaceDepth < 1.0)
-	//{
-	//	if ((pixelLightSpaceDepth - bias1 > textureDepth))
-	//	{
-	//		shadow = 1.0;
-	//	}
-	//}
+		//float shadow = 0.0;
+		//float textureDepth = texture(depthTexture, projCoords.xy).r;
+		//if (pixelLightSpaceDepth < 1.0)
+		//{
+		//	if ((pixelLightSpaceDepth - bias1 > textureDepth))
+		//	{
+		//		shadow = 1.0;
+		//	}
+		//}
 
-	//float shadow = 0.0;
-	//if (pixelLightSpaceDepth < 1.0)
-	//{
-	//	for (int i = 0; i < 4; i++) 
-	//	{
-	//		float textureDepth = texture(depthTexture, projCoords.xy + poissonDisk[i] / 500.0).r;
+		//float shadow = 0.0;
+		//if (pixelLightSpaceDepth < 1.0)
+		//{
+		//	for (int i = 0; i < 4; i++) 
+		//	{
+		//		float textureDepth = texture(depthTexture, projCoords.xy + poissonDisk[i] / 500.0).r;
 
-	//		if (pixelLightSpaceDepth - bias1 > textureDepth) {
-	//			shadow += 0.2;
-	//		}
-	//	}
-	//}
-	//
+		//		if (pixelLightSpaceDepth - bias1 > textureDepth) {
+		//			shadow += 0.2;
+		//		}
+		//	}
+		//}
+		//
 
 
-	// Vogel disk PCF
+		// Vogel disk PCF
 	float shadow = 0.0;
 	//if (pixelLightSpaceDepth < 1.0)
 	{
@@ -212,13 +230,13 @@ void main()
 	float shadow = CalculateShadow();
 
 	vec4 worldPos = vec4(ps_in.worldPos, 1.0);
-	vec4 fragPosViewSpace = ShadowDataBuffer.ShadowCameraViewMatrix * worldPos;
+	vec4 fragPosViewSpace = shadowBuffer.ShadowCameraViewMatrix * worldPos;
 	vec3 color;
- 	if (bool(ps_in.bShadowVisualizeMode))
- 	{
+	if (bool(debugBuffer.bShadowVisualizeMode))
+	{
 		// Recalculated for debug
-		int cascadeCount = ShadowDataBuffer.cascadesCount;
-		float cascadePlaneDistances[3] = ShadowDataBuffer.shadowCascadeFarPlanes;
+		int cascadeCount = shadowBuffer.cascadesCount;
+		float cascadePlaneDistances[3] = shadowBuffer.shadowCascadeFarPlanes;
 		float ViewSpaceDepthValue = -fragPosViewSpace.z;
 
 		int layer = -1;
@@ -236,29 +254,36 @@ void main()
 
 		if (layer != -1)
 		{
- 			vec3 cascadeColors[3] = { 
+			vec3 cascadeColors[3] = {
 				vec3(1.0, 0.0, 0.0),	// red
 				vec3(0.0, 1.0, 0.0),	// green
 				vec3(0.0, 0.0, 1.0) };	// blue
 
- 			color = cascadeColors[layer];
+			color = cascadeColors[layer];
 
 		}
 		else
 		{
 			color = vec3(0.0, 0.0, 0.0); // Outside of any available cascade
 		}
- 	}
-	else if (bool(ps_in.bNormalVisualizeMode))
+	}
+	else if (bool(debugBuffer.bNormalVisualizeMode))
 	{
-		vec3 mapNormal = texture(NormalMap, ps_in.TexCoords).xyz;
-		mapNormal = mapNormal * 2.0 - 1.0;
-		vec3 wsNormal = normalize(ps_in.TangentToWorld * mapNormal);
-		color = wsNormal;
+		if (bool(lightDataBuffer.bHasNormalMap))
+		{
+			vec3 mapNormal = texture(NormalMap, ps_in.TexCoords).xyz;
+			mapNormal = mapNormal * 2.0 - 1.0;
+			vec3 wsNormal = normalize(ps_in.TangentToWorld * mapNormal);
+			color = wsNormal;
+		}
+		else
+		{
+			color = normalize(ps_in.VertexNormal);
+		}
 	}
 	else
- 	{
-		if (!bool(ps_in.bUseShadows))
+	{
+		if (!bool(debugBuffer.bUseShadows))
 		{
 			shadow = 0.0;
 		}
@@ -267,27 +292,30 @@ void main()
 		float shadowModifier = 1 - shadow;
 
 		vec3 ambientColor = texture(DiffuseMap, ps_in.TexCoords).xyz;
-		if (bool(DebugDataBuffer.bUseNormalMapping))
+		if (bool(debugBuffer.bUseNormalMapping) && bool(lightDataBuffer.bHasNormalMap))
 		{
-// 			mat3 WorldToTangent = transpose(ps_in.TangentToWorld);
-// 
-// 			vec2 glMappedTexCoords = vec2(ps_in.TexCoords.x, 1.0 - ps_in.TexCoords.y);
+			// 			mat3 WorldToTangent = transpose(ps_in.TangentToWorld);
+			// 
+			// 			vec2 glMappedTexCoords = vec2(ps_in.TexCoords.x, 1.0 - ps_in.TexCoords.y);
 			vec3 mapNormal = texture(NormalMap, ps_in.TexCoords).xyz;
 			mapNormal = mapNormal * 2.0 - 1.0;
-// 			vec3 tsLightDir = normalize(WorldToTangent * ps_in.DirectionalLightDirection);
-// 			float diffPower = max(dot(mapNormal, tsLightDir), 0.3);
-// 
-// 			vec3 dirLightColor = diffPower * texture(DiffuseMap, ps_in.TexCoords).xyz;
+			// 			vec3 tsLightDir = normalize(WorldToTangent * ps_in.DirectionalLightDirection);
+			// 			float diffPower = max(dot(mapNormal, tsLightDir), 0.3);
+			// 
+			// 			vec3 dirLightColor = diffPower * texture(DiffuseMap, ps_in.TexCoords).xyz;
 
 			vec3 wsNormal = normalize(ps_in.TangentToWorld * mapNormal);
-			color = shadowModifier * CalcDirLight(ps_in.DirectionalLightDirection, wsNormal, normalize(ps_in.viewPos - ps_in.worldPos));
+
+			color = shadowModifier * CalcDirLight(shadowBuffer.DirectionalLightDirection.xyz, wsNormal, normalize(lightDataBuffer.viewPos - ps_in.worldPos));
 		}
 		else
 		{
-			vec3 wsNormal = normalize(ps_in.Normal);
-			color = shadowModifier * CalcDirLight(ps_in.DirectionalLightDirection, wsNormal, normalize(ps_in.viewPos - ps_in.worldPos));
+			vec3 wsNormal = normalize(ps_in.VertexNormal);
+			color = shadowModifier * CalcDirLight(shadowBuffer.DirectionalLightDirection.xyz, wsNormal, normalize(lightDataBuffer.viewPos - ps_in.worldPos));
 		}
- 	}
+
+		//color = shadowModifier * vec3(1.0, 0.0, 0.0);
+	}
 
 	FragColor = vec4(color, 1.0);
 }

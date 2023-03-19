@@ -593,11 +593,11 @@ void D3D11RHI::BindUniformBuffer(const RHIUniformBuffer & inBuffer)
 {
 	// TODO: Also need to treat different buffer registers
 	const D3D11UniformBuffer& d3d11Buffer = static_cast<const D3D11UniformBuffer&>(inBuffer);
-	if (inBuffer.BType == ConstantBufferType::Vertex)
+	if (inBuffer.BType == ConstantBufferBinding::Vertex)
 	{
 		ImmediateContext->VSSetConstantBuffers(0, 1, &d3d11Buffer.Handle);
 	}
-	else if (inBuffer.BType == ConstantBufferType::Pixel)
+	else if (inBuffer.BType == ConstantBufferBinding::Pixel)
 	{
 		ImmediateContext->PSSetConstantBuffers(0, 1, &d3d11Buffer.Handle);
 	}
@@ -628,11 +628,11 @@ void D3D11RHI::UnbindUniformBuffer(const RHIUniformBuffer & inBuffer)
 {
 	ImmediateContext->VSSetConstantBuffers(0, 0, nullptr);
 
-	if (inBuffer.BType == ConstantBufferType::Vertex)
+	if (inBuffer.BType == ConstantBufferBinding::Vertex)
 	{
 		ImmediateContext->VSSetConstantBuffers(0, 0, nullptr);
 	}
-	else if (inBuffer.BType == ConstantBufferType::Pixel)
+	else if (inBuffer.BType == ConstantBufferBinding::Pixel)
 	{
 		ImmediateContext->PSSetConstantBuffers(0, 0, nullptr);
 	}

@@ -33,6 +33,7 @@
 #include "RenderUtils.h"
 #include "Math/AABB.h"
 #include "imgui.h"
+#include "ShaderTypes.h"
 
 constexpr glm::vec4 ClearColor(0.3f, 0.5f, 1.f, 0.4f);
 
@@ -229,6 +230,17 @@ void ForwardRenderer::SetupLightingConstants()
 
 	UniformsCache["DirectionalLightDirection"] = glm::normalize(-LightDir);
 
+
+	SPointLight test1;
+	SPointLight test2;
+	test2.ambient = glm::vec4(1.f, .0f, 0.f, 0.f);
+	//test.position = glm::vec3(0.f, 1.0f, 0.f);
+
+	eastl::vector<SPointLight> pointLights;
+	pointLights.push_back(test1);
+	pointLights.push_back(test2);
+
+	UniformsCache["pointLightsTest"] = pointLights;
 }
 
 void ForwardRenderer::DrawSkybox()
@@ -507,23 +519,23 @@ void ForwardRenderer::DrawCommand(const RenderCommand& inCommand)
 
 	const uint32_t indicesCount = dataContainer->VBuffer->GetIndicesCount();
 
-	material->SetUniforms(UniformsCache);
+	material->SetUniformsValue(UniformsCache);
 	material->BindBuffers();
 
 	switch (inCommand.DrawType)
 	{
-	case EDrawCallType::DrawElements:
+	case EDrawType::DrawElements:
 	{
 		RHI::Get()->DrawElements(indicesCount);
 
 		break;
 	}
-	case EDrawCallType::DrawArrays:
+	case EDrawType::DrawArrays:
 	{
 		//glDrawArrays(GL_TRIANGLES, 0, indicesCount);
 		break;
 	}
-	case EDrawCallType::DrawInstanced:
+	case EDrawType::DrawInstanced:
 	{
 		RHI::Get()->DrawInstanced(indicesCount, inCommand.InstancesCount);
 		break;
@@ -591,7 +603,7 @@ eastl::shared_ptr<RenderMaterial> ForwardRenderer::GetMaterial(const RenderComma
 
 		switch (inCommand.DrawType)
 		{
-		case EDrawCallType::DrawElements:
+		case EDrawType::DrawElements:
 		{
 			bool materialExists = false;
 			depthMaterial = matManager.GetOrAddMaterial<DepthMaterial>("depth_material", materialExists);
@@ -613,12 +625,12 @@ eastl::shared_ptr<RenderMaterial> ForwardRenderer::GetMaterial(const RenderComma
 			}
 			break;
 		}
-		case EDrawCallType::DrawArrays:
+		case EDrawType::DrawArrays:
 		{
 			ASSERT(false);
 			break;
 		}
-		case EDrawCallType::DrawInstanced:
+		case EDrawType::DrawInstanced:
 		{
 			bool materialExists = false;
 			depthMaterial = matManager.GetOrAddMaterial<DepthMaterial>("depth_material_instanced", materialExists);

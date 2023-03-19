@@ -1,6 +1,6 @@
 #include "RHIUniformBuffer.h"
 
 RHIUniformBuffer::RHIUniformBuffer(size_t inInitSize)
-	: InitSize(inInitSize)
+	: RHIBufferBase(RHIBufferType::Uniform), InitSize(inInitSize)
 {}
 

@@ -31,10 +31,10 @@ void RenderMaterial::SetRequiredUniforms()
 		{"model"}
 		};
 
-	UBuffers.push_back({ defaultUniforms, ConstantBufferType::Vertex });
+	UBuffers.push_back({ defaultUniforms, ConstantBufferBinding::Vertex });
 }
 
-void RenderMaterial::SetUniforms(eastl::unordered_map<eastl::string, SelfRegisteringUniform>& inUniformsCache)
+void RenderMaterial::SetUniformsValue(eastl::unordered_map<eastl::string, SelfRegisteringUniform>& inUniformsCache)
 {
 	using uniformsIterator = const eastl::unordered_map<eastl::string, SelfRegisteringUniform>::const_iterator;
 

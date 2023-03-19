@@ -22,17 +22,17 @@ void DepthMaterial::SetRequiredUniforms()
   	{"model"}
   	};
   
-	UBuffers.push_back({ vertexUniforms, ConstantBufferType::Vertex });
+	UBuffers.push_back({ vertexUniforms, ConstantBufferBinding::Vertex });
 
 	eastl::vector<UniformWithFlag> geometryUniforms = {
 	{"lsMatrices", 3}
 	};
 
-	UBuffers.push_back({ geometryUniforms, ConstantBufferType::Geometry });
+	UBuffers.push_back({ geometryUniforms, ConstantBufferBinding::Geometry });
 }
 
-void DepthMaterial::SetUniforms(eastl::unordered_map<eastl::string, struct SelfRegisteringUniform>& inUniformsCache)
+void DepthMaterial::SetUniformsValue(eastl::unordered_map<eastl::string, struct SelfRegisteringUniform>& inUniformsCache)
 {
-	__super::SetUniforms(inUniformsCache);
+	__super::SetUniformsValue(inUniformsCache);
 }
 

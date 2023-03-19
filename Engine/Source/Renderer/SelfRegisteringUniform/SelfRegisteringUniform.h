@@ -6,6 +6,7 @@
 #include "Renderer/RHI/Resources/UniformBufferContainer.h"
 #include "Core/EngineUtils.h"
 #include "Renderer/RHI/Resources/RHITexture.h"
+#include "Renderer/ShaderTypes.h"
 
 class IUniformData
 {
@@ -200,23 +201,12 @@ struct SelfRegisteringUniform
 	SelfRegisteringUniform(const glm::vec4& inValue);
 	SelfRegisteringUniform(const eastl::vector<float>& inValue);
 	SelfRegisteringUniform(const eastl::vector<glm::mat4>& inValue);
+	SelfRegisteringUniform(const eastl::vector<SPointLight>& inValue);
 	SelfRegisteringUniform(const eastl::shared_ptr<RHITexture2D>& inValue);
 
 	void Register(class UniformBufferContainer& inBuffer, const size_t inRequiredCount) const;
 
 public:
-	enum class UniformType
-	{
-		Uniform1i,
-		Uniform1ui,
-		Uniform1f,
-		Uniform4fv,
-		Uniform3f,
-		Uniform4f,
-		UniformfArray,
-		Uniform4fvArray,
-		UniformTexture,
-	} Type;
 
 	template<typename T>
 	T& GetValue() 

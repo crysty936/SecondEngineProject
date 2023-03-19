@@ -14,5 +14,5 @@ void RenderMaterial_Debug::SetRequiredUniforms()
 	{"view"},
 	};
 
-	UBuffers.push_back({ defaultUniforms, ConstantBufferType::Vertex });
+	UBuffers.push_back({ defaultUniforms, ConstantBufferBinding::Vertex });
 }

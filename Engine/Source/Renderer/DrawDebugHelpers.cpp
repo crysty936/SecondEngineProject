@@ -148,7 +148,7 @@ void DrawDebugManager::Draw()
 
 		material->ResetUniforms();
 
-		material->SetUniforms(ForwardRenderer::Get().GetUniformsCache());
+		material->SetUniformsValue(ForwardRenderer::Get().GetUniformsCache());
 		material->BindBuffers();
 
 		RHI::Get()->DrawPoints(numPoints);
@@ -200,7 +200,7 @@ void DrawDebugManager::Draw()
 
 		material->ResetUniforms();
 
-		material->SetUniforms(ForwardRenderer::Get().GetUniformsCache());
+		material->SetUniformsValue(ForwardRenderer::Get().GetUniformsCache());
 		material->BindBuffers();
 
 		RHI::Get()->DrawPoints(static_cast<int32_t>(debugLines.size()));

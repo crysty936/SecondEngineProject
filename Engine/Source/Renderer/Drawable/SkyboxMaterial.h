@@ -10,5 +10,5 @@ public:
 	~SkyboxMaterial();
 
 	virtual void SetRequiredUniforms() override;
-	virtual void SetUniforms(eastl::unordered_map<eastl::string, struct SelfRegisteringUniform>& inUniformsCache) override;
+	virtual void SetUniformsValue(eastl::unordered_map<eastl::string, struct SelfRegisteringUniform>& inUniformsCache) override;
 };

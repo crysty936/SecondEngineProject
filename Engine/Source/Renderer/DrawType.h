@@ -6,7 +6,7 @@ enum class EFaceCullMode
 	Back
 };
 
-enum class EDrawCallType
+enum class EDrawType
 {
 	DrawElements,
 	DrawArrays,

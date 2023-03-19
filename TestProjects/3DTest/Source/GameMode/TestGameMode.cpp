@@ -15,7 +15,7 @@
 #include "Renderer/RHI/RHI.h"
 #include "Renderer/Material/MaterialsManager.h"
 #include "Utils/InlineVector.h"
-#include "Renderer/Drawable/RenderMaterial_WithLighting.h"
+#include "Renderer/Drawable/RenderMaterial_Parallax.h"
 #include "Renderer/Drawable/RenderMaterial_Billboard.h"
 
 TestGameMode GGameMode = {};
@@ -78,7 +78,7 @@ protected:
 		newCommand.Material = inMaterial;
 		newCommand.Parent = inParent;
 		newCommand.DataContainer = inDataContainer;
-		newCommand.DrawType = EDrawCallType::DrawInstanced;
+		newCommand.DrawType = EDrawType::DrawInstanced;
 		newCommand.InstancesCount = InstancesCount * InstancesCount;
 		//newCommand.DrawPasses = static_cast<EDrawMode::Type>(EDrawMode::Default | EDrawMode::NORMAL_VISUALIZE);
 
@@ -172,7 +172,7 @@ public:
   		newCommand.Material = material;
   		newCommand.DataContainer = dataContainer;
   		newCommand.Parent = cubeNode;
-  		newCommand.DrawType = EDrawCallType::DrawInstanced;
+  		newCommand.DrawType = EDrawType::DrawInstanced;
 		newCommand.InstancesCount = instancesCount * instancesCount;
   
   		ForwardRenderer::Get().AddCommand(newCommand);
@@ -218,7 +218,7 @@ public:
 
 		MaterialsManager& matManager = MaterialsManager::Get();
 		bool materialExists = false;
-		eastl::shared_ptr<RenderMaterial> material = matManager.GetOrAddMaterial<RenderMaterial_WithLighting>("parallax_quad_material", materialExists);
+		eastl::shared_ptr<RenderMaterial> material = matManager.GetOrAddMaterial<RenderMaterial_Parallax>("parallax_quad_material", materialExists);
 
 		if (!materialExists)
 		{
@@ -231,8 +231,8 @@ public:
 			material->OwnedTextures.push_back(heightMap);
 
 			eastl::vector<ShaderSourceInput> shaders = {
-			{ "VS_Pos-UV-Normal-Tangent-Bitangent_Model_WorldPosition", EShaderType::Vertex },
-			{ "PS_ParallaxTest", EShaderType::Fragment } };
+			{ "Parallax/VS_Pos-UV-Normal-Tangent-Bitangent_Model_WorldPosition", EShaderType::Vertex },
+			{ "Parallax/PS_ParallaxTest", EShaderType::Fragment } };
 
 			material->Shader = RHI::Instance->CreateShaderFromPath(shaders, inputLayout);
 		}
@@ -244,7 +244,7 @@ public:
 		newCommand.Material = material;
 		newCommand.DataContainer = dataContainer;
 		newCommand.Parent = cubeNode;
-		newCommand.DrawType = EDrawCallType::DrawElements;
+		newCommand.DrawType = EDrawType::DrawElements;
 
 		ForwardRenderer::Get().AddCommand(newCommand);
 	}
@@ -305,7 +305,7 @@ public:
 		newCommand.Material = material;
 		newCommand.DataContainer = dataContainer;
 		newCommand.Parent = billboardNode;
-		newCommand.DrawType = EDrawCallType::DrawElements;
+		newCommand.DrawType = EDrawType::DrawElements;
 
 		ForwardRenderer::Get().AddCommand(newCommand);
 	}
@@ -362,21 +362,21 @@ void TestGameMode::Init()
  	}
 
 	// Light
-	eastl::shared_ptr<LightSource> lightObj = EntityHelper::CreateObject<LightSource>();
-	lightObj->SetRelativeLocation(glm::vec3(1000, 20000.0f, -1000.f));
-	lightObj->SetScale(glm::vec3(100.f, 100.f, 100.f));
+// 	eastl::shared_ptr<LightSource> lightObj = EntityHelper::CreateObject<LightSource>();
+// 	lightObj->SetRelativeLocation(glm::vec3(1000, 20000.0f, -1000.f));
+// 	lightObj->SetScale(glm::vec3(100.f, 100.f, 100.f));
 
-// 	AssimpModel = eastl::shared_ptr<AssimpModel3D>(EntityHelper::CreateObject<AssimpModel3D>("../Data/Models/Shiba/scene.gltf"));
-// 	AssimpModel->SetScale(glm::vec3(10.f, 10.f, 10.f));
-// 	AssimpModel->Move(glm::vec3(0.f, 10.f, 0.f));
+  	AssimpModel = eastl::shared_ptr<AssimpModel3D>(EntityHelper::CreateObject<AssimpModel3D>("../Data/Models/Shiba/scene.gltf"));
+  	AssimpModel->SetScale(glm::vec3(10.f, 10.f, 10.f));
+  	AssimpModel->Move(glm::vec3(0.f, 10.f, 0.f));
 
 	FloorModel = EntityHelper::CreateObject<AssimpModel3D>("../Data/Models/Floor/scene.gltf");
 	FloorModel->Move(glm::vec3(0.f, -2.f, 0.f));
 	//floorModel->SetScale(glm::vec3(10.f, 1.f, 10.f));
 
 	//TransformObjPtr concreteFloor = EntityHelper::CreateObject<AssimpModel3D>("../Data/Models/ConcreteFloor/Source/plane.fbx");
-	TransformObjPtr concreteFloor = EntityHelper::CreateObject<AssimpModel3D>("../Data/Models/ConcreteFloorGLTF/scene.gltf");
-	concreteFloor->Move(glm::vec3(5.f, 0.f, 0.f));
+// 	TransformObjPtr concreteFloor = EntityHelper::CreateObject<AssimpModel3D>("../Data/Models/ConcreteFloorGLTF/scene.gltf");
+// 	concreteFloor->Move(glm::vec3(5.f, 0.f, 0.f));
 
 
 	//Quad = EntityHelper::CreateObject<ParallaxQuad>();
@@ -390,12 +390,8 @@ void TestGameMode::Init()
 
 
 	eastl::shared_ptr<InstancedCubeTest> instancedObj = EntityHelper::CreateObject<InstancedCubeTest>();
-
-	Billboard = EntityHelper::CreateObject<BillboardQuad>();
-
-
-
-
+	//TransformObjPtr concreteFloor = EntityHelper::CreateObject<AssimpModel3D>("../Data/Models/ConcreteFloorGLTF/scene.gltf");
+	//Billboard = EntityHelper::CreateObject<BillboardQuad>();
 
   	//eastl::shared_ptr<InstancedAssimpModelTest> instancedObj = EntityHelper::CreateObject<InstancedAssimpModelTest>("../Data/Models/Backpack/scene.gltf");
   	//instancedObj->SetScale(glm::vec3(0.01f, 0.01f, 0.01f));
@@ -433,6 +429,4 @@ void TestGameMode::Tick(float inDeltaT)
 	//FloorModel->Rotate(0.1f, glm::vec3(1.f, 0.f, 0.f));
 
 	//Quad->Rotate(0.1f, glm::vec3(-1.f, 0.f, 0.f));
-
-	//Billboard->LookAt(GameCamera->GetAbsoluteTransform().Translation);
 }

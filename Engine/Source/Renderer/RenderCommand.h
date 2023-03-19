@@ -21,7 +21,7 @@ struct RenderCommand
 	eastl::shared_ptr<class MeshDataContainer> DataContainer;
 	eastl::shared_ptr<class RenderMaterial> Material;
 	eastl::weak_ptr<const class DrawableObject> Parent;
-	EDrawCallType DrawType{ EDrawCallType::DrawElements };
+	EDrawType DrawType{ EDrawType::DrawElements };
 	EDrawMode::Type DrawPasses = EDrawMode::Default;
 
 	/** In case draw mode is DrawInstanced */

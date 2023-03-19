@@ -64,7 +64,7 @@ void TriangleShape::CreateProxy()
 	newCommand.Material = material;
 	newCommand.DataContainer = dataContainer;
 	newCommand.Parent = this_shared(this);
-	newCommand.DrawType = EDrawCallType::DrawElements;
+	newCommand.DrawType = EDrawType::DrawElements;
 
 	ForwardRenderer::Get().AddCommand(newCommand);
 }
@@ -116,7 +116,7 @@ void SquareShape::CreateProxy()
  	newCommand.Material = material;
  	newCommand.DataContainer = dataContainer;
  	newCommand.Parent = this_shared(this);
- 	newCommand.DrawType = EDrawCallType::DrawElements;
+ 	newCommand.DrawType = EDrawType::DrawElements;
  
 	ForwardRenderer::Get().AddCommand(newCommand);
 }
@@ -183,7 +183,7 @@ void CubeShape::CreateProxy()
 	newCommand.Material = material;
 	newCommand.DataContainer = dataContainer;
 	newCommand.Parent = cubeNode;
-	newCommand.DrawType = EDrawCallType::DrawElements;
+	newCommand.DrawType = EDrawType::DrawElements;
 
 	ForwardRenderer::Get().AddCommand(newCommand);
 }
@@ -302,7 +302,7 @@ void LightSource::CreateProxy()
 	newCommand.Material = material;
 	newCommand.DataContainer = dataContainer;
 	newCommand.Parent = cubeNode;
-	newCommand.DrawType = EDrawCallType::DrawElements;
+	newCommand.DrawType = EDrawType::DrawElements;
 
 	ForwardRenderer::Get().AddCommand(newCommand);
 }
@@ -428,6 +428,6 @@ void FullScreenQuad::CreateCommand()
 	QuadCommand.Material = material;
 	QuadCommand.DataContainer = dataContainer;
 	QuadCommand.Parent = this_shared(this);
-	QuadCommand.DrawType = EDrawCallType::DrawElements;
+	QuadCommand.DrawType = EDrawType::DrawElements;
 }
 

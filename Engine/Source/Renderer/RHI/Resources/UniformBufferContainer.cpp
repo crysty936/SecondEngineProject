@@ -19,29 +19,29 @@ void UniformBufferContainer::AddData(const void* inData, const size_t inSize, co
 
 			const size_t multiplier = Counter / 16;
  			Counter = (multiplier + 1) * 16;
- 			UniformsCache.resize(Counter);
+ 			UniformsDataCache.resize(Counter);
  		}
  	}
 
-	if (UniformsCache.size() < (Counter + finalSize))
+	if (UniformsDataCache.size() < (Counter + finalSize))
 	{
-		UniformsCache.resize(Counter + finalSize);
+		UniformsDataCache.resize(Counter + finalSize);
 	}
 
 	// Allow adding of padding
 	if (inData)
 	{
-		memcpy(&UniformsCache[Counter], inData, inSize);
+		memcpy(&UniformsDataCache[Counter], inData, inSize);
 	}
 	Counter += finalSize;
 }
 
-void UniformBufferContainer::UpdateData(const ConstantBufferType inBufferType, const int32_t inBufferNr)
+void UniformBufferContainer::UpdateData(const ConstantBufferBinding inBufferType, const int32_t inBufferNr)
 {
 	if (!RHIBuffer)
 	{
 		// Buffer size should be a multiple of 16
-		size_t bufferSize = UniformsCache.size();
+		size_t bufferSize = UniformsDataCache.size();
 		if ((bufferSize % 16) > 0)
 		{
 			// Round size to the next 16 multiple
@@ -53,7 +53,7 @@ void UniformBufferContainer::UpdateData(const ConstantBufferType inBufferType, c
 		RHIBuffer->BType = inBufferType;
 	}
 
-	RHI::Get()->UniformBufferUpdateData(*RHIBuffer, UniformsCache.data(), UniformsCache.size(), inBufferNr);
+	RHI::Get()->UniformBufferUpdateData(*RHIBuffer, UniformsDataCache.data(), UniformsDataCache.size(), inBufferNr);
 }
 
 void UniformBufferContainer::Clear()

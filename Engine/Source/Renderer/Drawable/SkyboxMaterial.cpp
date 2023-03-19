@@ -13,7 +13,7 @@ void SkyboxMaterial::SetRequiredUniforms()
 // 		};
 }
 
-void SkyboxMaterial::SetUniforms(eastl::unordered_map<eastl::string, struct SelfRegisteringUniform>& inUniformsCache)
+void SkyboxMaterial::SetUniformsValue(eastl::unordered_map<eastl::string, struct SelfRegisteringUniform>& inUniformsCache)
 {
 // 	const eastl::string uniformName = "view";
 // 	auto& iter = inUniformsCache.find(uniformName);

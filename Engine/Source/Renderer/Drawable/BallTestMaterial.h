@@ -9,7 +9,7 @@ public:
 	BallTestMaterial();
 	~BallTestMaterial();
 
-	void SetUniforms(eastl::unordered_map<eastl::string, struct SelfRegisteringUniform>& inUniformsCache) override;
+	void SetUniformsValue(eastl::unordered_map<eastl::string, struct SelfRegisteringUniform>& inUniformsCache) override;
 
 	virtual void SetRequiredUniforms() override;
 

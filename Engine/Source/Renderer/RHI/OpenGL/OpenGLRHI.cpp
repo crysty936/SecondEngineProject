@@ -1027,6 +1027,55 @@ void OpenGLRHI::ImGuiRenderDrawData()
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
+void OpenGLRHI::ReadBufferData(const RHIBufferBase& inBuffer, const size_t inOffset, const size_t inSize, void* outData)
+{
+	const RHIBufferType bufferType = inBuffer.BufferType;
+	uint32_t glHandle = 0;
+	int32_t glType = 0;
+
+	// TODO: Hack, ew, fix pls
+	switch (bufferType)
+	{
+	case RHIBufferType::Unknown:
+		ASSERT(0);
+		break;
+	case RHIBufferType::Vertex:
+	{
+		const GLVertexBuffer& buffer = static_cast<const GLVertexBuffer&>(inBuffer);
+		glHandle = buffer.Handle;
+
+		glType = GL_ARRAY_BUFFER;
+		break;
+	}
+	case RHIBufferType::Index:
+	{
+		const GLIndexBuffer& buffer = static_cast<const GLIndexBuffer&>(inBuffer);
+		glHandle = buffer.Handle;
+
+		glType = GL_ELEMENT_ARRAY_BUFFER;
+		break;
+	}
+	case RHIBufferType::Uniform:
+	{
+		const GlUniformBuffer& buffer = static_cast<const GlUniformBuffer&>(inBuffer);
+		glHandle = buffer.GLHandle;
+
+		glType = GL_UNIFORM_BUFFER;
+		break;
+	}
+	default:
+		break;
+	}
+
+	ASSERT(glHandle != 0);
+
+	glBindBuffer(glType, glHandle);
+
+	glGetBufferSubData(glType, inOffset, inSize, outData);
+
+	glBindBuffer(glType, 0);
+}
+
 void OpenGLRHI::ClearVertexBuffer(class RHIVertexBuffer& inBuffer)
 {
 	const GLVertexBuffer& glBuffer = static_cast<const GLVertexBuffer&>(inBuffer);

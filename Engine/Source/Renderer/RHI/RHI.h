@@ -59,10 +59,10 @@ public:
 	virtual void UniformBufferUpdateData(class RHIUniformBuffer& inBuffer, const void* inData, const size_t inDataSize, const int32_t inBufferNr) {};
 
 	/** Attach a texture to the color ouput of a framebuffer */
-	virtual void AttachTextureToFramebufferColor(class  RHIFrameBuffer& inFrameBuffer, class RHITexture2D& inTex) {}
+	virtual void AttachTextureToFramebufferColor(class RHIFrameBuffer& inFrameBuffer, class RHITexture2D& inTex) {}
 
 	/** Attach a texture to the depth output of a framebuffer. Preferrably a texture with only depth component */
-	virtual void AttachTextureToFramebufferDepth(class  RHIFrameBuffer& inFrameBuffer, class RHITexture2D& inTex) {}
+	virtual void AttachTextureToFramebufferDepth(class RHIFrameBuffer& inFrameBuffer, class RHITexture2D& inTex) {}
 
 	virtual void ClearTexture(const RHITexture2D& inTexture, const glm::vec4& inColor) {}
 
@@ -99,6 +99,8 @@ public:
 	virtual void SetFaceCullMode(const EFaceCullMode inMode) {}
 
 	virtual void PrepareProjectionForRendering(glm::mat4& inProj) {}
+
+	virtual void ReadBufferData(const class RHIBufferBase& inBuffer, const size_t inOffset, const size_t inSize, void* outData) {}
 
 	// ImGui
 	virtual void ImGuiInit() {}

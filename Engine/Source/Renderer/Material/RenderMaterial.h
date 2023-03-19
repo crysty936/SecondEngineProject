@@ -16,12 +16,12 @@ struct UniformWithFlag
 
 struct BufferWithRequirements
 {
-	BufferWithRequirements(eastl::vector<UniformWithFlag>& inRequiredUniforms, ConstantBufferType inBufferType)
+	BufferWithRequirements(eastl::vector<UniformWithFlag>& inRequiredUniforms, ConstantBufferBinding inBufferType)
 		: RequiredUniforms(inRequiredUniforms), BufferType(inBufferType), BufferContainer()
 	{}
 
 	eastl::vector<UniformWithFlag> RequiredUniforms;
-	ConstantBufferType BufferType = ConstantBufferType::Vertex;
+	ConstantBufferBinding BufferType = ConstantBufferBinding::Vertex;
 	UniformBufferContainer BufferContainer;
 };
 
@@ -34,7 +34,7 @@ public:
 	virtual void Init();
 	void ResetUniforms();
 	virtual void SetRequiredUniforms();
-	virtual void SetUniforms(eastl::unordered_map<eastl::string, struct SelfRegisteringUniform>& inUniformsCache);
+	virtual void SetUniformsValue(eastl::unordered_map<eastl::string, struct SelfRegisteringUniform>& inUniformsCache);
 	void BindBuffers();
 	void UnbindBuffers();
 	UniformWithFlag* FindRequiredUniform(const eastl::string& inUniformName);

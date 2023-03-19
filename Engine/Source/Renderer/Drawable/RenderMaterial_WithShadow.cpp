@@ -3,6 +3,7 @@
 #include "Core/EngineUtils.h"
 #include "Renderer/Material/MaterialHelpers.h"
 #include "Renderer/ForwardRenderer.h"
+#include "../RHI/RHI.h"
 
 RenderMaterial_WithShadow::RenderMaterial_WithShadow() = default;
 RenderMaterial_WithShadow::~RenderMaterial_WithShadow() = default;
@@ -17,38 +18,55 @@ void RenderMaterial_WithShadow::SetRequiredUniforms()
 	{"ShadowCameraViewMatrix"},
 	{"DirectionalLightDirection"},
 	{"cascadesCount"},
-	{"bShadowVisualizeMode"},
-	{"bNormalVisualizeMode"},
-	{"bUseNormalMapping"},
-	{"bUseShadows"},
 	{"shadowCascadeFarPlanes", 3},
 	};
 
-	UBuffers.push_back({ defaultUniforms, ConstantBufferType::Vertex });
+	UBuffers.push_back({ defaultUniforms, ConstantBufferBinding::Pixel });
 
 
 	eastl::vector<UniformWithFlag> LightingUniforms = {
 		{"ViewPos"},
+		{"pointLightsTest", 3},
+		{"bHasNormalMap"},
 	};
 
-	UBuffers.push_back({ LightingUniforms, ConstantBufferType::Vertex });
+	UBuffers.push_back({ LightingUniforms, ConstantBufferBinding::Pixel });
 
+
+	eastl::vector<UniformWithFlag> debugConstants = {
+	{"bShadowVisualizeMode"},
+	{"bNormalVisualizeMode"},
+	{"bUseNormalMapping"},
+	{"bUseShadows"},
+	};
+
+	UBuffers.push_back({ debugConstants, ConstantBufferBinding::Pixel });
 }
 
-void RenderMaterial_WithShadow::SetUniforms(eastl::unordered_map<eastl::string, struct SelfRegisteringUniform>& inUniformsCache)
+void RenderMaterial_WithShadow::SetUniformsValue(eastl::unordered_map<eastl::string, struct SelfRegisteringUniform>& inUniformsCache)
 {
-	__super::SetUniforms(inUniformsCache);
+	inUniformsCache["bHasNormalMap"] = OwnedTextures.size() > 1;
 
 	const eastl::weak_ptr<RHITexture2D> depthTexture = inUniformsCache["DirectionalLightCascadedShadowTexture"].GetValue<eastl::shared_ptr<RHITexture2D>>();
 	
-	if (eastl::find_if(ExternalTextures.begin(), ExternalTextures.end(), 
-		[depthTexture](const eastl::weak_ptr<RHITexture2D>& inPtr) {
+	if (eastl::find_if(ExternalTextures.begin(), ExternalTextures.end(), [depthTexture](const eastl::weak_ptr<RHITexture2D>& inPtr) {
 		return depthTexture.lock() == inPtr.lock(); 
-		}) != ExternalTextures.end())
+		}) == ExternalTextures.end())
 	{
-		return;
+		ExternalTextures.push_back(depthTexture);
 	}
 
-	ExternalTextures.push_back(depthTexture);
+	__super::SetUniformsValue(inUniformsCache);
+
+// 
+//  	UniformBufferContainer& container = UBuffers[1].BufferContainer;
+//  	eastl::shared_ptr<RHIUniformBuffer>& RHIBuffer = container.RHIBuffer;
+//  
+//  	void* data = new char[container.Counter];
+//  
+//  	RHI::Get()->ReadBufferData(*RHIBuffer, 0, container.Counter, data);
+//  
+//  	SPointLight* test = static_cast<SPointLight*>(data);
+
 }
 

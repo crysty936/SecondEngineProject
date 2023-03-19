@@ -102,8 +102,8 @@ void AssimpModel3D::ProcessNodesRecursively(const aiNode & inNode, const aiScene
 eastl::shared_ptr<RHIShader> AssimpModel3D::CreateShaders(const VertexInputLayout& inLayout) const
 {
 	eastl::vector<ShaderSourceInput> shaders = {
-		{ "VS_Pos-UV-Normal-Tangent-Bitangent_Model_WorldPosition_WithShadow", EShaderType::Vertex },
-		{ "PS_TexNormalMapped_WithShadow", EShaderType::Fragment } };
+		{ "AssimpLightingShadow/VS_Pos-UV-Normal-Tangent-Bitangent_Model_WorldPosition_WithShadow", EShaderType::Vertex },
+		{ "AssimpLightingShadow/PS_TexNormalMapped_WithShadow", EShaderType::Fragment } };
 
 	return RHI::Get()->CreateShaderFromPath(shaders, inLayout);
 }
@@ -119,7 +119,7 @@ RenderCommand AssimpModel3D::CreateRenderCommand(eastl::shared_ptr<RenderMateria
 	newCommand.Material = inMaterial;
 	newCommand.Parent = inParent;
 	newCommand.DataContainer = inDataContainer;
-	newCommand.DrawType = EDrawCallType::DrawElements;
+	newCommand.DrawType = EDrawType::DrawElements;
 	newCommand.DrawPasses = static_cast<EDrawMode::Type>(EDrawMode::Default /*| EDrawMode::NORMAL_VISUALIZE*/);
 
 	return newCommand;
@@ -181,13 +181,28 @@ void AssimpModel3D::ProcessMesh(const aiMesh& inMesh, const aiScene& inScene, ea
 			Vertex vert;
 			const aiVector3D& aiVertex = inMesh.mVertices[i];
 			const aiVector3D& aiNormal = inMesh.mNormals[i];
-			const aiVector3D& aiTangent = inMesh.mTangents[i];
-			const aiVector3D& aiBitangent = inMesh.mBitangents[i];
 
 			vert.Position = glm::vec3(aiVertex.x, aiVertex.y, aiVertex.z);
 			vert.Normal = glm::vec3(aiNormal.x, aiNormal.y, aiNormal.z);
-			vert.Tangent = glm::vec3(aiTangent.x, aiTangent.y, aiTangent.z);
-			vert.Bitangent = glm::vec3(aiBitangent.x, aiBitangent.y, aiBitangent.z);
+			if (inMesh.mTangents)
+			{
+				const aiVector3D& aiTangent = inMesh.mTangents[i];
+				vert.Tangent = glm::vec3(aiTangent.x, aiTangent.y, aiTangent.z);
+			}
+			else
+			{
+				vert.Tangent = glm::vec3(1.f, 0.f, 0.f);
+			}
+
+			if (inMesh.mBitangents)
+			{
+				const aiVector3D& aiBitangent = inMesh.mBitangents[i];
+				vert.Bitangent = glm::vec3(aiBitangent.x, aiBitangent.y, aiBitangent.z);
+			}
+			else
+			{
+				vert.Bitangent = glm::vec3(0.f, 1.f, 0.f);
+			}
 
 			if (inMesh.mTextureCoords[0])
 			{
