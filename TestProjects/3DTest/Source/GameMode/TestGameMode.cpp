@@ -17,6 +17,7 @@
 #include "Utils/InlineVector.h"
 #include "Renderer/Drawable/RenderMaterial_Parallax.h"
 #include "Renderer/Drawable/RenderMaterial_Billboard.h"
+#include "Renderer/DrawDebugHelpers.h"
 
 TestGameMode GGameMode = {};
 
@@ -393,7 +394,7 @@ void TestGameMode::Init()
 //  	model->Move(glm::vec3(0.f, 3.f, 0.f));
 
 
-	eastl::shared_ptr<InstancedCubeTest> instancedObj = EntityHelper::CreateObject<InstancedCubeTest>("Instaned Cubes");
+	eastl::shared_ptr<InstancedCubeTest> instancedObj = EntityHelper::CreateObject<InstancedCubeTest>("Instanced Cubes");
 	//TransformObjPtr concreteFloor = EntityHelper::CreateObject<AssimpModel3D>("../Data/Models/ConcreteFloorGLTF/scene.gltf");
 	//Billboard = EntityHelper::CreateObject<BillboardQuad>();
 
@@ -415,12 +416,17 @@ void TestGameMode::Init()
 
 	//eastl::shared_ptr<Skybox> skybox = ObjectCreation::NewObject<Skybox>();
 // 
-//  	{
-//  		eastl::shared_ptr<LightSource> lightSource = ObjectCreation::NewObject<LightSource>();
-//  		//lightSource->Move(glm::vec3(0.f, 15.f, 0.f));
-//  		lightSource->SetRelativeLocation({ -2.0f, 20.0f, -1.0f });
-// 		lightSource->Rotate(20.f, glm::vec3(0.f, 1.f, 0.f));
-//  	}
+  	{
+  		eastl::shared_ptr<LightSource> lightSource = EntityHelper::CreateObject<LightSource>("Directional Light");
+  		//lightSource->Move(glm::vec3(0.f, 15.f, 0.f));
+  		lightSource->SetRelativeLocation({ -2.0f, 20.0f, -1.0f });
+ 		lightSource->Rotate(20.f, glm::vec3(0.f, 1.f, 0.f));
+  	}
+
+
+	CubeObj = EntityHelper::CreateObject<CubeShape>("Cube1");
+	CubeObj->Move(glm::vec3(5.f, 0.f, 0.f));
+
 
 }
 
@@ -433,4 +439,13 @@ void TestGameMode::Tick(float inDeltaT)
 	//FloorModel->Rotate(0.1f, glm::vec3(1.f, 0.f, 0.f));
 
 	//Quad->Rotate(0.1f, glm::vec3(-1.f, 0.f, 0.f));
+
+
+	const glm::vec3 dir = glm::normalize(AssimpModel->GetAbsoluteTransform().Translation - CubeObj->GetAbsoluteTransform().Translation);
+
+	const glm::vec3 endPoint = CubeObj->GetAbsoluteTransform().Translation + dir * 20.f;
+
+	DrawDebugHelpers::DrawDebugLine(CubeObj->GetAbsoluteTransform().Translation, endPoint, glm::vec3(1.f, 0.f, 0.f));
+
+	DrawDebugHelpers::DrawDebugPoint(endPoint);
 }
