@@ -26,7 +26,8 @@ public:
 	void CalculateAbsTransform() const;
 	void Move(const glm::vec3 inMoveVector);
 	void Rotate(const float inAmount, const glm::vec3 inAxis);
-	void SetRotation(const glm::vec3 inNewRotation);
+	void SetRotationEuler(const glm::vec3 inNewRotation);
+	void SetRotationRadians(const glm::vec3 inNewRotation);
 	inline glm::vec3 GetRelRotation() const { return Rotation; }
 	void SetRelTransform(const Transform& inNewTransf);
 	void SetRelativeLocation(const glm::vec3 inRelLoc);

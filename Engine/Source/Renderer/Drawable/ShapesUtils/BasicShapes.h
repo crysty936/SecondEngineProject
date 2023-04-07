@@ -2,6 +2,7 @@
 #include "EASTL/shared_ptr.h"
 #include "Renderer/Model/3D/Model3D.h"
 #include "../../RenderCommand.h"
+#include "../../LightTypes.h"
 
 class TriangleShape : public DrawableObject, public IDrawableContainer
 {
@@ -42,8 +43,10 @@ public:
 class LightSource : public Model3D
 {
 public:
-	LightSource(const eastl::string& inName);
+	LightSource(const eastl::string& inName, const ELightType inType);
 	virtual ~LightSource();
+
+	ELightType Type = ELightType::Directional;
 
 	virtual void CreateProxy() override;
 };

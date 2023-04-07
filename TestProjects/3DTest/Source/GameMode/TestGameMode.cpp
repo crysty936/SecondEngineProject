@@ -326,7 +326,7 @@ void TestGameMode::Init()
 	// Scene setup 
 	SceneManager& sManager = SceneManager::Get();
 	Scene& currentScene = sManager.GetCurrentScene();
-	GameCamera = currentScene.CurrentCamera;
+	GameCamera = currentScene.GetCurrentCamera();
 	//GameCamera->SetMovementDelegates(*Controller);
 
 	// Push camera back a bit
@@ -417,15 +417,12 @@ void TestGameMode::Init()
 	//eastl::shared_ptr<Skybox> skybox = ObjectCreation::NewObject<Skybox>();
 // 
   	{
-  		eastl::shared_ptr<LightSource> lightSource = EntityHelper::CreateObject<LightSource>("Directional Light");
-  		//lightSource->Move(glm::vec3(0.f, 15.f, 0.f));
-  		lightSource->SetRelativeLocation({ -2.0f, 20.0f, -1.0f });
- 		lightSource->Rotate(20.f, glm::vec3(0.f, 1.f, 0.f));
+		DirLight = EntityHelper::CreateObject<LightSource>("Directional Light", ELightType::Directional);
+		DirLight->SetRelativeLocation({ -2.0f, 20.0f, -1.0f });
+		DirLight->Rotate(20.f, glm::vec3(0.f, 1.f, 0.f));
   	}
 
 
-	CubeObj = EntityHelper::CreateObject<CubeShape>("Cube1");
-	CubeObj->Move(glm::vec3(5.f, 0.f, 0.f));
 
 
 }
@@ -441,11 +438,22 @@ void TestGameMode::Tick(float inDeltaT)
 	//Quad->Rotate(0.1f, glm::vec3(-1.f, 0.f, 0.f));
 
 
-	const glm::vec3 dir = glm::normalize(AssimpModel->GetAbsoluteTransform().Translation - CubeObj->GetAbsoluteTransform().Translation);
+	glm::vec3 forward = glm::vec3(0.f, 0.f, 1.f);
+	glm::vec3 right = glm::vec3(1.f, 0.f, 0.f);
+	glm::vec3 up = glm::vec3(0.f, 1.f, 0.f);
 
-	const glm::vec3 endPoint = CubeObj->GetAbsoluteTransform().Translation + dir * 20.f;
+	const glm::quat& rot = DirLight->GetAbsoluteTransform().Rotation;
+	//const glm::mat3 rotMat = 
 
-	DrawDebugHelpers::DrawDebugLine(CubeObj->GetAbsoluteTransform().Translation, endPoint, glm::vec3(1.f, 0.f, 0.f));
 
-	DrawDebugHelpers::DrawDebugPoint(endPoint);
+	// order of operations matters, considered like a matrix
+	forward = glm::normalize(rot * forward);
+	right = glm::normalize(rot * right);
+	up = glm::normalize(rot * up);
+
+	const glm::vec3 start = DirLight->GetAbsoluteTransform().Translation;
+
+	DrawDebugHelpers::DrawDebugLine(start, start + forward * 20.f, glm::vec3(0.f, 0.f, 1.f));
+	DrawDebugHelpers::DrawDebugLine(start, start + right * 20.f, glm::vec3(1.f, 0.f, 0.f));
+	DrawDebugHelpers::DrawDebugLine(start, start + up * 20.f, glm::vec3(0.f, 1.f, 0.f));
 }

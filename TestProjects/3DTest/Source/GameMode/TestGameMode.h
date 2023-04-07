@@ -31,7 +31,7 @@ private:
 
 
 	eastl::shared_ptr<class AssimpModel3D> AssimpModel;
-	eastl::shared_ptr<TransformObject> CubeObj;
+	eastl::shared_ptr<class LightSource> DirLight;
 	eastl::shared_ptr<class AssimpModel3D> FloorModel;
 	TransformObjPtr Quad;
 	TransformObjPtr Billboard;

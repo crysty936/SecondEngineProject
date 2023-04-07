@@ -29,8 +29,6 @@ private:
 	void AddDebugLine(const DebugLine& inLine);
 
 private:
-	const eastl::vector<glm::vec3>& GetPoints() const { return DebugPoints; }
-	const eastl::vector<DebugLine>& GetLines() const { return DebugLines; }
 	
 	inline void ClearDebugData() 
 	{ 

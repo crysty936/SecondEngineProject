@@ -198,37 +198,81 @@ void ForwardRenderer::Present()
 	RHI::Get()->SwapBuffers();
 }
 
-static glm::vec3 LightDir = glm::vec3(-0.5f, -0.5f, 0.f);
-
 void ForwardRenderer::SetupLightingConstants()
 {
+	const eastl::vector<LightData>& lights = SceneManager::Get().GetCurrentScene().GetLights();
+
+	eastl::vector<LightData> dirLights;
+
+	eastl::vector<LightData> pointLights;
+
+	for (const LightData& light : lights)
+	{
+		switch (light.Type)
+		{
+		case ELightType::Directional:
+		{
+			dirLights.push_back(light);
+			break;
+		}
+		case ELightType::Point:
+		{
+			pointLights.push_back(light);
+			break;
+		}
+		}
+	}
+
+	ASSERT(dirLights.size() <= 1);
+
+	//////////////////////////////////////////////////////////////////////////
+	// ImGui
+	//////////////////////////////////////////////////////////////////////////
+
+	ImGui::SeparatorText("Lighting");
+
 	ImGui::Checkbox("Visualize Normals", &bNormalVisualizeMode);
 	ImGui::Checkbox("Use Normal Mapping", &bUseNormalMapping);
 	ImGui::Checkbox("Use Parallax Mapping", &bUseParallaxMapping);
-
 	ImGui::DragFloat("Parallax Height Scale", &ParallaxHeightScale, 0.01f, 0.f, 1.f, "%f", ImGuiSliderFlags_AlwaysClamp);
-	UniformsCache["ParallaxHeightScale"] = ParallaxHeightScale;
+
+	static bool bUpdateViewPosDir = true;
+	ImGui::Checkbox("Update View Pos Dir", &bUpdateViewPosDir);
+
+	//////////////////////////////////////////////////////////////////////////
+	//
+	//////////////////////////////////////////////////////////////////////////
 
 	UniformsCache["bNormalVisualizeMode"] = bNormalVisualizeMode ? 1 : 0;
 	UniformsCache["bUseNormalMapping"] = bUseNormalMapping ? 1 : 0;
 	UniformsCache["bUseParallaxMapping"] = bUseParallaxMapping ? 1 : 0;
+	UniformsCache["ParallaxHeightScale"] = ParallaxHeightScale;
 
-	const glm::vec3 cameraPos = SceneManager::Get().GetCurrentScene().CurrentCamera->GetAbsoluteTransform().Translation;
+	const glm::vec3 cameraPos = SceneManager::Get().GetCurrentScene().GetCurrentCamera()->GetAbsoluteTransform().Translation;
 
-	const glm::vec3 forward = glm::vec3(0.f, 0.f, 1.f);
-	const glm::vec3 cameraForward = SceneManager::Get().GetCurrentScene().CurrentCamera->GetAbsoluteTransform().Rotation * forward;
+	constexpr glm::vec3 forward = glm::vec3(0.f, 0.f, 1.f);
+	const glm::vec3 cameraForward = SceneManager::Get().GetCurrentScene().GetCurrentCamera()->GetAbsoluteTransform().Rotation * forward;
 
-	static bool bUpdateViewPosDir = true;
-	ImGui::Checkbox("Update View Pos Dir", &bUpdateViewPosDir);
 	if (bUpdateViewPosDir)
 	{
 		UniformsCache["ViewPos"] = cameraPos;
 		UniformsCache["ViewDir"] = cameraForward;
 	}
 
-	ImGui::InputFloat3("Light Dir", &LightDir.x);
+	const bool useDirLight = dirLights.size() > 0;
+	UniformsCache["bUseDirLight"] = (int32_t)useDirLight;
 
-	UniformsCache["DirectionalLightDirection"] = glm::normalize(-LightDir);
+	if (useDirLight)
+	{
+		const LightData& dirLightData = dirLights[0];
+
+		const glm::vec3 dir = glm::eulerAngles(dirLightData.Source->GetAbsoluteTransform().Rotation);
+		UniformsCache["DirectionalLightDirection"] = glm::normalize(dir);
+	}
+	else
+	{
+		UniformsCache["DirectionalLightDirection"] = glm::vec3(0.f, 0.f, 0.f);
+	}
 
 
 	SPointLight test1;
@@ -236,11 +280,11 @@ void ForwardRenderer::SetupLightingConstants()
 	test2.ambient = glm::vec4(1.f, .0f, 0.f, 0.f);
 	//test.position = glm::vec3(0.f, 1.0f, 0.f);
 
-	eastl::vector<SPointLight> pointLights;
-	pointLights.push_back(test1);
-	pointLights.push_back(test2);
+	eastl::vector<SPointLight> shaderPointLightData;
+	shaderPointLightData.push_back(test1);
+	shaderPointLightData.push_back(test2);
 
-	UniformsCache["pointLightsTest"] = pointLights;
+	UniformsCache["PointLights"] = shaderPointLightData;
 }
 
 void ForwardRenderer::DrawSkybox()
@@ -298,10 +342,33 @@ glm::mat4 ForwardRenderer::CreateCascadeMatrix(const glm::mat4& inCameraProj, co
 
 eastl::vector<glm::mat4> ForwardRenderer::CreateCascadesMatrices()
 {
+	const eastl::vector<LightData>& lights = SceneManager::Get().GetCurrentScene().GetLights();
+	eastl::vector<LightData> dirLights;
+
+	for (const LightData& light : lights)
+	{
+		switch (light.Type)
+		{
+		case ELightType::Directional:
+		{
+			dirLights.push_back(light);
+			break;
+		}
+		}
+	}
+
+	ASSERT(dirLights.size() <= 1);
+
+	if (dirLights.size() == 0)
+	{
+		return {};
+	}
+
+	const glm::vec3 lightDir = glm::eulerAngles(dirLights[0].Source->GetAbsoluteTransform().Rotation);
+
 	eastl::vector<glm::mat4> cascades;
 	cascades.reserve(CascadesCount);
 
-	const glm::vec3 lightDir = glm::normalize(LightDir);
 	const glm::mat4& cameraView = UniformsCache["view"].GetValue<glm::mat4>();
 
 	const float windowWidth = static_cast<float>(Engine->GetMainWindow().GetProperties().Width);
@@ -423,7 +490,7 @@ void ForwardRenderer::DrawShadowMap()
 
 void ForwardRenderer::UpdateUniforms()
 {
-	const glm::mat4 view = SceneManager::Get().GetCurrentScene().CurrentCamera->GetLookAt();
+	const glm::mat4 view = SceneManager::Get().GetCurrentScene().GetCurrentCamera()->GetLookAt();
 	UniformsCache["view"] = view;
 }
 

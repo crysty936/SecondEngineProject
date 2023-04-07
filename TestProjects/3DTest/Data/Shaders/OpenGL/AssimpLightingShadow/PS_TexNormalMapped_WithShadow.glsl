@@ -1,7 +1,7 @@
 #extension GL_ARB_separate_shader_objects : enable
 layout(location = 0) out vec4 FragColor;
 
-struct PointLight {
+struct PointLightData {
 	vec3 position;
 
 	float linear;
@@ -21,19 +21,20 @@ in VS_OUT
 	mat3 TangentToWorld;
 } ps_in;
 
-layout(std140, binding = 1) uniform ShadowDataBuffer
+layout(std140, binding = 1) uniform CascadedShadowDataBuffer
 {
 	mat4 lsMatrices[3];
 	mat4 ShadowCameraViewMatrix;
-	vec4 DirectionalLightDirection;
 	int cascadesCount;
 	float shadowCascadeFarPlanes[3];
 } shadowBuffer;
 
 layout(std140, binding = 2) uniform LightingDataBuffer
 {
+	int bUseDirLight;
+	vec3 DirectionalLightDir;
 	vec3 viewPos;
-	PointLight test[3];
+	PointLightData PointLights[3];
 	int bHasNormalMap;
 } lightDataBuffer;
 
@@ -94,10 +95,10 @@ float CalculateShadow()
 	float pixelLightSpaceDepth = lsPosFinal.z;
 
 	// 2 different ways of calculating bias 
-	float cosTheta = clamp(dot(ps_in.VertexNormal, shadowBuffer.DirectionalLightDirection.xyz), 0.0, 1.0);
+	float cosTheta = clamp(dot(ps_in.VertexNormal, lightDataBuffer.DirectionalLightDir), 0.0, 1.0);
 	float bias = 0.005 * tan(acos(cosTheta));
 	bias = clamp(bias, 0.0, 0.05);
-	//float bias = max(0.005 * (1.0 - clamp(dot(ps_in.Normal, ShadowDataBuffer.DirectionalLightDirection.xyz), 0.0, 1.0)), 0.005);
+	//float bias = max(0.005 * (1.0 - clamp(dot(ps_in.Normal, lightDataBuffer.DirectionalLightDir), 0.0, 1.0)), 0.005);
 
 	float farPlane = 200.0;
 	// 	if (layer == cascadeCount)
@@ -188,10 +189,10 @@ float CalculateShadow()
 vec3 CalcDirLight(vec3 lightDir, vec3 normal, vec3 viewDir)
 {
 	// diffuse shading
-	float diff = max(dot(normal, lightDir), 0.0);
+	float diff = clamp(dot(normal, lightDir), 0.0, 1.0);
 	// specular shading
 	vec3 reflectDir = reflect(-lightDir, normal);
-	float spec = pow(max(dot(viewDir, reflectDir), 0.0), 0.5);
+	float spec = pow(clamp(dot(viewDir, reflectDir), 0.0, 1.0), 2.0);
 	// combine results
 	vec3 ambient = 0.2 * vec3(texture(DiffuseMap, ps_in.TexCoords));
 	vec3 diffuse = diff * vec3(texture(DiffuseMap, ps_in.TexCoords));
@@ -199,7 +200,6 @@ vec3 CalcDirLight(vec3 lightDir, vec3 normal, vec3 viewDir)
 
 	return (ambient + diffuse + specular);
 }
-
 
 // vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 // {
@@ -231,7 +231,7 @@ void main()
 
 	vec4 worldPos = vec4(ps_in.worldPos, 1.0);
 	vec4 fragPosViewSpace = shadowBuffer.ShadowCameraViewMatrix * worldPos;
-	vec3 color;
+	vec3 color = vec3(0.0, 0.0, 0.0);
 	if (bool(debugBuffer.bShadowVisualizeMode))
 	{
 		// Recalculated for debug
@@ -291,7 +291,9 @@ void main()
 		// modify to 0 = fully shadowed, 1 = fully lit
 		float shadowModifier = 1 - shadow;
 
-		vec3 ambientColor = texture(DiffuseMap, ps_in.TexCoords).xyz;
+		vec3 viewToFragW = normalize(lightDataBuffer.viewPos - ps_in.worldPos);
+		vec3 wsNormal;
+
 		if (bool(debugBuffer.bUseNormalMapping) && bool(lightDataBuffer.bHasNormalMap))
 		{
 			// 			mat3 WorldToTangent = transpose(ps_in.TangentToWorld);
@@ -304,17 +306,19 @@ void main()
 			// 
 			// 			vec3 dirLightColor = diffPower * texture(DiffuseMap, ps_in.TexCoords).xyz;
 
-			vec3 wsNormal = normalize(ps_in.TangentToWorld * mapNormal);
-
-			color = shadowModifier * CalcDirLight(shadowBuffer.DirectionalLightDirection.xyz, wsNormal, normalize(lightDataBuffer.viewPos - ps_in.worldPos));
+			wsNormal = normalize(ps_in.TangentToWorld * mapNormal);
 		}
 		else
 		{
-			vec3 wsNormal = normalize(ps_in.VertexNormal);
-			color = shadowModifier * CalcDirLight(shadowBuffer.DirectionalLightDirection.xyz, wsNormal, normalize(lightDataBuffer.viewPos - ps_in.worldPos));
+			wsNormal = normalize(ps_in.VertexNormal);
 		}
 
-		//color = shadowModifier * vec3(1.0, 0.0, 0.0);
+		if (bool(lightDataBuffer.bUseDirLight))
+		{
+			color += shadowModifier * CalcDirLight(lightDataBuffer.DirectionalLightDir, wsNormal, viewToFragW);
+		}
+
+
 	}
 
 	FragColor = vec4(color, 1.0);

@@ -5,6 +5,7 @@ struct SPointLight {
 
 	float linear;
 	float quadratic;
+
 	float padding1;
 	float padding2;
 

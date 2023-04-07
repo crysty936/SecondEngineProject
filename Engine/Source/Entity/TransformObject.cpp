@@ -1,4 +1,5 @@
 #include "TransformObject.h"
+#include "glm/gtc/constants.hpp"
 
 TransformObject::TransformObject(const eastl::string& inName)
 	: Name{inName}
@@ -17,7 +18,7 @@ const Transform TransformObject::GetRelativeTransform() const
 {
 	Transform newTransform;
 	newTransform.Translation = Location;
-	newTransform.Rotation = Rotation;
+	newTransform.Rotation = glm::radians(Rotation);
 	newTransform.Scale = Scale;
 
 	return newTransform;
@@ -57,26 +58,32 @@ void TransformObject::Rotate(const float inAmount, const glm::vec3 inAxis)
 {
 	const float radians = glm::radians(inAmount);
 	const glm::quat additiveRotation = glm::angleAxis(radians, inAxis);
-	const glm::quat currentRotation(Rotation);
+	const glm::quat currentRotation(glm::radians(Rotation));
 
 	const glm::quat newRotation = currentRotation * additiveRotation;
-	const glm::vec3 newRotationEuler = glm::eulerAngles(newRotation);
+	const glm::vec3 newRotationEulerRadians = glm::eulerAngles(newRotation);
 
-	SetRotation(newRotationEuler);
+	SetRotationRadians(newRotationEulerRadians);
 
 	glm::mat4 mat = GetAbsoluteTransform().GetMatrix();
 }
 
-void TransformObject::SetRotation(const glm::vec3 inNewRotation)
+void TransformObject::SetRotationEuler(const glm::vec3 inNewRotation)
 {
 	Rotation = inNewRotation;
+	MakeTransfDirty();
+}
+
+void TransformObject::SetRotationRadians(const glm::vec3 inNewRotation)
+{
+	Rotation = glm::degrees(inNewRotation);
 	MakeTransfDirty();
 }
 
 void TransformObject::SetRelTransform(const Transform& inNewTransf)
 {
 	Location = inNewTransf.Translation;
-	Rotation =  glm::eulerAngles(inNewTransf.Rotation);
+	Rotation =  glm::degrees(glm::eulerAngles(inNewTransf.Rotation));
 	Scale = inNewTransf.Scale;
 	MakeTransfDirty();
 }
@@ -110,7 +117,7 @@ void TransformObject::LookAt(const glm::vec3 inTarget)
 	const glm::quat q = glm::quat_cast(rotationMatrix);
 	const glm::vec3 angles = glm::eulerAngles(q);
 
-	SetRotation(angles);
+	SetRotationRadians(angles);
 }
 
 void TransformObject::MakeTransfDirty() const

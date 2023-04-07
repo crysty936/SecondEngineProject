@@ -109,7 +109,7 @@ void DrawDebugManager::Draw()
 {
 	// Points
 	{
-		const eastl::vector<glm::vec3> debugPoints = Get().GetPoints();
+		const eastl::vector<glm::vec3> debugPoints = Get().DebugPoints;
 
 		const int32_t numPoints = static_cast<int32_t>(debugPoints.size());
 
@@ -160,7 +160,7 @@ void DrawDebugManager::Draw()
 
 	// Lines
 	{
-		const eastl::vector<DebugLine> debugLines = Get().GetLines();
+		const eastl::vector<DebugLine> debugLines = Get().DebugLines;
 
 		VertexInputLayout inputLayout;
 		// Vertex points

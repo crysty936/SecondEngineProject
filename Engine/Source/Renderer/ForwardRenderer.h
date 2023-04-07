@@ -91,6 +91,11 @@ private:
 	bool bUseNormalMapping = true;
 	bool bUseParallaxMapping = true;
 	float ParallaxHeightScale = 0.1f;
+
+
+
+
+
 };
 
 extern const uint32_t SHADOW_WIDTH;

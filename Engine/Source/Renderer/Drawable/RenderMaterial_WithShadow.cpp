@@ -16,7 +16,6 @@ void RenderMaterial_WithShadow::SetRequiredUniforms()
 	eastl::vector<UniformWithFlag> defaultUniforms = {
 	{"lsMatrices", 3},
 	{"ShadowCameraViewMatrix"},
-	{"DirectionalLightDirection"},
 	{"cascadesCount"},
 	{"shadowCascadeFarPlanes", 3},
 	};
@@ -25,8 +24,10 @@ void RenderMaterial_WithShadow::SetRequiredUniforms()
 
 
 	eastl::vector<UniformWithFlag> LightingUniforms = {
+		{"bUseDirLight"},
+		{"DirectionalLightDirection"},
 		{"ViewPos"},
-		{"pointLightsTest", 3},
+		{"PointLights", 3},
 		{"bHasNormalMap"},
 	};
 

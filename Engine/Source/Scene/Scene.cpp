@@ -1,8 +1,13 @@
 #include "Scene.h"
 #include "Entity/Entity.h"
 #include "imgui.h"
+#include "Camera/Camera.h"
 
-Scene::Scene() = default;
+Scene::Scene()
+{
+	CurrentCamera = eastl::make_shared<Camera>();
+}
+
 Scene::~Scene() = default;
 
 void Scene::TickObjects(float inDeltaT)
@@ -28,8 +33,6 @@ void Scene::DisplayObjects()
 
 	ImGui::End();
 }
-
-
 
 void Scene::RecursivelyTickObjects(float inDeltaT, eastl::vector<TransformObjPtr>& inObjects)
 {

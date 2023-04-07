@@ -43,7 +43,7 @@ void Editor::Internal_PostInit()
 
 	SceneManager& sManager = SceneManager::Get();
 	Scene& currentScene = sManager.GetCurrentScene();
-	ViewportCamera = currentScene.CurrentCamera;
+	ViewportCamera = currentScene.GetCurrentCamera();
 	ViewportCamera->SetMovementDelegates(*Controller);
 
 
