@@ -56,7 +56,7 @@ public:
 	inline eastl::unordered_map<eastl::string, SelfRegisteringUniform>& GetUniformsCache() const { return UniformsCache; };
 
 private:
-	void SetupLightingConstants();
+	void SetLightingConstants();
 	void DrawSkybox();
 	void DrawShadowMap();
 	void SetBaseUniforms();

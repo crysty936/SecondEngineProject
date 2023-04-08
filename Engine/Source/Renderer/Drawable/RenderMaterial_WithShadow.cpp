@@ -26,8 +26,10 @@ void RenderMaterial_WithShadow::SetRequiredUniforms()
 	eastl::vector<UniformWithFlag> LightingUniforms = {
 		{"bUseDirLight"},
 		{"DirectionalLightDirection"},
+		{"DebugLightPos"},
 		{"ViewPos"},
 		{"PointLights", 3},
+		{"NumPointLights"},
 		{"bHasNormalMap"},
 	};
 

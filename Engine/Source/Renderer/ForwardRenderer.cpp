@@ -126,7 +126,6 @@ void ForwardRenderer::SetBaseUniforms()
 	RHI::Get()->PrepareProjectionForRendering(projection);
 
 	UniformsCache["projection"] = projection;
-	UniformsCache["DirectionalLightCascadedShadowTexture"] = DirectionalLightCascadedShadowTexture;
 }
 
 void ForwardRenderer::Init(const WindowProperties& inMainWindowProperties)
@@ -162,7 +161,7 @@ void ForwardRenderer::Draw()
 
 	DrawShadowMap();
 
-	SetupLightingConstants();
+	SetLightingConstants();
 
 	// Clear default framebuffer buffers
 	RHI::Get()->ClearBuffers();
@@ -198,7 +197,7 @@ void ForwardRenderer::Present()
 	RHI::Get()->SwapBuffers();
 }
 
-void ForwardRenderer::SetupLightingConstants()
+void ForwardRenderer::SetLightingConstants()
 {
 	const eastl::vector<LightData>& lights = SceneManager::Get().GetCurrentScene().GetLights();
 
@@ -266,8 +265,10 @@ void ForwardRenderer::SetupLightingConstants()
 	{
 		const LightData& dirLightData = dirLights[0];
 
-		const glm::vec3 dir = glm::eulerAngles(dirLightData.Source->GetAbsoluteTransform().Rotation);
+		const glm::vec3 dir = dirLightData.Source->GetAbsoluteTransform().Rotation * glm::vec3(0.f, 0.f, 1.f);
 		UniformsCache["DirectionalLightDirection"] = glm::normalize(dir);
+
+		UniformsCache["DebugLightPos"] = dirLightData.Source->GetAbsoluteTransform().Translation;
 	}
 	else
 	{
@@ -284,6 +285,7 @@ void ForwardRenderer::SetupLightingConstants()
 	shaderPointLightData.push_back(test1);
 	shaderPointLightData.push_back(test2);
 
+	UniformsCache["NumPointLights"] =  static_cast<int32_t>(shaderPointLightData.size());
 	UniformsCache["PointLights"] = shaderPointLightData;
 }
 
@@ -363,8 +365,9 @@ eastl::vector<glm::mat4> ForwardRenderer::CreateCascadesMatrices()
 	{
 		return {};
 	}
+	UniformsCache["DirectionalLightCascadedShadowTexture"] = DirectionalLightCascadedShadowTexture;
 
-	const glm::vec3 lightDir = glm::eulerAngles(dirLights[0].Source->GetAbsoluteTransform().Rotation);
+	const glm::vec3 lightDir = dirLights[0].Source->GetAbsoluteTransform().Rotation * glm::vec3(0.f, 0.f, 1.f);
 
 	eastl::vector<glm::mat4> cascades;
 	cascades.reserve(CascadesCount);
@@ -498,7 +501,7 @@ void ForwardRenderer::DrawCommands(const eastl::vector<RenderCommand>& inCommand
 {
 	// TODO: Fix the draw mode thing with objects being able to tell which passes they are in
 	// and the renderer being able to use certain passes
-	if (CurrentDrawMode == EDrawMode::Default)
+	if (CurrentDrawMode & EDrawMode::Default)
 	{
 		const int32_t builtInPassesCount = glm::log2((int)EDrawMode::Count);
 		for (int i = 0; i < builtInPassesCount; ++i)
@@ -519,7 +522,7 @@ void ForwardRenderer::DrawCommands(const eastl::vector<RenderCommand>& inCommand
 	{
 		for (const RenderCommand& renderCommand : inCommands)
 		{
-			if (CurrentDrawMode == EDrawMode::DEPTH && !renderCommand.Material->bCastShadow)
+			if (CurrentDrawMode & EDrawMode::DEPTH && !renderCommand.Material->bCastShadow)
 			{
 				continue;
 			}

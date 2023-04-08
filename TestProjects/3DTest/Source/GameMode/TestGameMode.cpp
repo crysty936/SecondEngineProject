@@ -419,7 +419,7 @@ void TestGameMode::Init()
   	{
 		DirLight = EntityHelper::CreateObject<LightSource>("Directional Light", ELightType::Directional);
 		DirLight->SetRelativeLocation({ -2.0f, 20.0f, -1.0f });
-		DirLight->Rotate(20.f, glm::vec3(0.f, 1.f, 0.f));
+		DirLight->SetRotationDegrees(glm::vec3(80.f, 0.f, 0.f));
   	}
 
 
