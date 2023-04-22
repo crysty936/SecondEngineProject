@@ -29,6 +29,7 @@ void main()
 	//float depthValue = texture(quadTexture, inTexCoords).r;
 	//FragColor = vec4(vec3(depthValue), 1.0);
 
-	vec4 color = texture(quadTexture, ps_in.TexCoords);
-	FragColor = color;
+	vec4 diffuse = texture(quadTexture, ps_in.TexCoords);
+	vec3 color = pow(diffuse.xyz, vec3(1.0 / 2.2));
+	FragColor = vec4(color.xyz, diffuse.w);
 }
