@@ -257,8 +257,8 @@ void Skybox::CreateProxy()
 	//RHI->SetSkyboxCommand(newCommand);
 }
 
-LightSource::LightSource(const eastl::string& inName, const ELightType inType)
-	: Model3D(inName), Type{inType}
+LightSource::LightSource(const eastl::string& inName)
+	: Model3D(inName)
 {
 
 }
@@ -266,9 +266,7 @@ LightSource::~LightSource() = default;
 
 void LightSource::CreateProxy()
 {
-	LightData lData{ Type,  this_shared(this)};
-
-	SceneManager::Get().GetCurrentScene().AddLight(lData);
+	SceneManager::Get().GetCurrentScene().AddLight(this_shared(this));
 
 	const eastl::string RenderDataContainerID = "lightVAO";
 	eastl::shared_ptr<MeshDataContainer> dataContainer{ nullptr };

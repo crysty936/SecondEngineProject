@@ -199,14 +199,14 @@ void ForwardRenderer::Present()
 
 void ForwardRenderer::SetLightingConstants()
 {
-	const eastl::vector<LightData>& lights = SceneManager::Get().GetCurrentScene().GetLights();
+	const eastl::vector<eastl::shared_ptr<LightSource>>& lights = SceneManager::Get().GetCurrentScene().GetLights();
+	
+	eastl::vector<eastl::shared_ptr<LightSource>> dirLights;
+	eastl::vector<eastl::shared_ptr<LightSource>> pointLights;
 
-	eastl::vector<LightData> dirLights;
-	eastl::vector<LightData> pointLights;
-
-	for (const LightData& light : lights)
+	for (const eastl::shared_ptr<LightSource>& light : lights)
 	{
-		switch (light.Type)
+		switch (light->Data.Type)
 		{
 		case ELightType::Directional:
 		{
@@ -229,18 +229,18 @@ void ForwardRenderer::SetLightingConstants()
 
 	ImGui::SeparatorText("Lighting");
 
-	ImGui::Checkbox("Visualize Normals", &bNormalVisualizeMode);
-	ImGui::Checkbox("Use Normal Mapping", &bUseNormalMapping);
-
 	static bool bUpdateViewPosDir = true;
 	ImGui::Checkbox("Update View Pos Dir", &bUpdateViewPosDir);
+
+	ImGui::Checkbox("Visualize Normals", &bNormalVisualizeMode);
+	UniformsCache["bNormalVisualizeMode"] = bNormalVisualizeMode ? 1 : 0;
+
+	ImGui::Checkbox("Use Normal Mapping", &bUseNormalMapping);
+	UniformsCache["bUseNormalMapping"] = bUseNormalMapping ? 1 : 0;
 
 	//////////////////////////////////////////////////////////////////////////
 	//
 	//////////////////////////////////////////////////////////////////////////
-
-	UniformsCache["bNormalVisualizeMode"] = bNormalVisualizeMode ? 1 : 0;
-	UniformsCache["bUseNormalMapping"] = bUseNormalMapping ? 1 : 0;
 
 	const glm::vec3 cameraPos = SceneManager::Get().GetCurrentScene().GetCurrentCamera()->GetAbsoluteTransform().Translation;
 
@@ -258,12 +258,10 @@ void ForwardRenderer::SetLightingConstants()
 
 	if (useDirLight)
 	{
-		const LightData& dirLightData = dirLights[0];
+		const eastl::shared_ptr<LightSource>& dirLight = dirLights[0];
 
-		const glm::vec3 dir = dirLightData.Source->GetAbsoluteTransform().Rotation * glm::vec3(0.f, 0.f, 1.f);
+		const glm::vec3 dir = dirLight->GetAbsoluteTransform().Rotation * glm::vec3(0.f, 0.f, 1.f);
 		UniformsCache["DirectionalLightDirection"] = glm::normalize(dir);
-
-		UniformsCache["DebugLightPos"] = dirLightData.Source->GetAbsoluteTransform().Translation;
 	}
 	else
 	{
@@ -271,20 +269,15 @@ void ForwardRenderer::SetLightingConstants()
 	}
 
 
-	//SPointLight test1;
-	//SPointLight test2;
-	//test2.ambient = glm::vec4(1.f, .0f, 0.f, 0.f);
-	//test.position = glm::vec3(0.f, 1.0f, 0.f);
-
 	eastl::vector<SPointLight> shaderPointLightData;
-	for (const LightData& data : pointLights)
+	for (const eastl::shared_ptr<LightSource>& light : pointLights)
 	{
 		SPointLight pointLight;
 
-		const Transform& lightTransf = data.Source->GetAbsoluteTransform();
+		const Transform& lightTransf = light->GetAbsoluteTransform();
 		pointLight.position = glm::vec4(lightTransf.Translation.x, lightTransf.Translation.y, lightTransf.Translation.z, 0.f);
 
-		const PointLightData& pointData = data.TypeData.PointData;
+		const PointLightData& pointData = light->Data.TypeData.PointData;
 		
 		pointLight.linear = pointData.Linear;
 		pointLight.linear = pointData.Linear;
@@ -353,12 +346,12 @@ glm::mat4 ForwardRenderer::CreateCascadeMatrix(const glm::mat4& inCameraProj, co
 
 eastl::vector<glm::mat4> ForwardRenderer::CreateCascadesMatrices()
 {
-	const eastl::vector<LightData>& lights = SceneManager::Get().GetCurrentScene().GetLights();
-	eastl::vector<LightData> dirLights;
+	const eastl::vector<eastl::shared_ptr<LightSource>>& lights = SceneManager::Get().GetCurrentScene().GetLights();
+	eastl::vector<eastl::shared_ptr<LightSource>> dirLights;
 
-	for (const LightData& light : lights)
+	for (const eastl::shared_ptr<LightSource>& light : lights)
 	{
-		switch (light.Type)
+		switch (light->Data.Type)
 		{
 		case ELightType::Directional:
 		{
@@ -368,15 +361,16 @@ eastl::vector<glm::mat4> ForwardRenderer::CreateCascadesMatrices()
 		}
 	}
 
+	UniformsCache["DirectionalLightCascadedShadowTexture"] = DirectionalLightCascadedShadowTexture;
+
 	ASSERT(dirLights.size() <= 1);
 
 	if (dirLights.size() == 0)
 	{
 		return {};
 	}
-	UniformsCache["DirectionalLightCascadedShadowTexture"] = DirectionalLightCascadedShadowTexture;
 
-	const glm::vec3 lightDir = dirLights[0].Source->GetAbsoluteTransform().Rotation * glm::vec3(0.f, 0.f, 1.f);
+	const glm::vec3 lightDir = dirLights[0]->GetAbsoluteTransform().Rotation * glm::vec3(0.f, 0.f, 1.f);
 
 	eastl::vector<glm::mat4> cascades;
 	cascades.reserve(CascadesCount);

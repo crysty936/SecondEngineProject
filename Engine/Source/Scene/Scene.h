@@ -3,6 +3,7 @@
 #include "EASTL/shared_ptr.h"
 #include "Entity/TransformObject.h"
 #include "Renderer/LightTypes.h"
+#include "Renderer/Drawable/ShapesUtils/BasicShapes.h"
 
 /**
  * Scene should contain all objects present in that scene as gameobjects.
@@ -25,8 +26,8 @@ public:
 	void DisplayObjects();
 
 	inline eastl::shared_ptr<class Camera>& GetCurrentCamera();
-	inline void AddLight(const LightData& inLightData);
-	inline const eastl::vector<LightData>& GetLights() const;
+	inline void AddLight(const eastl::shared_ptr<LightSource>& inLightData);
+	inline const eastl::vector<eastl::shared_ptr<LightSource>>& GetLights() const;
 
 
 private:
@@ -37,7 +38,7 @@ private:
 private:
 	eastl::vector<TransformObjPtr> Objects;
 	eastl::shared_ptr<class Camera> CurrentCamera;
-	eastl::vector<LightData> Lights;
+	eastl::vector<eastl::shared_ptr<LightSource>> Lights;
 };
 
 
@@ -46,12 +47,12 @@ eastl::shared_ptr<class Camera>& Scene::GetCurrentCamera()
 	return CurrentCamera;
 }
 
-void Scene::AddLight(const LightData& inLightData)
+void Scene::AddLight(const eastl::shared_ptr<LightSource>& inLightData)
 {
 	Lights.push_back(inLightData);
 }
 
-const eastl::vector<LightData>& Scene::GetLights() const
+const eastl::vector<eastl::shared_ptr<LightSource>>& Scene::GetLights() const
 {
 	return Lights;
 }

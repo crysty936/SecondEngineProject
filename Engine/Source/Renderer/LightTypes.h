@@ -24,7 +24,6 @@ enum class ELightType
 struct LightData
 {
 	ELightType Type;
-	TransformObjPtr Source;
 
 	union {
 		DirLightData DirData;

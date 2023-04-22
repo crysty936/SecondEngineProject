@@ -43,10 +43,10 @@ public:
 class LightSource : public Model3D
 {
 public:
-	LightSource(const eastl::string& inName, const ELightType inType);
+	LightSource(const eastl::string& inName);
 	virtual ~LightSource();
 
-	ELightType Type = ELightType::Directional;
+	LightData Data;
 
 	virtual void CreateProxy() override;
 };

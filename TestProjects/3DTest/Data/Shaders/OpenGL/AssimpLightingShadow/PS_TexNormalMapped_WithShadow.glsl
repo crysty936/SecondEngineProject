@@ -31,7 +31,6 @@ layout(std140, binding = 2) uniform LightingDataBuffer
 {
 	int bUseDirLight;
 	vec3 DirectionalLightDir;
-	vec3 DebugLightPos;
 	vec3 viewPos;
 	PointLightData PointLights[3];
 	int NumPointLights;
@@ -328,24 +327,6 @@ void main()
 
 
 	}
-
-	// test code
-
-//  	vec3 lightToFrag = normalize(ps_in.worldPos - lightDataBuffer.DebugLightPos);
-//  	float cosAngle = clamp(dot(lightDataBuffer.DirectionalLightDir, lightToFrag), 0, 1);
-//  
-//  	float coefficient = ceil(cosAngle - 0.9);
-//  	color = coefficient * vec3(0, 1, 0);
-
-
-	//vec3 fragToLight = -lightToFrag;
-	//float cosUpDir = clamp(dot(fragToLight, vec3(0, 1, 0)), 0, 1);
-	//float coefficient = ceil(cosUpDir - 0.9);
-
-
-	//color = coefficient * vec3(0, 1, 0);
-
-	//
 
 	FragColor = vec4(color, 1.0);
 }
