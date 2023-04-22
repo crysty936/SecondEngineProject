@@ -419,23 +419,42 @@ void TestGameMode::Init()
 // 
 
 
-  	{
-		DirLight = EntityHelper::CreateObject<LightSource>("Directional Light");
-		DirLight->Data.Type = ELightType::Directional;
-		DirLight->SetRelativeLocation({ -2.0f, 20.0f, -1.0f });
-		DirLight->SetRotationDegrees(glm::vec3(80.f, 0.f, 0.f));
-  	}
+//   	{
+// 		DirLight = EntityHelper::CreateObject<LightSource>("Directional Light");
+// 		DirLight->Data.Type = ELightType::Directional;
+// 		DirLight->SetRelativeLocation({ -2.0f, 20.0f, -1.0f });
+// 		DirLight->SetRotationDegrees(glm::vec3(80.f, 0.f, 0.f));
+//   	}
 
+	{
+		eastl::shared_ptr<LightSource> PointLight = EntityHelper::CreateObject<LightSource>("Point Light 1");
+		PointLight->Data.Type = ELightType::Point;
+		PointLight->Data.TypeData.PointData.Linear = 0.0014f;
+		PointLight->Data.TypeData.PointData.Quadratic = 0.000007f;
+		PointLight->Data.TypeData.PointData.Color = glm::vec3(1.f, 1.f, 1.f);
 
-	//{
-	//	DirLight = EntityHelper::CreateObject<LightSource>("Point Light", ELightType::Point);
-	//	DirLight->SetRelativeLocation({ -2.0f, 20.0f, -1.0f });
-	//	DirLight->SetRotationDegrees(glm::vec3(80.f, 0.f, 0.f));
+		PointLight->SetRelativeLocation({ -10.f, 1.0f, 35.f });
+	}
 
+	{
+		eastl::shared_ptr<LightSource> PointLight = EntityHelper::CreateObject<LightSource>("Point Light 2");
+		PointLight->Data.Type = ELightType::Point;
+		PointLight->Data.TypeData.PointData.Linear = 0.0014f;
+		PointLight->Data.TypeData.PointData.Quadratic = 0.000007f;
+		PointLight->Data.TypeData.PointData.Color = glm::vec3(1.f, 1.f, 1.f);
 
-	//}
+		PointLight->SetRelativeLocation({ -65.f, 1.0f, 0.f });
+	}
 
+	{
+		eastl::shared_ptr<LightSource> PointLight = EntityHelper::CreateObject<LightSource>("Point Light 3");
+		PointLight->Data.Type = ELightType::Point;
+		PointLight->Data.TypeData.PointData.Linear = 0.0014f;
+		PointLight->Data.TypeData.PointData.Quadratic = 0.000007f;
+		PointLight->Data.TypeData.PointData.Color = glm::vec3(1.f, 1.f, 1.f);
 
+		PointLight->SetRelativeLocation({ 22.f, 1.0f, -18.f });
+	}
 }
 
 void TestGameMode::Tick(float inDeltaT)
@@ -448,21 +467,29 @@ void TestGameMode::Tick(float inDeltaT)
 
 	//Quad->Rotate(0.1f, glm::vec3(-1.f, 0.f, 0.f));
 
-
 	glm::vec3 forward = glm::vec3(0.f, 0.f, 1.f);
 	glm::vec3 right = glm::vec3(1.f, 0.f, 0.f);
 	glm::vec3 up = glm::vec3(0.f, 1.f, 0.f);
 
- 	const glm::quat& rot = DirLight->GetAbsoluteTransform().Rotation;
+	const eastl::shared_ptr<LightSource>& usedLight = DirLight;
+
+	if (usedLight)
+	{
+ 		const glm::quat& rot = usedLight->GetAbsoluteTransform().Rotation;
  
- 	// order of operations matters, considered like a matrix
- 	forward = glm::normalize(rot * forward);
- 	right = glm::normalize(rot * right);
- 	up = glm::normalize(rot * up);
+ 		// order of operations matters, considered like a matrix
+ 		forward = glm::normalize(rot * forward);
+ 		right = glm::normalize(rot * right);
+ 		up = glm::normalize(rot * up);
  
- 	const glm::vec3 start = DirLight->GetAbsoluteTransform().Translation;
+ 		const glm::vec3 start = usedLight->GetAbsoluteTransform().Translation;
  
- 	DrawDebugHelpers::DrawDebugLine(start, start + forward * 20.f, glm::vec3(0.f, 0.f, 1.f));
- 	DrawDebugHelpers::DrawDebugLine(start, start + right * 20.f, glm::vec3(1.f, 0.f, 0.f));
- 	DrawDebugHelpers::DrawDebugLine(start, start + up * 20.f, glm::vec3(0.f, 1.f, 0.f));
+ 		DrawDebugHelpers::DrawDebugLine(start, start + forward * 20.f, glm::vec3(0.f, 0.f, 1.f));
+ 		DrawDebugHelpers::DrawDebugLine(start, start + right * 20.f, glm::vec3(1.f, 0.f, 0.f));
+ 		DrawDebugHelpers::DrawDebugLine(start, start + up * 20.f, glm::vec3(0.f, 1.f, 0.f));
+	}
+
+
+
+
 }

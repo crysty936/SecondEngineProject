@@ -46,6 +46,13 @@ void RenderMaterial::SetUniformsValue(eastl::unordered_map<eastl::string, SelfRe
 		// Register all required uniforms
 		for (UniformWithFlag& requiredUniform : buffer.RequiredUniforms)
 		{
+			//test code
+// 			if (requiredUniform.UniformName == "PointLights")
+// 			{
+// 				__debugbreak();
+// 			}
+			//
+
 			if (requiredUniform.IsSet)
 			{
 				continue;

@@ -280,8 +280,7 @@ void ForwardRenderer::SetLightingConstants()
 		const PointLightData& pointData = light->Data.TypeData.PointData;
 		
 		pointLight.linear = pointData.Linear;
-		pointLight.linear = pointData.Linear;
-
+		pointLight.quadratic = pointData.Quadratic;
 		pointLight.color = glm::vec4(pointData.Color.x, pointData.Color.y, pointData.Color.z, 0.f);
 
 		shaderPointLightData.push_back(pointLight);
