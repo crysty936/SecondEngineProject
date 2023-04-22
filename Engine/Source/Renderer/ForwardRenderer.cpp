@@ -202,7 +202,6 @@ void ForwardRenderer::SetLightingConstants()
 	const eastl::vector<LightData>& lights = SceneManager::Get().GetCurrentScene().GetLights();
 
 	eastl::vector<LightData> dirLights;
-
 	eastl::vector<LightData> pointLights;
 
 	for (const LightData& light : lights)
@@ -232,8 +231,6 @@ void ForwardRenderer::SetLightingConstants()
 
 	ImGui::Checkbox("Visualize Normals", &bNormalVisualizeMode);
 	ImGui::Checkbox("Use Normal Mapping", &bUseNormalMapping);
-	ImGui::Checkbox("Use Parallax Mapping", &bUseParallaxMapping);
-	ImGui::DragFloat("Parallax Height Scale", &ParallaxHeightScale, 0.01f, 0.f, 1.f, "%f", ImGuiSliderFlags_AlwaysClamp);
 
 	static bool bUpdateViewPosDir = true;
 	ImGui::Checkbox("Update View Pos Dir", &bUpdateViewPosDir);
@@ -244,8 +241,6 @@ void ForwardRenderer::SetLightingConstants()
 
 	UniformsCache["bNormalVisualizeMode"] = bNormalVisualizeMode ? 1 : 0;
 	UniformsCache["bUseNormalMapping"] = bUseNormalMapping ? 1 : 0;
-	UniformsCache["bUseParallaxMapping"] = bUseParallaxMapping ? 1 : 0;
-	UniformsCache["ParallaxHeightScale"] = ParallaxHeightScale;
 
 	const glm::vec3 cameraPos = SceneManager::Get().GetCurrentScene().GetCurrentCamera()->GetAbsoluteTransform().Translation;
 
@@ -276,14 +271,28 @@ void ForwardRenderer::SetLightingConstants()
 	}
 
 
-	SPointLight test1;
-	SPointLight test2;
-	test2.ambient = glm::vec4(1.f, .0f, 0.f, 0.f);
+	//SPointLight test1;
+	//SPointLight test2;
+	//test2.ambient = glm::vec4(1.f, .0f, 0.f, 0.f);
 	//test.position = glm::vec3(0.f, 1.0f, 0.f);
 
 	eastl::vector<SPointLight> shaderPointLightData;
-	shaderPointLightData.push_back(test1);
-	shaderPointLightData.push_back(test2);
+	for (const LightData& data : pointLights)
+	{
+		SPointLight pointLight;
+
+		const Transform& lightTransf = data.Source->GetAbsoluteTransform();
+		pointLight.position = glm::vec4(lightTransf.Translation.x, lightTransf.Translation.y, lightTransf.Translation.z, 0.f);
+
+		const PointLightData& pointData = data.TypeData.PointData;
+		
+		pointLight.linear = pointData.Linear;
+		pointLight.linear = pointData.Linear;
+
+		pointLight.color = glm::vec4(pointData.Color.x, pointData.Color.y, pointData.Color.z, 0.f);
+
+		shaderPointLightData.push_back(pointLight);
+	}
 
 	UniformsCache["NumPointLights"] =  static_cast<int32_t>(shaderPointLightData.size());
 	UniformsCache["PointLights"] = shaderPointLightData;
@@ -489,6 +498,7 @@ void ForwardRenderer::DrawShadowMap()
 
  	// Reset to default
 	//RHI::Instance->SetFaceCullMode(EFaceCullMode::Back);
+
 }
 
 void ForwardRenderer::UpdateUniforms()

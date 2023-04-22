@@ -89,9 +89,6 @@ private:
 	bool bCascadeVisualizeMode = false;
 	bool bNormalVisualizeMode = false;
 	bool bUseNormalMapping = true;
-	bool bUseParallaxMapping = true;
-	float ParallaxHeightScale = 0.1f;
-
 
 
 

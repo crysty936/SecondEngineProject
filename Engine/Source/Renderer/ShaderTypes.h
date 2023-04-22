@@ -9,8 +9,6 @@ struct SPointLight {
 	float padding1;
 	float padding2;
 
-	glm::vec4 ambient;
-	glm::vec4 diffuse;
-	glm::vec4 specular;
+	glm::vec4 color;
 };
 

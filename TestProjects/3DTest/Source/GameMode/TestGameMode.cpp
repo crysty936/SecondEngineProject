@@ -187,7 +187,8 @@ public:
 class ParallaxQuad : public Model3D
 {
 public:
-	ParallaxQuad() = default;
+	ParallaxQuad(const eastl::string& inName)
+		: Model3D(inName) {}
 	virtual ~ParallaxQuad() = default;
 
 	virtual void CreateProxy() override
@@ -384,7 +385,7 @@ void TestGameMode::Init()
 // 	concreteFloor->Move(glm::vec3(5.f, 0.f, 0.f));
 
 
-	//Quad = EntityHelper::CreateObject<ParallaxQuad>();
+	//Quad = EntityHelper::CreateObject<ParallaxQuad>("Parallax Quad");
 	//Quad->Rotate(90.f, glm::vec3(-1.f, 0.f, 0.f));
 
 	//eastl::shared_ptr<AssimpModel3D> sponzaModel = EntityHelper::CreateObject<AssimpModel3D>("../Data/Models/Sponza/scene.gltf");

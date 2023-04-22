@@ -73,9 +73,11 @@ void Scene::RecursivelyDisplayObjects(eastl::vector<TransformObjPtr>& inObjects,
 			if (displayChildNodes)
 			{
 				bool dirty = false;
-				dirty |= ImGui::InputFloat3("Position", &obj->Location.x);
-				dirty |= ImGui::InputFloat3("Rotation", &obj->Rotation.x);
-				dirty |= ImGui::InputFloat3("Scale", &obj->Scale.x);
+				constexpr float dragSpeed = 0.05f;
+
+				dirty |= ImGui::DragFloat3("Position", &obj->Location.x, dragSpeed);
+				dirty |= ImGui::DragFloat3("Rotation", &obj->Rotation.x, dragSpeed);
+				dirty |= ImGui::DragFloat3("Scale", &obj->Scale.x, dragSpeed);
 
 				if (dirty)
 				{
