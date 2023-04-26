@@ -6,13 +6,13 @@
 #include "Renderer/RenderCommand.h"
 #include "Renderer/ForwardRenderer.h"
 #include "Core/EntityHelper.h"
-#include "Renderer/Drawable/SkyboxMaterial.h"
+#include "Renderer/Drawable/Materials/SkyboxMaterial.h"
 #include "glad/glad.h"
 #include "Renderer/RHI/Resources/RHIVertexBuffer.h"
 #include "Renderer/RHI/RHI.h"
 #include "Renderer/RHI/Resources/RHIIndexBuffer.h"
-#include "Renderer/Drawable//BallTestMaterial.h"
-#include "Renderer/Drawable/RenderMaterial_WithShadow.h"
+#include "Renderer/Drawable/Materials/BallTestMaterial.h"
+#include "Renderer/Drawable/Materials/RenderMaterial_WithShadow.h"
 
 TriangleShape::TriangleShape(const eastl::string& inName)
 	: DrawableObject(inName)
@@ -383,7 +383,6 @@ void MirrorQuad::CreateProxy()
 
 }
 
-
 class FullScreenQuadMaterial : public RenderMaterial
 {
 
@@ -392,7 +391,7 @@ public:
 	{}
 };
 
-FullScreenQuad::FullScreenQuad(eastl::shared_ptr<RHITexture2D>& inTexture, const eastl::string& inName)
+FullScreenQuad::FullScreenQuad(const eastl::string& inName)
 	: DrawableObject(inName)
 {
 }

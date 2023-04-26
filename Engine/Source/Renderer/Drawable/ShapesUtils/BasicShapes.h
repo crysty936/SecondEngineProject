@@ -63,7 +63,7 @@ public:
 class FullScreenQuad : public DrawableObject, public IDrawableContainer
 {
 public:
-	FullScreenQuad(eastl::shared_ptr<RHITexture2D>& inTexture, const eastl::string& inName);
+	FullScreenQuad(const eastl::string& inName);
 	virtual ~FullScreenQuad();
 
 	void CreateProxy() override;

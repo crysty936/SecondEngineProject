@@ -15,7 +15,7 @@
 #include "Renderer/RHI/Resources/MeshDataContainer.h"
 #include "Renderer/Material/MaterialsManager.h"
 #include "Core/EntityHelper.h"
-#include "Renderer/Drawable/DepthMaterial.h"
+#include "Renderer/Drawable/Materials/DepthMaterial.h"
 #include "Core/WindowsPlatform.h"
 #include "glm/gtc/integer.hpp"
 
@@ -28,7 +28,7 @@
 #include "Renderer/RHI/Resources/RHITexture.h"
 #include "Drawable/ShapesUtils/BasicShapes.h"
 #include "EASTL/stack.h"
-#include "Drawable/RenderMaterial_Debug.h"
+#include "Drawable/Materials/RenderMaterial_Debug.h"
 #include "DrawDebugHelpers.h"
 #include "RenderUtils.h"
 #include "Math/AABB.h"
@@ -136,12 +136,11 @@ void ForwardRenderer::Init(const WindowProperties& inMainWindowProperties)
 	GlobalRenderTexture = RHI::Get()->CreateRenderTexture();
 	RHI::Get()->AttachTextureToFramebufferColor(*GlobalFrameBuffer, *GlobalRenderTexture);
 
-	ScreenQuad = EntityHelper::CreateObject<FullScreenQuad>(GlobalRenderTexture, "Global Renderer Screen Quad");
+	ScreenQuad = EntityHelper::CreateObject<FullScreenQuad>("Global Renderer Screen Quad");
 	ScreenQuad->CreateCommand();
 	ScreenQuad->GetCommand().Material->OwnedTextures.push_back(GlobalRenderTexture);
 
 	DepthFrameBuffer = RHI::Get()->CreateEmptyFrameBuffer();
-	//DepthRenderTexture = RHI::Instance->CreateDepthMap(SHADOW_WIDTH, SHADOW_HEIGHT);
 	DirectionalLightCascadedShadowTexture = RHI::Get()->CreateArrayDepthMap(SHADOW_WIDTH, SHADOW_HEIGHT, MAX_CASCADES_COUNT);
 	RHI::Get()->AttachTextureToFramebufferDepth(*DepthFrameBuffer, *DirectionalLightCascadedShadowTexture);
 }
@@ -166,28 +165,28 @@ void ForwardRenderer::Draw()
 	// Clear default framebuffer buffers
 	RHI::Get()->ClearBuffers();
 
-	//RHI::Instance->BindFrameBuffer(*GlobalFrameBuffer);
-	//RHI::Instance->ClearTexture(*GlobalRenderTexture, glm::vec4(0.f, 0.f, 0.f, 1.f));
+	RHI::Instance->BindFrameBuffer(*GlobalFrameBuffer);
+	RHI::Instance->ClearTexture(*GlobalRenderTexture, glm::vec4(0.f, 0.f, 0.f, 1.f));
 
 	// Clear additional framebuffer buffers
-	//RHI::Instance->ClearBuffers();
-// 
+	RHI::Instance->ClearBuffers();
 
     DrawCommands(MainCommands);
 
-	//RHI::Instance->UnbindFrameBuffer(*GlobalFrameBuffer);
+	// Draw debug primitives
+	DrawDebugManager::Draw();
 
+	RHI::Instance->UnbindFrameBuffer(*GlobalFrameBuffer);
 
+	SetDrawMode(EDrawMode::Default);
 
 // To draw the depth map
 //  	SetDrawMode(EDrawMode::DEPTH_VISUALIZE);
 //  	ScreenQuad->GetCommand().Material->WeakTextures.clear();
 //  	ScreenQuad->GetCommand().Material->WeakTextures.push_back(DepthRenderTexture);
-//  	DrawCommand(ScreenQuad->GetCommand());
 
+  	DrawCommand(ScreenQuad->GetCommand());
 
-	// Draw debug primitives
-	DrawDebugManager::Draw();
 
 	ImGui::End();
 }

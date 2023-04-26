@@ -1,4 +1,4 @@
-#include "Renderer/Drawable/SkyboxMaterial.h"
+#include "Renderer/Drawable/Materials/SkyboxMaterial.h"
 #include "Renderer/SelfRegisteringUniform/SelfRegisteringUniform.h"
 #include "Core/EngineUtils.h"
 

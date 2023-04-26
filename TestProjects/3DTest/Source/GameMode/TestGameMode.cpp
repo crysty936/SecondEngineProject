@@ -15,15 +15,14 @@
 #include "Renderer/RHI/RHI.h"
 #include "Renderer/Material/MaterialsManager.h"
 #include "Utils/InlineVector.h"
-#include "Renderer/Drawable/RenderMaterial_Parallax.h"
-#include "Renderer/Drawable/RenderMaterial_Billboard.h"
+#include "Renderer/Drawable/Materials/RenderMaterial_Parallax.h"
+#include "Renderer/Drawable/Materials/RenderMaterial_Billboard.h"
 #include "Renderer/DrawDebugHelpers.h"
 
 TestGameMode GGameMode = {};
 
 TestGameMode::TestGameMode() = default;
 TestGameMode::~TestGameMode() = default;
-
 
 class InstancedAssimpModelTest : public AssimpModel3D
 {
@@ -434,7 +433,7 @@ void TestGameMode::Init()
 		PointLight->Data.Type = ELightType::Point;
 		PointLight->Data.TypeData.PointData.Linear = linear;
 		PointLight->Data.TypeData.PointData.Quadratic = quadratic;
-		PointLight->Data.TypeData.PointData.Color = glm::vec3(1.f, 1.f, 1.f);
+		PointLight->Data.TypeData.PointData.Color = glm::vec3(0.f, 0.5f, 0.f);
 
 		PointLight->SetRelativeLocation({ -10.f, 1.0f, 35.f });
 	}
@@ -444,7 +443,7 @@ void TestGameMode::Init()
 		PointLight->Data.Type = ELightType::Point;
 		PointLight->Data.TypeData.PointData.Linear = linear;
 		PointLight->Data.TypeData.PointData.Quadratic = quadratic;
-		PointLight->Data.TypeData.PointData.Color = glm::vec3(1.f, 1.f, 1.f);
+		PointLight->Data.TypeData.PointData.Color = glm::vec3(0.f, 0.f, 0.2f);
 
 		PointLight->SetRelativeLocation({ -65.f, 1.0f, 0.f });
 	}
@@ -454,7 +453,7 @@ void TestGameMode::Init()
 		PointLight->Data.Type = ELightType::Point;
 		PointLight->Data.TypeData.PointData.Linear = linear;
 		PointLight->Data.TypeData.PointData.Quadratic = quadratic;
-		PointLight->Data.TypeData.PointData.Color = glm::vec3(1.f, 1.f, 1.f);
+		PointLight->Data.TypeData.PointData.Color = glm::vec3(100.f, 100.f, 100.f);
 
 		PointLight->SetRelativeLocation({ 22.f, 1.0f, -18.f });
 	}

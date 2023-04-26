@@ -4,13 +4,14 @@
 
 enum class ETextureType
 {
-	Default, // 2D
+	Single, // 2D
 	Array
 };
 
 enum class ERHITextureChannelsType
 {
 	RGBA,
+	RGBAHDR,
 	Depth
 };
 
@@ -24,6 +25,6 @@ public:
 	// TODO: Debug only
 	eastl::string SourcePath;
 
-	ETextureType TextureType = ETextureType::Default;
+	ETextureType TextureType = ETextureType::Single;
 	ERHITextureChannelsType ChannelsType = ERHITextureChannelsType::RGBA;
 };

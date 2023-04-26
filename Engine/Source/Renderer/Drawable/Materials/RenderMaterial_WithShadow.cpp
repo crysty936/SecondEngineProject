@@ -1,9 +1,9 @@
-#include "Renderer/Drawable/RenderMaterial_WithShadow.h"
+#include "Renderer/Drawable/Materials/RenderMaterial_WithShadow.h"
 #include "Renderer/SelfRegisteringUniform/SelfRegisteringUniform.h"
 #include "Core/EngineUtils.h"
 #include "Renderer/Material/MaterialHelpers.h"
 #include "Renderer/ForwardRenderer.h"
-#include "../RHI/RHI.h"
+#include "Renderer/RHI/RHI.h"
 
 RenderMaterial_WithShadow::RenderMaterial_WithShadow() = default;
 RenderMaterial_WithShadow::~RenderMaterial_WithShadow() = default;

@@ -382,7 +382,7 @@ eastl::shared_ptr<class RHITexture2D> OpenGLRHI::CreateRenderTexture()
  	glBindTexture(GL_TEXTURE_2D, texHandle);
  
  	const WindowProperties& windowProps = Engine->GetMainWindow().GetProperties();
- 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, windowProps.Width, windowProps.Height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+ 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, windowProps.Width, windowProps.Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
  
  	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
  	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -391,6 +391,33 @@ eastl::shared_ptr<class RHITexture2D> OpenGLRHI::CreateRenderTexture()
  	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
  
  	glBindTexture(GL_TEXTURE_2D, 0);
+
+	newTexture->Width = windowProps.Width;
+	newTexture->Height = windowProps.Height;
+	newTexture->NrChannels = 3;
+	newTexture->ChannelsType = ERHITextureChannelsType::RGBA;
+
+	return newTexture;
+}
+
+eastl::shared_ptr<class RHITexture2D> OpenGLRHI::CreateRenderTextureHDR()
+{
+	uint32_t texHandle = 0;
+	glGenTextures(1, &texHandle);
+	eastl::shared_ptr<GLTexture2D> newTexture = eastl::make_shared<GLTexture2D>(texHandle);
+
+	glBindTexture(GL_TEXTURE_2D, texHandle);
+
+	const WindowProperties& windowProps = Engine->GetMainWindow().GetProperties();
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, windowProps.Width, windowProps.Height, 0, GL_RGBA, GL_FLOAT, nullptr);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
 
 	newTexture->Width = windowProps.Width;
 	newTexture->Height = windowProps.Height;
@@ -428,7 +455,7 @@ eastl::shared_ptr<class RHITexture2D> OpenGLRHI::CreateDepthMap(const int32_t in
 	newTexture->Height = inHeight;
 	newTexture->NrChannels = 3;
 	newTexture->ChannelsType = ERHITextureChannelsType::Depth;
-	newTexture->TextureType = ETextureType::Default;
+	newTexture->TextureType = ETextureType::Single;
 
 	return newTexture;
 }
@@ -570,7 +597,7 @@ void OpenGLRHI::AttachTextureToFramebufferDepth(RHIFrameBuffer& inFrameBuffer, R
 
 	switch (tex.TextureType)
 	{
-	case ETextureType::Default:
+	case ETextureType::Single:
 	{
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, tex.GlHandle, 0);
 		glBuffer.DepthStencingAttachment = tex.GlHandle;
@@ -744,7 +771,7 @@ void OpenGLRHI::BindTexture2D(const RHITexture2D& inTex, const int32_t inTexId)
 
 	switch (glTex.TextureType)
 	{
-	case ETextureType::Default:
+	case ETextureType::Single:
 	{
 		glBindTexture(GL_TEXTURE_2D, glTex.GlHandle);
 

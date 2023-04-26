@@ -1,4 +1,4 @@
-#include "Renderer/Drawable/BallTestMaterial.h"
+#include "Renderer/Drawable/Materials/BallTestMaterial.h"
 #include "Renderer/SelfRegisteringUniform/SelfRegisteringUniform.h"
 
 BallTestMaterial::BallTestMaterial() = default;

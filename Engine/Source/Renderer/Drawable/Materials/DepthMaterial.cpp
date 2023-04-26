@@ -1,4 +1,4 @@
-#include "Renderer/Drawable/DepthMaterial.h"
+#include "Renderer/Drawable/Materials/DepthMaterial.h"
 #include "Renderer/SelfRegisteringUniform/SelfRegisteringUniform.h"
 #include "Core/EngineUtils.h"
 #include "Renderer/Material/MaterialHelpers.h"

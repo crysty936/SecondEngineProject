@@ -81,6 +81,9 @@ public:
 	/** Render texture with all channels */
 	virtual eastl::shared_ptr<class RHITexture2D> CreateRenderTexture() { return nullptr; }
 
+	/** Render texture with all channels, 16bit float */
+	virtual eastl::shared_ptr<class RHITexture2D> CreateRenderTextureHDR() { return nullptr; }
+
 	/** Texture with only one channel for depth */
 	virtual eastl::shared_ptr<class RHITexture2D> CreateDepthMap(const int32_t inWidth, const int32_t inHeight) { return nullptr; }
 	virtual eastl::shared_ptr<class RHITexture2D> CreateArrayDepthMap(const int32_t inDepthMapWidth, const int32_t inDepthMapHeight, const int32_t inSize) { return nullptr; }

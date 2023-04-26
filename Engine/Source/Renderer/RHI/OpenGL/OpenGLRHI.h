@@ -24,6 +24,8 @@ public:
 
 	virtual eastl::shared_ptr<class RHITexture2D> CreateTexture2D(const eastl::string& inDataPath) override;
 	virtual eastl::shared_ptr<class RHITexture2D> CreateRenderTexture() override;
+	virtual eastl::shared_ptr<class RHITexture2D> CreateRenderTextureHDR() override;
+
 	virtual eastl::shared_ptr<class RHITexture2D> CreateDepthMap(const int32_t inWidth, const int32_t inHeight) override;
 	virtual eastl::shared_ptr<class RHITexture2D> CreateArrayDepthMap(const int32_t inDepthMapWidth, const int32_t inDepthMapHeight, const int32_t inSize) override;
 	virtual eastl::shared_ptr<class RHIFrameBuffer> CreateDepthStencilFrameBuffer() override;
@@ -82,6 +84,8 @@ public:
 	void ImGuiInit() override;
 	void ImGuiBeginFrame() override;
 	void ImGuiRenderDrawData() override;
+
+
 
 
 

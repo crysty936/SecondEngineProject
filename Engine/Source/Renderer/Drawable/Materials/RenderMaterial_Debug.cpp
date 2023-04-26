@@ -1,4 +1,4 @@
-#include "Renderer/Drawable/RenderMaterial_Debug.h"
+#include "Renderer/Drawable/Materials/RenderMaterial_Debug.h"
 #include "Renderer/SelfRegisteringUniform/SelfRegisteringUniform.h"
 #include "Core/EngineUtils.h"
 #include "Renderer/Material/MaterialHelpers.h"
