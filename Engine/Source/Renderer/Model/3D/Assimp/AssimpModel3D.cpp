@@ -10,7 +10,7 @@
 #include "Renderer/RHI/Resources/MeshDataContainer.h"
 #include "Renderer/RHI/Resources/RHITexture.h"
 #include "Renderer/RHI/RHI.h"
-#include "Renderer/Drawable/Materials/RenderMaterial_WithShadow.h"
+#include "Renderer/Material/EngineMaterials/RenderMaterial_WithShadow.h"
 
 static Transform aiMatrixToTransform(const aiMatrix4x4& inMatrix)
 {

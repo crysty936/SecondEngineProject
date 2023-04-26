@@ -6,13 +6,13 @@
 #include "Renderer/RenderCommand.h"
 #include "Renderer/ForwardRenderer.h"
 #include "Core/EntityHelper.h"
-#include "Renderer/Drawable/Materials/SkyboxMaterial.h"
+#include "Renderer/Material/EngineMaterials/SkyboxMaterial.h"
 #include "glad/glad.h"
 #include "Renderer/RHI/Resources/RHIVertexBuffer.h"
 #include "Renderer/RHI/RHI.h"
 #include "Renderer/RHI/Resources/RHIIndexBuffer.h"
-#include "Renderer/Drawable/Materials/BallTestMaterial.h"
-#include "Renderer/Drawable/Materials/RenderMaterial_WithShadow.h"
+#include "Renderer/Material/EngineMaterials/BallTestMaterial.h"
+#include "Renderer/Material/EngineMaterials/RenderMaterial_WithShadow.h"
 
 TriangleShape::TriangleShape(const eastl::string& inName)
 	: DrawableObject(inName)

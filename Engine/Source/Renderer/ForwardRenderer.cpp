@@ -15,7 +15,7 @@
 #include "Renderer/RHI/Resources/MeshDataContainer.h"
 #include "Renderer/Material/MaterialsManager.h"
 #include "Core/EntityHelper.h"
-#include "Renderer/Drawable/Materials/DepthMaterial.h"
+#include "Renderer/Material/EngineMaterials/DepthMaterial.h"
 #include "Core/WindowsPlatform.h"
 #include "glm/gtc/integer.hpp"
 
@@ -28,7 +28,7 @@
 #include "Renderer/RHI/Resources/RHITexture.h"
 #include "Drawable/ShapesUtils/BasicShapes.h"
 #include "EASTL/stack.h"
-#include "Drawable/Materials/RenderMaterial_Debug.h"
+#include "Material/EngineMaterials/RenderMaterial_Debug.h"
 #include "DrawDebugHelpers.h"
 #include "RenderUtils.h"
 #include "Math/AABB.h"

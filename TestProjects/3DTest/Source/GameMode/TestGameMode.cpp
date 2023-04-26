@@ -15,8 +15,8 @@
 #include "Renderer/RHI/RHI.h"
 #include "Renderer/Material/MaterialsManager.h"
 #include "Utils/InlineVector.h"
-#include "Renderer/Drawable/Materials/RenderMaterial_Parallax.h"
-#include "Renderer/Drawable/Materials/RenderMaterial_Billboard.h"
+#include "Renderer/Material/EngineMaterials/RenderMaterial_Parallax.h"
+#include "Renderer/Material/EngineMaterials/RenderMaterial_Billboard.h"
 #include "Renderer/DrawDebugHelpers.h"
 
 TestGameMode GGameMode = {};
@@ -54,7 +54,6 @@ protected:
 				glm::mat4& instanceMat = instanceOffsets[i * InstancesCount + j];
 
 				instanceMat = glm::identity<glm::mat4>();
-
 				instanceMat = glm::translate(instanceMat, glm::vec3(4.f * i, 4.f * j, 0.f));
 			}
 		}

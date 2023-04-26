@@ -4,7 +4,7 @@
 #include "RenderUtils.h"
 #include "RHI/RHI.h"
 #include "Material/MaterialsManager.h"
-#include "Drawable/Materials/RenderMaterial_Debug.h"
+#include "Material/EngineMaterials/RenderMaterial_Debug.h"
 
 eastl::shared_ptr<RHIVertexBuffer> DebugPointsBuffer = nullptr;
 eastl::shared_ptr<RHIVertexBuffer> DebugLinesBuffer = nullptr;
