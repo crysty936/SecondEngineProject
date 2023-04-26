@@ -207,7 +207,7 @@ void ForwardRenderer::Draw()
 
 	RHI::Instance->CopyRenderTexture(*GlobalRenderTexture, *ColorBackupTexture);
 
-	RHI::Instance->UnbindFrameBuffer(*GlobalFrameBuffer);
+	RHI::Instance->BindDefaultFrameBuffer();
 
 	SetDrawMode(EDrawMode::Default);
 
@@ -218,6 +218,8 @@ void ForwardRenderer::Draw()
 
   	//DrawCommand(TonemappingQuad->GetCommand());
 
+
+	// Bloom
 
 	RHI::Instance->BindFrameBuffer(*AuxiliaryFrameBuffer);
 	RHI::Instance->ClearBuffers();
@@ -258,7 +260,6 @@ void ForwardRenderer::Draw()
 //  	ScreenQuad->GetCommand().Material->ExternalTextures.clear();
 //  	ScreenQuad->GetCommand().Material->ExternalTextures.push_back(GlobalRenderTexture);
 // 	DrawCommand(ScreenQuad->GetCommand());
- 		
 
  	BloomMergeUtilQuad->GetCommand().Material->ExternalTextures.clear();
  	BloomMergeUtilQuad->GetCommand().Material->ExternalTextures.push_back(ColorBackupTexture);
