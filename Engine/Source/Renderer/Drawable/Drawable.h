@@ -12,6 +12,8 @@ public:
 	inline void SetVisible(const bool inValue) { bIsVisible = inValue; }
 	inline bool IsVisible() const { return bIsVisible; }
 
+	virtual void CreateProxy() {};
+
 private:
 	bool bIsVisible{ true };
 };

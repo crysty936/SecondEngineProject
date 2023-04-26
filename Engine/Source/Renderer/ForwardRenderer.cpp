@@ -107,6 +107,7 @@ ForwardRenderer::ForwardRenderer(const WindowProperties& inMainWindowProperties)
 ForwardRenderer::~ForwardRenderer() = default;
 
 eastl::shared_ptr<FullScreenQuad> ScreenQuad;
+eastl::shared_ptr<ToneMapQuad> TonemappingQuad;
 
 eastl::shared_ptr<RHIFrameBuffer> GlobalFrameBuffer = nullptr;
 eastl::shared_ptr<RHITexture2D> GlobalRenderTexture = nullptr;
@@ -136,9 +137,14 @@ void ForwardRenderer::Init(const WindowProperties& inMainWindowProperties)
 	GlobalRenderTexture = RHI::Get()->CreateRenderTexture();
 	RHI::Get()->AttachTextureToFramebufferColor(*GlobalFrameBuffer, *GlobalRenderTexture);
 
-	ScreenQuad = EntityHelper::CreateObject<FullScreenQuad>("Global Renderer Screen Quad");
+	ScreenQuad = EntityHelper::CreateVisualEntity<FullScreenQuad>("Global Renderer Screen Quad");
 	ScreenQuad->CreateCommand();
 	ScreenQuad->GetCommand().Material->OwnedTextures.push_back(GlobalRenderTexture);
+
+	TonemappingQuad = EntityHelper::CreateEntity<ToneMapQuad>("Global Renderer Tonemapping Quad");
+	TonemappingQuad->CreateCommand();
+	TonemappingQuad->GetCommand().Material->OwnedTextures.push_back(GlobalRenderTexture);
+
 
 	DepthFrameBuffer = RHI::Get()->CreateEmptyFrameBuffer();
 	DirectionalLightCascadedShadowTexture = RHI::Get()->CreateArrayDepthMap(SHADOW_WIDTH, SHADOW_HEIGHT, MAX_CASCADES_COUNT);
@@ -185,7 +191,7 @@ void ForwardRenderer::Draw()
 //  	ScreenQuad->GetCommand().Material->WeakTextures.clear();
 //  	ScreenQuad->GetCommand().Material->WeakTextures.push_back(DepthRenderTexture);
 
-  	DrawCommand(ScreenQuad->GetCommand());
+  	DrawCommand(TonemappingQuad->GetCommand());
 
 
 	ImGui::End();
@@ -236,6 +242,10 @@ void ForwardRenderer::SetLightingConstants()
 
 	ImGui::Checkbox("Use Normal Mapping", &bUseNormalMapping);
 	UniformsCache["bUseNormalMapping"] = bUseNormalMapping ? 1 : 0;
+
+	static float exposure = 1.f;
+	ImGui::DragFloat("Exposure", &exposure, 0.01f, 0.f, 10.f);
+	UniformsCache["Exposure"] = exposure;
 
 	//////////////////////////////////////////////////////////////////////////
 	//

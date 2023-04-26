@@ -8,8 +8,6 @@ out VS_OUT
 	vec2 TexCoords;
 } vs_out;
 
-//layout(location = 0) out vec2 outTexCoords;
-
 void main()
 {
 	vs_out.TexCoords = inTexCoords;

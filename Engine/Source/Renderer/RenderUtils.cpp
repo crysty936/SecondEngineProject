@@ -1,4 +1,11 @@
 #include "RenderUtils.h"
+#include "EASTL/string.h"
+#include "RHI/Resources/VertexInputLayout.h"
+#include "ForwardRenderer.h"
+#include "Drawable/ShapesUtils/BasicShapesData.h"
+#include "RHI/RHI.h"
+#include "Material/MaterialsManager.h"
+#include "Material/RenderMaterial.h"
 
 eastl::array<glm::vec3, 8> RenderUtils::GenerateSpaceCorners(const glm::mat4& SpaceToProjectionSpace, const float MinZ, const float MaxZ)
 {
@@ -39,4 +46,69 @@ glm::vec3 RenderUtils::GetProjectionCenter(const glm::mat4& inProj)
 	center /= projCorners.size();
 
 	return center;
+}
+
+ToneMapQuad::ToneMapQuad(const eastl::string& inName)
+	: DrawableObject(inName)
+{
+
+}
+
+void ToneMapQuad::CreateCommand()
+{
+	const eastl::string RenderDataContainerID = "squareVAO";
+	eastl::shared_ptr<MeshDataContainer> dataContainer{ nullptr };
+
+	const bool existingContainer = ForwardRenderer::Get().GetOrCreateContainer(RenderDataContainerID, dataContainer);
+
+	VertexInputLayout inputLayout;
+	// Vertex points
+	inputLayout.Push<float>(3, VertexInputType::Position);
+	// Vertex Tex Coords
+	inputLayout.Push<float>(2, VertexInputType::TexCoords);
+
+	if (!existingContainer)
+	{
+		int32_t indicesCount = BasicShapesData::GetSquareIndicesCount();
+		eastl::shared_ptr<RHIIndexBuffer> ib = RHI::Get()->CreateIndexBuffer(BasicShapesData::GetSquareIndices(), indicesCount);
+
+
+		int32_t verticesCount = BasicShapesData::GetSquareVerticesCount();
+		const eastl::shared_ptr<RHIVertexBuffer> vb = RHI::Get()->CreateVertexBuffer(inputLayout, BasicShapesData::GetSquareVertices(), verticesCount, ib);
+
+		dataContainer->VBuffer = vb;
+	}
+
+	MaterialsManager& matManager = MaterialsManager::Get();
+
+	class EmptyMaterial : public RenderMaterial
+	{
+
+	public:
+		virtual void SetRequiredUniforms() override
+		{
+			eastl::vector<UniformWithFlag> defaultUniforms = {
+			{"Exposure"},
+			};
+
+			UBuffers.push_back({ defaultUniforms, ConstantBufferBinding::Pixel });
+		}
+	};
+
+	bool materialExists = false;
+	eastl::shared_ptr<EmptyMaterial> material = matManager.GetOrAddMaterial<EmptyMaterial>("TonemapQuad_Material", materialExists);
+
+	if (!materialExists)
+	{
+		eastl::vector<ShaderSourceInput> shaders = {
+		{ "ToneMapping/VS_Pos-UV_UnchangedPosition", EShaderType::Vertex },
+		{ "ToneMapping/PS_ToneMap", EShaderType::Fragment } };
+
+		material->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
+	}
+
+	QuadCommand.Material = material;
+	QuadCommand.DataContainer = dataContainer;
+	QuadCommand.Parent = this_shared(this);
+	QuadCommand.DrawType = EDrawType::DrawElements;
 }

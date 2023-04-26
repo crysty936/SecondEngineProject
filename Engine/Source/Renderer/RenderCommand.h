@@ -2,7 +2,6 @@
 #include "Renderer/DrawType.h"
 #include "EASTL/shared_ptr.h"
 
-
 namespace EDrawMode
 {
 	enum Type : uint8_t
@@ -21,7 +20,8 @@ struct RenderCommand
 	eastl::shared_ptr<class MeshDataContainer> DataContainer;
 	eastl::shared_ptr<class RenderMaterial> Material;
 	eastl::weak_ptr<const class DrawableObject> Parent;
-	EDrawType DrawType{ EDrawType::DrawElements };
+
+	EDrawType DrawType = EDrawType::DrawElements;
 	EDrawMode::Type DrawPasses = EDrawMode::Default;
 
 	/** In case draw mode is DrawInstanced */

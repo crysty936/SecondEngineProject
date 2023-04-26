@@ -4,6 +4,8 @@
 #include "Entity/TransformObject.h"
 #include "Renderer/Drawable/Drawable.h"
 
+// TODO: Remake this and get rid of the horrible IDrawableContainer thing
+
 // Each mesh node has a number of meshes. Those meshes don't have their own location as it's the
 // Node that holds the transform for all of them. One Mesh Node to many Render Commands, each Render Command represent a mesh
 

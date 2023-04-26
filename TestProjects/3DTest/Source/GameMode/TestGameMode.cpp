@@ -370,17 +370,18 @@ void TestGameMode::Init()
 // 	lightObj->SetRelativeLocation(glm::vec3(1000, 20000.0f, -1000.f));
 // 	lightObj->SetScale(glm::vec3(100.f, 100.f, 100.f));
 
-  	AssimpModel = eastl::shared_ptr<AssimpModel3D>(EntityHelper::CreateObject<AssimpModel3D>("../Data/Models/Shiba/scene.gltf", "Shiba"));
+  	AssimpModel = eastl::shared_ptr<AssimpModel3D>(EntityHelper::CreateVisualEntity<AssimpModel3D>("../Data/Models/Shiba/scene.gltf", "Shiba"));
   	AssimpModel->SetScale(glm::vec3(10.f, 10.f, 10.f));
   	AssimpModel->Move(glm::vec3(0.f, 10.f, 0.f));
 
-	FloorModel = EntityHelper::CreateObject<AssimpModel3D>("../Data/Models/Floor/scene.gltf", "Floor");
+	FloorModel = EntityHelper::CreateVisualEntity<AssimpModel3D>("../Data/Models/Floor/scene.gltf", "Floor");
 	FloorModel->Move(glm::vec3(0.f, -2.f, 0.f));
 	//floorModel->SetScale(glm::vec3(10.f, 1.f, 10.f));
 
 	//TransformObjPtr concreteFloor = EntityHelper::CreateObject<AssimpModel3D>("../Data/Models/ConcreteFloor/Source/plane.fbx");
 // 	TransformObjPtr concreteFloor = EntityHelper::CreateObject<AssimpModel3D>("../Data/Models/ConcreteFloorGLTF/scene.gltf");
 // 	concreteFloor->Move(glm::vec3(5.f, 0.f, 0.f));
+
 
 
 	//Quad = EntityHelper::CreateObject<ParallaxQuad>("Parallax Quad");
@@ -393,7 +394,7 @@ void TestGameMode::Init()
 //  	model->Move(glm::vec3(0.f, 3.f, 0.f));
 
 
-	eastl::shared_ptr<InstancedCubeTest> instancedObj = EntityHelper::CreateObject<InstancedCubeTest>("Instanced Cubes");
+	eastl::shared_ptr<InstancedCubeTest> instancedObj = EntityHelper::CreateVisualEntity<InstancedCubeTest>("Instanced Cubes");
 	//TransformObjPtr concreteFloor = EntityHelper::CreateObject<AssimpModel3D>("../Data/Models/ConcreteFloorGLTF/scene.gltf");
 	//Billboard = EntityHelper::CreateObject<BillboardQuad>();
 
@@ -428,7 +429,7 @@ void TestGameMode::Init()
 	constexpr float quadratic = 0.0002f;
 
 	{
-		eastl::shared_ptr<LightSource> PointLight = EntityHelper::CreateObject<LightSource>("Point Light 1");
+		eastl::shared_ptr<LightSource> PointLight = EntityHelper::CreateVisualEntity<LightSource>("Point Light 1");
 		PointLight->Data.Type = ELightType::Point;
 		PointLight->Data.TypeData.PointData.Linear = linear;
 		PointLight->Data.TypeData.PointData.Quadratic = quadratic;
@@ -438,7 +439,7 @@ void TestGameMode::Init()
 	}
 
 	{
-		eastl::shared_ptr<LightSource> PointLight = EntityHelper::CreateObject<LightSource>("Point Light 2");
+		eastl::shared_ptr<LightSource> PointLight = EntityHelper::CreateVisualEntity<LightSource>("Point Light 2");
 		PointLight->Data.Type = ELightType::Point;
 		PointLight->Data.TypeData.PointData.Linear = linear;
 		PointLight->Data.TypeData.PointData.Quadratic = quadratic;
@@ -448,11 +449,11 @@ void TestGameMode::Init()
 	}
 
 	{
-		eastl::shared_ptr<LightSource> PointLight = EntityHelper::CreateObject<LightSource>("Point Light 3");
+		eastl::shared_ptr<LightSource> PointLight = EntityHelper::CreateVisualEntity<LightSource>("Point Light 3");
 		PointLight->Data.Type = ELightType::Point;
 		PointLight->Data.TypeData.PointData.Linear = linear;
 		PointLight->Data.TypeData.PointData.Quadratic = quadratic;
-		PointLight->Data.TypeData.PointData.Color = glm::vec3(100.f, 100.f, 100.f);
+		PointLight->Data.TypeData.PointData.Color = glm::vec3(10.f, 10.f, 10.f);
 
 		PointLight->SetRelativeLocation({ 22.f, 1.0f, -18.f });
 	}
