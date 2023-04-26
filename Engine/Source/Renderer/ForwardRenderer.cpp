@@ -211,7 +211,7 @@ void ForwardRenderer::SetLightingConstants()
 
 	for (const eastl::shared_ptr<LightSource>& light : lights)
 	{
-		switch (light->Data.Type)
+		switch (light->LData.Type)
 		{
 		case ELightType::Directional:
 		{
@@ -286,11 +286,11 @@ void ForwardRenderer::SetLightingConstants()
 		const Transform& lightTransf = light->GetAbsoluteTransform();
 		pointLight.position = glm::vec4(lightTransf.Translation.x, lightTransf.Translation.y, lightTransf.Translation.z, 0.f);
 
-		const PointLightData& pointData = light->Data.TypeData.PointData;
+		const PointLightData& pointData = light->LData.TypeData.PointData;
 		
 		pointLight.linear = pointData.Linear;
 		pointLight.quadratic = pointData.Quadratic;
-		pointLight.color = glm::vec4(pointData.Color.x, pointData.Color.y, pointData.Color.z, 0.f);
+		pointLight.color = glm::vec4(light->LData.Color.x, light->LData.Color.y, light->LData.Color.z, 0.f);
 
 		shaderPointLightData.push_back(pointLight);
 	}
@@ -359,7 +359,7 @@ eastl::vector<glm::mat4> ForwardRenderer::CreateCascadesMatrices()
 
 	for (const eastl::shared_ptr<LightSource>& light : lights)
 	{
-		switch (light->Data.Type)
+		switch (light->LData.Type)
 		{
 		case ELightType::Directional:
 		{
@@ -601,6 +601,7 @@ void ForwardRenderer::DrawCommand(const RenderCommand& inCommand)
 
 	const uint32_t indicesCount = dataContainer->VBuffer->GetIndicesCount();
 
+	parent->UpdateCustomUniforms(UniformsCache);
 	material->SetUniformsValue(UniformsCache);
 	material->BindBuffers();
 

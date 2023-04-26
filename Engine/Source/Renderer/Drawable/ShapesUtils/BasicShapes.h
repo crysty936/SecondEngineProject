@@ -1,8 +1,8 @@
 #pragma once
 #include "EASTL/shared_ptr.h"
 #include "Renderer/Model/3D/Model3D.h"
-#include "../../RenderCommand.h"
-#include "../../LightTypes.h"
+#include "Renderer/RenderCommand.h"
+#include "Renderer/LightTypes.h"
 
 class TriangleShape : public DrawableObject, public IDrawableContainer
 {
@@ -46,7 +46,7 @@ public:
 	LightSource(const eastl::string& inName);
 	virtual ~LightSource();
 
-	LightData Data;
+	LightData LData;
 
 	virtual void CreateProxy() override;
 };

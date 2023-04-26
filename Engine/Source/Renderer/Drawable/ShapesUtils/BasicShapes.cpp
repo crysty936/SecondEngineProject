@@ -12,6 +12,8 @@
 #include "Renderer/RHI/Resources/RHIIndexBuffer.h"
 #include "Renderer/Material/EngineMaterials/BallTestMaterial.h"
 #include "Renderer/Material/EngineMaterials/RenderMaterial_WithShadow.h"
+#include "EASTL/unordered_map.h"
+#include "Renderer/Material/EngineMaterials/RenderMaterial_LightSource.h"
 
 TriangleShape::TriangleShape(const eastl::string& inName)
 	: DrawableObject(inName)
@@ -293,18 +295,42 @@ void LightSource::CreateProxy()
 
 	MaterialsManager& matManager = MaterialsManager::Get();
 	bool materialExists = false;
-	eastl::shared_ptr<RenderMaterial> material = matManager.GetOrAddMaterial<RenderMaterial>("light_material", materialExists);
+	eastl::shared_ptr<RenderMaterial_LightSource> material = matManager.GetOrAddMaterial<RenderMaterial_LightSource>("light_material", materialExists);
 
 	if (!materialExists)
 	{
 		eastl::vector<ShaderSourceInput> shaders = {
-		{ "VS_Pos-UV-Normal", EShaderType::Vertex },
-		{ "PS_LightSource", EShaderType::Fragment } };
+		{ "LightSource/VS_Pos-UV-Normal", EShaderType::Vertex },
+		{ "LightSource/PS_LightSource", EShaderType::Fragment } };
 
 		material->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
 	}
 
-	eastl::shared_ptr<MeshNode> cubeNode = eastl::make_shared<MeshNode>("Light Mesh");
+	// TODO: Hack, fix the Drawable, DrawableContainer stuff thing to allow this to work smoothly and
+	// allow the uniform data to be extracted easily
+	class LightMeshNode : public MeshNode
+	{
+	public:
+		LightMeshNode(const eastl::string& inName, eastl::shared_ptr<LightSource>& inParent)
+			: MeshNode(inName), Parent(inParent) {}
+
+		virtual ~LightMeshNode() = default;
+
+
+		void UpdateCustomUniforms(eastl::unordered_map<eastl::string, struct SelfRegisteringUniform>& inUniformsCache) const override
+		{
+			if (eastl::shared_ptr<LightSource> parentLocked = Parent.lock())
+			{
+				const LightData& lData = parentLocked->LData;
+				inUniformsCache["LightColor"] = lData.Color;
+			}
+		}
+
+		eastl::weak_ptr<LightSource> Parent;
+	};
+
+
+	eastl::shared_ptr<LightMeshNode> cubeNode = eastl::make_shared<LightMeshNode>("Light Mesh", this_shared(this));
 	AddChild(cubeNode);
 
 	material->bCastShadow = false;

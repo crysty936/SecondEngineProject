@@ -11,8 +11,6 @@ struct PointLightData
 {
 	float Linear;
 	float Quadratic;
-
-	glm::vec3 Color;
 };
 
 enum class ELightType
@@ -24,6 +22,8 @@ enum class ELightType
 struct LightData
 {
 	ELightType Type;
+
+	glm::vec3 Color;
 
 	union {
 		DirLightData DirData;

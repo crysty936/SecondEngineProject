@@ -430,30 +430,30 @@ void TestGameMode::Init()
 
 	{
 		eastl::shared_ptr<LightSource> PointLight = EntityHelper::CreateVisualEntity<LightSource>("Point Light 1");
-		PointLight->Data.Type = ELightType::Point;
-		PointLight->Data.TypeData.PointData.Linear = linear;
-		PointLight->Data.TypeData.PointData.Quadratic = quadratic;
-		PointLight->Data.TypeData.PointData.Color = glm::vec3(0.f, 0.5f, 0.f);
+		PointLight->LData.Type = ELightType::Point;
+		PointLight->LData.TypeData.PointData.Linear = linear;
+		PointLight->LData.TypeData.PointData.Quadratic = quadratic;
+		PointLight->LData.Color = glm::vec3(0.f, 0.5f, 0.f);
 
 		PointLight->SetRelativeLocation({ -10.f, 1.0f, 35.f });
 	}
 
 	{
 		eastl::shared_ptr<LightSource> PointLight = EntityHelper::CreateVisualEntity<LightSource>("Point Light 2");
-		PointLight->Data.Type = ELightType::Point;
-		PointLight->Data.TypeData.PointData.Linear = linear;
-		PointLight->Data.TypeData.PointData.Quadratic = quadratic;
-		PointLight->Data.TypeData.PointData.Color = glm::vec3(0.f, 0.f, 0.2f);
+		PointLight->LData.Type = ELightType::Point;
+		PointLight->LData.TypeData.PointData.Linear = linear;
+		PointLight->LData.TypeData.PointData.Quadratic = quadratic;
+		PointLight->LData.Color = glm::vec3(0.f, 0.f, 0.2f);
 
 		PointLight->SetRelativeLocation({ -65.f, 1.0f, 0.f });
 	}
 
 	{
 		eastl::shared_ptr<LightSource> PointLight = EntityHelper::CreateVisualEntity<LightSource>("Point Light 3");
-		PointLight->Data.Type = ELightType::Point;
-		PointLight->Data.TypeData.PointData.Linear = linear;
-		PointLight->Data.TypeData.PointData.Quadratic = quadratic;
-		PointLight->Data.TypeData.PointData.Color = glm::vec3(10.f, 10.f, 10.f);
+		PointLight->LData.Type = ELightType::Point;
+		PointLight->LData.TypeData.PointData.Linear = linear;
+		PointLight->LData.TypeData.PointData.Quadratic = quadratic;
+		PointLight->LData.Color = glm::vec3(10.f, 10.f, 10.f);
 
 		PointLight->SetRelativeLocation({ 22.f, 1.0f, -18.f });
 	}
