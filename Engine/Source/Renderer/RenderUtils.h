@@ -23,3 +23,42 @@ public:
 private:
 	RenderCommand QuadCommand;
 };
+
+class ExtractBrightAreasQuad : public DrawableObject
+{
+public:
+	ExtractBrightAreasQuad(const eastl::string& inName);
+	~ExtractBrightAreasQuad() = default;
+
+	void CreateCommand();
+	inline const RenderCommand& GetCommand() { return QuadCommand; };
+
+private:
+	RenderCommand QuadCommand;
+};
+
+class GaussianBlurQuad : public DrawableObject
+{
+public:
+	GaussianBlurQuad(const eastl::string& inName);
+	~GaussianBlurQuad() = default;
+
+	void CreateCommand();
+	inline const RenderCommand& GetCommand() { return QuadCommand; };
+
+private:
+	RenderCommand QuadCommand;
+};
+
+class BloomMergeQuad : public DrawableObject
+{
+public:
+	BloomMergeQuad(const eastl::string& inName);
+	~BloomMergeQuad() = default;
+
+	void CreateCommand();
+	inline const RenderCommand& GetCommand() { return QuadCommand; };
+
+private:
+	RenderCommand QuadCommand;
+};

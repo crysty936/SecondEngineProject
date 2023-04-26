@@ -108,9 +108,17 @@ ForwardRenderer::~ForwardRenderer() = default;
 
 eastl::shared_ptr<FullScreenQuad> ScreenQuad;
 eastl::shared_ptr<ToneMapQuad> TonemappingQuad;
+eastl::shared_ptr<ExtractBrightAreasQuad> ExtractBrightAreasUtilQuad;
+eastl::shared_ptr<GaussianBlurQuad> GaussianBlurUtilQuad;
+eastl::shared_ptr<BloomMergeQuad> BloomMergeUtilQuad;
 
 eastl::shared_ptr<RHIFrameBuffer> GlobalFrameBuffer = nullptr;
 eastl::shared_ptr<RHITexture2D> GlobalRenderTexture = nullptr;
+
+eastl::shared_ptr<RHIFrameBuffer> AuxiliaryFrameBuffer = nullptr;
+eastl::shared_ptr<RHITexture2D> AuxiliaryRenderTexture = nullptr;
+
+eastl::shared_ptr<RHITexture2D> ColorBackupTexture = nullptr;
 
 eastl::shared_ptr<RHIFrameBuffer> DepthFrameBuffer = nullptr;
 eastl::shared_ptr<RHITexture2D> DirectionalLightCascadedShadowTexture = nullptr;
@@ -134,17 +142,32 @@ void ForwardRenderer::Init(const WindowProperties& inMainWindowProperties)
 	Instance = new ForwardRenderer{ inMainWindowProperties };
 
 	GlobalFrameBuffer = RHI::Get()->CreateDepthStencilFrameBuffer();
-	GlobalRenderTexture = RHI::Get()->CreateRenderTexture();
+	GlobalRenderTexture = RHI::Get()->CreateRenderTextureHDR();
 	RHI::Get()->AttachTextureToFramebufferColor(*GlobalFrameBuffer, *GlobalRenderTexture);
+
+	AuxiliaryFrameBuffer = RHI::Get()->CreateDepthStencilFrameBuffer();
+	AuxiliaryRenderTexture = RHI::Get()->CreateRenderTextureHDR();
+	RHI::Get()->AttachTextureToFramebufferColor(*AuxiliaryFrameBuffer, *AuxiliaryRenderTexture);
+
 
 	ScreenQuad = EntityHelper::CreateVisualEntity<FullScreenQuad>("Global Renderer Screen Quad");
 	ScreenQuad->CreateCommand();
-	ScreenQuad->GetCommand().Material->OwnedTextures.push_back(GlobalRenderTexture);
 
 	TonemappingQuad = EntityHelper::CreateEntity<ToneMapQuad>("Global Renderer Tonemapping Quad");
 	TonemappingQuad->CreateCommand();
 	TonemappingQuad->GetCommand().Material->OwnedTextures.push_back(GlobalRenderTexture);
 
+	ExtractBrightAreasUtilQuad = EntityHelper::CreateEntity<ExtractBrightAreasQuad>("Extract Bright Areas Quad");
+	ExtractBrightAreasUtilQuad->CreateCommand();
+	ExtractBrightAreasUtilQuad->GetCommand().Material->OwnedTextures.push_back(GlobalRenderTexture);
+
+	GaussianBlurUtilQuad = EntityHelper::CreateEntity<GaussianBlurQuad>("Gaussian Blur Quad");
+	GaussianBlurUtilQuad->CreateCommand();
+
+	BloomMergeUtilQuad = EntityHelper::CreateEntity<BloomMergeQuad>("Bloom Merge Quad");
+	BloomMergeUtilQuad->CreateCommand();
+
+	ColorBackupTexture = RHI::Get()->CreateRenderTextureHDR();
 
 	DepthFrameBuffer = RHI::Get()->CreateEmptyFrameBuffer();
 	DirectionalLightCascadedShadowTexture = RHI::Get()->CreateArrayDepthMap(SHADOW_WIDTH, SHADOW_HEIGHT, MAX_CASCADES_COUNT);
@@ -182,6 +205,8 @@ void ForwardRenderer::Draw()
 	// Draw debug primitives
 	DrawDebugManager::Draw();
 
+	RHI::Instance->CopyRenderTexture(*GlobalRenderTexture, *ColorBackupTexture);
+
 	RHI::Instance->UnbindFrameBuffer(*GlobalFrameBuffer);
 
 	SetDrawMode(EDrawMode::Default);
@@ -191,8 +216,54 @@ void ForwardRenderer::Draw()
 //  	ScreenQuad->GetCommand().Material->WeakTextures.clear();
 //  	ScreenQuad->GetCommand().Material->WeakTextures.push_back(DepthRenderTexture);
 
-  	DrawCommand(TonemappingQuad->GetCommand());
+  	//DrawCommand(TonemappingQuad->GetCommand());
 
+
+	RHI::Instance->BindFrameBuffer(*AuxiliaryFrameBuffer);
+	RHI::Instance->ClearBuffers();
+
+  	DrawCommand(ExtractBrightAreasUtilQuad->GetCommand());
+
+ 	RHI::Instance->BindDefaultFrameBuffer();
+
+ 	static int blurPassesCount = 10;
+	ImGui::DragInt("Bloom Blur Passes Count", &blurPassesCount, 2, 0.f, 100.f);
+
+ 	for (int32_t i = 0; i < blurPassesCount; ++i)
+ 	{
+ 		// Use Global render buffer for horizontal and Auxiliary for vertical
+ 		const bool horizontal = i % 2 == 0;
+		UniformsCache["BlurHorizontal"] = int32_t(horizontal);
+
+		GaussianBlurUtilQuad->GetCommand().Material->ExternalTextures.clear();
+
+		if (horizontal)
+ 		{
+ 			RHI::Instance->BindFrameBuffer(*GlobalFrameBuffer);
+			RHI::Instance->ClearBuffers();
+			GaussianBlurUtilQuad->GetCommand().Material->ExternalTextures.push_back(AuxiliaryRenderTexture);
+ 		}
+ 		else
+ 		{
+ 			RHI::Instance->BindFrameBuffer(*AuxiliaryFrameBuffer);
+			RHI::Instance->ClearBuffers();
+			GaussianBlurUtilQuad->GetCommand().Material->ExternalTextures.push_back(GlobalRenderTexture);
+ 		}
+ 
+ 		DrawCommand(GaussianBlurUtilQuad->GetCommand());
+ 	}
+
+	RHI::Instance->BindDefaultFrameBuffer();
+
+//  	ScreenQuad->GetCommand().Material->ExternalTextures.clear();
+//  	ScreenQuad->GetCommand().Material->ExternalTextures.push_back(GlobalRenderTexture);
+// 	DrawCommand(ScreenQuad->GetCommand());
+ 		
+
+ 	BloomMergeUtilQuad->GetCommand().Material->ExternalTextures.clear();
+ 	BloomMergeUtilQuad->GetCommand().Material->ExternalTextures.push_back(ColorBackupTexture);
+ 	BloomMergeUtilQuad->GetCommand().Material->ExternalTextures.push_back(GlobalRenderTexture);
+ 	DrawCommand(BloomMergeUtilQuad->GetCommand());
 
 	ImGui::End();
 }

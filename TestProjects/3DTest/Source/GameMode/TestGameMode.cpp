@@ -394,7 +394,9 @@ void TestGameMode::Init()
 //  	model->Move(glm::vec3(0.f, 3.f, 0.f));
 
 
-	eastl::shared_ptr<InstancedCubeTest> instancedObj = EntityHelper::CreateVisualEntity<InstancedCubeTest>("Instanced Cubes");
+	//eastl::shared_ptr<InstancedCubeTest> instancedObj = EntityHelper::CreateVisualEntity<InstancedCubeTest>("Instanced Cubes");
+
+
 	//TransformObjPtr concreteFloor = EntityHelper::CreateObject<AssimpModel3D>("../Data/Models/ConcreteFloorGLTF/scene.gltf");
 	//Billboard = EntityHelper::CreateObject<BillboardQuad>();
 
@@ -433,7 +435,7 @@ void TestGameMode::Init()
 		PointLight->LData.Type = ELightType::Point;
 		PointLight->LData.TypeData.PointData.Linear = linear;
 		PointLight->LData.TypeData.PointData.Quadratic = quadratic;
-		PointLight->LData.Color = glm::vec3(0.f, 0.5f, 0.f);
+		PointLight->LData.Color = glm::vec3(0.f, 3.f, 0.f);
 
 		PointLight->SetRelativeLocation({ -10.f, 1.0f, 35.f });
 	}
@@ -443,7 +445,7 @@ void TestGameMode::Init()
 		PointLight->LData.Type = ELightType::Point;
 		PointLight->LData.TypeData.PointData.Linear = linear;
 		PointLight->LData.TypeData.PointData.Quadratic = quadratic;
-		PointLight->LData.Color = glm::vec3(0.f, 0.f, 0.2f);
+		PointLight->LData.Color = glm::vec3(0.f, 0.f, 15.f);
 
 		PointLight->SetRelativeLocation({ -65.f, 1.0f, 0.f });
 	}

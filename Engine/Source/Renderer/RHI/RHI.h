@@ -48,6 +48,7 @@ public:
 	virtual void BindUniformBuffer(const RHIUniformBuffer& inBuffer) {};
 	virtual void BindTexture2D(const class RHITexture2D& inTex, const int32_t inTexId) {};
 	virtual void BindFrameBuffer(const class RHIFrameBuffer& inFrameBuffer) {};
+	virtual void BindDefaultFrameBuffer() {};
 
 	virtual void UnbindVertexBuffer(const class RHIVertexBuffer& inBuffer, const bool inUnbindIndexBuffer = true) {};
 	virtual void UnbindIndexBuffer(const class RHIIndexBuffer& inBuffer) {};
@@ -83,6 +84,8 @@ public:
 
 	/** Render texture with all channels, 16bit float */
 	virtual eastl::shared_ptr<class RHITexture2D> CreateRenderTextureHDR() { return nullptr; }
+
+	virtual void CopyRenderTexture(class RHITexture2D& inSrc, class RHITexture2D& inTrg) {}
 
 	/** Texture with only one channel for depth */
 	virtual eastl::shared_ptr<class RHITexture2D> CreateDepthMap(const int32_t inWidth, const int32_t inHeight) { return nullptr; }

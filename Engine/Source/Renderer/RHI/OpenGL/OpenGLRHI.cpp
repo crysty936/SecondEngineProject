@@ -427,6 +427,20 @@ eastl::shared_ptr<class RHITexture2D> OpenGLRHI::CreateRenderTextureHDR()
 	return newTexture;
 }
 
+void OpenGLRHI::CopyRenderTexture(class RHITexture2D& inSrc, class RHITexture2D& inTrg)
+{
+	const GLTexture2D& glSrc = static_cast<const GLTexture2D&>(inSrc);
+	const GLTexture2D& glTrg = static_cast<const GLTexture2D&>(inTrg);
+
+
+	ASSERT(glSrc.Width == glTrg.Width && glSrc.Height == glTrg.Height);
+
+	glCopyImageSubData(glSrc.GlHandle, GL_TEXTURE_2D, 0, 0, 0, 0,
+		glTrg.GlHandle, GL_TEXTURE_2D, 0, 0, 0, 0,
+		glSrc.Width, glSrc.Height, 1);
+}
+
+
 eastl::shared_ptr<class RHITexture2D> OpenGLRHI::CreateDepthMap(const int32_t inWidth, const int32_t inHeight)
 {
 	uint32_t texHandle = 0;
@@ -1013,6 +1027,11 @@ void OpenGLRHI::BindFrameBuffer(const class RHIFrameBuffer& inFrameBuffer)
 {
 	const GLFrameBuffer& glBuffer = static_cast<const GLFrameBuffer&>(inFrameBuffer);
 	glBindFramebuffer(GL_FRAMEBUFFER, glBuffer.GLHandle);
+}
+
+void OpenGLRHI::BindDefaultFrameBuffer()
+{
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void OpenGLRHI::UnbindFrameBuffer(const class RHIFrameBuffer& inFrameBuffer)
