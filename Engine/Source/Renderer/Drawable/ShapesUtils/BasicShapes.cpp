@@ -1,7 +1,6 @@
 #include "BasicShapes.h"
 #include "Renderer/Drawable/ShapesUtils/BasicShapesData.h"
 #include "Renderer/RHI/Resources/MeshDataContainer.h"
-#include "Renderer/OpenGL/OpenGLCubeMap.h"
 #include "Renderer/Material/MaterialsManager.h"
 #include "Renderer/RenderCommand.h"
 #include "Renderer/ForwardRenderer.h"
