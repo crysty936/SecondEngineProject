@@ -362,13 +362,13 @@ eastl::shared_ptr<RHIUniformBuffer> OpenGLRHI::CreateUniformBuffer(size_t inSize
 	return newBuffer;
 }
 
-eastl::shared_ptr<RHITexture2D> OpenGLRHI::CreateTexture2D(const eastl::string& inDataPath)
+eastl::shared_ptr<RHITexture2D> OpenGLRHI::CreateAndLoadTexture2D(const eastl::string& inDataPath, const bool inSRGB)
 {
 	uint32_t texHandle = 0;
 	glGenTextures(1, &texHandle);
 
 	eastl::shared_ptr<GLTexture2D> newTexture = eastl::make_shared<GLTexture2D>(texHandle);
-	LoadImageToTextureFromPath(*newTexture, inDataPath);
+	LoadImageToTextureFromPath(*newTexture, inDataPath, inSRGB);
 
 	return newTexture;
 }
@@ -632,7 +632,7 @@ void OpenGLRHI::AttachTextureToFramebufferDepth(RHIFrameBuffer& inFrameBuffer, R
 	UnbindFrameBuffer(inFrameBuffer);
 }
 
-void OpenGLRHI::LoadImageToTextureFromPath(RHITexture2D& inTexture, const eastl::string& inPath)
+void OpenGLRHI::LoadImageToTextureFromPath(RHITexture2D& inTexture, const eastl::string& inPath, const bool inSRGB)
 {
 	GLTexture2D& tex = static_cast<GLTexture2D&>(inTexture);
 	ImageData data = ImageLoading::LoadImageData(inPath.data());
@@ -668,7 +668,15 @@ void OpenGLRHI::LoadImageToTextureFromPath(RHITexture2D& inTexture, const eastl:
 	}
 	}
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB8_ALPHA8, data.Width, data.Height, 0, imageFormat, GL_UNSIGNED_BYTE, data.RawData);
+	if (inSRGB)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB8_ALPHA8, data.Width, data.Height, 0, imageFormat, GL_UNSIGNED_BYTE, data.RawData);
+	}
+	else
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, data.Width, data.Height, 0, imageFormat, GL_UNSIGNED_BYTE, data.RawData);
+	}
+
 	glGenerateMipmap(GL_TEXTURE_2D);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);

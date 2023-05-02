@@ -258,7 +258,7 @@ eastl::vector<eastl::shared_ptr<RHITexture2D>> AssimpModel3D::LoadMaterialTextur
 		if (!IsTextureLoaded(Str.C_Str(), tex))
 		{
 			const eastl::string path = ModelDir + eastl::string("/") + eastl::string(Str.C_Str());
-			tex = RHI::Get()->CreateTexture2D(path);
+			tex = RHI::Get()->CreateAndLoadTexture2D(path, inAssimpTexType != aiTextureType_NORMALS);
 			tex->SourcePath = eastl::string(Str.C_Str());
 			LoadedTextures.push_back(tex);
 		}

@@ -226,7 +226,10 @@ vec3 CalcPointLight(PointLightData light, vec3 normal, vec3 fragPos, vec3 viewDi
 	diffuse *= attenuation;
 	//specular *= attenuation;
  
-	return (ambient + diffuse /*+ specular*/);
+	vec3 test = vec3(diff, diff, diff);
+	//test *= attenuation;
+
+	return (ambient /*+ diffuse*/ /*+ specular*/);
 }
 
 void main()
@@ -275,11 +278,15 @@ void main()
 	}
 	else if (bool(debugBuffer.bNormalVisualizeMode))
 	{
-		if (bool(lightDataBuffer.bHasNormalMap))
+		if (bool(lightDataBuffer.bHasNormalMap) && bool(debugBuffer.bUseNormalMapping))
 		{
 			vec3 mapNormal = texture(NormalMap, ps_in.TexCoords).xyz;
+			// convert to -1..1
 			mapNormal = mapNormal * 2.0 - 1.0;
 			vec3 wsNormal = normalize(ps_in.TangentToWorld * mapNormal);
+
+			// convert to 0..1
+			wsNormal = (wsNormal + 1.0) / 2.0;
 			color = wsNormal;
 		}
 		else
@@ -325,12 +332,13 @@ void main()
 
 		}
 
-		for (int i = 0; i < lightDataBuffer.NumPointLights; ++i)
-		{
-			color += CalcPointLight(lightDataBuffer.PointLights[i], wsNormal, ps_in.worldPos, viewToFragW);
-		}
+		//for (int i = 0; i < lightDataBuffer.NumPointLights; ++i)
+		//{
+		//	color += CalcPointLight(lightDataBuffer.PointLights[i], wsNormal, ps_in.worldPos, viewToFragW);
+		//}
 
-		//color = lightDataBuffer.PointLights[0].position;
+
+		color = CalcPointLight(lightDataBuffer.PointLights[0], wsNormal, ps_in.worldPos, viewToFragW);
 
 	}
 

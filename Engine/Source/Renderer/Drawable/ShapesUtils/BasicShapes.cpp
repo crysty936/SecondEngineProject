@@ -169,7 +169,7 @@ void CubeShape::CreateProxy()
   
   	if (!materialExists)
   	{
-		eastl::shared_ptr<RHITexture2D> tex = RHI::Get()->CreateTexture2D("../Data/Textures/MinecraftGrass.jpg");
+		eastl::shared_ptr<RHITexture2D> tex = RHI::Get()->CreateAndLoadTexture2D("../Data/Textures/MinecraftGrass.jpg", true);
 		material->OwnedTextures.push_back(tex);
 
 		eastl::vector<ShaderSourceInput> shaders = {

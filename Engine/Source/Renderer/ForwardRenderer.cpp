@@ -197,6 +197,9 @@ void ForwardRenderer::Draw()
 	RHI::Instance->BindFrameBuffer(*GlobalFrameBuffer);
 	RHI::Instance->ClearTexture(*GlobalRenderTexture, glm::vec4(0.f, 0.f, 0.f, 1.f));
 
+	// To output right to default buffer
+	//RHI::Instance->BindDefaultFrameBuffer();
+
 	// Clear additional framebuffer buffers
 	RHI::Instance->ClearBuffers();
 
@@ -206,8 +209,6 @@ void ForwardRenderer::Draw()
 	DrawDebugManager::Draw();
 
 	RHI::Instance->CopyRenderTexture(*GlobalRenderTexture, *ColorBackupTexture);
-
-	RHI::Instance->BindDefaultFrameBuffer();
 
 	SetDrawMode(EDrawMode::Default);
 
@@ -221,50 +222,52 @@ void ForwardRenderer::Draw()
 
 	// Bloom
 
-	RHI::Instance->BindFrameBuffer(*AuxiliaryFrameBuffer);
-	RHI::Instance->ClearBuffers();
+ 	RHI::Instance->BindFrameBuffer(*AuxiliaryFrameBuffer);
+ 	RHI::Instance->ClearBuffers();
 
-  	DrawCommand(ExtractBrightAreasUtilQuad->GetCommand());
+ 	//RHI::Instance->BindDefaultFrameBuffer();
 
+   	DrawCommand(ExtractBrightAreasUtilQuad->GetCommand());
+
+  	RHI::Instance->BindDefaultFrameBuffer();
+ 
+  	static int blurPassesCount = 10;
+ 	ImGui::DragInt("Bloom Blur Passes Count", &blurPassesCount, 2, 0.f, 100.f);
+
+  	for (int32_t i = 0; i < blurPassesCount; ++i)
+  	{
+  		// Use Global render buffer for horizontal and Auxiliary for vertical
+  		const bool horizontal = i % 2 == 0;
+ 		UniformsCache["BlurHorizontal"] = int32_t(horizontal);
+ 
+ 		GaussianBlurUtilQuad->GetCommand().Material->ExternalTextures.clear();
+ 
+ 		if (horizontal)
+  		{
+  			RHI::Instance->BindFrameBuffer(*GlobalFrameBuffer);
+ 			RHI::Instance->ClearBuffers();
+ 			GaussianBlurUtilQuad->GetCommand().Material->ExternalTextures.push_back(AuxiliaryRenderTexture);
+  		}
+  		else
+  		{
+  			RHI::Instance->BindFrameBuffer(*AuxiliaryFrameBuffer);
+ 			RHI::Instance->ClearBuffers();
+ 			GaussianBlurUtilQuad->GetCommand().Material->ExternalTextures.push_back(GlobalRenderTexture);
+  		}
+  
+  		DrawCommand(GaussianBlurUtilQuad->GetCommand());
+  	}
+ 
  	RHI::Instance->BindDefaultFrameBuffer();
 
- 	static int blurPassesCount = 10;
-	ImGui::DragInt("Bloom Blur Passes Count", &blurPassesCount, 2, 0.f, 100.f);
+	//ScreenQuad->GetCommand().Material->ExternalTextures.clear();
+	//ScreenQuad->GetCommand().Material->ExternalTextures.push_back(GlobalRenderTexture);
+	//DrawCommand(ScreenQuad->GetCommand());
 
- 	for (int32_t i = 0; i < blurPassesCount; ++i)
- 	{
- 		// Use Global render buffer for horizontal and Auxiliary for vertical
- 		const bool horizontal = i % 2 == 0;
-		UniformsCache["BlurHorizontal"] = int32_t(horizontal);
-
-		GaussianBlurUtilQuad->GetCommand().Material->ExternalTextures.clear();
-
-		if (horizontal)
- 		{
- 			RHI::Instance->BindFrameBuffer(*GlobalFrameBuffer);
-			RHI::Instance->ClearBuffers();
-			GaussianBlurUtilQuad->GetCommand().Material->ExternalTextures.push_back(AuxiliaryRenderTexture);
- 		}
- 		else
- 		{
- 			RHI::Instance->BindFrameBuffer(*AuxiliaryFrameBuffer);
-			RHI::Instance->ClearBuffers();
-			GaussianBlurUtilQuad->GetCommand().Material->ExternalTextures.push_back(GlobalRenderTexture);
- 		}
- 
- 		DrawCommand(GaussianBlurUtilQuad->GetCommand());
- 	}
-
-	RHI::Instance->BindDefaultFrameBuffer();
-
-//  	ScreenQuad->GetCommand().Material->ExternalTextures.clear();
-//  	ScreenQuad->GetCommand().Material->ExternalTextures.push_back(GlobalRenderTexture);
-// 	DrawCommand(ScreenQuad->GetCommand());
-
- 	BloomMergeUtilQuad->GetCommand().Material->ExternalTextures.clear();
- 	BloomMergeUtilQuad->GetCommand().Material->ExternalTextures.push_back(ColorBackupTexture);
- 	BloomMergeUtilQuad->GetCommand().Material->ExternalTextures.push_back(GlobalRenderTexture);
- 	DrawCommand(BloomMergeUtilQuad->GetCommand());
+  	BloomMergeUtilQuad->GetCommand().Material->ExternalTextures.clear();
+  	BloomMergeUtilQuad->GetCommand().Material->ExternalTextures.push_back(ColorBackupTexture);
+  	BloomMergeUtilQuad->GetCommand().Material->ExternalTextures.push_back(GlobalRenderTexture);
+  	DrawCommand(BloomMergeUtilQuad->GetCommand());
 
 	ImGui::End();
 }
@@ -866,9 +869,9 @@ eastl::shared_ptr<RenderMaterial> ForwardRenderer::GetMaterial(const RenderComma
 			inputLayout.Push<float>(2, VertexInputType::TexCoords);
 
 			eastl::vector<ShaderSourceInput> shaders = {
-			{ "VS_Pos-UV-Normal_Geometry_NormalVisualize", EShaderType::Vertex },
-			{ "GS_VisualizeNormals", EShaderType::Geometry },
-			{ "PS_FlatColor", EShaderType::Fragment } };
+			{ "VisualizeNormalsGeometry/VS_Pos-UV-Normal_Geometry_NormalVisualize", EShaderType::Vertex },
+			{ "VisualizeNormalsGeometry/GS_VisualizeNormals", EShaderType::Geometry },
+			{ "VisualizeNormalsGeometry/PS_FlatColor", EShaderType::Fragment } };
 
 			visNormalMat->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
  		}

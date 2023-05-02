@@ -22,7 +22,7 @@ public:
 	eastl::shared_ptr<class RHIShader> CreateShaderFromSource(const eastl::vector<ShaderSourceInput> inShaderSources, const VertexInputLayout& inInputLayout, const eastl::string& inVSName = "VS", const eastl::string& inPSName = "PS") override;
 	eastl::shared_ptr<class RHIShader> CreateShaderFromPath(const eastl::vector<ShaderSourceInput> inPathShaderSources, const VertexInputLayout& inInputLayout) override;
 
-	virtual eastl::shared_ptr<class RHITexture2D> CreateTexture2D(const eastl::string& inDataPath) override;
+	virtual eastl::shared_ptr<class RHITexture2D> CreateAndLoadTexture2D(const eastl::string& inDataPath, const bool inSRGB) override;
 	virtual eastl::shared_ptr<class RHITexture2D> CreateRenderTexture() override;
 	virtual eastl::shared_ptr<class RHITexture2D> CreateRenderTextureHDR() override;
 	virtual void CopyRenderTexture(class RHITexture2D& inSrc, class RHITexture2D& inTrg) override;
@@ -94,7 +94,7 @@ public:
 
 
 private:
-	void LoadImageToTextureFromPath(RHITexture2D& inTexture, const eastl::string& inPath);
+	void LoadImageToTextureFromPath(RHITexture2D& inTexture, const eastl::string& inPath, const bool inSRGB);
 
 	void* GLContext = nullptr;
 };

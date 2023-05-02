@@ -295,7 +295,7 @@ eastl::shared_ptr<class RHIUniformBuffer> D3D11RHI::CreateUniformBuffer(size_t i
 	return newBuffer;
 }
 
-eastl::shared_ptr<class RHITexture2D> D3D11RHI::CreateTexture2D(const eastl::string& inDataPath)
+eastl::shared_ptr<class RHITexture2D> D3D11RHI::CreateAndLoadTexture2D(const eastl::string& inDataPath, const bool inSRGB)
 {
 	// TODO: Create empty texture and they update it using UpdateSubresource
 

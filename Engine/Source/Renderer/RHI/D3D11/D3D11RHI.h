@@ -15,7 +15,7 @@ public:
 
  	eastl::shared_ptr<class RHIUniformBuffer> CreateUniformBuffer(size_t inSize) override;
  
-	virtual eastl::shared_ptr<class RHITexture2D> CreateTexture2D(const eastl::string& inDataPath) override;
+	virtual eastl::shared_ptr<class RHITexture2D> CreateAndLoadTexture2D(const eastl::string& inDataPath, const bool inSRGB) override;
 
 	virtual void BindVertexBuffer(const RHIVertexBuffer& inBuffer, const bool inBindIndexBuffer = true) override;
 	virtual void BindIndexBuffer(const RHIIndexBuffer& inBuffer) override;

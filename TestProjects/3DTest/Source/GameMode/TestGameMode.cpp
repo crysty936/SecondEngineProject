@@ -158,7 +158,7 @@ public:
   
   		if (!materialExists)
   		{
-  			eastl::shared_ptr<RHITexture2D> tex = RHI::Instance->CreateTexture2D("../Data/Textures/MinecraftGrass.jpg");
+  			eastl::shared_ptr<RHITexture2D> tex = RHI::Instance->CreateAndLoadTexture2D("../Data/Textures/MinecraftGrass.jpg", true);
   			material->OwnedTextures.push_back(tex);
   
   			eastl::vector<ShaderSourceInput> shaders = {
@@ -226,9 +226,9 @@ public:
 
 		if (!materialExists)
 		{
-			eastl::shared_ptr<RHITexture2D> diffMap = RHI::Instance->CreateTexture2D("../Data/Textures/Parallax/bricks.jpg");
-			eastl::shared_ptr<RHITexture2D> normalMap = RHI::Instance->CreateTexture2D("../Data/Textures/Parallax/bricks_normal.jpg");
-			eastl::shared_ptr<RHITexture2D> heightMap = RHI::Instance->CreateTexture2D("../Data/Textures/Parallax/bricks_disp.jpg");
+			eastl::shared_ptr<RHITexture2D> diffMap = RHI::Instance->CreateAndLoadTexture2D("../Data/Textures/Parallax/bricks.jpg", true);
+			eastl::shared_ptr<RHITexture2D> normalMap = RHI::Instance->CreateAndLoadTexture2D("../Data/Textures/Parallax/bricks_normal.jpg", false);
+			eastl::shared_ptr<RHITexture2D> heightMap = RHI::Instance->CreateAndLoadTexture2D("../Data/Textures/Parallax/bricks_disp.jpg", true);
 
 			material->OwnedTextures.push_back(diffMap);
 			material->OwnedTextures.push_back(normalMap);
@@ -291,7 +291,7 @@ public:
 
 		if (!materialExists)
 		{
-			eastl::shared_ptr<RHITexture2D> diffMap = RHI::Instance->CreateTexture2D("../Data/Textures/MinecraftGrass.jpg");
+			eastl::shared_ptr<RHITexture2D> diffMap = RHI::Instance->CreateAndLoadTexture2D("../Data/Textures/MinecraftGrass.jpg", true);
 
 			material->OwnedTextures.push_back(diffMap);
 
@@ -427,28 +427,28 @@ void TestGameMode::Init()
 // 		DirLight->SetRotationDegrees(glm::vec3(80.f, 0.f, 0.f));
 //   	}
 
-	constexpr float linear = 0.007f;
-	constexpr float quadratic = 0.0002f;
+	constexpr float linear = 0.0014f;
+	constexpr float quadratic = 0.000007f;
 
-	{
-		eastl::shared_ptr<LightSource> PointLight = EntityHelper::CreateVisualEntity<LightSource>("Point Light 1");
-		PointLight->LData.Type = ELightType::Point;
-		PointLight->LData.TypeData.PointData.Linear = linear;
-		PointLight->LData.TypeData.PointData.Quadratic = quadratic;
-		PointLight->LData.Color = glm::vec3(0.f, 3.f, 0.f);
-
-		PointLight->SetRelativeLocation({ -10.f, 1.0f, 35.f });
-	}
-
-	{
-		eastl::shared_ptr<LightSource> PointLight = EntityHelper::CreateVisualEntity<LightSource>("Point Light 2");
-		PointLight->LData.Type = ELightType::Point;
-		PointLight->LData.TypeData.PointData.Linear = linear;
-		PointLight->LData.TypeData.PointData.Quadratic = quadratic;
-		PointLight->LData.Color = glm::vec3(0.f, 0.f, 15.f);
-
-		PointLight->SetRelativeLocation({ -65.f, 1.0f, 0.f });
-	}
+// 	{
+// 		eastl::shared_ptr<LightSource> PointLight = EntityHelper::CreateVisualEntity<LightSource>("Point Light 1");
+// 		PointLight->LData.Type = ELightType::Point;
+// 		PointLight->LData.TypeData.PointData.Linear = linear;
+// 		PointLight->LData.TypeData.PointData.Quadratic = quadratic;
+// 		PointLight->LData.Color = glm::vec3(0.f, 3.f, 0.f);
+// 
+// 		PointLight->SetRelativeLocation({ -10.f, 1.0f, 35.f });
+// 	}
+// 
+// 	{
+// 		eastl::shared_ptr<LightSource> PointLight = EntityHelper::CreateVisualEntity<LightSource>("Point Light 2");
+// 		PointLight->LData.Type = ELightType::Point;
+// 		PointLight->LData.TypeData.PointData.Linear = linear;
+// 		PointLight->LData.TypeData.PointData.Quadratic = quadratic;
+// 		PointLight->LData.Color = glm::vec3(0.f, 0.f, 15.f);
+// 
+// 		PointLight->SetRelativeLocation({ -65.f, 1.0f, 0.f });
+// 	}
 
 	{
 		eastl::shared_ptr<LightSource> PointLight = EntityHelper::CreateVisualEntity<LightSource>("Point Light 3");
@@ -457,7 +457,7 @@ void TestGameMode::Init()
 		PointLight->LData.TypeData.PointData.Quadratic = quadratic;
 		PointLight->LData.Color = glm::vec3(10.f, 10.f, 10.f);
 
-		PointLight->SetRelativeLocation({ 22.f, 1.0f, -18.f });
+		PointLight->SetRelativeLocation({ 0.5f, 1.0f, -52.f });
 	}
 }
 
