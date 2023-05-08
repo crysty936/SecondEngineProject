@@ -18,6 +18,7 @@
 #include "Core/WindowsPlatform.h"
 #include "imgui.h"
 #include "backends/imgui_impl_opengl3.h"
+#include "Renderer//Renderer.h"
 
 namespace GLUtils
 {
@@ -974,10 +975,14 @@ eastl::shared_ptr<class RHIShader> OpenGLRHI::CreateShaderFromPath(const eastl::
 	eastl::vector<ShaderSourceInput> rhiSpecificSources;
 	rhiSpecificSources.reserve(inPathShaderSources.size());
 
+	const eastl::string materialsDirPrefix = Renderer::Get().GetMaterialsDirPrefix();
+
 	for (const ShaderSourceInput& sourceInput : inPathShaderSources)
 	{
 		eastl::string fullPath = sourceInput.ShaderSource;
-		fullPath.insert(0, "../Data/Shaders/OpenGL/");
+		const eastl::string shaderPathPrefix = "../Data/Shaders/OpenGL/" + materialsDirPrefix + "/";
+
+		fullPath.insert(0, shaderPathPrefix);
 		fullPath.append(".glsl");
 
 		eastl::string shaderCode;

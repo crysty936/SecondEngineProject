@@ -41,6 +41,7 @@ private:
 	eastl::vector<DebugLine> DebugLines;
 
 	friend class ForwardRenderer;
+	friend class DeferredRenderer;
 	friend struct DrawDebugHelpers;
 };
 

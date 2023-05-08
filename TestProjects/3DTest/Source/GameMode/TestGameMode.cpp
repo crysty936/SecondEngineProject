@@ -228,7 +228,7 @@ public:
 		{
 			eastl::shared_ptr<RHITexture2D> diffMap = RHI::Instance->CreateAndLoadTexture2D("../Data/Textures/Parallax/bricks.jpg", true);
 			eastl::shared_ptr<RHITexture2D> normalMap = RHI::Instance->CreateAndLoadTexture2D("../Data/Textures/Parallax/bricks_normal.jpg", false);
-			eastl::shared_ptr<RHITexture2D> heightMap = RHI::Instance->CreateAndLoadTexture2D("../Data/Textures/Parallax/bricks_disp.jpg", true);
+			eastl::shared_ptr<RHITexture2D> heightMap = RHI::Instance->CreateAndLoadTexture2D("../Data/Textures/Parallax/bricks_disp.jpg", false);
 
 			material->OwnedTextures.push_back(diffMap);
 			material->OwnedTextures.push_back(normalMap);
@@ -342,17 +342,17 @@ void TestGameMode::Init()
 //         		centerObj->SetScale(glm::vec3(100.f, 0.5f, 100.f));
  	}
 	{
-		//eastl::shared_ptr<CubeShape> centerObj = BasicShapesHelpers::CreateCubeObject();
+		eastl::shared_ptr<CubeShape> centerObj = EntityHelper::CreateVisualEntity<CubeShape>("Cube 1");
 
 		//eastl::shared_ptr<SquareShape> SquareTestObj = BasicShapesHelpers::CreateSquareObject();
 
 		//eastl::shared_ptr<CubeShape> lightObj = BasicShapesHelpers::CreateCubeObject();
 		//lightObj->SetRelativeLocation(glm::vec3(10.f, 20.f, 15.f));
 	}
-// 	{
-//  		eastl::shared_ptr<CubeShape> centerObj = BasicShapesHelpers::CreateCubeObject();
-//  		centerObj->Move(glm::vec3(0.f, 0.f, 5.f));
-// 	}
+ 	{
+  		eastl::shared_ptr<CubeShape> centerObj = EntityHelper::CreateVisualEntity<CubeShape>("Cube 2");
+  		centerObj->Move(glm::vec3(0.f, 0.f, 5.f));
+ 	}
  	{
 // 		for (int32_t j = 0; j < 100; ++j)
 // 		{
@@ -364,68 +364,6 @@ void TestGameMode::Init()
 // 			}
 // 		}
  	}
-
-	// Light
-// 	eastl::shared_ptr<LightSource> lightObj = EntityHelper::CreateObject<LightSource>();
-// 	lightObj->SetRelativeLocation(glm::vec3(1000, 20000.0f, -1000.f));
-// 	lightObj->SetScale(glm::vec3(100.f, 100.f, 100.f));
-
-  	AssimpModel = eastl::shared_ptr<AssimpModel3D>(EntityHelper::CreateVisualEntity<AssimpModel3D>("../Data/Models/Shiba/scene.gltf", "Shiba"));
-  	AssimpModel->SetScale(glm::vec3(10.f, 10.f, 10.f));
-  	AssimpModel->Move(glm::vec3(0.f, 10.f, 0.f));
-
-	FloorModel = EntityHelper::CreateVisualEntity<AssimpModel3D>("../Data/Models/Floor/scene.gltf", "Floor");
-	FloorModel->Move(glm::vec3(0.f, -2.f, 0.f));
-	//floorModel->SetScale(glm::vec3(10.f, 1.f, 10.f));
-
-	//TransformObjPtr concreteFloor = EntityHelper::CreateObject<AssimpModel3D>("../Data/Models/ConcreteFloor/Source/plane.fbx");
-// 	TransformObjPtr concreteFloor = EntityHelper::CreateObject<AssimpModel3D>("../Data/Models/ConcreteFloorGLTF/scene.gltf");
-// 	concreteFloor->Move(glm::vec3(5.f, 0.f, 0.f));
-
-
-
-	//Quad = EntityHelper::CreateObject<ParallaxQuad>("Parallax Quad");
-	//Quad->Rotate(90.f, glm::vec3(-1.f, 0.f, 0.f));
-
-	//eastl::shared_ptr<AssimpModel3D> sponzaModel = EntityHelper::CreateObject<AssimpModel3D>("../Data/Models/Sponza/scene.gltf");
-
-//  	eastl::shared_ptr<AssimpModel3D> model = EntityHelper::CreateObject<AssimpModel3D>("../Data/Models/Backpack/scene.gltf");
-//  	model->SetScale(glm::vec3(0.01f, 0.01f, 0.01f));
-//  	model->Move(glm::vec3(0.f, 3.f, 0.f));
-
-
-	//eastl::shared_ptr<InstancedCubeTest> instancedObj = EntityHelper::CreateVisualEntity<InstancedCubeTest>("Instanced Cubes");
-
-
-	//TransformObjPtr concreteFloor = EntityHelper::CreateObject<AssimpModel3D>("../Data/Models/ConcreteFloorGLTF/scene.gltf");
-	//Billboard = EntityHelper::CreateObject<BillboardQuad>();
-
-  	//eastl::shared_ptr<InstancedAssimpModelTest> instancedObj = EntityHelper::CreateObject<InstancedAssimpModelTest>("../Data/Models/Backpack/scene.gltf");
-  	//instancedObj->SetScale(glm::vec3(0.01f, 0.01f, 0.01f));
-  	//instancedObj->Move(glm::vec3(0.f, 3.f, 0.f));
-
-
-
-//  	{
-//  		eastl::shared_ptr<MirrorQuad> test = ObjectCreation::NewObject<MirrorQuad>();
-//  
-//  		test->Move(glm::vec3(0.0f, 0.0f, -10.f));
-//  	}
-
-//    	eastl::shared_ptr<AssimpModel3D> model = ObjectCreation::NewObject<AssimpModel3D>("../Data/Models/Shiba/scene.gltf");
-//    	model->Move(glm::vec3(0.f, 0.f, -5.f));
-   	//model->SetScale(glm::vec3(0.01f, 0.01f, 0.01f));
-
-	//eastl::shared_ptr<Skybox> skybox = ObjectCreation::NewObject<Skybox>();
-// 
-
-
-//   	{
-// 		DirLight = EntityHelper::CreateObject<LightSource>("Directional Light");
-// 		DirLight->Data.Type = ELightType::Directional;
-// 		DirLight->SetRelativeLocation({ -2.0f, 20.0f, -1.0f });
-// 		DirLight->SetRotationDegrees(glm::vec3(80.f, 0.f, 0.f));
-//   	}
 
 	constexpr float linear = 0.0014f;
 	constexpr float quadratic = 0.000007f;
@@ -450,15 +388,23 @@ void TestGameMode::Init()
 // 		PointLight->SetRelativeLocation({ -65.f, 1.0f, 0.f });
 // 	}
 
-	{
-		eastl::shared_ptr<LightSource> PointLight = EntityHelper::CreateVisualEntity<LightSource>("Point Light 3");
-		PointLight->LData.Type = ELightType::Point;
-		PointLight->LData.TypeData.PointData.Linear = linear;
-		PointLight->LData.TypeData.PointData.Quadratic = quadratic;
-		PointLight->LData.Color = glm::vec3(10.f, 10.f, 10.f);
 
-		PointLight->SetRelativeLocation({ 0.5f, 1.0f, -52.f });
-	}
+//   	AssimpModel = eastl::shared_ptr<AssimpModel3D>(EntityHelper::CreateVisualEntity<AssimpModel3D>("../Data/Models/Shiba/scene.gltf", "Shiba"));
+//   	AssimpModel->SetScale(glm::vec3(10.f, 10.f, 10.f));
+//   	AssimpModel->Move(glm::vec3(0.f, 10.f, 0.f));
+
+// 	FloorModel = EntityHelper::CreateVisualEntity<AssimpModel3D>("../Data/Models/Floor/scene.gltf", "Floor");
+// 	FloorModel->Move(glm::vec3(0.f, -2.f, 0.f));
+
+// 	{
+// 		eastl::shared_ptr<LightSource> PointLight = EntityHelper::CreateVisualEntity<LightSource>("Point Light 3");
+// 		PointLight->LData.Type = ELightType::Point;
+// 		PointLight->LData.TypeData.PointData.Linear = linear;
+// 		PointLight->LData.TypeData.PointData.Quadratic = quadratic;
+// 		PointLight->LData.Color = glm::vec3(10.f, 10.f, 10.f);
+// 
+// 		PointLight->SetRelativeLocation({ 0.5f, 1.0f, -52.f });
+// 	}
 }
 
 void TestGameMode::Tick(float inDeltaT)

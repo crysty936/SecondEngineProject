@@ -2,7 +2,6 @@
 #include "Renderer/SelfRegisteringUniform/SelfRegisteringUniform.h"
 #include "Core/EngineUtils.h"
 #include "Renderer/Material/MaterialHelpers.h"
-#include "Renderer/ForwardRenderer.h"
 
 RenderMaterial_Debug::RenderMaterial_Debug() = default;
 RenderMaterial_Debug::~RenderMaterial_Debug() = default;

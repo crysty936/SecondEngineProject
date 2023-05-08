@@ -14,6 +14,7 @@
 #include "Renderer/RHI/Resources/MeshDataContainer.h"
 #include "Window/WindowProperties.h"
 #include "RenderCommand.h"
+#include "Renderer.h"
 
 /**
  * TODO: Renderers should be differentiated between 2D and 3D because optimizations can be made for 2D only renderers (pixel perfect view)
@@ -28,38 +29,37 @@ struct RenderingLoadCommand
 	eastl::shared_ptr<class TransformObject> Parent;
 };
 
-class ForwardRenderer
+class ForwardRenderer : public Renderer
 {
 private:
 	ForwardRenderer(const WindowProperties& inMainWindowProperties);
 	virtual ~ForwardRenderer();
 
 public:
-	// Will create the base window and return the context for it
-	static void Init(const WindowProperties& inMainWindowProperties = {});
-	static void Terminate();
-	void Draw();
-	void Present();
+	void Draw() override;
+	void Present() override;
 
-	inline static ForwardRenderer& Get() { ASSERT(Instance); return *Instance; }
-	void AddCommand(const RenderCommand& inCommand);
-	void AddCommands(eastl::vector<RenderCommand> inCommands);
-	void SetDrawMode(const EDrawMode::Type inDrawMode);
-	void AddRenderLoadCommand(const RenderingLoadCommand& inCommand);
+	void AddCommand(const RenderCommand& inCommand) override;
+	void AddCommands(eastl::vector<RenderCommand> inCommands) override;
+	//void AddRenderLoadCommand(const RenderingLoadCommand& inCommand) override;
 
 	/**
 	 * return: bool, true if the RenderDataContainer was already present and is initialized, false otherwise
 	 * outContainer: newly created or existing cached Container
 	 */
-	bool GetOrCreateContainer(const eastl::string& inInstanceName, OUT eastl::shared_ptr<MeshDataContainer>& outContainer);
+	bool GetOrCreateContainer(const eastl::string& inInstanceName, OUT eastl::shared_ptr<MeshDataContainer>& outContainer) override;
 
-	inline eastl::unordered_map<eastl::string, SelfRegisteringUniform>& GetUniformsCache() const { return UniformsCache; };
+
+	eastl::string GetMaterialsDirPrefix() override;
+
+protected:
+	void InitInternal() override;
 
 private:
+	void SetDrawMode(const EDrawMode::Type inDrawMode);
 	void SetLightingConstants();
 	void DrawSkybox();
 	void DrawShadowMap();
-	void SetBaseUniforms();
 	void UpdateUniforms();
 	void DrawCommands(const eastl::vector<RenderCommand>& inCommands);
 	void DrawCommand(const RenderCommand& inCommand);
@@ -77,8 +77,6 @@ private:
 	friend void DrawDebugPoint(const glm::vec3& inPointLoc);
 
 private:
-	inline static ForwardRenderer* Instance = nullptr;
-	mutable eastl::unordered_map<eastl::string, SelfRegisteringUniform> UniformsCache;
 	eastl::vector<RenderCommand> MainCommands;
 	EDrawMode::Type CurrentDrawMode = EDrawMode::Default;
 	//eastl::queue<RenderingLoadCommand> LoadQueue;
@@ -90,8 +88,9 @@ private:
 	bool bNormalVisualizeMode = false;
 	bool bUseNormalMapping = true;
 
+	eastl::vector<float> shadowCascadeFarPlanes = { CAMERA_FAR / 10.0f, CAMERA_FAR / 2.0f, CAMERA_FAR };
 
-
+	friend class Renderer;
 
 };
 

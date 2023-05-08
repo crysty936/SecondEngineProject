@@ -11,9 +11,10 @@ uniform sampler2D quadTexture;
 void main()
 {
 	vec3 hdrColor = texture(quadTexture, ps_in.TexCoords).xyz;
-	float brightness = dot(hdrColor, vec3(0.2126, 0.7152, 0.0722));
+	vec3 srgbToLuminance = vec3(0.2126, 0.7152, 0.0722);
+	float brightness = dot(hdrColor, srgbToLuminance);
 	vec3 color;
-	if (brightness > 1.0)
+	if (brightness > 2.0)
 		color = hdrColor.rgb;
 	else
 		color = vec3(0.0, 0.0, 0.0);

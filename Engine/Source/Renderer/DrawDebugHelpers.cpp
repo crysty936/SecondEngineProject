@@ -1,6 +1,6 @@
 #include "DrawDebugHelpers.h"
 #include "Utils/InlineVector.h"
-#include "ForwardRenderer.h"
+#include "Renderer.h"
 #include "RenderUtils.h"
 #include "RHI/RHI.h"
 #include "Material/MaterialsManager.h"
@@ -148,7 +148,7 @@ void DrawDebugManager::Draw()
 
 		material->ResetUniforms();
 
-		material->SetUniformsValue(ForwardRenderer::Get().GetUniformsCache());
+		material->SetUniformsValue(Renderer::Get().GetUniformsCache());
 		material->BindBuffers();
 
 		RHI::Get()->DrawPoints(numPoints);
@@ -200,7 +200,7 @@ void DrawDebugManager::Draw()
 
 		material->ResetUniforms();
 
-		material->SetUniformsValue(ForwardRenderer::Get().GetUniformsCache());
+		material->SetUniformsValue(Renderer::Get().GetUniformsCache());
 		material->BindBuffers();
 
 		RHI::Get()->DrawPoints(static_cast<int32_t>(debugLines.size()));

@@ -2,7 +2,6 @@
 #include "Renderer/SelfRegisteringUniform/SelfRegisteringUniform.h"
 #include "Core/EngineUtils.h"
 #include "Renderer/Material/MaterialHelpers.h"
-#include "Renderer/ForwardRenderer.h"
 #include "imgui.h"
 
 RenderMaterial_Parallax::RenderMaterial_Parallax() = default;

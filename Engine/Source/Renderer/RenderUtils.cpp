@@ -1,7 +1,7 @@
 #include "RenderUtils.h"
 #include "EASTL/string.h"
 #include "RHI/Resources/VertexInputLayout.h"
-#include "ForwardRenderer.h"
+#include "Renderer.h"
 #include "Drawable/ShapesUtils/BasicShapesData.h"
 #include "RHI/RHI.h"
 #include "Material/MaterialsManager.h"
@@ -59,7 +59,7 @@ void ToneMapQuad::CreateCommand()
 	const eastl::string RenderDataContainerID = "squareVAO";
 	eastl::shared_ptr<MeshDataContainer> dataContainer{ nullptr };
 
-	const bool existingContainer = ForwardRenderer::Get().GetOrCreateContainer(RenderDataContainerID, dataContainer);
+	const bool existingContainer = Renderer::Get().GetOrCreateContainer(RenderDataContainerID, dataContainer);
 
 	VertexInputLayout inputLayout;
 	// Vertex points
@@ -124,7 +124,7 @@ void ExtractBrightAreasQuad::CreateCommand()
 	const eastl::string RenderDataContainerID = "squareVAO";
 	eastl::shared_ptr<MeshDataContainer> dataContainer{ nullptr };
 
-	const bool existingContainer = ForwardRenderer::Get().GetOrCreateContainer(RenderDataContainerID, dataContainer);
+	const bool existingContainer = Renderer::Get().GetOrCreateContainer(RenderDataContainerID, dataContainer);
 
 	VertexInputLayout inputLayout;
 	// Vertex points
@@ -176,7 +176,7 @@ void GaussianBlurQuad::CreateCommand()
 	const eastl::string RenderDataContainerID = "squareVAO";
 	eastl::shared_ptr<MeshDataContainer> dataContainer{ nullptr };
 
-	const bool existingContainer = ForwardRenderer::Get().GetOrCreateContainer(RenderDataContainerID, dataContainer);
+	const bool existingContainer = Renderer::Get().GetOrCreateContainer(RenderDataContainerID, dataContainer);
 
 	VertexInputLayout inputLayout;
 	// Vertex points
@@ -242,7 +242,7 @@ void BloomMergeQuad::CreateCommand()
 	const eastl::string RenderDataContainerID = "squareVAO";
 	eastl::shared_ptr<MeshDataContainer> dataContainer{ nullptr };
 
-	const bool existingContainer = ForwardRenderer::Get().GetOrCreateContainer(RenderDataContainerID, dataContainer);
+	const bool existingContainer = Renderer::Get().GetOrCreateContainer(RenderDataContainerID, dataContainer);
 
 	VertexInputLayout inputLayout;
 	// Vertex points

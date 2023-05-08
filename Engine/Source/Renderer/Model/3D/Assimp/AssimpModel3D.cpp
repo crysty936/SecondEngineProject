@@ -5,7 +5,7 @@
 #include "assimp/postprocess.h"
 #include "Renderer/Material/MaterialsManager.h"
 #include "Renderer/RenderCommand.h"
-#include "Renderer/ForwardRenderer.h"
+#include "Renderer/Renderer.h"
 #include "Renderer/RenderingPrimitives.h"
 #include "Renderer/RHI/Resources/MeshDataContainer.h"
 #include "Renderer/RHI/Resources/RHITexture.h"
@@ -51,7 +51,7 @@ void AssimpModel3D::LoadModelToRoot(const eastl::string inPath, TransformObjPtr 
 	eastl::vector<RenderCommand> resultingCommands;
 	eastl::shared_ptr<MeshNode> mesh = LoadData(resultingCommands);
 
-	ForwardRenderer::Get().AddCommands(resultingCommands);
+	Renderer::Get().AddCommands(resultingCommands);
 
 	inParent->AddChild(mesh);
 }
@@ -169,7 +169,7 @@ void AssimpModel3D::ProcessMesh(const aiMesh& inMesh, const aiScene& inScene, ea
  
 	const eastl::string renderDataContainerID = inMesh.mName.C_Str();
 	eastl::shared_ptr<MeshDataContainer> dataContainer;
-	const bool existingContainer = ForwardRenderer::Get().GetOrCreateContainer(renderDataContainerID, dataContainer);
+	const bool existingContainer = Renderer::Get().GetOrCreateContainer(renderDataContainerID, dataContainer);
 
 	if (!existingContainer)
 	{

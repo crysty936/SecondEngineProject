@@ -35,16 +35,10 @@
 #include "imgui.h"
 #include "ShaderTypes.h"
 
-constexpr glm::vec4 ClearColor(0.3f, 0.5f, 1.f, 0.4f);
-
 const uint32_t SHADOW_WIDTH = 1024;
 const uint32_t SHADOW_HEIGHT = 1024;
 
-constexpr float CAMERA_FOV = 45.f;
-constexpr float CAMERA_NEAR = 0.1f;
-constexpr float CAMERA_FAR = 50000.f;
 constexpr int32_t MAX_CASCADES_COUNT = 3;
-eastl::vector<float> shadowCascadeFarPlanes = { CAMERA_FAR / 10.0f, CAMERA_FAR / 2.0f, CAMERA_FAR};
 
 static std::mutex RenderCommandsMutex;
 static std::mutex LoadQueueMutex;
@@ -76,36 +70,6 @@ static std::condition_variable LoadQueueCondition;
 // 	}
 // }
 
-ForwardRenderer::ForwardRenderer(const WindowProperties& inMainWindowProperties)
-{
-	SetViewportSizeToMain();
-
-	RHI::Get()->ClearColor(ClearColor);
-
-	// Set the default uniforms
-	SetBaseUniforms();
-
-
-// 	// Create the shadow map framebuffer
-// 	glGenFramebuffers(1, &RHI->ShadowMapBuffer);
-// 	glBindFramebuffer(GL_FRAMEBUFFER, RHI->ShadowMapBuffer);
-// 
-// 	RHI->ShadowBufferTex = eastl::make_shared<OpenGLDepthMap>("ShadowMap");
-// 	RHI->ShadowBufferTex->Init();
-// 
-// 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, RHI->ShadowBufferTex->TexHandle, 0);
-// 
-// 	glDrawBuffer(GL_NONE);
-// 	glReadBuffer(GL_NONE);
-// 
-// 	ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
-// 
-// 	// Bind the default frame buffer
-// 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-
-ForwardRenderer::~ForwardRenderer() = default;
-
 eastl::shared_ptr<FullScreenQuad> ScreenQuad;
 eastl::shared_ptr<ToneMapQuad> TonemappingQuad;
 eastl::shared_ptr<ExtractBrightAreasQuad> ExtractBrightAreasUtilQuad;
@@ -123,24 +87,16 @@ eastl::shared_ptr<RHITexture2D> ColorBackupTexture = nullptr;
 eastl::shared_ptr<RHIFrameBuffer> DepthFrameBuffer = nullptr;
 eastl::shared_ptr<RHITexture2D> DirectionalLightCascadedShadowTexture = nullptr;
 
-void ForwardRenderer::SetBaseUniforms()
+ForwardRenderer::ForwardRenderer(const WindowProperties& inMainWindowProperties)
+	: Renderer(inMainWindowProperties)
 {
-	// By default, use a D3D11 projection matrix.
-	// Note: glm is RH but uses a sneaky minus to change the handedness of the output to LH (how OpenGL actually is)
-	const float windowWidth = static_cast<float>(Engine->GetMainWindow().GetProperties().Width);
-	const float windowHeight = static_cast<float>(Engine->GetMainWindow().GetProperties().Height);
 
-	glm::mat4 projection = glm::perspectiveRH_ZO(glm::radians(CAMERA_FOV), windowWidth / windowHeight, CAMERA_NEAR, CAMERA_FAR);
-	//glm::mat4 lightProjection = glm::orthoRH_ZO(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
-	RHI::Get()->PrepareProjectionForRendering(projection);
-
-	UniformsCache["projection"] = projection;
 }
 
-void ForwardRenderer::Init(const WindowProperties& inMainWindowProperties)
-{
-	Instance = new ForwardRenderer{ inMainWindowProperties };
+ForwardRenderer::~ForwardRenderer() = default;
 
+void ForwardRenderer::InitInternal()
+{
 	GlobalFrameBuffer = RHI::Get()->CreateDepthStencilFrameBuffer();
 	GlobalRenderTexture = RHI::Get()->CreateRenderTextureHDR();
 	RHI::Get()->AttachTextureToFramebufferColor(*GlobalFrameBuffer, *GlobalRenderTexture);
@@ -172,12 +128,6 @@ void ForwardRenderer::Init(const WindowProperties& inMainWindowProperties)
 	DepthFrameBuffer = RHI::Get()->CreateEmptyFrameBuffer();
 	DirectionalLightCascadedShadowTexture = RHI::Get()->CreateArrayDepthMap(SHADOW_WIDTH, SHADOW_HEIGHT, MAX_CASCADES_COUNT);
 	RHI::Get()->AttachTextureToFramebufferDepth(*DepthFrameBuffer, *DirectionalLightCascadedShadowTexture);
-}
-
-void ForwardRenderer::Terminate()
-{
-	ASSERT(Instance);
-	delete Instance;
 }
 
 void ForwardRenderer::Draw()
@@ -919,13 +869,13 @@ void ForwardRenderer::SetDrawMode(const EDrawMode::Type inDrawMode)
 	CurrentDrawMode = inDrawMode;
 }
 
-void ForwardRenderer::AddRenderLoadCommand(const RenderingLoadCommand & inCommand)
-{
-	std::unique_lock<std::mutex> lock{ LoadQueueMutex };
-
-	//LoadQueue.push(inCommand);
-	LoadQueueCondition.notify_one();
-}
+// void ForwardRenderer::AddRenderLoadCommand(const RenderingLoadCommand & inCommand)
+// {
+// 	std::unique_lock<std::mutex> lock{ LoadQueueMutex };
+// 
+// 	//LoadQueue.push(inCommand);
+// 	LoadQueueCondition.notify_one();
+// }
 
 bool ForwardRenderer::GetOrCreateContainer(const eastl::string& inInstanceName, OUT eastl::shared_ptr<MeshDataContainer>& outContainer)
 {
@@ -951,6 +901,11 @@ bool ForwardRenderer::GetOrCreateContainer(const eastl::string& inInstanceName, 
 	//GetVAOMutex.unlock();
 
 	return false;
+}
+
+eastl::string ForwardRenderer::GetMaterialsDirPrefix()
+{
+	return "Forward";
 }
 
 void ForwardRenderer::SetViewportSizeToMain()

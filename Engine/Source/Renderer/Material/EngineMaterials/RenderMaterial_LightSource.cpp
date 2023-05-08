@@ -2,7 +2,6 @@
 #include "Renderer/SelfRegisteringUniform/SelfRegisteringUniform.h"
 #include "Core/EngineUtils.h"
 #include "Renderer/Material/MaterialHelpers.h"
-#include "Renderer/ForwardRenderer.h"
 #include "Renderer/DrawDebugHelpers.h"
 
 RenderMaterial_LightSource::RenderMaterial_LightSource() = default;

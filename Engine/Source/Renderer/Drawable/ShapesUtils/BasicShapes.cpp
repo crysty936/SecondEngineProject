@@ -3,7 +3,7 @@
 #include "Renderer/RHI/Resources/MeshDataContainer.h"
 #include "Renderer/Material/MaterialsManager.h"
 #include "Renderer/RenderCommand.h"
-#include "Renderer/ForwardRenderer.h"
+#include "Renderer/Renderer.h"
 #include "Core/EntityHelper.h"
 #include "Renderer/Material/EngineMaterials/SkyboxMaterial.h"
 #include "glad/glad.h"
@@ -27,7 +27,7 @@ void TriangleShape::CreateProxy()
 	const eastl::string RenderDataContainerID = "triangleVAO";
 	eastl::shared_ptr<MeshDataContainer> dataContainer{ nullptr };
 
-	const bool existingContainer = ForwardRenderer::Get().GetOrCreateContainer(RenderDataContainerID, dataContainer);
+	const bool existingContainer = Renderer::Get().GetOrCreateContainer(RenderDataContainerID, dataContainer);
 
 	VertexInputLayout inputLayout;
 	// Vertex points
@@ -71,7 +71,7 @@ void TriangleShape::CreateProxy()
 	newCommand.Parent = this_shared(this);
 	newCommand.DrawType = EDrawType::DrawElements;
 
-	ForwardRenderer::Get().AddCommand(newCommand);
+	Renderer::Get().AddCommand(newCommand);
 }
 
 
@@ -87,7 +87,7 @@ void SquareShape::CreateProxy()
  	const eastl::string RenderDataContainerID = "squareVAO";
 	eastl::shared_ptr<MeshDataContainer> dataContainer{ nullptr };
 
-	const bool existingContainer = ForwardRenderer::Get().GetOrCreateContainer(RenderDataContainerID, dataContainer);
+	const bool existingContainer = Renderer::Get().GetOrCreateContainer(RenderDataContainerID, dataContainer);
  
  	VertexInputLayout inputLayout;
  	// Vertex points
@@ -127,7 +127,7 @@ void SquareShape::CreateProxy()
  	newCommand.Parent = this_shared(this);
  	newCommand.DrawType = EDrawType::DrawElements;
  
-	ForwardRenderer::Get().AddCommand(newCommand);
+	Renderer::Get().AddCommand(newCommand);
 }
 
 CubeShape::CubeShape(const eastl::string& inName)
@@ -142,7 +142,7 @@ void CubeShape::CreateProxy()
   	const eastl::string RenderDataContainerID = "cubeVAO";
  	eastl::shared_ptr<MeshDataContainer> dataContainer{ nullptr };
 
-	const bool existingContainer = ForwardRenderer::Get().GetOrCreateContainer(RenderDataContainerID, dataContainer);
+	const bool existingContainer = Renderer::Get().GetOrCreateContainer(RenderDataContainerID, dataContainer);
 	VertexInputLayout inputLayout;
 	// Vertex points
 	inputLayout.Push<float>(3, VertexInputType::Position);
@@ -173,8 +173,8 @@ void CubeShape::CreateProxy()
 		material->OwnedTextures.push_back(tex);
 
 		eastl::vector<ShaderSourceInput> shaders = {
-		{ "VS_Pos-UV-Normal_WithShadow", EShaderType::Vertex },
-		{ "PS_BasicTex_WithShadow", EShaderType::Fragment } };
+		{ "DefaultCubeMaterial/VS_Pos-UV-Normal_WithShadow", EShaderType::Vertex },
+		{ "DefaultCubeMaterial/PS_BasicTex_WithShadow", EShaderType::Fragment } };
 
 		material->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
   	}
@@ -188,7 +188,7 @@ void CubeShape::CreateProxy()
 	newCommand.Parent = cubeNode;
 	newCommand.DrawType = EDrawType::DrawElements;
 
-	ForwardRenderer::Get().AddCommand(newCommand);
+	Renderer::Get().AddCommand(newCommand);
 }
 
 Skybox::Skybox(const eastl::string& inName)
@@ -272,7 +272,7 @@ void LightSource::CreateProxy()
 	const eastl::string RenderDataContainerID = "lightVAO";
 	eastl::shared_ptr<MeshDataContainer> dataContainer{ nullptr };
 
-	const bool existingContainer = ForwardRenderer::Get().GetOrCreateContainer(RenderDataContainerID, dataContainer);
+	const bool existingContainer = Renderer::Get().GetOrCreateContainer(RenderDataContainerID, dataContainer);
 	VertexInputLayout inputLayout;
 	// Vertex points
 	inputLayout.Push<float>(3, VertexInputType::Position);
@@ -341,7 +341,7 @@ void LightSource::CreateProxy()
 	newCommand.Parent = cubeNode;
 	newCommand.DrawType = EDrawType::DrawElements;
 
-	ForwardRenderer::Get().AddCommand(newCommand);
+	Renderer::Get().AddCommand(newCommand);
 }
 
 // Mirror
@@ -432,7 +432,7 @@ void FullScreenQuad::CreateCommand()
 	const eastl::string RenderDataContainerID = "squareVAO";
 	eastl::shared_ptr<MeshDataContainer> dataContainer{ nullptr };
 
-	const bool existingContainer = ForwardRenderer::Get().GetOrCreateContainer(RenderDataContainerID, dataContainer);
+	const bool existingContainer = Renderer::Get().GetOrCreateContainer(RenderDataContainerID, dataContainer);
 
 	VertexInputLayout inputLayout;
 	// Vertex points

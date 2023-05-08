@@ -10,7 +10,7 @@
 #include "Renderer/Material/MaterialsManager.h"
 #include "Window/WindowsWindow.h"
 #include "Renderer/RHI/RHI.h"
-#include "Renderer/ForwardRenderer.h"
+#include "Renderer/Renderer.h"
 #include "backends/imgui_impl_win32.h"
 #include "imgui.h"
 #include "Editor/Editor.h"
@@ -51,7 +51,7 @@ void EngineCore::Init()
 	// Hide Cursor for input
 	InputSystem::Get().SetCursorMode(ECursorMode::Disabled, Engine->MainWindow->GetHandle());
 
-	ForwardRenderer::Init();
+	Renderer::Init();
 
 	TimersManager::Init();
 
@@ -72,7 +72,7 @@ void EngineCore::Terminate()
 	Editor::Terminate();
 
 	TimersManager::Terminate();
-	ForwardRenderer::Terminate();
+	Renderer::Terminate();
 	InputSystem::Terminate();
 
 	RHI::Terminate();
@@ -135,7 +135,7 @@ void EngineCore::Run()
 
 		GEditor->Tick(CurrentDeltaT);
 
- 		ForwardRenderer::Get().Draw();
+		Renderer::Get().Draw();
 
 		// Draw ImGui
 		ImGui::EndFrame();
@@ -149,7 +149,7 @@ void EngineCore::Run()
 			ImGui::RenderPlatformWindowsDefault();
 		}
 
-		ForwardRenderer::Get().Present();
+		Renderer::Get().Present();
 
 		CheckShouldCloseWindow();
 	}
