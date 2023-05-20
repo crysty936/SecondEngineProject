@@ -62,3 +62,17 @@ public:
 private:
 	RenderCommand QuadCommand;
 };
+
+class VisualizeDepthQuad : public DrawableObject
+{
+public:
+	VisualizeDepthQuad(const eastl::string& inName);
+	~VisualizeDepthQuad() = default;
+
+	void CreateCommand();
+	inline const RenderCommand& GetCommand() { return QuadCommand; };
+
+private:
+	RenderCommand QuadCommand;
+};
+

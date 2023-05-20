@@ -13,6 +13,9 @@ SelfRegisteringUniform::SelfRegisteringUniform(const float inValue)
 SelfRegisteringUniform::SelfRegisteringUniform(const glm::mat4& inValue)
 	: Data{ eastl::make_unique<SelfRegisteringUniformData<glm::mat4>>(inValue) } {}
 
+SelfRegisteringUniform::SelfRegisteringUniform(const glm::vec2& inValue)
+	: Data{ eastl::make_unique<SelfRegisteringUniformData<glm::vec2>>(inValue) } {}
+
 SelfRegisteringUniform::SelfRegisteringUniform(const glm::vec3& inValue)
 	: Data{ eastl::make_unique<SelfRegisteringUniformData<glm::vec3>>(inValue) } {}
 

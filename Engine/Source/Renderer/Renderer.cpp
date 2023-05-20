@@ -8,7 +8,7 @@
 
 #define RENDERER_FORWARD 1
 #define RENDERER_DEFERRED 2
-#define CHOSEN_RENDERER 1
+#define CHOSEN_RENDERER 2
 
 constexpr glm::vec4 ClearColor(0.3f, 0.5f, 1.f, 0.4f);
 
@@ -60,5 +60,7 @@ void Renderer::SetBaseUniforms()
 	RHI::Get()->PrepareProjectionForRendering(projection);
 
 	UniformsCache["projection"] = projection;
+
+	UniformsCache["CameraNearFar"] = glm::vec2(CAMERA_NEAR, CAMERA_FAR);
 }
 

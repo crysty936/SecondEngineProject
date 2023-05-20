@@ -37,10 +37,6 @@
 
 constexpr glm::vec4 ClearColor(0.3f, 0.5f, 1.f, 0.4f);
 
-constexpr float CAMERA_FOV = 45.f;
-constexpr float CAMERA_NEAR = 0.1f;
-constexpr float CAMERA_FAR = 50000.f;
-
 static std::mutex RenderCommandsMutex;
 static std::mutex GetVAOMutex;
 
@@ -53,12 +49,33 @@ DeferredRenderer::~DeferredRenderer() = default;
 
 static eastl::shared_ptr<RHIFrameBuffer> GBuffer = nullptr;
 static eastl::shared_ptr<RHITexture2D> GlobalRenderTexture = nullptr;
+static eastl::shared_ptr<RHITexture2D> GDepthTexture = nullptr;
+
+eastl::shared_ptr<VisualizeDepthQuad> VisualizeDepthUtil;
+
 
 void DeferredRenderer::InitInternal()
 {
-	GBuffer = RHI::Get()->CreateDepthStencilFrameBuffer();
-	GlobalRenderTexture = RHI::Get()->CreateRenderTextureHDR();
-	RHI::Get()->AttachTextureToFramebufferColor(*GBuffer, *GlobalRenderTexture);
+	GBuffer = RHI::Get()->CreateEmptyFrameBuffer();
+	//GlobalRenderTexture = RHI::Get()->CreateRenderTexture();
+	//RHI::Get()->AttachTextureToFramebufferColor(*GBuffer, *GlobalRenderTexture);
+
+	const WindowsWindow& currentWindow = Engine->GetMainWindow();
+	const WindowProperties& props = currentWindow.GetProperties();
+	GDepthTexture = RHI::Get()->CreateDepthMap(props.Width, props.Height);
+
+	RHI::Get()->AttachTextureToFramebufferDepth(*GBuffer, *GDepthTexture);
+
+
+	VisualizeDepthUtil = EntityHelper::CreateEntity<VisualizeDepthQuad>("VisualizeDepth");
+	VisualizeDepthUtil->CreateCommand();
+
+
+
+	VisualizeDepthUtil->GetCommand().Material->ExternalTextures.push_back(GDepthTexture);
+
+
+
 
 
 }
@@ -73,18 +90,26 @@ void DeferredRenderer::Draw()
 	SetLightingConstants();
 
 
-// 	RHI::Instance->BindFrameBuffer(*GlobalFrameBuffer);
-// 	RHI::Instance->ClearTexture(*GlobalRenderTexture, glm::vec4(0.f, 0.f, 0.f, 1.f));
+ 	RHI::Instance->BindFrameBuffer(*GBuffer);
+	RHI::Get()->ClearBuffers();
+	RHI::Instance->ClearTexture(*GDepthTexture, glm::vec4(1.f, 1.f, 1.f, 1.f));
 
 
 	// Clear default framebuffer buffers
-	RHI::Instance->BindDefaultFrameBuffer();
-	RHI::Get()->ClearBuffers();
+	//RHI::Instance->BindDefaultFrameBuffer();
+	//RHI::Get()->ClearBuffers();
 
     DrawCommands(MainCommands);
 
+
+	RHI::Instance->BindDefaultFrameBuffer();
+	RHI::Get()->ClearBuffers();
+
+	DrawCommand(VisualizeDepthUtil->GetCommand());
+
+
 	// Draw debug primitives
-	DrawDebugManager::Draw();
+	//DrawDebugManager::Draw();
 
 
 	ImGui::End();
@@ -200,8 +225,7 @@ void DeferredRenderer::UpdateUniforms()
 
 void DeferredRenderer::DrawCommands(const eastl::vector<RenderCommand>& inCommands)
 {
-	// TODO: Fix the draw mode thing with objects being able to tell which passes they are in
-	// and the renderer being able to use certain passes
+	// TODO: Fix this
 	if (CurrentDrawMode & EDrawMode::Default)
 	{
 		const int32_t builtInPassesCount = glm::log2((int)EDrawMode::Count);
@@ -217,6 +241,8 @@ void DeferredRenderer::DrawCommands(const eastl::vector<RenderCommand>& inComman
 					DrawCommand(renderCommand);
 				}
 			}
+
+			SetDrawMode(EDrawMode::Default);
 		}
 	}
 	else

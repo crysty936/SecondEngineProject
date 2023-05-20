@@ -165,7 +165,7 @@ void CubeShape::CreateProxy()
   
   	MaterialsManager& matManager = MaterialsManager::Get();
   	bool materialExists = false;
-	eastl::shared_ptr<RenderMaterial> material = matManager.GetOrAddMaterial<RenderMaterial_WithShadow>("cube_material", materialExists);
+	eastl::shared_ptr<RenderMaterial> material = matManager.GetOrAddMaterial<RenderMaterial>("cube_material", materialExists);
   
   	if (!materialExists)
   	{

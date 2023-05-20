@@ -182,7 +182,7 @@ void ForwardRenderer::Draw()
   	RHI::Instance->BindDefaultFrameBuffer();
  
   	static int blurPassesCount = 10;
- 	ImGui::DragInt("Bloom Blur Passes Count", &blurPassesCount, 2, 0.f, 100.f);
+ 	ImGui::DragInt("Bloom Blur Passes Count", &blurPassesCount, 2, 0, 100);
 
   	for (int32_t i = 0; i < blurPassesCount; ++i)
   	{
