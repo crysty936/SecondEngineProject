@@ -15,7 +15,7 @@ Features:
 - Bloom
 - ...
 
-Note: Not all of these features may be fully functional at any given commit. That's to allow faster iteration. The commits at which these features are functinal are named accordingly.
+Note: Not all of these features may be fully functional at any given commit. That's to allow faster iteration. The commits at which these features are functional are named accordingly.
 
 ## 
 Libs:
