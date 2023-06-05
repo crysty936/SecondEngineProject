@@ -88,7 +88,7 @@ public:
 
 public:
 	glm::vec2 Data;
-	glm::vec4 AlignedData;
+	glm::vec4 AlignedData{};
 };
 
 
@@ -125,7 +125,7 @@ public:
 
 public:
 	glm::vec3 Data;
-	glm::vec4 AlignedData;
+	glm::vec4 AlignedData{};
 };
 
 template<typename T>

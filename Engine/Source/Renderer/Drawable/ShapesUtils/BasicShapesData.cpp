@@ -146,8 +146,8 @@ int32_t BasicShapesData::GetSquareIndicesCount()
 // Cube
  // CCW Cube Vertices
  // z goes from 1 to -1 so they appear at first sight as CW
-// These are commented as {where they are in the clip cube when looking straigh on}{face to be used for}
-// NOT {place in used face}{face to be used for}
+// These are commented as [where they are in the clip cube when looking straigh on][face to be used for]
+// NOT [place in used face][face to be used for]
 const float CubeVertices[] = {
 
 	// Vertices			 // Normal			  //Tex Coords

@@ -44,6 +44,6 @@ protected:
 
 	const float CAMERA_FOV = 45.f;
 	const float CAMERA_NEAR = 0.1f;
-	const float CAMERA_FAR = 50000.f;
+	const float CAMERA_FAR = 10000.f;
 };
 

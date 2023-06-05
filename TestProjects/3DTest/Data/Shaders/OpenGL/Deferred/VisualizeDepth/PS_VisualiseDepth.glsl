@@ -9,7 +9,10 @@ in VS_OUT
 
 layout(std140, binding = 1) uniform ViewConstantsBuffer
 {
-	vec2 CameraNearFar;
+	mat4 perspInv;
+	mat4 viewInv;
+	vec4 CameraNearFar;
+	vec4 ViewportSize;
 
 } ViewConstants;
 
@@ -20,17 +23,26 @@ void main()
 {
 	float depthValue = texture(quadTexture, ps_in.TexCoords).r;
 
-	//- (static_cast<T>(2) * zFar * zNear) / (zFar - zNear);
-	//(2.0 * near * far) / (far + near - z * (far - near));
+	if (depthValue > 0.9999f)
+	{
+		discard;
+	}
 
-	//-(zFar * zNear) / (zFar - zNear);
+	//vec2 clipCoord = ps_in.TexCoords.xy * 2.f - 1.f;
+	vec2 clipCoord = (gl_FragCoord.xy / ViewConstants.ViewportSize.xy) * 2.f - 1.f;
 
+	vec4 clipsSpaceLoc = vec4(clipCoord.x, clipCoord.y, depthValue, 1.0);
 
+	vec4 viewSpacePos = ViewConstants.perspInv * clipsSpaceLoc;
+	viewSpacePos /= viewSpacePos.w;
 
-	float near = ViewConstants.CameraNearFar.x;
+	vec4 worldSpacePos = ViewConstants.viewInv * viewSpacePos;
+
 	float far = ViewConstants.CameraNearFar.y;
-	float normalizedDepth = (2.0 * near * far) / (far + near - depthValue * (far - near));;
 
+	float normalizedDepth = abs(viewSpacePos.z) / far;
 
-	FragColor = vec4(vec3(normalizedDepth), 1.0);
+	FragColor = vec4(worldSpacePos.xyz, 1.0);
+
+ 
 }

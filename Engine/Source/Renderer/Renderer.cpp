@@ -6,9 +6,9 @@
 #include "Window/WindowsWindow.h"
 #include "Core/EngineCore.h"
 
+#define CHOSEN_RENDERER 2
 #define RENDERER_FORWARD 1
 #define RENDERER_DEFERRED 2
-#define CHOSEN_RENDERER 2
 
 constexpr glm::vec4 ClearColor(0.3f, 0.5f, 1.f, 0.4f);
 
@@ -50,17 +50,15 @@ void Renderer::SetViewportSizeToMain()
 
 void Renderer::SetBaseUniforms()
 {
-	// By default, use a D3D11 projection matrix.
 	// Note: glm is RH but uses a sneaky minus to change the handedness of the output to LH (how OpenGL actually is)
 	const float windowWidth = static_cast<float>(Engine->GetMainWindow().GetProperties().Width);
 	const float windowHeight = static_cast<float>(Engine->GetMainWindow().GetProperties().Height);
 
 	glm::mat4 projection = glm::perspectiveRH_ZO(glm::radians(CAMERA_FOV), windowWidth / windowHeight, CAMERA_NEAR, CAMERA_FAR);
-	//glm::mat4 lightProjection = glm::orthoRH_ZO(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
 	RHI::Get()->PrepareProjectionForRendering(projection);
 
 	UniformsCache["projection"] = projection;
 
-	UniformsCache["CameraNearFar"] = glm::vec2(CAMERA_NEAR, CAMERA_FAR);
+	UniformsCache["CameraNearFar"] = glm::vec4(CAMERA_NEAR, CAMERA_FAR, 0.f, 0.f);
 }
 

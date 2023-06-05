@@ -344,14 +344,14 @@ void TestGameMode::Init()
 	{
 		eastl::shared_ptr<CubeShape> centerObj = EntityHelper::CreateVisualEntity<CubeShape>("Cube 1");
 
-		//eastl::shared_ptr<SquareShape> SquareTestObj = BasicShapesHelpers::CreateSquareObject();
+		//eastl::shared_ptr<SquareShape> SquareTestObj = EntityHelper::CreateVisualEntity<SquareShape>("Quad 1");
 
 		//eastl::shared_ptr<CubeShape> lightObj = BasicShapesHelpers::CreateCubeObject();
 		//lightObj->SetRelativeLocation(glm::vec3(10.f, 20.f, 15.f));
 	}
  	{
-  		eastl::shared_ptr<CubeShape> centerObj = EntityHelper::CreateVisualEntity<CubeShape>("Cube 2");
-  		centerObj->Move(glm::vec3(0.f, 0.f, 5.f));
+  		//eastl::shared_ptr<CubeShape> centerObj = EntityHelper::CreateVisualEntity<CubeShape>("Cube 2");
+  		//centerObj->Move(glm::vec3(0.f, 0.f, 5.f));
  	}
  	{
 // 		for (int32_t j = 0; j < 100; ++j)

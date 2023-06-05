@@ -219,8 +219,8 @@ void DeferredRenderer::SetLightingConstants()
 
 void DeferredRenderer::UpdateUniforms()
 {
-	const glm::mat4 view = SceneManager::Get().GetCurrentScene().GetCurrentCamera()->GetLookAt();
-	UniformsCache["view"] = view;
+ 	const glm::mat4 view = SceneManager::Get().GetCurrentScene().GetCurrentCamera()->GetLookAt();
+ 	UniformsCache["view"] = view;
 }
 
 void DeferredRenderer::DrawCommands(const eastl::vector<RenderCommand>& inCommands)
