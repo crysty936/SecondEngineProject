@@ -1,19 +1,30 @@
 # SecondEngineProject
-A framework I am developing to learn and experiment with Graphics and Engine Architecture.
+A framework used for learning and experimenting.
 
 Features:
-- Multithreaded renderer architecture - Command driven renderer, loading assets is done on a different thread.
+- RHI Abstraction: Multi Rendering API Support: OpenGl, D3D11
 - Custom pure C++ Unreal-like delegates implemented using templates.
-- Timers system.
+- Native Win32 API and Windows Loop Handling
+- Forward Rendering
+- Deferred Rendering
+- Directional Lights
+- Point Lights
+- Cascaded Shadow Maps
+- Normal Mapping
+- Parallax Mapping
+- Bloom
+- ...
+
+Note: Not all of these features may be fully functional at any given commit. That's to allow faster iteration. The commits at which these features are functinal are named accordingly.
 
 ## 
 Libs:
-- GLFW
 - Glad
 - EASTL
 - GTest
 - Assimp
 - stb_image
+- imgui
 
 Instructions:
 1. Go into one of the Test Projects(Only 3DTest is working at the moment - Flappy Test is based on an older engine version).
