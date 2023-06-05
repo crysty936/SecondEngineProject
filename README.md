@@ -13,6 +13,7 @@ Features:
 - Normal Mapping
 - Parallax Mapping
 - Bloom
+- Scene graph with properties edit functionality using imgui
 - ...
 
 Note: Not all of these features may be fully functional at any given commit. That's to allow faster iteration. The commits at which these features are functional are named accordingly.
