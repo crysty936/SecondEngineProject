@@ -1,5 +1,6 @@
 #extension GL_ARB_separate_shader_objects : enable
-layout(location = 0) out vec4 FragColor;
+layout(location = 0) out vec4 gNormal;
+layout(location = 1) out vec4 gAlbedoSpec;
 
 in VS_OUT
 {
@@ -208,5 +209,7 @@ void main()
  		//color = vec3(projCoords.xy, layer);
  	}
 
-	FragColor = vec4(color, 1.0);
+	gNormal =  vec4(ps_in.Normal / 2.0 + 0.5, 1.0);
+	//gNormal =  vec4(ps_in.Normal / 2.0 + 0.5, 1.0);
+	gAlbedoSpec = texture(diffuse, ps_in.TexCoords);
 }

@@ -3,9 +3,18 @@
 #include "Scene/Scene.h"
 #include "Renderer/Drawable/Drawable.h"
 
-class EntityHelper
+class SceneHelper
 {
 public:
+	template<typename T, typename... inParamTypes>
+	static eastl::shared_ptr<T> CreateObject(inParamTypes... inParams)
+	{
+		eastl::shared_ptr<T> newObject = eastl::make_shared<T>(std::forward<inParamTypes>(inParams)...);
+
+		return newObject;
+	}
+
+
 	template<typename T, typename... inParamTypes>
 	static eastl::shared_ptr<T> CreateEntity(inParamTypes... inParams)
 	{

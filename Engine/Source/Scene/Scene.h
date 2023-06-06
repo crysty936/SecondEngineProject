@@ -4,6 +4,7 @@
 #include "Entity/TransformObject.h"
 #include "Renderer/LightTypes.h"
 #include "Renderer/Drawable/ShapesUtils/BasicShapes.h"
+#include "Renderer/RenderUtils.h"
 
 /**
  * Scene should contain all objects present in that scene as gameobjects.

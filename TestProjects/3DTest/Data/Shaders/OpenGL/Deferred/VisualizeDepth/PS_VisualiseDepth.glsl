@@ -23,11 +23,6 @@ void main()
 {
 	float depthValue = texture(quadTexture, ps_in.TexCoords).r;
 
-	if (depthValue > 0.9999f)
-	{
-		discard;
-	}
-
 	//vec2 clipCoord = ps_in.TexCoords.xy * 2.f - 1.f;
 	vec2 clipCoord = (gl_FragCoord.xy / ViewConstants.ViewportSize.xy) * 2.f - 1.f;
 
@@ -37,12 +32,21 @@ void main()
 	viewSpacePos /= viewSpacePos.w;
 
 	vec4 worldSpacePos = ViewConstants.viewInv * viewSpacePos;
-
-	float far = ViewConstants.CameraNearFar.y;
-
-	float normalizedDepth = abs(viewSpacePos.z) / far;
-
 	FragColor = vec4(worldSpacePos.xyz, 1.0);
 
+
+	if (depthValue > 0.999999f)
+	{
+		FragColor = vec4(0.f, 0.f, 0.f, 1.f);
+	}
+
+// 	if (depthValue > 0.999999f)
+// 	{
+// 		FragColor = vec4(1.f, 1.f, 1.f, 1.f);
+// 	}
+
+// 	float far = ViewConstants.CameraNearFar.y;
+// 	float normalizedDepth = abs(viewSpacePos.z) / far;
+	//FragColor = vec4(vec3(normalizedDepth), 1.0);
  
 }

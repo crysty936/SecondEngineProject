@@ -374,7 +374,7 @@ eastl::shared_ptr<RHITexture2D> OpenGLRHI::CreateAndLoadTexture2D(const eastl::s
 	return newTexture;
 }
 
-eastl::shared_ptr<class RHITexture2D> OpenGLRHI::CreateRenderTexture()
+eastl::shared_ptr<class RHITexture2D> OpenGLRHI::CreateRenderTexture(const int32_t inWidth, const int32_t inHeight, const ERHITexturePrecision inPrecision, const ERHITextureFilter inFilter)
 {
 	uint32_t texHandle = 0;
 	glGenTextures(1, &texHandle);
@@ -382,48 +382,57 @@ eastl::shared_ptr<class RHITexture2D> OpenGLRHI::CreateRenderTexture()
 
  	glBindTexture(GL_TEXTURE_2D, texHandle);
  
- 	const WindowProperties& windowProps = Engine->GetMainWindow().GetProperties();
- 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, windowProps.Width, windowProps.Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+	int32_t internalFormat = 0;
+	uint32_t internalType = 0;
+	
+	switch (inPrecision)
+	{
+	case ERHITexturePrecision::UnsignedByte:
+	{
+		internalFormat = GL_RGBA;
+		internalType = GL_UNSIGNED_BYTE;
+		break;
+	}
+	case ERHITexturePrecision::Float16:
+	{
+		internalFormat = GL_RGBA16F;
+		internalType = GL_FLOAT;
+		break;
+	}
+	}
+
+ 	glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, inWidth, inHeight, 0, GL_RGBA, internalType, nullptr);
+
+	int32_t filterType = 0;
+
+	switch (inFilter)
+	{
+	case ERHITextureFilter::Linear:
+	{
+		filterType = GL_LINEAR;
+		break;
+	}
+	case ERHITextureFilter::Nearest:
+	{
+		filterType = GL_NEAREST;
+		break;
+	}
+	}
  
- 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
- 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+ 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filterType);
+ 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filterType);
  
  	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
  	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
  
  	glBindTexture(GL_TEXTURE_2D, 0);
 
-	newTexture->Width = windowProps.Width;
-	newTexture->Height = windowProps.Height;
+	newTexture->Width = inWidth;
+	newTexture->Height = inHeight;
 	newTexture->NrChannels = 3;
 	newTexture->ChannelsType = ERHITextureChannelsType::RGBA;
-
-	return newTexture;
-}
-
-eastl::shared_ptr<class RHITexture2D> OpenGLRHI::CreateRenderTextureHDR()
-{
-	uint32_t texHandle = 0;
-	glGenTextures(1, &texHandle);
-	eastl::shared_ptr<GLTexture2D> newTexture = eastl::make_shared<GLTexture2D>(texHandle);
-
-	glBindTexture(GL_TEXTURE_2D, texHandle);
-
-	const WindowProperties& windowProps = Engine->GetMainWindow().GetProperties();
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, windowProps.Width, windowProps.Height, 0, GL_RGBA, GL_FLOAT, nullptr);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-
-	glBindTexture(GL_TEXTURE_2D, 0);
-
-	newTexture->Width = windowProps.Width;
-	newTexture->Height = windowProps.Height;
-	newTexture->NrChannels = 3;
-	newTexture->ChannelsType = ERHITextureChannelsType::RGBA;
+	newTexture->Precision = inPrecision;
+	newTexture->Filter = inFilter;
 
 	return newTexture;
 }
@@ -543,7 +552,8 @@ eastl::shared_ptr<RHIFrameBuffer> OpenGLRHI::CreateDepthStencilFrameBuffer()
 	ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 
 	eastl::shared_ptr<GLFrameBuffer> frameBuffer = eastl::make_shared<GLFrameBuffer>(frameBufferHandle);
-	frameBuffer->DepthStencingAttachment = rbo;
+	// TODO: Use this when needed, another class for RHIRenderBuffer needs to be created
+	//frameBuffer->DepthStencilAttachment = rbo;
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -586,16 +596,18 @@ void OpenGLRHI::UniformBufferUpdateData(RHIUniformBuffer& inBuffer, const void* 
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
-void OpenGLRHI::AttachTextureToFramebufferColor(RHIFrameBuffer& inFrameBuffer, RHITexture2D& inTex)
+void OpenGLRHI::AttachTextureToFramebufferColor(RHIFrameBuffer& inFrameBuffer, eastl::shared_ptr<RHITexture2D>& inTex)
 {
 	GLFrameBuffer& glBuffer = static_cast< GLFrameBuffer&>(inFrameBuffer);
-	const GLTexture2D& tex = static_cast<const GLTexture2D&>(inTex);
+	const GLTexture2D& tex = static_cast<const GLTexture2D&>(*inTex);
 
 	BindFrameBuffer(inFrameBuffer);
 
+	const int32_t attachmentIndex = GL_COLOR_ATTACHMENT0 + static_cast<int32_t>(glBuffer.ColorAttachments.size());
+
 	// Attach the texture to the FBO
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex.GlHandle, 0);
-	glBuffer.ColorAttachment = tex.GlHandle;
+	glFramebufferTexture2D(GL_FRAMEBUFFER, attachmentIndex, GL_TEXTURE_2D, tex.GlHandle, 0);
+	glBuffer.ColorAttachments.push_back(inTex);
 
 	UnbindFrameBuffer(inFrameBuffer);
 
@@ -603,10 +615,10 @@ void OpenGLRHI::AttachTextureToFramebufferColor(RHIFrameBuffer& inFrameBuffer, R
 	//glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0);
 }
 
-void OpenGLRHI::AttachTextureToFramebufferDepth(RHIFrameBuffer& inFrameBuffer, RHITexture2D& inTex)
+void OpenGLRHI::AttachTextureToFramebufferDepth(RHIFrameBuffer& inFrameBuffer, eastl::shared_ptr<RHITexture2D>& inTex)
 {
 	GLFrameBuffer& glBuffer = static_cast<GLFrameBuffer&>(inFrameBuffer);
-	const GLTexture2D& tex = static_cast<const GLTexture2D&>(inTex);
+	const GLTexture2D& tex = static_cast<const GLTexture2D&>(*inTex);
 
 	BindFrameBuffer(inFrameBuffer);
 
@@ -615,7 +627,7 @@ void OpenGLRHI::AttachTextureToFramebufferDepth(RHIFrameBuffer& inFrameBuffer, R
 	case ETextureType::Single:
 	{
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, tex.GlHandle, 0);
-		glBuffer.DepthStencingAttachment = tex.GlHandle;
+		glBuffer.DepthAttachment = inTex;
 		break;
 	}
 	case ETextureType::Array:
@@ -1040,6 +1052,25 @@ void OpenGLRHI::BindFrameBuffer(const class RHIFrameBuffer& inFrameBuffer)
 {
 	const GLFrameBuffer& glBuffer = static_cast<const GLFrameBuffer&>(inFrameBuffer);
 	glBindFramebuffer(GL_FRAMEBUFFER, glBuffer.GLHandle);
+
+	constexpr uint32_t attachments[32] = {
+		GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2,
+		GL_COLOR_ATTACHMENT3, GL_COLOR_ATTACHMENT4, GL_COLOR_ATTACHMENT5,
+		GL_COLOR_ATTACHMENT6, GL_COLOR_ATTACHMENT7, GL_COLOR_ATTACHMENT8,
+		GL_COLOR_ATTACHMENT9, GL_COLOR_ATTACHMENT10, GL_COLOR_ATTACHMENT11,
+		GL_COLOR_ATTACHMENT12, GL_COLOR_ATTACHMENT13, GL_COLOR_ATTACHMENT14,
+		GL_COLOR_ATTACHMENT15, GL_COLOR_ATTACHMENT16, GL_COLOR_ATTACHMENT17,
+		GL_COLOR_ATTACHMENT18, GL_COLOR_ATTACHMENT19, GL_COLOR_ATTACHMENT20,
+		GL_COLOR_ATTACHMENT21, GL_COLOR_ATTACHMENT22, GL_COLOR_ATTACHMENT23,
+		GL_COLOR_ATTACHMENT24, GL_COLOR_ATTACHMENT25, GL_COLOR_ATTACHMENT26,
+		GL_COLOR_ATTACHMENT27, GL_COLOR_ATTACHMENT28, GL_COLOR_ATTACHMENT29,
+		GL_COLOR_ATTACHMENT30, GL_COLOR_ATTACHMENT31,
+	};
+
+	if (glBuffer.ColorAttachments.size() > 0)
+	{
+		glDrawBuffers(static_cast<int32_t>(glBuffer.ColorAttachments.size()), attachments);
+	}
 }
 
 void OpenGLRHI::BindDefaultFrameBuffer()

@@ -23,8 +23,7 @@ public:
 	eastl::shared_ptr<class RHIShader> CreateShaderFromPath(const eastl::vector<ShaderSourceInput> inPathShaderSources, const VertexInputLayout& inInputLayout) override;
 
 	virtual eastl::shared_ptr<class RHITexture2D> CreateAndLoadTexture2D(const eastl::string& inDataPath, const bool inSRGB) override;
-	virtual eastl::shared_ptr<class RHITexture2D> CreateRenderTexture() override;
-	virtual eastl::shared_ptr<class RHITexture2D> CreateRenderTextureHDR() override;
+	virtual eastl::shared_ptr<class RHITexture2D> CreateRenderTexture(const int32_t inWidth, const int32_t inHeight, const ERHITexturePrecision inPrecision = ERHITexturePrecision::UnsignedByte, const ERHITextureFilter inFilter = ERHITextureFilter::Linear) override;
 	virtual void CopyRenderTexture(class RHITexture2D& inSrc, class RHITexture2D& inTrg) override;
 
 
@@ -47,8 +46,8 @@ public:
 	virtual void UnbindTexture2D(const RHITexture2D& inTex, const int32_t inTexId) override;
 
 	virtual void UniformBufferUpdateData(RHIUniformBuffer& inBuffer, const void* inData, const size_t inDataSize, const int32_t inBufferNr) override;
-	virtual void AttachTextureToFramebufferColor(RHIFrameBuffer& inFrameBuffer, RHITexture2D& inTex) override;
-	virtual void AttachTextureToFramebufferDepth(RHIFrameBuffer& inFrameBuffer, RHITexture2D& inTex) override;
+	virtual void AttachTextureToFramebufferColor(RHIFrameBuffer& inFrameBuffer, eastl::shared_ptr<class RHITexture2D>& inTex) override;
+	virtual void AttachTextureToFramebufferDepth(RHIFrameBuffer& inFrameBuffer, eastl::shared_ptr<class RHITexture2D>& inTex) override;
 
 
 	void SetViewportSize(const int32_t inWidth, const int32_t inHeight) override;

@@ -14,7 +14,7 @@
 #include "Renderer/Material/RenderMaterial.h"
 #include "Renderer/RHI/Resources/MeshDataContainer.h"
 #include "Renderer/Material/MaterialsManager.h"
-#include "Core/EntityHelper.h"
+#include "Core/SceneHelper.h"
 #include "Renderer/Material/EngineMaterials/DepthMaterial.h"
 #include "Core/WindowsPlatform.h"
 #include "glm/gtc/integer.hpp"
@@ -35,8 +35,6 @@
 #include "imgui.h"
 #include "ShaderTypes.h"
 
-constexpr glm::vec4 ClearColor(0.3f, 0.5f, 1.f, 0.4f);
-
 static std::mutex RenderCommandsMutex;
 static std::mutex GetVAOMutex;
 
@@ -49,10 +47,13 @@ DeferredRenderer::~DeferredRenderer() = default;
 
 static eastl::shared_ptr<RHIFrameBuffer> GBuffer = nullptr;
 static eastl::shared_ptr<RHITexture2D> GlobalRenderTexture = nullptr;
-static eastl::shared_ptr<RHITexture2D> GDepthTexture = nullptr;
+static eastl::shared_ptr<RHITexture2D> GBufferDepth = nullptr;
+static eastl::shared_ptr<RHITexture2D> GBufferNormal = nullptr;
+static eastl::shared_ptr<RHITexture2D> GBufferColorSpec = nullptr;
 
 eastl::shared_ptr<VisualizeDepthQuad> VisualizeDepthUtil;
-
+eastl::shared_ptr<FullScreenQuad> VisualizeNormalsUtil;
+eastl::shared_ptr<FullScreenQuad> VisualizeAlbedoUtil;
 
 void DeferredRenderer::InitInternal()
 {
@@ -62,19 +63,27 @@ void DeferredRenderer::InitInternal()
 
 	const WindowsWindow& currentWindow = Engine->GetMainWindow();
 	const WindowProperties& props = currentWindow.GetProperties();
-	GDepthTexture = RHI::Get()->CreateDepthMap(props.Width, props.Height);
+	GBufferDepth = RHI::Get()->CreateDepthMap(props.Width, props.Height);
 
-	RHI::Get()->AttachTextureToFramebufferDepth(*GBuffer, *GDepthTexture);
+	RHI::Get()->AttachTextureToFramebufferDepth(*GBuffer, GBufferDepth);
 
+	GBufferNormal = RHI::Get()->CreateRenderTexture(props.Width, props.Height, ERHITexturePrecision::Float16, ERHITextureFilter::Nearest);
+	RHI::Get()->AttachTextureToFramebufferColor(*GBuffer, GBufferNormal);
 
-	VisualizeDepthUtil = EntityHelper::CreateEntity<VisualizeDepthQuad>("VisualizeDepth");
+ 	GBufferColorSpec = RHI::Get()->CreateRenderTexture(props.Width, props.Height, ERHITexturePrecision::UnsignedByte, ERHITextureFilter::Nearest);
+ 	RHI::Get()->AttachTextureToFramebufferColor(*GBuffer, GBufferColorSpec);
+
+	VisualizeDepthUtil = SceneHelper::CreateObject<VisualizeDepthQuad>("VisualizeDepth");
 	VisualizeDepthUtil->CreateCommand();
+	VisualizeDepthUtil->GetCommand().Material->ExternalTextures.push_back(GBufferDepth);
 
+	VisualizeNormalsUtil = SceneHelper::CreateObject<FullScreenQuad>("VisualizeNormalsTex");
+	VisualizeNormalsUtil->CreateCommand();
+	VisualizeNormalsUtil->GetCommand().Material->ExternalTextures.push_back(GBufferNormal);
 
-
-	VisualizeDepthUtil->GetCommand().Material->ExternalTextures.push_back(GDepthTexture);
-
-
+	VisualizeAlbedoUtil = SceneHelper::CreateObject<FullScreenQuad>("VisualizeNormalsTex");
+	VisualizeAlbedoUtil->CreateCommand();
+	VisualizeAlbedoUtil->GetCommand().Material->ExternalTextures.push_back(GBufferColorSpec);
 
 
 
@@ -92,7 +101,7 @@ void DeferredRenderer::Draw()
 
  	RHI::Instance->BindFrameBuffer(*GBuffer);
 	RHI::Get()->ClearBuffers();
-	RHI::Instance->ClearTexture(*GDepthTexture, glm::vec4(1.f, 1.f, 1.f, 1.f));
+	RHI::Instance->ClearTexture(*GBufferDepth, glm::vec4(1.f, 1.f, 1.f, 1.f));
 
 
 	// Clear default framebuffer buffers
@@ -106,6 +115,7 @@ void DeferredRenderer::Draw()
 	RHI::Get()->ClearBuffers();
 
 	DrawCommand(VisualizeDepthUtil->GetCommand());
+	//DrawCommand(VisualizeNormalsUtil->GetCommand());
 
 
 	// Draw debug primitives

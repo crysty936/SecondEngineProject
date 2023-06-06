@@ -7,6 +7,7 @@
 #include "glm/ext/vector_float4.hpp"
 #include "glm/ext/matrix_float4x4.hpp"
 #include "Renderer/DrawType.h"
+#include "Resources/RHITexture.h"
 
 enum class EShaderType
 {
@@ -60,10 +61,10 @@ public:
 	virtual void UniformBufferUpdateData(class RHIUniformBuffer& inBuffer, const void* inData, const size_t inDataSize, const int32_t inBufferNr) {};
 
 	/** Attach a texture to the color ouput of a framebuffer */
-	virtual void AttachTextureToFramebufferColor(class RHIFrameBuffer& inFrameBuffer, class RHITexture2D& inTex) {}
+	virtual void AttachTextureToFramebufferColor(class RHIFrameBuffer& inFrameBuffer, eastl::shared_ptr<class RHITexture2D>& inTex) {}
 
 	/** Attach a texture to the depth output of a framebuffer. Preferrably a texture with only depth component */
-	virtual void AttachTextureToFramebufferDepth(class RHIFrameBuffer& inFrameBuffer, class RHITexture2D& inTex) {}
+	virtual void AttachTextureToFramebufferDepth(class RHIFrameBuffer& inFrameBuffer, eastl::shared_ptr<class RHITexture2D>& inTex) {}
 
 	virtual void ClearTexture(const RHITexture2D& inTexture, const glm::vec4& inColor) {}
 
@@ -76,14 +77,10 @@ public:
 	/**  A frame buffer that already has Depth Stencil attachments, can be used with texture color attachment */
 	virtual eastl::shared_ptr<class RHIFrameBuffer> CreateDepthStencilFrameBuffer() { return nullptr; }
 
-	/** Empty framebuffer, texture can be attached to any output */
 	virtual eastl::shared_ptr<class RHIFrameBuffer> CreateEmptyFrameBuffer() { return nullptr; }
 
 	/** Render texture with all channels */
-	virtual eastl::shared_ptr<class RHITexture2D> CreateRenderTexture() { return nullptr; }
-
-	/** Render texture with all channels, 16bit float */
-	virtual eastl::shared_ptr<class RHITexture2D> CreateRenderTextureHDR() { return nullptr; }
+	virtual eastl::shared_ptr<class RHITexture2D> CreateRenderTexture(const int32_t inWidth, const int32_t inHeight, const ERHITexturePrecision inPrecision = ERHITexturePrecision::UnsignedByte, const ERHITextureFilter inFilter = ERHITextureFilter::Linear) { return nullptr; }
 
 	virtual void CopyRenderTexture(class RHITexture2D& inSrc, class RHITexture2D& inTrg) {}
 

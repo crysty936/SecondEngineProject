@@ -31,15 +31,6 @@ public:
 	virtual void CreateProxy() override;
 };
 
-class Skybox : public Model3D
-{
-public:
-	Skybox(const eastl::string& inName);
-	virtual ~Skybox();
-
-	virtual void CreateProxy() override;
-};
-
 class LightSource : public Model3D
 {
 public:
@@ -49,27 +40,4 @@ public:
 	LightData LData;
 
 	virtual void CreateProxy() override;
-};
-
-class MirrorQuad : public DrawableObject, public IDrawableContainer
-{
-public:
-	MirrorQuad(const eastl::string& inName);
-	virtual ~MirrorQuad();
-
-	void CreateProxy() override;
-};
-
-class FullScreenQuad : public DrawableObject, public IDrawableContainer
-{
-public:
-	FullScreenQuad(const eastl::string& inName);
-	virtual ~FullScreenQuad();
-
-	void CreateProxy() override;
-	void CreateCommand();
-	inline const RenderCommand& GetCommand() { return QuadCommand; };
-
-private:
-	RenderCommand QuadCommand;
 };

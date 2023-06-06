@@ -11,8 +11,19 @@ enum class ETextureType
 enum class ERHITextureChannelsType
 {
 	RGBA,
-	RGBAHDR,
 	Depth
+};
+
+enum class ERHITexturePrecision
+{
+	UnsignedByte,
+	Float16,
+};
+
+enum class ERHITextureFilter
+{
+	Linear,
+	Nearest
 };
 
 class RHITexture2D
@@ -27,4 +38,6 @@ public:
 
 	ETextureType TextureType = ETextureType::Single;
 	ERHITextureChannelsType ChannelsType = ERHITextureChannelsType::RGBA;
+	ERHITexturePrecision Precision = ERHITexturePrecision::UnsignedByte;
+	ERHITextureFilter Filter = ERHITextureFilter::Linear;
 };

@@ -5,12 +5,12 @@ GLFrameBuffer::GLFrameBuffer(const uint32_t inHandle)
 	: RHIFrameBuffer(), GLHandle(inHandle)
 {}
 
-bool GLFrameBuffer::HasDepthStencilAttachment() const
+bool GLFrameBuffer::HasDepthAttachment() const
 {
-	return DepthStencingAttachment != 0;
+	return DepthAttachment != nullptr;
 }
 
 bool GLFrameBuffer::HasColorAttachment() const
 {
-	return ColorAttachment != 0;
+	return ColorAttachments.size() != 0;
 }

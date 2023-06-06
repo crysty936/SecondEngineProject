@@ -208,5 +208,6 @@ void main()
  		//color = vec3(projCoords.xy, layer);
  	}
 
+	color = ps_in.Normal / 2.0 + 0.5;
 	FragColor = vec4(color, 1.0);
 }

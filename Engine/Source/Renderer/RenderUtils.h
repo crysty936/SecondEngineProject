@@ -4,12 +4,47 @@
 #include "glm/ext/matrix_float4x4.hpp"
 #include "RenderCommand.h"
 #include "Drawable/Drawable.h"
+#include "Model/3D/Model3D.h"
+#include "LightTypes.h"
 
 namespace RenderUtils
 {
 	eastl::array<glm::vec3, 8> GenerateSpaceCorners(const glm::mat4& SpaceToProjectionSpace, const float MinZ = 0.f, const float MaxZ = 1.f);
 	glm::vec3 GetProjectionCenter(const glm::mat4& inProj);
 }
+
+class Skybox : public Model3D
+{
+public:
+	Skybox(const eastl::string& inName);
+	virtual ~Skybox();
+
+	virtual void CreateProxy() override;
+};
+
+class MirrorQuad : public DrawableObject, public IDrawableContainer
+{
+public:
+	MirrorQuad(const eastl::string& inName);
+	virtual ~MirrorQuad();
+
+	void CreateProxy() override;
+};
+
+class FullScreenQuad : public DrawableObject, public IDrawableContainer
+{
+public:
+	FullScreenQuad(const eastl::string& inName);
+	virtual ~FullScreenQuad();
+
+	void CreateProxy() override;
+	void CreateCommand();
+	inline const RenderCommand& GetCommand() { return QuadCommand; };
+
+private:
+	RenderCommand QuadCommand;
+};
+
 
 class ToneMapQuad : public DrawableObject
 {

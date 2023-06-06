@@ -14,7 +14,7 @@
 #include "Renderer/Material/RenderMaterial.h"
 #include "Renderer/RHI/Resources/MeshDataContainer.h"
 #include "Renderer/Material/MaterialsManager.h"
-#include "Core/EntityHelper.h"
+#include "Core/SceneHelper.h"
 #include "Renderer/Material/EngineMaterials/DepthMaterial.h"
 #include "Core/WindowsPlatform.h"
 #include "glm/gtc/integer.hpp"
@@ -98,36 +98,42 @@ ForwardRenderer::~ForwardRenderer() = default;
 void ForwardRenderer::InitInternal()
 {
 	GlobalFrameBuffer = RHI::Get()->CreateDepthStencilFrameBuffer();
-	GlobalRenderTexture = RHI::Get()->CreateRenderTextureHDR();
-	RHI::Get()->AttachTextureToFramebufferColor(*GlobalFrameBuffer, *GlobalRenderTexture);
+
+	const WindowsWindow& currentWindow = Engine->GetMainWindow();
+	const WindowProperties& props = currentWindow.GetProperties();
+
+	// HDR Texture
+	GlobalRenderTexture = RHI::Get()->CreateRenderTexture(props.Width, props.Height, ERHITexturePrecision::Float16, ERHITextureFilter::Linear);
+	RHI::Get()->AttachTextureToFramebufferColor(*GlobalFrameBuffer, GlobalRenderTexture);
 
 	AuxiliaryFrameBuffer = RHI::Get()->CreateDepthStencilFrameBuffer();
-	AuxiliaryRenderTexture = RHI::Get()->CreateRenderTextureHDR();
-	RHI::Get()->AttachTextureToFramebufferColor(*AuxiliaryFrameBuffer, *AuxiliaryRenderTexture);
+	AuxiliaryRenderTexture = RHI::Get()->CreateRenderTexture(props.Width, props.Height, ERHITexturePrecision::Float16, ERHITextureFilter::Linear);
+	RHI::Get()->AttachTextureToFramebufferColor(*AuxiliaryFrameBuffer, AuxiliaryRenderTexture);
 
 
-	ScreenQuad = EntityHelper::CreateVisualEntity<FullScreenQuad>("Global Renderer Screen Quad");
+	ScreenQuad = SceneHelper::CreateVisualEntity<FullScreenQuad>("Global Renderer Screen Quad");
 	ScreenQuad->CreateCommand();
 
-	TonemappingQuad = EntityHelper::CreateEntity<ToneMapQuad>("Global Renderer Tonemapping Quad");
+	TonemappingQuad = SceneHelper::CreateEntity<ToneMapQuad>("Global Renderer Tonemapping Quad");
 	TonemappingQuad->CreateCommand();
 	TonemappingQuad->GetCommand().Material->OwnedTextures.push_back(GlobalRenderTexture);
 
-	ExtractBrightAreasUtilQuad = EntityHelper::CreateEntity<ExtractBrightAreasQuad>("Extract Bright Areas Quad");
+	ExtractBrightAreasUtilQuad = SceneHelper::CreateEntity<ExtractBrightAreasQuad>("Extract Bright Areas Quad");
 	ExtractBrightAreasUtilQuad->CreateCommand();
 	ExtractBrightAreasUtilQuad->GetCommand().Material->OwnedTextures.push_back(GlobalRenderTexture);
 
-	GaussianBlurUtilQuad = EntityHelper::CreateEntity<GaussianBlurQuad>("Gaussian Blur Quad");
+	GaussianBlurUtilQuad = SceneHelper::CreateEntity<GaussianBlurQuad>("Gaussian Blur Quad");
 	GaussianBlurUtilQuad->CreateCommand();
 
-	BloomMergeUtilQuad = EntityHelper::CreateEntity<BloomMergeQuad>("Bloom Merge Quad");
+	BloomMergeUtilQuad = SceneHelper::CreateEntity<BloomMergeQuad>("Bloom Merge Quad");
 	BloomMergeUtilQuad->CreateCommand();
 
-	ColorBackupTexture = RHI::Get()->CreateRenderTextureHDR();
+	// HDR Texture
+	ColorBackupTexture = RHI::Get()->CreateRenderTexture(props.Width, props.Height, ERHITexturePrecision::Float16, ERHITextureFilter::Linear);
 
 	DepthFrameBuffer = RHI::Get()->CreateEmptyFrameBuffer();
 	DirectionalLightCascadedShadowTexture = RHI::Get()->CreateArrayDepthMap(SHADOW_WIDTH, SHADOW_HEIGHT, MAX_CASCADES_COUNT);
-	RHI::Get()->AttachTextureToFramebufferDepth(*DepthFrameBuffer, *DirectionalLightCascadedShadowTexture);
+	RHI::Get()->AttachTextureToFramebufferDepth(*DepthFrameBuffer, DirectionalLightCascadedShadowTexture);
 }
 
 void ForwardRenderer::Draw()
