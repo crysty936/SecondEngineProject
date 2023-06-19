@@ -12,7 +12,11 @@ RenderMaterial_VisualizeDepth::~RenderMaterial_VisualizeDepth() = default;
 
 void RenderMaterial_VisualizeDepth::SetRequiredUniforms()
 {
-	__super::SetRequiredUniforms();
+	eastl::vector<UniformWithFlag> defaultUniforms = {
+	{"model"}
+	};
+
+	UBuffers.push_back({ defaultUniforms, ConstantBufferBinding::Vertex });
 
 	eastl::vector<UniformWithFlag> additionalUniforms = {
 	{"perspInv"},

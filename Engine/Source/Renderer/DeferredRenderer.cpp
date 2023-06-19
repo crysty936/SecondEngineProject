@@ -52,8 +52,8 @@ static eastl::shared_ptr<RHITexture2D> GBufferNormal = nullptr;
 static eastl::shared_ptr<RHITexture2D> GBufferColorSpec = nullptr;
 
 eastl::shared_ptr<VisualizeDepthQuad> VisualizeDepthUtil;
-eastl::shared_ptr<FullScreenQuad> VisualizeNormalsUtil;
-eastl::shared_ptr<FullScreenQuad> VisualizeAlbedoUtil;
+eastl::shared_ptr<GBufferVisualizeQuad> VisualizeNormalsUtil;
+eastl::shared_ptr<GBufferVisualizeQuad> VisualizeAlbedoUtil;
 
 void DeferredRenderer::InitInternal()
 {
@@ -76,17 +76,22 @@ void DeferredRenderer::InitInternal()
 	VisualizeDepthUtil = SceneHelper::CreateObject<VisualizeDepthQuad>("VisualizeDepth");
 	VisualizeDepthUtil->CreateCommand();
 	VisualizeDepthUtil->GetCommand().Material->ExternalTextures.push_back(GBufferDepth);
+	VisualizeDepthUtil->SetScale(glm::vec3(0.33f, 0.33f, 1.f));
+	VisualizeDepthUtil->SetRelativeLocation(glm::vec3(-0.67, 0.65f, 0.0f));
 
-	VisualizeNormalsUtil = SceneHelper::CreateObject<FullScreenQuad>("VisualizeNormalsTex");
+
+	VisualizeNormalsUtil = SceneHelper::CreateObject<GBufferVisualizeQuad>("VisualizeNormalsTex");
 	VisualizeNormalsUtil->CreateCommand();
 	VisualizeNormalsUtil->GetCommand().Material->ExternalTextures.push_back(GBufferNormal);
-
-	VisualizeAlbedoUtil = SceneHelper::CreateObject<FullScreenQuad>("VisualizeNormalsTex");
-	VisualizeAlbedoUtil->CreateCommand();
-	VisualizeAlbedoUtil->GetCommand().Material->ExternalTextures.push_back(GBufferColorSpec);
+	VisualizeNormalsUtil->SetScale(glm::vec3(0.33f, 0.33f, 1.f));
+	VisualizeNormalsUtil->SetRelativeLocation(glm::vec3(0.f, 0.65f, 0.0f));
 
 
-
+ 	VisualizeAlbedoUtil = SceneHelper::CreateObject<GBufferVisualizeQuad>("VisualizeAlbedoTex");
+ 	VisualizeAlbedoUtil->CreateCommand();
+ 	VisualizeAlbedoUtil->GetCommand().Material->ExternalTextures.push_back(GBufferColorSpec);
+ 	VisualizeAlbedoUtil->SetScale(glm::vec3(0.33f, 0.33f, 1.f));
+ 	VisualizeAlbedoUtil->SetRelativeLocation(glm::vec3(0.67f, 0.65f, 0.0f));
 }
 
 void DeferredRenderer::Draw()
@@ -110,12 +115,17 @@ void DeferredRenderer::Draw()
 
     DrawCommands(MainCommands);
 
-
 	RHI::Instance->BindDefaultFrameBuffer();
 	RHI::Get()->ClearBuffers();
 
 	DrawCommand(VisualizeDepthUtil->GetCommand());
-	//DrawCommand(VisualizeNormalsUtil->GetCommand());
+	VisualizeNormalsUtil->GetCommand().Material->ExternalTextures.clear();
+	VisualizeNormalsUtil->GetCommand().Material->ExternalTextures.push_back(GBufferNormal);
+	DrawCommand(VisualizeNormalsUtil->GetCommand());
+
+ 	VisualizeAlbedoUtil->GetCommand().Material->ExternalTextures.clear();
+ 	VisualizeAlbedoUtil->GetCommand().Material->ExternalTextures.push_back(GBufferColorSpec);
+ 	DrawCommand(VisualizeAlbedoUtil->GetCommand());
 
 
 	// Draw debug primitives

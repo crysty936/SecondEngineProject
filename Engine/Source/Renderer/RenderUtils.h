@@ -45,6 +45,20 @@ private:
 	RenderCommand QuadCommand;
 };
 
+class GBufferVisualizeQuad : public DrawableObject, public IDrawableContainer
+{
+public:
+	GBufferVisualizeQuad(const eastl::string& inName);
+	virtual ~GBufferVisualizeQuad();
+
+	void CreateProxy() override;
+	void CreateCommand();
+	inline const RenderCommand& GetCommand() { return QuadCommand; };
+
+private:
+	RenderCommand QuadCommand;
+};
+
 
 class ToneMapQuad : public DrawableObject
 {

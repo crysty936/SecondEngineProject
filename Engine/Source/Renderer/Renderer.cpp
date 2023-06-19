@@ -15,7 +15,7 @@ Renderer::Renderer(const WindowProperties& inMainWindowProperties)
 {
 	SetViewportSizeToMain();
 
-	constexpr glm::vec4 ClearColor(1.f, 1.f, 1.f, 1.f);
+	constexpr glm::vec4 ClearColor(0.f, 0.f, 0.f, 1.f);
 	RHI::Get()->ClearColor(ClearColor);
 
 	// Set the default uniforms

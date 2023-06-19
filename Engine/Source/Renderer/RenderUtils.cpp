@@ -185,12 +185,18 @@ void MirrorQuad::CreateProxy()
 
 }
 
-class FullScreenQuadMaterial : public RenderMaterial
+class GBufferVisualizeMaterial : public RenderMaterial
 {
 
 public:
 	virtual void SetRequiredUniforms() override
-	{}
+	{
+ 		eastl::vector<UniformWithFlag> defaultUniforms = {
+ 			{"model"}
+ 		};
+ 
+ 		UBuffers.push_back({ defaultUniforms, ConstantBufferBinding::Vertex });
+	}
 };
 
 FullScreenQuad::FullScreenQuad(const eastl::string& inName)
@@ -231,13 +237,67 @@ void FullScreenQuad::CreateCommand()
 
 	MaterialsManager& matManager = MaterialsManager::Get();
 	bool materialExists = false;
-	eastl::shared_ptr<FullScreenQuadMaterial> material = matManager.GetOrAddMaterial<FullScreenQuadMaterial>("TexQuad_Material", materialExists);
+	eastl::shared_ptr<RenderMaterial> material = matManager.GetOrAddMaterial("ScreenQuad_Material", materialExists);
 
 	if (!materialExists)
 	{
 		eastl::vector<ShaderSourceInput> shaders = {
-		{ "Pos-UV_BasicTex/VS_Pos-UV_UnchangedPosition", EShaderType::Vertex },
-		{ "Pos-UV_BasicTex/PS_BasicTex", EShaderType::Fragment } };
+		{ "ScreenQuad/VS_Pos-UV_UnchangedPosition", EShaderType::Vertex },
+		{ "ScreenQuad/PS_BasicTex", EShaderType::Fragment } };
+
+		material->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
+	}
+
+	QuadCommand.Material = material;
+	QuadCommand.DataContainer = dataContainer;
+	QuadCommand.Parent = this_shared(this);
+	QuadCommand.DrawType = EDrawType::DrawElements;
+}
+
+
+GBufferVisualizeQuad::GBufferVisualizeQuad(const eastl::string& inName)
+	: DrawableObject(inName)
+{
+}
+GBufferVisualizeQuad::~GBufferVisualizeQuad() = default;
+
+void GBufferVisualizeQuad::CreateProxy()
+{}
+
+void GBufferVisualizeQuad::CreateCommand()
+{
+	const eastl::string RenderDataContainerID = "squareVAO";
+	eastl::shared_ptr<MeshDataContainer> dataContainer{ nullptr };
+
+	const bool existingContainer = Renderer::Get().GetOrCreateContainer(RenderDataContainerID, dataContainer);
+
+	VertexInputLayout inputLayout;
+	// Vertex points
+	inputLayout.Push<float>(3, VertexInputType::Position);
+	// Vertex Tex Coords
+	inputLayout.Push<float>(2, VertexInputType::TexCoords);
+
+	if (!existingContainer)
+	{
+		int32_t indicesCount = BasicShapesData::GetSquareIndicesCount();
+		eastl::shared_ptr<RHIIndexBuffer> ib = RHI::Get()->CreateIndexBuffer(BasicShapesData::GetSquareIndices(), indicesCount);
+
+
+		int32_t verticesCount = BasicShapesData::GetSquareVerticesCount();
+		const eastl::shared_ptr<RHIVertexBuffer> vb = RHI::Get()->CreateVertexBuffer(inputLayout, BasicShapesData::GetSquareVertices(), verticesCount, ib);
+
+		dataContainer->VBuffer = vb;
+	}
+
+	MaterialsManager& matManager = MaterialsManager::Get();
+	bool materialExists = false;
+	eastl::shared_ptr<GBufferVisualizeMaterial> material = matManager.GetOrAddMaterial<GBufferVisualizeMaterial>("GbufferVisualize_Material", materialExists);
+
+	if (!materialExists)
+	{
+		eastl::vector<ShaderSourceInput> shaders = {
+		{ "GBufferVisualize/VS_ModelPosition-UV", EShaderType::Vertex },
+		{ "GBufferVisualize/PS_BasicTex", EShaderType::Fragment } };
 
 		material->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
 	}
@@ -527,7 +587,7 @@ void VisualizeDepthQuad::CreateCommand()
 	if (!materialExists)
 	{
 		eastl::vector<ShaderSourceInput> shaders = {
-		{ "VisualizeDepth/VS_Pos-UV_UnchangedPosition", EShaderType::Vertex },
+		{ "VisualizeDepth/VS_ModelPosition-UV", EShaderType::Vertex },
 		{ "VisualizeDepth/PS_VisualiseDepth", EShaderType::Fragment } };
 
 		material->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
