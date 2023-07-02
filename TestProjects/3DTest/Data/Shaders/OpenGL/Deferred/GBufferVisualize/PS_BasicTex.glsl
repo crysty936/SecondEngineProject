@@ -29,7 +29,7 @@ void main()
 	//float depthValue = texture(quadTexture, inTexCoords).r;
 	//FragColor = vec4(vec3(depthValue), 1.0);
 
-	if (ps_in.TexCoords.x > 0.99f || ps_in.TexCoords.x < 0.01f || ps_in.TexCoords.y > 0.99f || ps_in.TexCoords.y < 0.01f)
+	if (ps_in.TexCoords.x > 0.995f || ps_in.TexCoords.x < 0.005f || ps_in.TexCoords.y > 0.995f || ps_in.TexCoords.y < 0.005f)
 	{
 		FragColor = vec4(0.f, 1.f, 0.f, 1.f);
 		return;

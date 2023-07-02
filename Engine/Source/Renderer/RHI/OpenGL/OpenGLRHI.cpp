@@ -445,9 +445,19 @@ void OpenGLRHI::CopyRenderTexture(class RHITexture2D& inSrc, class RHITexture2D&
 
 	ASSERT(glSrc.Width == glTrg.Width && glSrc.Height == glTrg.Height);
 
-	glCopyImageSubData(glSrc.GlHandle, GL_TEXTURE_2D, 0, 0, 0, 0,
+ 	glCopyImageSubData(glSrc.GlHandle, GL_TEXTURE_2D, 0, 0, 0, 0,
+ 		glTrg.GlHandle, GL_TEXTURE_2D, 0, 0, 0, 0,
+ 		glSrc.Width, glSrc.Height, 1);
+}
+
+void OpenGLRHI::CopyRenderTextureRegion(class RHITexture2D& inSrc, class RHITexture2D& inTrg, const int32_t inOffsetX, const int32_t inOffsetY, const int32_t inRegionWidth, const int32_t inRegionHeight)
+{
+	const GLTexture2D& glSrc = static_cast<const GLTexture2D&>(inSrc);
+	const GLTexture2D& glTrg = static_cast<const GLTexture2D&>(inTrg);
+
+	glCopyImageSubData(glSrc.GlHandle, GL_TEXTURE_2D, 0, inOffsetX, inOffsetY, 0,
 		glTrg.GlHandle, GL_TEXTURE_2D, 0, 0, 0, 0,
-		glSrc.Width, glSrc.Height, 1);
+		inRegionWidth, inRegionHeight, 1);
 }
 
 
@@ -1115,6 +1125,16 @@ void OpenGLRHI::ImGuiBeginFrame()
 void OpenGLRHI::ImGuiRenderDrawData()
 {
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+
+void OpenGLRHI::DisableDepthTest()
+{
+	glDisable(GL_DEPTH_TEST);
+}
+
+void OpenGLRHI::EnableDepthTest()
+{
+	glEnable(GL_DEPTH_TEST);
 }
 
 void OpenGLRHI::ReadBufferData(const RHIBufferBase& inBuffer, const size_t inOffset, const size_t inSize, void* outData)

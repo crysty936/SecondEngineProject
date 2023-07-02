@@ -25,6 +25,7 @@ public:
 	virtual eastl::shared_ptr<class RHITexture2D> CreateAndLoadTexture2D(const eastl::string& inDataPath, const bool inSRGB) override;
 	virtual eastl::shared_ptr<class RHITexture2D> CreateRenderTexture(const int32_t inWidth, const int32_t inHeight, const ERHITexturePrecision inPrecision = ERHITexturePrecision::UnsignedByte, const ERHITextureFilter inFilter = ERHITextureFilter::Linear) override;
 	virtual void CopyRenderTexture(class RHITexture2D& inSrc, class RHITexture2D& inTrg) override;
+	virtual void CopyRenderTextureRegion(class RHITexture2D& inSrc, class RHITexture2D& inTrg, const int32_t inOffsetX, const int32_t inOffsetY, const int32_t inRegionWidth, const int32_t inRegionHeight) override;
 
 
 	virtual eastl::shared_ptr<class RHITexture2D> CreateDepthMap(const int32_t inWidth, const int32_t inHeight) override;
@@ -82,13 +83,14 @@ public:
 
 	void ReadBufferData(const RHIBufferBase& inBuffer, const size_t inOffset, const size_t inSize, void* outData) override;
 
+	void DisableDepthTest() override;
+	void EnableDepthTest() override;
+
+public:
 	// ImGui
 	void ImGuiInit() override;
 	void ImGuiBeginFrame() override;
 	void ImGuiRenderDrawData() override;
-
-
-
 
 
 

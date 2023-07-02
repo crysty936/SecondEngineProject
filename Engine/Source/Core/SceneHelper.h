@@ -6,6 +6,7 @@
 class SceneHelper
 {
 public:
+	// Plain C++ Object without any scene presence
 	template<typename T, typename... inParamTypes>
 	static eastl::shared_ptr<T> CreateObject(inParamTypes... inParams)
 	{
@@ -14,7 +15,7 @@ public:
 		return newObject;
 	}
 
-
+	// C++ object that has scene presence(position, parent hierarchy, etc)
 	template<typename T, typename... inParamTypes>
 	static eastl::shared_ptr<T> CreateEntity(inParamTypes... inParams)
 	{
@@ -28,10 +29,11 @@ public:
 	}
 
 
+	// Entity that has a visual representation
   	template<typename T, typename... inParamTypes>
 	static eastl::shared_ptr<T> CreateVisualEntity(inParamTypes... inParams)
   	{
-        static_assert(std::is_base_of<IDrawableContainer, T>::value, "Not a Drawable.");
+        static_assert(std::is_base_of<IDrawableContainer, T>::value, "Type to be created is not a Drawable.");
 
   		eastl::shared_ptr<T> newObject = eastl::make_shared<T>(std::forward<inParamTypes>(inParams)...);
   

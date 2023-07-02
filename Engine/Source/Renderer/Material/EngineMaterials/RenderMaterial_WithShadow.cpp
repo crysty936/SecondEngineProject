@@ -33,7 +33,6 @@ void RenderMaterial_WithShadow::SetRequiredUniforms()
 
 	UBuffers.push_back({ LightingUniforms, ConstantBufferBinding::Pixel });
 
-
 	eastl::vector<UniformWithFlag> debugConstants = {
 	{"bShadowVisualizeMode"},
 	{"bNormalVisualizeMode"},

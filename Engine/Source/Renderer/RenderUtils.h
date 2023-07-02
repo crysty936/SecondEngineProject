@@ -59,7 +59,6 @@ private:
 	RenderCommand QuadCommand;
 };
 
-
 class ToneMapQuad : public DrawableObject
 {
 public:
@@ -117,6 +116,19 @@ class VisualizeDepthQuad : public DrawableObject
 public:
 	VisualizeDepthQuad(const eastl::string& inName);
 	~VisualizeDepthQuad() = default;
+
+	void CreateCommand();
+	inline const RenderCommand& GetCommand() { return QuadCommand; };
+
+private:
+	RenderCommand QuadCommand;
+};
+
+class DefaultLightingModelQuad : public DrawableObject
+{
+public:
+	DefaultLightingModelQuad(const eastl::string& inName);
+	~DefaultLightingModelQuad() = default;
 
 	void CreateCommand();
 	inline const RenderCommand& GetCommand() { return QuadCommand; };

@@ -83,6 +83,7 @@ public:
 	virtual eastl::shared_ptr<class RHITexture2D> CreateRenderTexture(const int32_t inWidth, const int32_t inHeight, const ERHITexturePrecision inPrecision = ERHITexturePrecision::UnsignedByte, const ERHITextureFilter inFilter = ERHITextureFilter::Linear) { return nullptr; }
 
 	virtual void CopyRenderTexture(class RHITexture2D& inSrc, class RHITexture2D& inTrg) {}
+	virtual void CopyRenderTextureRegion(class RHITexture2D& inSrc, class RHITexture2D& inTrg, const int32_t inOffsetX, const int32_t inOffsetY, const int32_t inRegionWidth, const int32_t inRegionHeight) {}
 
 	/** Texture with only one channel for depth */
 	virtual eastl::shared_ptr<class RHITexture2D> CreateDepthMap(const int32_t inWidth, const int32_t inHeight) { return nullptr; }
@@ -104,6 +105,9 @@ public:
 	virtual void PrepareProjectionForRendering(glm::mat4& inProj) {}
 
 	virtual void ReadBufferData(const class RHIBufferBase& inBuffer, const size_t inOffset, const size_t inSize, void* outData) {}
+
+	virtual void DisableDepthTest() {}
+	virtual void EnableDepthTest() {}
 
 	// ImGui
 	virtual void ImGuiInit() {}
