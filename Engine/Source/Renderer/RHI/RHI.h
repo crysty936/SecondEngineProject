@@ -90,7 +90,9 @@ public:
 	virtual eastl::shared_ptr<class RHITexture2D> CreateArrayDepthMap(const int32_t inDepthMapWidth, const int32_t inDepthMapHeight, const int32_t inSize) { return nullptr; }
 
 	virtual void SetViewportSize(const int32_t inWidth, const int32_t inHeight) {}
-	virtual void ClearColor(const glm::vec4 inColor) {}
+
+	// Specify clear color
+	virtual void SetClearColor(const glm::vec4 inColor) {}
 
 	virtual void DrawElements(const int32_t inElementsCount) {}
 	virtual void DrawInstanced(const int32_t inElementsCount, const int32_t inInstancesCount) {}

@@ -26,6 +26,14 @@ void RenderMaterial_DefaultLighting::SetRequiredUniforms()
 	};
 
 	UBuffers.push_back({ additionalUniforms, ConstantBufferBinding::Pixel });
+
+	eastl::vector<UniformWithFlag> lightingUniforms = {
+	{"bUseDirLight"},
+	{"DirectionalLightDirection"},
+	{"ViewPos"},
+	};
+
+	UBuffers.push_back({ lightingUniforms, ConstantBufferBinding::Pixel });
 }
 
 void RenderMaterial_DefaultLighting::SetUniformsValue(eastl::unordered_map<eastl::string, struct SelfRegisteringUniform>& inUniformsCache)

@@ -23,7 +23,7 @@ struct LightData
 {
 	ELightType Type;
 
-	glm::vec3 Color;
+	glm::vec3 Color = glm::vec3(1.f, 1.f, 1.f);
 
 	union {
 		DirLightData DirData;

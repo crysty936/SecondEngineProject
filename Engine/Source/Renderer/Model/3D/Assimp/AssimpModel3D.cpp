@@ -102,8 +102,8 @@ void AssimpModel3D::ProcessNodesRecursively(const aiNode & inNode, const aiScene
 eastl::shared_ptr<RHIShader> AssimpModel3D::CreateShaders(const VertexInputLayout& inLayout) const
 {
 	eastl::vector<ShaderSourceInput> shaders = {
-		{ "AssimpLightingShadow/VS_Pos-UV-Normal-Tangent-Bitangent_Model_WorldPosition_WithShadow", EShaderType::Vertex },
-		{ "AssimpLightingShadow/PS_TexNormalMapped_WithShadow", EShaderType::Fragment } };
+		{ "GenericAssimpModel/VS_Pos-UV-Normal-Tangent-Bitangent_Model_WorldPosition_WithShadow", EShaderType::Vertex },
+		{ "GenericAssimpModel/PS_TexNormalMapped_WithShadow", EShaderType::Fragment } };
 
 	return RHI::Get()->CreateShaderFromPath(shaders, inLayout);
 }

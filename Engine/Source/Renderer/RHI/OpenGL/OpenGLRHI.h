@@ -54,7 +54,7 @@ public:
 	void SetViewportSize(const int32_t inWidth, const int32_t inHeight) override;
 
 
-	void ClearColor(const glm::vec4 inColor) override;
+	void SetClearColor(const glm::vec4 inColor) override;
 
 
 	void SwapBuffers() override;

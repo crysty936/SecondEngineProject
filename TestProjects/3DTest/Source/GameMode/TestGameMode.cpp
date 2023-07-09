@@ -365,6 +365,13 @@ void TestGameMode::Init()
 // 		}
  	}
 
+	{
+	 	DirLight = SceneHelper::CreateVisualEntity<LightSource>("Directional Light");
+	 	DirLight->LData.Type = ELightType::Directional;
+	 	DirLight->SetRelativeLocation({ -2.0f, 20.0f, -1.0f });
+	 	DirLight->SetRotationDegrees(glm::vec3(80.f, 0.f, 0.f));
+	}
+
 	constexpr float linear = 0.0014f;
 	constexpr float quadratic = 0.000007f;
 
@@ -393,8 +400,8 @@ void TestGameMode::Init()
 //   	AssimpModel->SetScale(glm::vec3(10.f, 10.f, 10.f));
 //   	AssimpModel->Move(glm::vec3(0.f, 10.f, 0.f));
 
-// 	FloorModel = SceneHelper::CreateVisualEntity<AssimpModel3D>("../Data/Models/Floor/scene.gltf", "Floor");
-// 	FloorModel->Move(glm::vec3(0.f, -2.f, 0.f));
+ 	FloorModel = SceneHelper::CreateVisualEntity<AssimpModel3D>("../Data/Models/Floor/scene.gltf", "Floor");
+ 	FloorModel->Move(glm::vec3(0.f, -2.f, 0.f));
 
 // 	{
 // 		eastl::shared_ptr<LightSource> PointLight = SceneHelper::CreateVisualEntity<LightSource>("Point Light 3");

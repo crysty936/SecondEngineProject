@@ -136,8 +136,8 @@ void DrawDebugManager::Draw()
 		if (!materialExists)
 		{
 			eastl::vector<ShaderSourceInput> shaders = {
-			{ "VS_Pos_ManuallyWritten_DebugPoints", EShaderType::Vertex },
-			{ "PS_FlatColor", EShaderType::Fragment } };
+			{ "Debug/VS_Pos_ManuallyWritten_DebugPoints", EShaderType::Vertex },
+			{ "Debug/PS_FlatColor", EShaderType::Fragment } };
 
 			material->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
 		}
@@ -187,9 +187,9 @@ void DrawDebugManager::Draw()
 		if (!materialExists)
 		{
 			eastl::vector<ShaderSourceInput> shaders = {
-			{ "VS_Pos_Geometry_ManuallyWritten_DebugLine", EShaderType::Vertex },
-			{ "GS_DebugLines", EShaderType::Geometry },
-			{ "PS_DebugLine_Color", EShaderType::Fragment } };
+			{ "Debug/VS_Pos_Geometry_ManuallyWritten_DebugLine", EShaderType::Vertex },
+			{ "Debug/GS_DebugLines", EShaderType::Geometry },
+			{ "Debug/PS_DebugLine_Color", EShaderType::Fragment } };
 
 			material->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
 		}

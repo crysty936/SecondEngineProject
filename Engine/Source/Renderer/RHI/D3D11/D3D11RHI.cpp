@@ -541,7 +541,7 @@ void D3D11RHI::SwapBuffers()
 	SwapChain->Present(0, 0);
 }
 
-void D3D11RHI::ClearColor(const glm::vec4 inColor)
+void D3D11RHI::SetClearColor(const glm::vec4 inColor)
 {
 	CurrentClearColor = inColor;
 }

@@ -143,12 +143,12 @@ void DeferredRenderer::Draw()
   	VisualizeAlbedoUtil->GetCommand().Material->ExternalTextures.push_back(GBufferColorSpec);
   	DrawCommand(VisualizeAlbedoUtil->GetCommand());
 
-	RHI::Get()->EnableDepthTest();
 
 
 	// Draw debug primitives
-	//DrawDebugManager::Draw();
+	DrawDebugManager::Draw();
 
+	RHI::Get()->EnableDepthTest();
 
 	ImGui::End();
 }
@@ -160,38 +160,38 @@ void DeferredRenderer::Present()
 
 void DeferredRenderer::SetLightingConstants()
 {
-	//const eastl::vector<eastl::shared_ptr<LightSource>>& lights = SceneManager::Get().GetCurrentScene().GetLights();
-	//
-	//eastl::vector<eastl::shared_ptr<LightSource>> dirLights;
-	//eastl::vector<eastl::shared_ptr<LightSource>> pointLights;
+	const eastl::vector<eastl::shared_ptr<LightSource>>& lights = SceneManager::Get().GetCurrentScene().GetLights();
 
-	//for (const eastl::shared_ptr<LightSource>& light : lights)
-	//{
-	//	switch (light->LData.Type)
-	//	{
-	//	case ELightType::Directional:
-	//	{
-	//		dirLights.push_back(light);
-	//		break;
-	//	}
-	//	case ELightType::Point:
-	//	{
-	//		pointLights.push_back(light);
-	//		break;
-	//	}
-	//	}
-	//}
+	eastl::vector<eastl::shared_ptr<LightSource>> dirLights;
+	eastl::vector<eastl::shared_ptr<LightSource>> pointLights;
 
-	//ASSERT(dirLights.size() <= 1);
+	for (const eastl::shared_ptr<LightSource>& light : lights)
+	{
+		switch (light->LData.Type)
+		{
+		case ELightType::Directional:
+		{
+			dirLights.push_back(light);
+			break;
+		}
+		case ELightType::Point:
+		{
+			pointLights.push_back(light);
+			break;
+		}
+		}
+	}
+
+	ASSERT(dirLights.size() <= 1);
 
 	////////////////////////////////////////////////////////////////////////////
 	//// ImGui
 	////////////////////////////////////////////////////////////////////////////
 
-	//ImGui::SeparatorText("Lighting");
+	ImGui::SeparatorText("Lighting");
 
-	//static bool bUpdateViewPosDir = true;
-	//ImGui::Checkbox("Update View Pos Dir", &bUpdateViewPosDir);
+	static bool bUpdateViewPosDir = true;
+	ImGui::Checkbox("Update View Pos Dir", &bUpdateViewPosDir);
 
 	//ImGui::Checkbox("Visualize Normals", &bNormalVisualizeMode);
 	//UniformsCache["bNormalVisualizeMode"] = bNormalVisualizeMode ? 1 : 0;
@@ -207,31 +207,31 @@ void DeferredRenderer::SetLightingConstants()
 	////
 	////////////////////////////////////////////////////////////////////////////
 
-	//const glm::vec3 cameraPos = SceneManager::Get().GetCurrentScene().GetCurrentCamera()->GetAbsoluteTransform().Translation;
+	const glm::vec3 cameraPos = SceneManager::Get().GetCurrentScene().GetCurrentCamera()->GetAbsoluteTransform().Translation;
 
 	//constexpr glm::vec3 forward = glm::vec3(0.f, 0.f, 1.f);
 	//const glm::vec3 cameraForward = SceneManager::Get().GetCurrentScene().GetCurrentCamera()->GetAbsoluteTransform().Rotation * forward;
 
-	//if (bUpdateViewPosDir)
-	//{
-	//	UniformsCache["ViewPos"] = cameraPos;
-	//	UniformsCache["ViewDir"] = cameraForward;
-	//}
+	if (bUpdateViewPosDir)
+	{
+		UniformsCache["ViewPos"] = cameraPos;
+		//UniformsCache["ViewDir"] = cameraForward;
+	}
 
-	//const bool useDirLight = dirLights.size() > 0;
-	//UniformsCache["bUseDirLight"] = (int32_t)useDirLight;
+	const bool useDirLight = dirLights.size() > 0;
+	UniformsCache["bUseDirLight"] = (int32_t)useDirLight;
 
-	//if (useDirLight)
-	//{
-	//	const eastl::shared_ptr<LightSource>& dirLight = dirLights[0];
+	if (useDirLight)
+	{
+		const eastl::shared_ptr<LightSource>& dirLight = dirLights[0];
 
-	//	const glm::vec3 dir = dirLight->GetAbsoluteTransform().Rotation * glm::vec3(0.f, 0.f, 1.f);
-	//	UniformsCache["DirectionalLightDirection"] = glm::normalize(dir);
-	//}
-	//else
-	//{
-	//	UniformsCache["DirectionalLightDirection"] = glm::vec3(0.f, 0.f, 0.f);
-	//}
+		const glm::vec3 dir = dirLight->GetAbsoluteTransform().Rotation * glm::vec3(0.f, 0.f, 1.f);
+		UniformsCache["DirectionalLightDirection"] = glm::normalize(dir);
+	}
+	else
+	{
+		UniformsCache["DirectionalLightDirection"] = glm::vec3(0.f, 0.f, 0.f);
+	}
 
 
 	//eastl::vector<SPointLight> shaderPointLightData;

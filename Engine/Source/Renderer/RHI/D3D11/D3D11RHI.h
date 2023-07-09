@@ -56,7 +56,7 @@ public:
 	virtual void SwapBuffers() override;
 
 
-	virtual void ClearColor(const glm::vec4 inColor) override;
+	virtual void SetClearColor(const glm::vec4 inColor) override;
 
 
 	virtual void PrepareProjectionForRendering(glm::mat4& inProj) override;

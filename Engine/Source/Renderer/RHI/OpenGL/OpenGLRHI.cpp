@@ -715,9 +715,8 @@ void OpenGLRHI::SetViewportSize(const int32_t inWidth, const int32_t inHeight)
 	glViewport(0, 0, inWidth, inHeight);
 }
 
-void OpenGLRHI::ClearColor(const glm::vec4 inColor)
+void OpenGLRHI::SetClearColor(const glm::vec4 inColor)
 {
-	// Clears the buffers attached to the current framebuffer
 	glClearColor(inColor.x, inColor.y, inColor.z, inColor.w);
 }
 
@@ -728,6 +727,7 @@ void OpenGLRHI::SwapBuffers()
 
 void OpenGLRHI::ClearBuffers()
 {
+	// Set values to ClearColor
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }
 
