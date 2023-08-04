@@ -36,24 +36,15 @@ void main()
 
 	vec4 clipsSpaceLoc = vec4(clipCoord.x, clipCoord.y, depthValue, 1.0);
 
- 	vec4 viewSpacePos = ViewConstants.perspInv * clipsSpaceLoc;
- 	viewSpacePos /= viewSpacePos.w;
-
-// 	vec4 worldSpacePos = ViewConstants.viewInv * viewSpacePos;
-// 	FragColor = vec4(worldSpacePos.xyz, 1.0);
-
-// 	if (depthValue > 0.999999f)
-// 	{
-// 		FragColor = vec4(0.f, 0.f, 0.f, 1.f);
-// 	}
-
- 	if (depthValue > 0.999999f)
- 	{
- 		FragColor = vec4(1.f, 1.f, 1.f, 1.f);
- 	}
+	vec4 viewSpacePos = ViewConstants.perspInv * clipsSpaceLoc;
+	viewSpacePos /= viewSpacePos.w;
 
  	float far = ViewConstants.CameraNearFar.y;
  	float normalizedDepth = abs(viewSpacePos.z) / far;
 	FragColor = vec4(vec3(normalizedDepth), 1.0);
  
+	if (depthValue > 0.999999f)
+	{
+		FragColor = vec4(1.f, 1.f, 1.f, 1.f);
+	}
 }

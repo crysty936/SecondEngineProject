@@ -21,6 +21,7 @@ public:
 
 	inline static Renderer& Get() { ASSERT(Instance); return *Instance; }
 	virtual void AddCommand(const RenderCommand& inCommand) = 0;
+	virtual void AddPostProcessCommand(const RenderCommand& inCommand) = 0;
 	virtual void AddCommands(eastl::vector<RenderCommand> inCommands) = 0;
 
 	/**

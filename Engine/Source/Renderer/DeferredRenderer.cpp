@@ -123,13 +123,17 @@ void DeferredRenderer::Draw()
 
     DrawCommands(MainCommands);
 
+	RHI::Get()->SetDepthWrite(false);
+	DrawCommands(PostProcessCommands);
+	RHI::Get()->SetDepthWrite(true);
+
 	RHI::Instance->BindDefaultFrameBuffer();
 	RHI::Get()->ClearBuffers();
 
 
 	DrawCommand(DefaultModelQuad->GetCommand());
 	
-	RHI::Get()->DisableDepthTest();
+	RHI::Get()->SetDepthTest(false);
 
  	DrawCommand(VisualizeDepthUtil->GetCommand());
 
@@ -148,7 +152,7 @@ void DeferredRenderer::Draw()
 	// Draw debug primitives
 	DrawDebugManager::Draw();
 
-	RHI::Get()->EnableDepthTest();
+	RHI::Get()->SetDepthTest(true);
 
 	ImGui::End();
 }
@@ -564,6 +568,7 @@ eastl::shared_ptr<RenderMaterial> DeferredRenderer::GetMaterial(const RenderComm
 void DeferredRenderer::AddCommand(const RenderCommand & inCommand)
 {
 	std::lock_guard<std::mutex> lock(RenderCommandsMutex);
+
 	MainCommands.push_back(inCommand);
 }
 
@@ -615,6 +620,20 @@ bool DeferredRenderer::GetOrCreateContainer(const eastl::string& inInstanceName,
 eastl::string DeferredRenderer::GetMaterialsDirPrefix()
 {
 	return "Deferred";
+}
+
+void DeferredRenderer::AddPostProcessCommand(const RenderCommand& inCommand)
+{
+	// TODO: Hack
+	if (inCommand.Material->bUsesSceneTextures)
+	{
+		//inCommand.Material->ExternalTextures.push_back(GBufferColorSpec);
+		//inCommand.Material->ExternalTextures.push_back(GBufferNormal);
+		inCommand.Material->ExternalTextures.push_back(GBufferDepth);
+	}
+	//
+
+	PostProcessCommands.push_back(inCommand);
 }
 
 void DeferredRenderer::SetViewportSizeToMain()

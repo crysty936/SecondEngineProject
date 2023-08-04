@@ -6,7 +6,7 @@ in VS_OUT
 	vec2 TexCoords;
 } ps_in;
 
-uniform sampler2D quadTexture;
+layout(binding = 0) uniform sampler2D quadTexture;
 
 //uniform float near = 0.1;
 //uniform float far = 1000.0;
@@ -36,6 +36,5 @@ void main()
 	}
 
 	vec4 color = texture(quadTexture, ps_in.TexCoords);
-	FragColor = vec4(color.a, color.a, color.a, 1.0);
-	//FragColor = vec4(1.f, 0.f, 0.f, 1.f);
+	FragColor = vec4(color.x, color.y, color.z, 1.0);
 }

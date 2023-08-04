@@ -315,6 +315,7 @@ public:
 	}
 };
 
+static eastl::shared_ptr<DeferredDecal> decal;
 
 void TestGameMode::Init()
 {
@@ -412,6 +413,12 @@ void TestGameMode::Init()
 // 
 // 		PointLight->SetRelativeLocation({ 0.5f, 1.0f, -52.f });
 // 	}
+
+
+	decal = SceneHelper::CreateVisualEntity<DeferredDecal>("Decal");
+	decal->Move(glm::vec3(4.f, 0.f, 0.f));
+	decal->SetScale(glm::vec3(5.f, 5.f, 5.f));
+
 }
 
 void TestGameMode::Tick(float inDeltaT)
@@ -428,22 +435,22 @@ void TestGameMode::Tick(float inDeltaT)
 	glm::vec3 right = glm::vec3(1.f, 0.f, 0.f);
 	glm::vec3 up = glm::vec3(0.f, 1.f, 0.f);
 
-	const eastl::shared_ptr<LightSource>& usedLight = DirLight;
+	const eastl::shared_ptr<TransformObject>& usedObj = decal;
 
-	if (usedLight)
+	if (usedObj)
 	{
- 		const glm::quat& rot = usedLight->GetAbsoluteTransform().Rotation;
+ 		const glm::quat& rot = usedObj->GetAbsoluteTransform().Rotation;
  
  		// order of operations matters, considered like a matrix
  		forward = glm::normalize(rot * forward);
  		right = glm::normalize(rot * right);
  		up = glm::normalize(rot * up);
  
- 		const glm::vec3 start = usedLight->GetAbsoluteTransform().Translation;
+ 		const glm::vec3 start = usedObj->GetAbsoluteTransform().Translation;
  
- 		DrawDebugHelpers::DrawDebugLine(start, start + forward * 20.f, glm::vec3(0.f, 0.f, 1.f));
- 		DrawDebugHelpers::DrawDebugLine(start, start + right * 20.f, glm::vec3(1.f, 0.f, 0.f));
- 		DrawDebugHelpers::DrawDebugLine(start, start + up * 20.f, glm::vec3(0.f, 1.f, 0.f));
+ 		DrawDebugHelpers::DrawDebugLine(start, start + forward * 10.f, glm::vec3(0.f, 0.f, 1.f));
+ 		DrawDebugHelpers::DrawDebugLine(start, start + right * 10.f, glm::vec3(1.f, 0.f, 0.f));
+ 		DrawDebugHelpers::DrawDebugLine(start, start + up * 10.f, glm::vec3(0.f, 1.f, 0.f));
 	}
 
 

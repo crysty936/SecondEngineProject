@@ -14,6 +14,7 @@
 #include "Renderer/Material/EngineMaterials/RenderMaterial_WithShadow.h"
 #include "EASTL/unordered_map.h"
 #include "Renderer/Material/EngineMaterials/RenderMaterial_LightSource.h"
+#include "Renderer/Material/EngineMaterials/RenderMaterial_DeferredDecal.h"
 
 TriangleShape::TriangleShape(const eastl::string& inName)
 	: DrawableObject(inName)
@@ -276,3 +277,66 @@ void LightSource::CreateProxy()
 
 	Renderer::Get().AddCommand(newCommand);
 }
+
+DeferredDecal::DeferredDecal(const eastl::string& inName)
+	: Model3D(inName)
+{
+
+}
+DeferredDecal::~DeferredDecal() = default;
+
+void DeferredDecal::CreateProxy()
+{
+	const eastl::string RenderDataContainerID = "deferredDecalVAO";
+	eastl::shared_ptr<MeshDataContainer> dataContainer{ nullptr };
+
+	const bool existingContainer = Renderer::Get().GetOrCreateContainer(RenderDataContainerID, dataContainer);
+	VertexInputLayout inputLayout;
+	// Vertex points
+	inputLayout.Push<float>(3, VertexInputType::Position);
+	// Vertex Normal
+	inputLayout.Push<float>(3, VertexInputType::Normal);
+	// Vertex Tex Coords
+	inputLayout.Push<float>(2, VertexInputType::TexCoords);
+
+	if (!existingContainer)
+	{
+		int32_t indicesCount = BasicShapesData::GetCubeIndicesCount();
+		eastl::shared_ptr<RHIIndexBuffer> ib = RHI::Get()->CreateIndexBuffer(BasicShapesData::GetCubeIndices(), indicesCount);
+
+
+		int32_t verticesCount = BasicShapesData::GetCubeVerticesCount();
+		const eastl::shared_ptr<RHIVertexBuffer> vb = RHI::Get()->CreateVertexBuffer(inputLayout, BasicShapesData::GetCubeVertices(), verticesCount, ib);
+
+		dataContainer->VBuffer = vb;
+	}
+
+	MaterialsManager& matManager = MaterialsManager::Get();
+	bool materialExists = false;
+	eastl::shared_ptr<RenderMaterial> material = matManager.GetOrAddMaterial<RenderMaterial_DeferredDecal>("deferred_decal_material", materialExists);
+	material->bUsesSceneTextures = true;
+
+	if (!materialExists)
+	{
+		eastl::shared_ptr<RHITexture2D> tex = RHI::Get()->CreateAndLoadTexture2D("../Data/Textures/MinecraftGrass.jpg", true);
+		material->OwnedTextures.push_back(tex);
+
+		eastl::vector<ShaderSourceInput> shaders = {
+		{ "DeferredDecal/VS_DeferredDecal", EShaderType::Vertex },
+		{ "DeferredDecal/PS_DeferredDecal", EShaderType::Fragment } };
+
+		material->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
+	}
+
+	eastl::shared_ptr<MeshNode> cubeNode = eastl::make_shared<MeshNode>("Cube Mesh");
+	AddChild(cubeNode);
+
+	RenderCommand newCommand;
+	newCommand.Material = material;
+	newCommand.DataContainer = dataContainer;
+	newCommand.Parent = cubeNode;
+	newCommand.DrawType = EDrawType::DrawElements;
+
+	Renderer::Get().AddPostProcessCommand(newCommand);
+}
+

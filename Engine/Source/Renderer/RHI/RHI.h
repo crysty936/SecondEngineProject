@@ -108,8 +108,8 @@ public:
 
 	virtual void ReadBufferData(const class RHIBufferBase& inBuffer, const size_t inOffset, const size_t inSize, void* outData) {}
 
-	virtual void DisableDepthTest() {}
-	virtual void EnableDepthTest() {}
+	virtual void SetDepthWrite(const bool inValue) {}
+	virtual void SetDepthTest(const bool inValue) {}
 
 	// ImGui
 	virtual void ImGuiInit() {}

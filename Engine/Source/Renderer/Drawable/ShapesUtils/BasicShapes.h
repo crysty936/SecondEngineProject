@@ -41,3 +41,13 @@ public:
 
 	virtual void CreateProxy() override;
 };
+
+
+class DeferredDecal : public Model3D
+{
+public:
+	DeferredDecal(const eastl::string& inName);
+	virtual ~DeferredDecal();
+
+	virtual void CreateProxy() override;
+};

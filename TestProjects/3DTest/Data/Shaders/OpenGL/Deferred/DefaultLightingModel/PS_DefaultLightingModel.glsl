@@ -48,33 +48,21 @@ vec3 CalcDirLight(vec3 lightDir, vec3 normal, vec3 viewDir)
 void main()
 {
 	const float depthValue = texture(GBufferDepth, ps_in.TexCoords).r;
-	//FragColor = vec4(vec3(depthValue).xyz, 1.0);
+	FragColor = vec4(vec3(depthValue), 1.0);
 
 	vec3 wsNormal = texture(GBufferNormal, ps_in.TexCoords).rgb;
 	wsNormal = wsNormal * 2.0 - 1.0;
 	//FragColor = vec4(wsNormal, 1.0);
 
-	vec2 clipCoord = ps_in.TexCoords.xy * 2.f - 1.f;
+	vec2 clipCoord = ps_in.TexCoords.xy * 2.0 - 1.0;
 	vec4 clipsSpaceLoc = vec4(clipCoord.x, clipCoord.y, depthValue, 1.0);
 
-	vec4 wsPos = ViewConstants.perspInv * clipsSpaceLoc;
-	wsPos /= wsPos.w;
-	vec4 worldSpacePos = ViewConstants.viewInv * wsPos;
-	vec3 normalizedWSPos = normalize(worldSpacePos.xyz) * 10;
-
+	vec4 viewSpacePosition = ViewConstants.perspInv * clipsSpaceLoc;
+	viewSpacePosition /= viewSpacePosition.w;
+	vec4 worldSpacePos = ViewConstants.viewInv * viewSpacePosition;
 	//vec3 albedo = texture(GBufferAlbedoSpec, ps_in.TexCoords).rgb;
 	//FragColor = vec4(albedo, 1.0);
 
-
-	// Account for positions with extremely large depth (at far plane)
-	vec3 viewToFragW = normalize(LightingConstants.ViewPos - worldSpacePos.xyz);
+	vec3 viewToFragW = normalize(worldSpacePos.xyz - LightingConstants.ViewPos);
 	FragColor = vec4(CalcDirLight(LightingConstants.DirectionalLightDir, wsNormal, viewToFragW), 1.0);
-	//FragColor = vec4(viewToFragW, 1.0);
-
-
-
-
-
-
-
 }

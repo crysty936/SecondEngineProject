@@ -1086,6 +1086,9 @@ void OpenGLRHI::BindFrameBuffer(const class RHIFrameBuffer& inFrameBuffer)
 void OpenGLRHI::BindDefaultFrameBuffer()
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	//constexpr uint32_t attachments[32] = { GL_COLOR_ATTACHMENT0 };
+	//glDrawBuffers(1, attachments);
 }
 
 void OpenGLRHI::UnbindFrameBuffer(const class RHIFrameBuffer& inFrameBuffer)
@@ -1127,14 +1130,28 @@ void OpenGLRHI::ImGuiRenderDrawData()
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
-void OpenGLRHI::DisableDepthTest()
+void OpenGLRHI::SetDepthWrite(const bool inValue)
 {
-	glDisable(GL_DEPTH_TEST);
+	if (inValue)
+	{
+		glDepthMask(GL_TRUE);
+	}
+	else
+	{
+		glDepthMask(GL_FALSE);
+	}
 }
 
-void OpenGLRHI::EnableDepthTest()
+void OpenGLRHI::SetDepthTest(const bool inValue)
 {
-	glEnable(GL_DEPTH_TEST);
+	if (inValue)
+	{
+		glEnable(GL_DEPTH_TEST);
+	}
+	else
+	{
+		glDisable(GL_DEPTH_TEST);
+	}
 }
 
 void OpenGLRHI::ReadBufferData(const RHIBufferBase& inBuffer, const size_t inOffset, const size_t inSize, void* outData)

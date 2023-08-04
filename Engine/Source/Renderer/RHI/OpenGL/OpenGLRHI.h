@@ -83,8 +83,10 @@ public:
 
 	void ReadBufferData(const RHIBufferBase& inBuffer, const size_t inOffset, const size_t inSize, void* outData) override;
 
-	void DisableDepthTest() override;
-	void EnableDepthTest() override;
+	void SetDepthWrite(const bool inValue) override;
+	void SetDepthTest(const bool inValue) override;
+
+
 
 public:
 	// ImGui

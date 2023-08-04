@@ -27,6 +27,7 @@ public:
 	virtual void Present() override;
 
 	virtual void AddCommand(const RenderCommand& inCommand) override;
+	void AddPostProcessCommand(const RenderCommand& inCommand) override;
 	virtual void AddCommands(eastl::vector<RenderCommand> inCommands) override;
 
 	/**
@@ -37,6 +38,8 @@ public:
 
 
 	eastl::string GetMaterialsDirPrefix() override;
+
+
 
 protected:
 	void InitInternal() override;
@@ -52,6 +55,7 @@ private:
 
 private:
 	eastl::vector<RenderCommand> MainCommands;
+	eastl::vector<RenderCommand> PostProcessCommands;
 	EDrawMode::Type CurrentDrawMode = EDrawMode::Default;
 	eastl::unordered_map<eastl::string, eastl::shared_ptr<class MeshDataContainer>> RenderDataContainerMap;
 
