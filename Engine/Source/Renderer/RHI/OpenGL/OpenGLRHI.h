@@ -87,6 +87,8 @@ public:
 	void SetDepthTest(const bool inValue) override;
 
 
+	void SetRasterizerState(const ERasterizerState inState) override;
+	void SetDepthOp(EDepthOp inValue) override;
 
 public:
 	// ImGui

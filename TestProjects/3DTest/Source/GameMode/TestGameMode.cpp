@@ -416,8 +416,8 @@ void TestGameMode::Init()
 
 
 	decal = SceneHelper::CreateVisualEntity<DeferredDecal>("Decal");
-	decal->Move(glm::vec3(4.f, 0.f, 0.f));
-	decal->SetScale(glm::vec3(5.f, 5.f, 5.f));
+	decal->Move(glm::vec3(4.f, -2.2f, 0.f));
+	decal->SetScale(glm::vec3(5.4f, 2.2f, 5.f));
 
 }
 
@@ -448,9 +448,9 @@ void TestGameMode::Tick(float inDeltaT)
  
  		const glm::vec3 start = usedObj->GetAbsoluteTransform().Translation;
  
- 		DrawDebugHelpers::DrawDebugLine(start, start + forward * 10.f, glm::vec3(0.f, 0.f, 1.f));
- 		DrawDebugHelpers::DrawDebugLine(start, start + right * 10.f, glm::vec3(1.f, 0.f, 0.f));
- 		DrawDebugHelpers::DrawDebugLine(start, start + up * 10.f, glm::vec3(0.f, 1.f, 0.f));
+ 		DrawDebugHelpers::DrawDebugLine(start, start + forward * 4.f, glm::vec3(0.f, 0.f, 1.f));
+ 		DrawDebugHelpers::DrawDebugLine(start, start + right * 4.f, glm::vec3(1.f, 0.f, 0.f));
+ 		DrawDebugHelpers::DrawDebugLine(start, start + up * 4.f, glm::vec3(0.f, 1.f, 0.f));
 	}
 
 

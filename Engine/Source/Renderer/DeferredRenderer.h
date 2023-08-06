@@ -27,7 +27,7 @@ public:
 	virtual void Present() override;
 
 	virtual void AddCommand(const RenderCommand& inCommand) override;
-	void AddPostProcessCommand(const RenderCommand& inCommand) override;
+	virtual void AddDecalCommand(const RenderCommand& inCommand) override;
 	virtual void AddCommands(eastl::vector<RenderCommand> inCommands) override;
 
 	/**
@@ -49,13 +49,14 @@ private:
 	void SetLightingConstants();
 	void UpdateUniforms();
 	void DrawCommands(const eastl::vector<RenderCommand>& inCommands);
+	void DrawDecals(const eastl::vector<RenderCommand>& inCommands);
 	void DrawCommand(const RenderCommand& inCommand);
 	eastl::shared_ptr<RenderMaterial> GetMaterial(const RenderCommand& inCommand) const;
 	void SetViewportSizeToMain();
 
 private:
 	eastl::vector<RenderCommand> MainCommands;
-	eastl::vector<RenderCommand> PostProcessCommands;
+	eastl::vector<RenderCommand> DecalCommands;
 	EDrawMode::Type CurrentDrawMode = EDrawMode::Default;
 	eastl::unordered_map<eastl::string, eastl::shared_ptr<class MeshDataContainer>> RenderDataContainerMap;
 

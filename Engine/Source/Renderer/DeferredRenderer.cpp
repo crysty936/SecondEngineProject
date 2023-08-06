@@ -116,15 +116,20 @@ void DeferredRenderer::Draw()
 	RHI::Get()->ClearBuffers();
 	RHI::Instance->ClearTexture(*GBufferDepth, glm::vec4(1.f, 1.f, 1.f, 1.f));
 
+	//static glm::vec3 viewOrigin;
+	//static bool bUpdateViewOrigin = true;
+	//ImGui::Checkbox("TestUpdateViewOrigin", &bUpdateViewOrigin);
+	//if (bUpdateViewOrigin)
+	//{
+	//	viewOrigin = SceneManager::Get().GetCurrentScene().GetCurrentCamera()->GetAbsoluteTransform().Translation;
+	//}
+	//DrawDebugHelpers::DrawDebugPoint(viewOrigin);
 
-	// Clear default framebuffer buffers
-	//RHI::Instance->BindDefaultFrameBuffer();
-	//RHI::Get()->ClearBuffers();
 
     DrawCommands(MainCommands);
 
 	RHI::Get()->SetDepthWrite(false);
-	DrawCommands(PostProcessCommands);
+	DrawDecals(DecalCommands);
 	RHI::Get()->SetDepthWrite(true);
 
 	RHI::Instance->BindDefaultFrameBuffer();
@@ -300,6 +305,69 @@ void DeferredRenderer::DrawCommands(const eastl::vector<RenderCommand>& inComman
 		}
 	}
 }
+
+void DeferredRenderer::DrawDecals(const eastl::vector<RenderCommand>& inCommands)
+{
+	SetDrawMode(EDrawMode::Default);
+	for (const RenderCommand& renderCommand : inCommands)
+	{
+		const eastl::shared_ptr<const DrawableObject> parent = renderCommand.Parent.lock();
+
+		//const glm::mat4 cameraMatrix = SceneManager::Get().GetCurrentScene().GetCurrentCamera()->GetAbsoluteTransform().GetMatrix();
+		//const glm::vec3 cameraMatrixPos = glm::vec3(cameraMatrix[3][0], cameraMatrix[3][1], cameraMatrix[3][2]);
+
+		const glm::mat4 decalToWorld = parent->GetModelMatrix();
+
+		eastl::array<glm::vec3, 8> projCorners = RenderUtils::GenerateSpaceCorners(glm::inverse(decalToWorld), -1.f, 1.f);
+		DrawDebugHelpers::DrawBoxArray(projCorners, false);
+
+		// Pre Stencil
+
+
+
+
+
+		//const glm::vec3 cameraPos = SceneManager::Get().GetCurrentScene().GetCurrentCamera()->GetAbsoluteTransform().Translation;
+		//const glm::vec3 decalPos = parent->GetAbsoluteTransform().Translation;
+
+		//const float cameraDecalDistanceSquared = glm::lengthSquared(cameraPos - decalPos);
+
+		//const glm::vec3 decalXScaledAxis = glm::vec3(decalToWorld[0][0], decalToWorld[0][1], decalToWorld[0][2]);
+		//const glm::vec3 decalYScaledAxis = glm::vec3(decalToWorld[1][0], decalToWorld[1][1], decalToWorld[1][2]);
+		//const glm::vec3 decalZScaledAxis = glm::vec3(decalToWorld[2][0], decalToWorld[2][1], decalToWorld[2][2]);
+
+		//const float conservativeRadius = glm::sqrt(glm::lengthSquared(decalXScaledAxis) + glm::lengthSquared(decalYScaledAxis) + glm::lengthSquared(decalZScaledAxis));
+		//const float decalBoundingSphereRadius = (conservativeRadius + CAMERA_NEAR * 2.f) * (conservativeRadius + CAMERA_NEAR * 2.f);
+		//const bool bInsideDecal = cameraDecalDistanceSquared < decalBoundingSphereRadius;
+
+
+		//if (bInsideDecal)
+		//{
+
+			// CW ensures that there's always a face of the decal cube that's visible(the inside one)
+			// so at first sight, there's no reason to draw decals with CCW, as that will work only when the viewer is outside the decal cube
+			RHI::Get()->SetRasterizerState(ERasterizerState::CW);
+
+			// This has to be combined with CW always because the pixels that will be used for drawing now will always be the ones *under* the surface that the decal intersects(ones above it are discarded 
+			// always by the operation that discards pixels outside cube bounds)
+			RHI::Get()->SetDepthOp(EDepthOp::Always);
+
+		//}
+		//else
+		//{
+			//RHI::Get()->SetDepthOp(EDepthOp::Less);
+			//RHI::Get()->SetRasterizerState(ERasterizerState::CCW);
+		//}
+
+		DrawCommand(renderCommand);
+
+		//DrawDebugHelpers::
+	}
+
+	RHI::Get()->SetRasterizerState(ERasterizerState::CCW);
+	RHI::Get()->SetDepthOp(EDepthOp::Less);
+}
+
 
 void DeferredRenderer::DrawCommand(const RenderCommand& inCommand)
 {
@@ -622,7 +690,7 @@ eastl::string DeferredRenderer::GetMaterialsDirPrefix()
 	return "Deferred";
 }
 
-void DeferredRenderer::AddPostProcessCommand(const RenderCommand& inCommand)
+void DeferredRenderer::AddDecalCommand(const RenderCommand& inCommand)
 {
 	// TODO: Hack
 	if (inCommand.Material->bUsesSceneTextures)
@@ -633,7 +701,7 @@ void DeferredRenderer::AddPostProcessCommand(const RenderCommand& inCommand)
 	}
 	//
 
-	PostProcessCommands.push_back(inCommand);
+	DecalCommands.push_back(inCommand);
 }
 
 void DeferredRenderer::SetViewportSizeToMain()

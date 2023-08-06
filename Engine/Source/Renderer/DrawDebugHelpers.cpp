@@ -53,7 +53,7 @@ void DrawDebugHelpers::DrawLinesArray(const eastl::vector<glm::vec3>& inLinesPoi
 //   5: Far Bottom Right
 //   6: Far Top Left
 //   7: Far Bottom Left
- void DrawDebugHelpers::DrawBoxArray(eastl::array<glm::vec3, 8> inArray, const glm::vec3& inColor)
+ void DrawDebugHelpers::DrawBoxArray(eastl::array<glm::vec3, 8> inArray, const bool inDrawSides, const glm::vec3& inColor)
  {
  	int32_t FaceVertexIndices[6][4] =
  	{
@@ -88,21 +88,24 @@ void DrawDebugHelpers::DrawLinesArray(const eastl::vector<glm::vec3>& inLinesPoi
 
 		DrawLinesArray(verticesVector, inColor);
  
-  		const glm::vec3 FaceCentre = (FaceVertices[0] + FaceVertices[1] + FaceVertices[2] + FaceVertices[3]) * 0.25f;
-  		FaceVertices[0] = FaceCentre + ((FaceVertices[0] - FaceCentre) * 0.75f);
-  		FaceVertices[1] = FaceCentre + ((FaceVertices[1] - FaceCentre) * 0.75f);
-  		FaceVertices[2] = FaceCentre + ((FaceVertices[2] - FaceCentre) * 0.75f);
-  		FaceVertices[3] = FaceCentre + ((FaceVertices[3] - FaceCentre) * 0.75f);
+		if (inDrawSides)
+		{
+  			const glm::vec3 FaceCentre = (FaceVertices[0] + FaceVertices[1] + FaceVertices[2] + FaceVertices[3]) * 0.25f;
+  			FaceVertices[0] = FaceCentre + ((FaceVertices[0] - FaceCentre) * 0.75f);
+  			FaceVertices[1] = FaceCentre + ((FaceVertices[1] - FaceCentre) * 0.75f);
+  			FaceVertices[2] = FaceCentre + ((FaceVertices[2] - FaceCentre) * 0.75f);
+  			FaceVertices[3] = FaceCentre + ((FaceVertices[3] - FaceCentre) * 0.75f);
   
-		verticesVector = FaceVertices.toVector();
- 		DrawLinesArray(verticesVector, FaceIndicatorColors[faceCount]);
+			verticesVector = FaceVertices.toVector();
+ 			DrawLinesArray(verticesVector, FaceIndicatorColors[faceCount]);
+		}
  	}
  }
 
 void DrawDebugHelpers::DrawProjection(const glm::mat4& inProj)
 {
 	eastl::array<glm::vec3, 8> projCorners = RenderUtils::GenerateSpaceCorners(inProj, 0.f, 1.f);
-	DrawBoxArray(projCorners, glm::vec3(1.f, 0.f, 0.f));
+	DrawBoxArray(projCorners, true, glm::vec3(1.f, 0.f, 0.f));
 }
 
 void DrawDebugManager::Draw()

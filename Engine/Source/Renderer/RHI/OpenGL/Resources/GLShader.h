@@ -8,5 +8,8 @@ public:
 	GLShader(const uint32_t inGLHandle);
 
 public:
-	uint32_t Handle;
+	uint32_t MainHandle = 0;
+	uint32_t VertexHandle = 0;
+	uint32_t FragmentHandle = 0;
+	uint32_t GeometryHandle = 0;
 };

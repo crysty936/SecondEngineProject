@@ -798,7 +798,7 @@ void OpenGLRHI::BindIndexBuffer(const RHIIndexBuffer& inBuffer)
 void OpenGLRHI::BindShader(const RHIShader& inShader)
 {
 	const GLShader& glShader = static_cast<const GLShader&>(inShader);
-	glUseProgram(glShader.Handle);
+	glUseProgram(glShader.MainHandle);
 }
 
 void OpenGLRHI::BindUniformBuffer(const RHIUniformBuffer& inBuffer)
@@ -866,12 +866,12 @@ uint32_t CreateShaderInternal(const eastl::string& Source, uint32_t ShaderType)
 {
 	GLuint shaderHandle = glCreateShader(ShaderType);
 
-	// Send the vertex shader source code to GL
+	// Send the shader source code to GL
 	// Note that std::string's .c_str is NULL character terminated.
 	const GLchar* source = Source.c_str();
 	glShaderSource(shaderHandle, 1, &source, nullptr);
 
-	// Compile the vertex shader
+	// Compile the shader
 	glCompileShader(shaderHandle);
 
 	GLint isCompiled = 0;
@@ -1130,6 +1130,57 @@ void OpenGLRHI::ImGuiRenderDrawData()
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
+void OpenGLRHI::SetDepthOp(EDepthOp inValue)
+{
+	switch (inValue)
+	{
+	case EDepthOp::Never:
+	{
+		glDepthFunc(GL_NEVER);
+		break;
+	}
+	case EDepthOp::Less:
+	{
+		glDepthFunc(GL_LESS);
+		break;
+	}
+	case EDepthOp::Equal:
+	{
+		glDepthFunc(GL_EQUAL);
+		break;
+	}
+	case EDepthOp::LessOrEqual:
+	{
+		glDepthFunc(GL_LEQUAL);
+		break;
+	}
+	case EDepthOp::Greater:
+	{
+		glDepthFunc(GL_GREATER);
+		break;
+	}
+	case EDepthOp::NotEqual:
+	{
+		glDepthFunc(GL_NOTEQUAL);
+		break;
+	}
+	case EDepthOp::GreaterOrEqual:
+	{
+		glDepthFunc(GL_GEQUAL);
+		break;
+	}
+	case EDepthOp::Always:
+	{
+		glDepthFunc(GL_ALWAYS);
+		break;
+	}
+	default:
+		break;
+
+	}
+
+}
+
 void OpenGLRHI::SetDepthWrite(const bool inValue)
 {
 	if (inValue)
@@ -1151,6 +1202,18 @@ void OpenGLRHI::SetDepthTest(const bool inValue)
 	else
 	{
 		glDisable(GL_DEPTH_TEST);
+	}
+}
+
+void OpenGLRHI::SetRasterizerState(const ERasterizerState inState)
+{
+	if (inState == ERasterizerState::CW)
+	{
+		glFrontFace(GL_CW);
+	}
+	else
+	{
+		glFrontFace(GL_CCW);
 	}
 }
 

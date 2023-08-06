@@ -14,6 +14,15 @@ namespace detail
 	};
 
 	template<length_t L, typename T, qualifier Q, bool Aligned>
+	struct compute_length_squared
+	{
+		GLM_FUNC_QUALIFIER static T call(vec<L, T, Q> const& v)
+		{
+			return dot(v, v);
+		}
+	};
+
+	template<length_t L, typename T, qualifier Q, bool Aligned>
 	struct compute_distance
 	{
 		GLM_FUNC_QUALIFIER static T call(vec<L, T, Q> const& p0, vec<L, T, Q> const& p1)
@@ -138,6 +147,14 @@ namespace detail
 		GLM_STATIC_ASSERT(std::numeric_limits<T>::is_iec559, "'length' accepts only floating-point inputs");
 
 		return detail::compute_length<L, T, Q, detail::is_aligned<Q>::value>::call(v);
+	}
+
+	template<length_t L, typename T, qualifier Q>
+	GLM_FUNC_QUALIFIER T lengthSquared(vec<L, T, Q> const& v)
+	{
+		GLM_STATIC_ASSERT(std::numeric_limits<T>::is_iec559, "'length' accepts only floating-point inputs");
+
+		return detail::compute_length_squared<L, T, Q, detail::is_aligned<Q>::value>::call(v);
 	}
 
 	// distance

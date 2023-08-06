@@ -337,6 +337,6 @@ void DeferredDecal::CreateProxy()
 	newCommand.Parent = cubeNode;
 	newCommand.DrawType = EDrawType::DrawElements;
 
-	Renderer::Get().AddPostProcessCommand(newCommand);
+	Renderer::Get().AddDecalCommand(newCommand);
 }
 

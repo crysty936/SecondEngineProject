@@ -16,6 +16,24 @@ enum class EShaderType
 	Geometry
 };
 
+enum class ERasterizerState
+{
+	CW,
+	CCW
+};
+
+enum class EDepthOp
+{
+	Never,
+	Less,
+	Equal,
+	LessOrEqual,
+	Greater,
+	NotEqual,
+	GreaterOrEqual,
+	Always
+};
+
 struct ShaderSourceInput
 {
 	/** Path or code */
@@ -110,6 +128,9 @@ public:
 
 	virtual void SetDepthWrite(const bool inValue) {}
 	virtual void SetDepthTest(const bool inValue) {}
+	virtual void SetDepthOp(EDepthOp inValue) {}
+
+	virtual void SetRasterizerState(const ERasterizerState inState) {}
 
 	// ImGui
 	virtual void ImGuiInit() {}

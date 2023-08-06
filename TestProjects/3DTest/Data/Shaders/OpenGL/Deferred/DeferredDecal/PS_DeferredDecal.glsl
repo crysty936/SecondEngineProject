@@ -39,7 +39,7 @@ void main()
 	vec4 osPosition = ps_in.clipToWorldMatrix * vec4(svPosition, 1.0);
 	osPosition = osPosition / osPosition.w;
 	
-	// Discard pixels with depth outside the cube bounds
+	// Discard pixels with outside the cube bounds
 
 	if (any(lessThan(osPosition.xyz + vec3(1.0f), vec3(0.f))))
 	{
