@@ -16,7 +16,7 @@ void RenderMaterial_DefaultLighting::SetRequiredUniforms()
 	{"model"}
 	};
 
-	UBuffers.push_back({ defaultUniforms, ConstantBufferBinding::Vertex });
+	UBuffers.push_back({ defaultUniforms, EShaderType::Sh_Vertex });
 
 	eastl::vector<UniformWithFlag> additionalUniforms = {
 	{"perspInv"},
@@ -25,7 +25,7 @@ void RenderMaterial_DefaultLighting::SetRequiredUniforms()
 	{"ViewportSize"},
 	};
 
-	UBuffers.push_back({ additionalUniforms, ConstantBufferBinding::Pixel });
+	UBuffers.push_back({ additionalUniforms, EShaderType::Sh_Fragment });
 
 	eastl::vector<UniformWithFlag> lightingUniforms = {
 	{"bUseDirLight"},
@@ -33,10 +33,10 @@ void RenderMaterial_DefaultLighting::SetRequiredUniforms()
 	{"ViewPos"},
 	};
 
-	UBuffers.push_back({ lightingUniforms, ConstantBufferBinding::Pixel });
+	UBuffers.push_back({ lightingUniforms, EShaderType::Sh_Fragment });
 }
 
-void RenderMaterial_DefaultLighting::SetUniformsValue(eastl::unordered_map<eastl::string, struct SelfRegisteringUniform>& inUniformsCache)
+void RenderMaterial_DefaultLighting::SetUniformsValue(eastl::unordered_map<eastl::string, struct SelfRegisteringUniform>& inUniformsCache, const EShaderType inShaderTypes)
 {
 	inUniformsCache["perspInv"] = glm::inverse(inUniformsCache["projection"].GetValue<glm::mat4>());
 	inUniformsCache["viewInv"] = glm::inverse(inUniformsCache["view"].GetValue<glm::mat4>());
@@ -45,6 +45,6 @@ void RenderMaterial_DefaultLighting::SetUniformsValue(eastl::unordered_map<eastl
 	const WindowProperties& props = currentWindow.GetProperties();
 	inUniformsCache["ViewportSize"] = glm::vec4(props.Width, props.Height, 0.f, 0.f);
 
-	__super::SetUniformsValue(inUniformsCache);
+	__super::SetUniformsValue(inUniformsCache, inShaderTypes);
 }
 

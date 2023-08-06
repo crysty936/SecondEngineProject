@@ -18,7 +18,8 @@
 #include "Core/WindowsPlatform.h"
 #include "imgui.h"
 #include "backends/imgui_impl_opengl3.h"
-#include "Renderer//Renderer.h"
+#include "Renderer/Renderer.h"
+#include "Renderer/Material/RenderMaterial.h"
 
 namespace GLUtils
 {
@@ -264,11 +265,10 @@ OpenGLRHI::OpenGLRHI()
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 
-	glEnable(GL_STENCIL_TEST);
-	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+	glDisable(GL_STENCIL_TEST);
 
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glEnable(GL_BLEND);
+	//glEnable(GL_STENCIL_TEST);
+	//glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
 	glEnable(GL_CULL_FACE);
 
@@ -469,7 +469,7 @@ eastl::shared_ptr<class RHITexture2D> OpenGLRHI::CreateDepthMap(const int32_t in
 
 	glBindTexture(GL_TEXTURE_2D, texHandle);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, inWidth, inHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, inWidth, inHeight, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, nullptr);
 
  	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
  	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -480,15 +480,15 @@ eastl::shared_ptr<class RHITexture2D> OpenGLRHI::CreateDepthMap(const int32_t in
 	// To use with sampler2DShadow
 	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
 
- 	constexpr float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
- 	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+ 	//constexpr float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+ 	//glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	newTexture->Width = inWidth;
 	newTexture->Height = inHeight;
 	newTexture->NrChannels = 3;
-	newTexture->ChannelsType = ERHITextureChannelsType::Depth;
+	newTexture->ChannelsType = ERHITextureChannelsType::DepthStencil;
 	newTexture->TextureType = ETextureType::Single;
 
 	return newTexture;
@@ -636,7 +636,7 @@ void OpenGLRHI::AttachTextureToFramebufferDepth(RHIFrameBuffer& inFrameBuffer, e
 	{
 	case ETextureType::Single:
 	{
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, tex.GlHandle, 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, tex.GlHandle, 0);
 		glBuffer.DepthAttachment = inTex;
 		break;
 	}
@@ -907,7 +907,7 @@ eastl::shared_ptr<RHIShader> OpenGLRHI::CreateShaderFromSource(const eastl::vect
 	{
 		switch (input.ShaderType)
 		{
-		case EShaderType::Vertex:
+		case EShaderType::Sh_Vertex:
 		{
 			eastl::string formattedVS = input.ShaderSource;
 			formattedVS.insert(0, "#version 420 \n #define VERTEX_SHADER \n #line 0 \n ");
@@ -915,7 +915,7 @@ eastl::shared_ptr<RHIShader> OpenGLRHI::CreateShaderFromSource(const eastl::vect
 
 			break;
 		}
-		case EShaderType::Fragment:
+		case EShaderType::Sh_Fragment:
 		{
 			eastl::string formattedPS = input.ShaderSource;
 			formattedPS.insert(0, "#version 420 \n #define FRAGMENT_SHADER \n #line 0 \n ");
@@ -923,7 +923,7 @@ eastl::shared_ptr<RHIShader> OpenGLRHI::CreateShaderFromSource(const eastl::vect
 
 			break;
 		}
-		case EShaderType::Geometry:
+		case EShaderType::Sh_Geometry:
 		{
 			eastl::string formattedGS = input.ShaderSource;
 			formattedGS.insert(0, "#version 420 \n #define GEOMETRY_SHADER \n #line 0 \n ");
@@ -988,7 +988,7 @@ eastl::shared_ptr<RHIShader> OpenGLRHI::CreateShaderFromSource(const eastl::vect
 	glDetachShader(program, vertexShader);
 	glDetachShader(program, fragmentShader);
 
-	eastl::shared_ptr<GLShader> newShader = eastl::make_shared<GLShader>(program);
+	eastl::shared_ptr<GLShader> newShader = eastl::make_shared<GLShader>(program, vertexShader, fragmentShader, geometryShader);
 	return newShader;
 }
 
@@ -1051,6 +1051,13 @@ void OpenGLRHI::ClearTexture(const RHITexture2D& inTexture, const glm::vec4& inC
 	case ERHITextureChannelsType::Depth:
 	{
 		glClearTexImage(glTex.GlHandle, 0, GL_DEPTH_COMPONENT, GL_FLOAT, &inColor);
+		break;
+	}
+	case ERHITextureChannelsType::DepthStencil:
+	{
+		// First 24 bits to 1 and stencil to 0
+		const uint32_t test[] = { 0xffffff00};
+		glClearTexImage(glTex.GlHandle, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, test);
 		break;
 	}
 	default:
@@ -1181,6 +1188,82 @@ void OpenGLRHI::SetDepthOp(EDepthOp inValue)
 
 }
 
+eastl::shared_ptr<class RHIShader> OpenGLRHI::GetVertexOnlyShader(const RenderMaterial& inFullMaterial)
+{
+	if (inFullMaterial.VertexOnlyShader)
+	{
+		return inFullMaterial.VertexOnlyShader;
+	}
+
+	const GLShader& glShader = static_cast<const GLShader&>(*inFullMaterial.Shader);
+
+	GLuint program = glCreateProgram();
+
+	// Attach our shaders to our program
+	glAttachShader(program, glShader.VertexHandle);
+
+	// Link our program
+	glLinkProgram(program);
+
+	// Note the different functions here: glGetProgram* instead of glGetShader*.
+	GLint isLinked = 0;
+	glGetProgramiv(program, GL_LINK_STATUS, (int*)&isLinked);
+	if (isLinked == GL_FALSE)
+	{
+		GLint maxLength = 0;
+		glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxLength);
+
+		// The maxLength includes the NULL character
+		char* infoLog = (char*)_malloca(maxLength * sizeof(char));
+		glGetProgramInfoLog(program, maxLength, &maxLength, &infoLog[0]);
+
+		// We don't need the program anymore.
+		glDeleteProgram(program);
+
+		LOG_ERROR("%s", infoLog);
+		ASSERT_MSG(0, "Shader Link failure.");
+
+		return nullptr;
+	}
+
+	// Always detach shaders after a successful link.
+	glDetachShader(program, glShader.VertexHandle);
+
+	eastl::shared_ptr<GLShader> newShader = eastl::make_shared<GLShader>(program, glShader.VertexHandle);
+	inFullMaterial.VertexOnlyShader = newShader;
+
+	return newShader;
+
+}
+
+void OpenGLRHI::TestStencilBufferStuff(class RHIFrameBuffer& inFrameBuffer)
+{
+	const GLFrameBuffer& glBuffer = static_cast<const GLFrameBuffer&>(inFrameBuffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, glBuffer.GLHandle);
+
+
+	// Create render buffer object for the frame buffer
+	uint32_t rbo;
+	glGenRenderbuffers(1, &rbo);
+	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+
+	// Allocate buffer size
+	const WindowProperties& windowProps = Engine->GetMainWindow().GetProperties();
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_STENCIL_INDEX8, windowProps.Width, windowProps.Height);
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+	// Attach the rbo to the framebuffer
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+
+	//// Clear the buffer
+	//glClearColor(0.f, 0.f, 0.f, 0.f);
+
+	ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
+
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
 void OpenGLRHI::SetDepthWrite(const bool inValue)
 {
 	if (inValue)
@@ -1214,6 +1297,18 @@ void OpenGLRHI::SetRasterizerState(const ERasterizerState inState)
 	else
 	{
 		glFrontFace(GL_CCW);
+	}
+}
+
+void OpenGLRHI::SetCullState(const bool inValue)
+{
+	if (inValue)
+	{
+		glEnable(GL_CULL_FACE);
+	}
+	else
+	{
+		glDisable(GL_CULL_FACE);
 	}
 }
 

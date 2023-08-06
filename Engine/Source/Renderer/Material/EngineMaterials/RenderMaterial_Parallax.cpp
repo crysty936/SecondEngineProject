@@ -20,10 +20,10 @@ void RenderMaterial_Parallax::SetRequiredUniforms()
 	{"ViewPos"},
 	};
 
-	UBuffers.push_back({ defaultUniforms, ConstantBufferBinding::Vertex });
+	UBuffers.push_back({ defaultUniforms, EShaderType::Sh_Vertex });
 }
 
-void RenderMaterial_Parallax::SetUniformsValue(eastl::unordered_map<eastl::string, struct SelfRegisteringUniform>& inUniformsCache)
+void RenderMaterial_Parallax::SetUniformsValue(eastl::unordered_map<eastl::string, struct SelfRegisteringUniform>& inUniformsCache, const EShaderType inShaderTypes)
 {
 	ImGui::SeparatorText("Parallax");
 	static bool bUseParallaxMapping = true;
@@ -33,6 +33,6 @@ void RenderMaterial_Parallax::SetUniformsValue(eastl::unordered_map<eastl::strin
 	ImGui::DragFloat("Parallax Height Scale", &ParallaxHeightScale, 0.01f, 0.f, 1.f, "%f", ImGuiSliderFlags_AlwaysClamp);
 	inUniformsCache["ParallaxHeightScale"] = ParallaxHeightScale;
 
-	__super::SetUniformsValue(inUniformsCache);
+	__super::SetUniformsValue(inUniformsCache, inShaderTypes);
 }
 

@@ -2,13 +2,7 @@
 #include "RHIBufferBase.h"
 
 #include <stdint.h>
-
-enum class ConstantBufferBinding
-{
-	Vertex,
-	Geometry,
-	Pixel
-};
+#include "Renderer/RHI/RHI.h"
 
 class RHIUniformBuffer : public RHIBufferBase
 {
@@ -17,5 +11,5 @@ public:
 
 public:
 	const size_t InitSize = 0;
-	ConstantBufferBinding BType = ConstantBufferBinding::Vertex;
+	EShaderType BindingType = EShaderType::Sh_Vertex;
 };

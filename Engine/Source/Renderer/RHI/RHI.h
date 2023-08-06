@@ -9,11 +9,13 @@
 #include "Renderer/DrawType.h"
 #include "Resources/RHITexture.h"
 
-enum class EShaderType
+enum EShaderType : uint8_t
 {
-	Vertex,
-	Fragment,
-	Geometry
+	Sh_Vertex = 1 << 0,
+	Sh_Fragment = 1 << 1,
+	Sh_Geometry = 1 << 2,
+
+	Sh_Universal = Sh_Vertex | Sh_Fragment | Sh_Geometry
 };
 
 enum class ERasterizerState
@@ -131,6 +133,12 @@ public:
 	virtual void SetDepthOp(EDepthOp inValue) {}
 
 	virtual void SetRasterizerState(const ERasterizerState inState) {}
+	virtual void SetCullState(const bool inValue) {};
+
+	virtual void TestStencilBufferStuff(class RHIFrameBuffer& inFrameBuffer) {}
+
+	// Used for pre-stencil
+	virtual eastl::shared_ptr<class RHIShader> GetVertexOnlyShader(const class RenderMaterial& inFullMaterial) { return nullptr; }
 
 	// ImGui
 	virtual void ImGuiInit() {}

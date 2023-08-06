@@ -88,7 +88,13 @@ public:
 
 
 	void SetRasterizerState(const ERasterizerState inState) override;
+	void SetCullState(const bool inValue) override;
 	void SetDepthOp(EDepthOp inValue) override;
+
+	eastl::shared_ptr<class RHIShader> GetVertexOnlyShader(const class RenderMaterial& inFullMaterial) override;
+
+
+	void TestStencilBufferStuff(class RHIFrameBuffer& inFrameBuffer) override;
 
 public:
 	// ImGui

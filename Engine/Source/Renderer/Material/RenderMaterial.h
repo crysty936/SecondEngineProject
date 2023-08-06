@@ -16,12 +16,12 @@ struct UniformWithFlag
 
 struct BufferWithRequirements
 {
-	BufferWithRequirements(eastl::vector<UniformWithFlag>& inRequiredUniforms, ConstantBufferBinding inBufferType)
-		: RequiredUniforms(inRequiredUniforms), BufferType(inBufferType), BufferContainer()
+	BufferWithRequirements(eastl::vector<UniformWithFlag>& inRequiredUniforms, EShaderType inBufferType)
+		: RequiredUniforms(inRequiredUniforms), BufferBindingType(inBufferType), BufferContainer()
 	{}
 
 	eastl::vector<UniformWithFlag> RequiredUniforms;
-	ConstantBufferBinding BufferType = ConstantBufferBinding::Vertex;
+	EShaderType BufferBindingType = EShaderType::Sh_Vertex;
 	UniformBufferContainer BufferContainer;
 };
 
@@ -34,14 +34,16 @@ public:
 	virtual void Init();
 	void ResetUniforms();
 	virtual void SetRequiredUniforms();
-	virtual void SetUniformsValue(eastl::unordered_map<eastl::string, struct SelfRegisteringUniform>& inUniformsCache);
-	void BindBuffers();
-	void UnbindBuffers();
+	virtual void SetUniformsValue(eastl::unordered_map<eastl::string, struct SelfRegisteringUniform>& inUniformsCache, const EShaderType inShaderTypes = Sh_Universal);
+	void BindBuffers(const EShaderType inShaderTypes = Sh_Universal);
+	void UnbindBuffers(const EShaderType inShaderTypes = Sh_Universal);
 	UniformWithFlag* FindRequiredUniform(const eastl::string& inUniformName);
 
 public:
 	eastl::vector<BufferWithRequirements> UBuffers;
 	eastl::shared_ptr<class RHIShader> Shader;
+	// Use for pre-stencil, initialized when it is required, otherwise NULL
+	mutable eastl::shared_ptr<class RHIShader> VertexOnlyShader;
 
 	eastl::vector<eastl::shared_ptr<class RHITexture2D>> OwnedTextures;
 	eastl::vector<eastl::weak_ptr<class RHITexture2D>> ExternalTextures;

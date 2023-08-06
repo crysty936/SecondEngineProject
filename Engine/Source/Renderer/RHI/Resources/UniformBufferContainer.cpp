@@ -36,7 +36,7 @@ void UniformBufferContainer::AddData(const void* inData, const size_t inSize, co
 	Counter += finalSize;
 }
 
-void UniformBufferContainer::UpdateData(const ConstantBufferBinding inBufferType, const int32_t inBufferNr)
+void UniformBufferContainer::UpdateData(const EShaderType inBufferType, const int32_t inBufferNr)
 {
 	if (!RHIBuffer)
 	{
@@ -50,7 +50,7 @@ void UniformBufferContainer::UpdateData(const ConstantBufferBinding inBufferType
 		}
 
 		RHIBuffer = RHI::Get()->CreateUniformBuffer(bufferSize);
-		RHIBuffer->BType = inBufferType;
+		RHIBuffer->BindingType = inBufferType;
 	}
 
 	RHI::Get()->UniformBufferUpdateData(*RHIBuffer, UniformsDataCache.data(), UniformsDataCache.size(), inBufferNr);

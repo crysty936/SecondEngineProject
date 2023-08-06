@@ -24,23 +24,28 @@ void RenderMaterial::ResetUniforms()
 
 void RenderMaterial::SetRequiredUniforms()
 {
-	// !! These have to be in the same order as they are in the shader
+	// !! These have to be in the same order as they are in the shader struct
 	eastl::vector<UniformWithFlag> defaultUniforms = {
 		{"projection"},
 		{"view"},
 		{"model"}
 		};
 
-	UBuffers.push_back({ defaultUniforms, ConstantBufferBinding::Vertex });
+	UBuffers.push_back({ defaultUniforms, EShaderType::Sh_Vertex });
 }
 
-void RenderMaterial::SetUniformsValue(eastl::unordered_map<eastl::string, SelfRegisteringUniform>& inUniformsCache)
+void RenderMaterial::SetUniformsValue(eastl::unordered_map<eastl::string, SelfRegisteringUniform>& inUniformsCache, const EShaderType inShaderType)
 {
 	using uniformsIterator = const eastl::unordered_map<eastl::string, SelfRegisteringUniform>::const_iterator;
 
 	for (int32_t i = 0; i < UBuffers.size(); ++i)
 	{
 		BufferWithRequirements& buffer = UBuffers[i];
+		if (!(buffer.BufferBindingType & inShaderType))
+		{
+			continue;
+		}
+
 		buffer.BufferContainer.Clear();
 
 		// Register all required uniforms
@@ -71,22 +76,32 @@ void RenderMaterial::SetUniformsValue(eastl::unordered_map<eastl::string, SelfRe
 			requiredUniform.IsSet = true;
 		}
 
-		buffer.BufferContainer.UpdateData(buffer.BufferType, i);
+		buffer.BufferContainer.UpdateData(buffer.BufferBindingType, i);
 	}
 }
 
-void RenderMaterial::BindBuffers()
+void RenderMaterial::BindBuffers(const EShaderType inShaderTypes)
 {
 	for (BufferWithRequirements& buffer : UBuffers)
 	{
+		if (!(buffer.BufferBindingType & inShaderTypes))
+		{
+			continue;
+		}
+
 		buffer.BufferContainer.Bind();
 	}
 }
 
-void RenderMaterial::UnbindBuffers()
+void RenderMaterial::UnbindBuffers(const EShaderType inShaderTypes)
 {
 	for (BufferWithRequirements& buffer : UBuffers)
 	{
+		if (!(buffer.BufferBindingType & inShaderTypes))
+		{
+			continue;
+		}
+
 		buffer.BufferContainer.Unbind();
 	}
 }

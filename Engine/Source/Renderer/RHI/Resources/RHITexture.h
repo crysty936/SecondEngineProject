@@ -11,7 +11,8 @@ enum class ETextureType
 enum class ERHITextureChannelsType
 {
 	RGBA,
-	Depth
+	Depth,
+	DepthStencil
 };
 
 enum class ERHITexturePrecision

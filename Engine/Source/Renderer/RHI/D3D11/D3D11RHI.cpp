@@ -374,7 +374,7 @@ eastl::shared_ptr<class RHIShader> D3D11RHI::CreateShaderFromSource(const eastl:
 	{
 		switch (shaderInput.ShaderType)
 		{
-		case EShaderType::Vertex:
+		case EShaderType::Sh_Vertex:
 		{
 			// Set up compilation environment
 			eastl::string formattedVS = "#define VERTEX_SHADER \n #line 0 \n ";
@@ -460,7 +460,7 @@ eastl::shared_ptr<class RHIShader> D3D11RHI::CreateShaderFromSource(const eastl:
 			}
 		}
 		break;
-		case EShaderType::Fragment:
+		case EShaderType::Sh_Fragment:
 		{
 			eastl::string formattedPS = "#define FRAGMENT_SHADER \n #line 0 \n ";
 			formattedPS.append(shaderInput.ShaderSource);
@@ -482,7 +482,7 @@ eastl::shared_ptr<class RHIShader> D3D11RHI::CreateShaderFromSource(const eastl:
 			psBlob->Release();
 		}
 		break;
-		case EShaderType::Geometry:
+		case EShaderType::Sh_Geometry:
 		{
 			// TODO
 		}
@@ -593,11 +593,11 @@ void D3D11RHI::BindUniformBuffer(const RHIUniformBuffer & inBuffer)
 {
 	// TODO: Also need to treat different buffer registers
 	const D3D11UniformBuffer& d3d11Buffer = static_cast<const D3D11UniformBuffer&>(inBuffer);
-	if (inBuffer.BType == ConstantBufferBinding::Vertex)
+	if (inBuffer.BindingType == EShaderType::Sh_Vertex)
 	{
 		ImmediateContext->VSSetConstantBuffers(0, 1, &d3d11Buffer.Handle);
 	}
-	else if (inBuffer.BType == ConstantBufferBinding::Pixel)
+	else if (inBuffer.BindingType == EShaderType::Sh_Fragment)
 	{
 		ImmediateContext->PSSetConstantBuffers(0, 1, &d3d11Buffer.Handle);
 	}
@@ -628,11 +628,11 @@ void D3D11RHI::UnbindUniformBuffer(const RHIUniformBuffer & inBuffer)
 {
 	ImmediateContext->VSSetConstantBuffers(0, 0, nullptr);
 
-	if (inBuffer.BType == ConstantBufferBinding::Vertex)
+	if (inBuffer.BindingType == EShaderType::Sh_Vertex)
 	{
 		ImmediateContext->VSSetConstantBuffers(0, 0, nullptr);
 	}
-	else if (inBuffer.BType == ConstantBufferBinding::Pixel)
+	else if (inBuffer.BindingType == EShaderType::Sh_Fragment)
 	{
 		ImmediateContext->PSSetConstantBuffers(0, 0, nullptr);
 	}

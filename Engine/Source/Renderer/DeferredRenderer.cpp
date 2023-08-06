@@ -35,6 +35,9 @@
 #include "imgui.h"
 #include "ShaderTypes.h"
 
+// TO REMOVE
+#include "glad/glad.h"
+
 static std::mutex RenderCommandsMutex;
 static std::mutex GetVAOMutex;
 
@@ -306,6 +309,106 @@ void DeferredRenderer::DrawCommands(const eastl::vector<RenderCommand>& inComman
 	}
 }
 
+void DeferredRenderer::RenderPreStencil(const RenderCommand& inCommand)
+{
+	const bool parentValid = !inCommand.Parent.expired();
+	if (!ENSURE(parentValid))
+	{
+		return;
+	}
+
+	const eastl::shared_ptr<const DrawableObject> parent = inCommand.Parent.lock();
+	const eastl::shared_ptr<RenderMaterial> material = GetMaterial(inCommand);
+	const eastl::shared_ptr<MeshDataContainer>& dataContainer = inCommand.DataContainer;
+
+	if (!parent->IsVisible() || !material)
+	{
+		return;
+	}
+
+	RHI::Get()->BindVertexBuffer(*(dataContainer->VBuffer));
+
+	// Additional vertex data buffers
+	for (const eastl::shared_ptr<RHIVertexBuffer>& additionalBuffer : dataContainer->AdditionalBuffers)
+	{
+		constexpr bool bindIndexBuffer = false;
+		RHI::Get()->BindVertexBuffer(*(additionalBuffer), bindIndexBuffer);
+	}
+
+	eastl::shared_ptr<RHIShader> vertexOnlyShader = RHI::Get()->GetVertexOnlyShader(*material);
+	RHI::Get()->BindShader(*vertexOnlyShader);
+
+	material->ResetUniforms();
+
+	UniformsCache["model"] = parent->GetModelMatrix();
+	UniformsCache["ObjPos"] = parent->GetAbsoluteTransform().Translation;
+
+	parent->UpdateCustomUniforms(UniformsCache);
+	material->SetUniformsValue(UniformsCache, EShaderType::Sh_Vertex);
+	material->BindBuffers(EShaderType::Sh_Vertex);
+
+	const uint32_t indicesCount = dataContainer->VBuffer->GetIndicesCount();
+
+
+
+
+	// Disable culling
+	RHI::Get()->SetCullState(false);
+
+	glEnable(GL_BLEND);
+
+	glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD);
+	glBlendFuncSeparate(GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA, GL_ZERO, GL_ONE);
+
+
+	//RHI::Get()->TestStencilBufferStuff(*GBuffer);
+
+
+
+
+	switch (inCommand.DrawType)
+	{
+	case EDrawType::DrawElements:
+	{
+		RHI::Get()->DrawElements(indicesCount);
+
+		break;
+	}
+	case EDrawType::DrawArrays:
+	{
+		//glDrawArrays(GL_TRIANGLES, 0, indicesCount);
+		break;
+	}
+	case EDrawType::DrawInstanced:
+	{
+		RHI::Get()->DrawInstanced(indicesCount, inCommand.InstancesCount);
+		break;
+	}
+	}
+
+	// Additional vertex data buffers
+//  	for (const eastl::shared_ptr<RHIVertexBuffer>& additionalBuffer : dataContainer->AdditionalBuffers)
+//  	{
+//  		constexpr bool unbindIndexBuffer = false;
+//  		RHI::Instance->UnbindVertexBuffer(*(additionalBuffer), unbindIndexBuffer);
+//  	}
+
+	RHI::Get()->UnbindVertexBuffer(*(dataContainer->VBuffer));
+
+	material->UnbindBuffers(EShaderType::Sh_Vertex);
+	RHI::Get()->UnbindShader(*(material->Shader));
+
+
+
+
+	glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD);
+	glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
+
+	glDisable(GL_BLEND);
+
+	RHI::Get()->SetCullState(true);
+}
+
 void DeferredRenderer::DrawDecals(const eastl::vector<RenderCommand>& inCommands)
 {
 	SetDrawMode(EDrawMode::Default);
@@ -322,11 +425,11 @@ void DeferredRenderer::DrawDecals(const eastl::vector<RenderCommand>& inCommands
 		DrawDebugHelpers::DrawBoxArray(projCorners, false);
 
 		// Pre Stencil
+		RenderPreStencil(renderCommand);
 
 
 
-
-
+		// Is camera inside decal
 		//const glm::vec3 cameraPos = SceneManager::Get().GetCurrentScene().GetCurrentCamera()->GetAbsoluteTransform().Translation;
 		//const glm::vec3 decalPos = parent->GetAbsoluteTransform().Translation;
 
@@ -525,9 +628,9 @@ eastl::shared_ptr<RenderMaterial> DeferredRenderer::GetMaterial(const RenderComm
 
 				eastl::vector<ShaderSourceInput> shaders = {
 				//{ "VS-Pos-Normal-UV_Instanced_Depth", EShaderType::Vertex },
-				{ "VS_Pos-Normal-UV_Depth_Cascaded", EShaderType::Vertex },
-				{ "GS_Depth_Cascaded", EShaderType::Geometry },
-				{ "PS_Empty", EShaderType::Fragment } };
+				{ "VS_Pos-Normal-UV_Depth_Cascaded", EShaderType::Sh_Vertex },
+				{ "GS_Depth_Cascaded", EShaderType::Sh_Geometry },
+				{ "PS_Empty", EShaderType::Sh_Fragment } };
 
 				depthMaterial->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
 			}
@@ -552,9 +655,9 @@ eastl::shared_ptr<RenderMaterial> DeferredRenderer::GetMaterial(const RenderComm
 
 				eastl::vector<ShaderSourceInput> shaders = {
 				//{ "Depth_VS-Pos-Normal-UV_Instanced", EShaderType::Vertex },
-				{ "VS_Pos-Normal-UV_Depth_Cascaded_Instanced", EShaderType::Vertex },
-				{ "GS_Depth_Cascaded", EShaderType::Geometry },
-				{ "PS_Empty", EShaderType::Fragment } };
+				{ "VS_Pos-Normal-UV_Depth_Cascaded_Instanced", EShaderType::Sh_Vertex },
+				{ "GS_Depth_Cascaded", EShaderType::Sh_Geometry },
+				{ "PS_Empty", EShaderType::Sh_Fragment } };
 
 				depthMaterial->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
 			}
@@ -583,8 +686,8 @@ eastl::shared_ptr<RenderMaterial> DeferredRenderer::GetMaterial(const RenderComm
 			inputLayout.Push<float>(2, VertexInputType::TexCoords);
 
 			eastl::vector<ShaderSourceInput> shaders = {
-			{ "VS_Pos-UV_UnchangedPosition", EShaderType::Vertex },
-			{ "PS_VisualiseDepth", EShaderType::Fragment } };
+			{ "VS_Pos-UV_UnchangedPosition", EShaderType::Sh_Vertex },
+			{ "PS_VisualiseDepth", EShaderType::Sh_Fragment } };
 
 			depthMaterial->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
 			//depthMaterial->OwnedTextures.push_back(DirectionalLightCascadedShadowTexture);
@@ -619,9 +722,9 @@ eastl::shared_ptr<RenderMaterial> DeferredRenderer::GetMaterial(const RenderComm
 			inputLayout.Push<float>(2, VertexInputType::TexCoords);
 
 			eastl::vector<ShaderSourceInput> shaders = {
-			{ "VisualizeNormalsGeometry/VS_Pos-UV-Normal_Geometry_NormalVisualize", EShaderType::Vertex },
-			{ "VisualizeNormalsGeometry/GS_VisualizeNormals", EShaderType::Geometry },
-			{ "VisualizeNormalsGeometry/PS_FlatColor", EShaderType::Fragment } };
+			{ "VisualizeNormalsGeometry/VS_Pos-UV-Normal_Geometry_NormalVisualize", EShaderType::Sh_Vertex },
+			{ "VisualizeNormalsGeometry/GS_VisualizeNormals", EShaderType::Sh_Geometry },
+			{ "VisualizeNormalsGeometry/PS_FlatColor", EShaderType::Sh_Fragment } };
 
 			visNormalMat->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
  		}

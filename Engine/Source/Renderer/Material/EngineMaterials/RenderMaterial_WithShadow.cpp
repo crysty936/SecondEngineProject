@@ -44,7 +44,7 @@ void RenderMaterial_WithShadow::SetRequiredUniforms()
 // 	UBuffers.push_back({ debugConstants, ConstantBufferBinding::Pixel });
 }
 
-void RenderMaterial_WithShadow::SetUniformsValue(eastl::unordered_map<eastl::string, struct SelfRegisteringUniform>& inUniformsCache)
+void RenderMaterial_WithShadow::SetUniformsValue(eastl::unordered_map<eastl::string, struct SelfRegisteringUniform>& inUniformsCache, const EShaderType inShaderTypes)
 {
 // 	inUniformsCache["bHasNormalMap"] = OwnedTextures.size() > 1;
 // 
@@ -57,7 +57,7 @@ void RenderMaterial_WithShadow::SetUniformsValue(eastl::unordered_map<eastl::str
 // 		ExternalTextures.push_back(depthTexture);
 // 	}
 
-	__super::SetUniformsValue(inUniformsCache);
+	__super::SetUniformsValue(inUniformsCache, inShaderTypes);
 
 // 
 //  	UniformBufferContainer& container = UBuffers[1].BufferContainer;

@@ -61,8 +61,8 @@ void TriangleShape::CreateProxy()
 		//material->Textures.push_back(std::move(tex));
 
 		eastl::vector<ShaderSourceInput> shaders = {
-		{ "ModelWorldPositionVertexShader", EShaderType::Vertex },
-		{ "FlatColorPixelShader", EShaderType::Fragment } };
+		{ "ModelWorldPositionVertexShader", EShaderType::Sh_Vertex },
+		{ "FlatColorPixelShader", EShaderType::Sh_Fragment } };
 		material->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
 	}
 
@@ -115,9 +115,9 @@ void SquareShape::CreateProxy()
  	if (!materialExists)
  	{
 		eastl::vector<ShaderSourceInput> shaders = {
-		{ "VS_Pos-UV", EShaderType::Vertex },
+		{ "VS_Pos-UV", EShaderType::Sh_Vertex },
 		//{ "GeometryTest_GS", EShaderType::Geometry },
-		{ "PS_FlatColor", EShaderType::Fragment } };
+		{ "PS_FlatColor", EShaderType::Sh_Fragment } };
 
 		material->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
 	}
@@ -174,8 +174,8 @@ void CubeShape::CreateProxy()
 		material->OwnedTextures.push_back(tex);
 
 		eastl::vector<ShaderSourceInput> shaders = {
-		{ "DefaultCubeMaterial/VS_Pos-UV-Normal_WithShadow", EShaderType::Vertex },
-		{ "DefaultCubeMaterial/PS_BasicTex_WithShadow", EShaderType::Fragment } };
+		{ "DefaultCubeMaterial/VS_Pos-UV-Normal_WithShadow", EShaderType::Sh_Vertex },
+		{ "DefaultCubeMaterial/PS_BasicTex_WithShadow", EShaderType::Sh_Fragment } };
 
 		material->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
   	}
@@ -234,8 +234,8 @@ void LightSource::CreateProxy()
 	if (!materialExists)
 	{
 		eastl::vector<ShaderSourceInput> shaders = {
-		{ "LightSource/VS_Pos-UV-Normal", EShaderType::Vertex },
-		{ "LightSource/PS_LightSource", EShaderType::Fragment } };
+		{ "LightSource/VS_Pos-UV-Normal", EShaderType::Sh_Vertex },
+		{ "LightSource/PS_LightSource", EShaderType::Sh_Fragment } };
 
 		material->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
 	}
@@ -322,8 +322,8 @@ void DeferredDecal::CreateProxy()
 		material->OwnedTextures.push_back(tex);
 
 		eastl::vector<ShaderSourceInput> shaders = {
-		{ "DeferredDecal/VS_DeferredDecal", EShaderType::Vertex },
-		{ "DeferredDecal/PS_DeferredDecal", EShaderType::Fragment } };
+		{ "DeferredDecal/VS_DeferredDecal", EShaderType::Sh_Vertex },
+		{ "DeferredDecal/PS_DeferredDecal", EShaderType::Sh_Fragment } };
 
 		material->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
 	}

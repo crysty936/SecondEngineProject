@@ -15,10 +15,10 @@ void RenderMaterial_Billboard::SetRequiredUniforms()
 	{"cameraLookAt"},
 	};
 
-	UBuffers.push_back({ additionalUniforms, ConstantBufferBinding::Vertex });
+	UBuffers.push_back({ additionalUniforms, EShaderType::Sh_Vertex });
 }
 
-void RenderMaterial_Billboard::SetUniformsValue(eastl::unordered_map<eastl::string, struct SelfRegisteringUniform>& inUniformsCache)
+void RenderMaterial_Billboard::SetUniformsValue(eastl::unordered_map<eastl::string, struct SelfRegisteringUniform>& inUniformsCache, const EShaderType inShaderTypes)
 {
 	const glm::vec3 cameraPos = inUniformsCache["ViewPos"].GetValue<glm::vec3>();
 	const glm::vec3 objPos = inUniformsCache["ObjPos"].GetValue<glm::vec3>();
@@ -37,6 +37,6 @@ void RenderMaterial_Billboard::SetUniformsValue(eastl::unordered_map<eastl::stri
 
 	inUniformsCache["cameraLookAt"] = rotationMatrix;
 
-	__super::SetUniformsValue(inUniformsCache);
+	__super::SetUniformsValue(inUniformsCache, inShaderTypes);
 }
 

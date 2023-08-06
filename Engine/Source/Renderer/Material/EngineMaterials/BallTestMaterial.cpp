@@ -4,7 +4,7 @@
 BallTestMaterial::BallTestMaterial() = default;
 BallTestMaterial::~BallTestMaterial() = default;
 
-void BallTestMaterial::SetUniformsValue(eastl::unordered_map<eastl::string, SelfRegisteringUniform>& inUniformsCache)
+void BallTestMaterial::SetUniformsValue(eastl::unordered_map<eastl::string, SelfRegisteringUniform>& inUniformsCache, const EShaderType inShaderTypes)
 {
 	glm::vec3 lightPos(10.f, 20.f, 15.f);
 	static float xRotation = 0.0f;
@@ -20,7 +20,7 @@ void BallTestMaterial::SetUniformsValue(eastl::unordered_map<eastl::string, Self
 
 	inUniformsCache["ScreenToWorld"] = SelfRegisteringUniform(invProjView);
 
- 	RenderMaterial::SetUniformsValue(inUniformsCache);
+ 	RenderMaterial::SetUniformsValue(inUniformsCache, inShaderTypes);
 }
 
 void BallTestMaterial::SetRequiredUniforms()
@@ -33,5 +33,5 @@ void BallTestMaterial::SetRequiredUniforms()
 	{"XRotation"},
   	};
   
-	UBuffers.push_back({ additionalUniforms, ConstantBufferBinding::Pixel });
+	UBuffers.push_back({ additionalUniforms, EShaderType::Sh_Fragment });
 }

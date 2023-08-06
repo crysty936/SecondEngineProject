@@ -35,8 +35,8 @@ protected:
 	virtual eastl::shared_ptr<RHIShader> CreateShaders(const class VertexInputLayout& inLayout) const override
 	{
 		eastl::vector<ShaderSourceInput> shaders = {
-		{ "VS_Pos-UV-Normal_Instanced", EShaderType::Vertex },
-		{ "PS_BasicTex", EShaderType::Fragment } };
+		{ "VS_Pos-UV-Normal_Instanced", EShaderType::Sh_Vertex },
+		{ "PS_BasicTex", EShaderType::Sh_Fragment } };
 
 		return RHI::Instance->CreateShaderFromPath(shaders, inLayout);
 	}
@@ -162,8 +162,8 @@ public:
   			material->OwnedTextures.push_back(tex);
   
   			eastl::vector<ShaderSourceInput> shaders = {
-  			{ "Pos-UV-Normal_BasicTex_Instanced/VS_Pos-UV-Normal_Instanced", EShaderType::Vertex },
-  			{ "Pos-UV-Normal_BasicTex_Instanced/PS_BasicTex", EShaderType::Fragment } };
+  			{ "Pos-UV-Normal_BasicTex_Instanced/VS_Pos-UV-Normal_Instanced", EShaderType::Sh_Vertex },
+  			{ "Pos-UV-Normal_BasicTex_Instanced/PS_BasicTex", EShaderType::Sh_Fragment } };
   
   			material->Shader = RHI::Instance->CreateShaderFromPath(shaders, inputLayout);
   		}
@@ -235,8 +235,8 @@ public:
 			material->OwnedTextures.push_back(heightMap);
 
 			eastl::vector<ShaderSourceInput> shaders = {
-			{ "Parallax/VS_Pos-UV-Normal-Tangent-Bitangent_Model_WorldPosition", EShaderType::Vertex },
-			{ "Parallax/PS_ParallaxTest", EShaderType::Fragment } };
+			{ "Parallax/VS_Pos-UV-Normal-Tangent-Bitangent_Model_WorldPosition", EShaderType::Sh_Vertex },
+			{ "Parallax/PS_ParallaxTest", EShaderType::Sh_Fragment } };
 
 			material->Shader = RHI::Instance->CreateShaderFromPath(shaders, inputLayout);
 		}
@@ -296,8 +296,8 @@ public:
 			material->OwnedTextures.push_back(diffMap);
 
 			eastl::vector<ShaderSourceInput> shaders = {
-			{ "Pos-UV_BasicTex_Billboard/VS_Pos-UV_Billboard", EShaderType::Vertex },
-			{ "Pos-UV_BasicTex_Billboard/PS_BasicTex", EShaderType::Fragment } };
+			{ "Pos-UV_BasicTex_Billboard/VS_Pos-UV_Billboard", EShaderType::Sh_Vertex },
+			{ "Pos-UV_BasicTex_Billboard/PS_BasicTex", EShaderType::Sh_Fragment } };
 
 			material->Shader = RHI::Instance->CreateShaderFromPath(shaders, inputLayout);
 		}

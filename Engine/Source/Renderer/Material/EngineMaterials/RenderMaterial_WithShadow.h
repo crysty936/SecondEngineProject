@@ -10,5 +10,5 @@ public:
 	~RenderMaterial_WithShadow();
 
 	virtual void SetRequiredUniforms() override;
-	virtual void SetUniformsValue(eastl::unordered_map<eastl::string, struct SelfRegisteringUniform>& inUniformsCache) override;
+	virtual void SetUniformsValue(eastl::unordered_map<eastl::string, struct SelfRegisteringUniform>& inUniformsCache, const EShaderType inShaderTypes = Sh_Universal) override;
 };

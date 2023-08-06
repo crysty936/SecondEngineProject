@@ -49,6 +49,7 @@ private:
 	void SetLightingConstants();
 	void UpdateUniforms();
 	void DrawCommands(const eastl::vector<RenderCommand>& inCommands);
+	void RenderPreStencil(const RenderCommand& inCommand);
 	void DrawDecals(const eastl::vector<RenderCommand>& inCommands);
 	void DrawCommand(const RenderCommand& inCommand);
 	eastl::shared_ptr<RenderMaterial> GetMaterial(const RenderCommand& inCommand) const;

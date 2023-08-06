@@ -10,5 +10,5 @@ public:
 	~RenderMaterial_DeferredDecal();
 
 	virtual void SetRequiredUniforms() override;
-	void SetUniformsValue(eastl::unordered_map<eastl::string, struct SelfRegisteringUniform>& inUniformsCache);
+	void SetUniformsValue(eastl::unordered_map<eastl::string, struct SelfRegisteringUniform>& inUniformsCache, const EShaderType inShaderTypes = Sh_Universal);
 };

@@ -15,5 +15,5 @@ void RenderMaterial_LightSource::SetRequiredUniforms()
 	{"LightColor"},
 	};
 
-	UBuffers.push_back({ additionalUniforms, ConstantBufferBinding::Pixel });
+	UBuffers.push_back({ additionalUniforms, EShaderType::Sh_Fragment });
 }

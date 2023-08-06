@@ -196,7 +196,7 @@ public:
  			{"model"}
  		};
  
- 		UBuffers.push_back({ defaultUniforms, ConstantBufferBinding::Vertex });
+ 		UBuffers.push_back({ defaultUniforms, EShaderType::Sh_Vertex });
 	}
 };
 
@@ -243,8 +243,8 @@ void FullScreenQuad::CreateCommand()
 	if (!materialExists)
 	{
 		eastl::vector<ShaderSourceInput> shaders = {
-		{ "ScreenQuad/VS_Pos-UV_UnchangedPosition", EShaderType::Vertex },
-		{ "ScreenQuad/PS_BasicTex", EShaderType::Fragment } };
+		{ "ScreenQuad/VS_Pos-UV_UnchangedPosition", EShaderType::Sh_Vertex },
+		{ "ScreenQuad/PS_BasicTex", EShaderType::Sh_Fragment } };
 
 		material->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
 	}
@@ -297,8 +297,8 @@ void GBufferVisualizeQuad::CreateCommand()
 	if (!materialExists)
 	{
 		eastl::vector<ShaderSourceInput> shaders = {
-		{ "GBufferVisualize/VS_ModelPosition-UV", EShaderType::Vertex },
-		{ "GBufferVisualize/PS_BasicTex", EShaderType::Fragment } };
+		{ "GBufferVisualize/VS_ModelPosition-UV", EShaderType::Sh_Vertex },
+		{ "GBufferVisualize/PS_BasicTex", EShaderType::Sh_Fragment } };
 
 		material->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
 	}
@@ -354,7 +354,7 @@ void ToneMapQuad::CreateCommand()
 			{"Exposure"},
 			};
 
-			UBuffers.push_back({ defaultUniforms, ConstantBufferBinding::Pixel });
+			UBuffers.push_back({ defaultUniforms, EShaderType::Sh_Fragment });
 		}
 	};
 
@@ -364,8 +364,8 @@ void ToneMapQuad::CreateCommand()
 	if (!materialExists)
 	{
 		eastl::vector<ShaderSourceInput> shaders = {
-		{ "ToneMapping/VS_Pos-UV_UnchangedPosition", EShaderType::Vertex },
-		{ "ToneMapping/PS_ToneMap", EShaderType::Fragment } };
+		{ "ToneMapping/VS_Pos-UV_UnchangedPosition", EShaderType::Sh_Vertex },
+		{ "ToneMapping/PS_ToneMap", EShaderType::Sh_Fragment } };
 
 		material->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
 	}
@@ -415,8 +415,8 @@ void ExtractBrightAreasQuad::CreateCommand()
 	if (!materialExists)
 	{
 		eastl::vector<ShaderSourceInput> shaders = {
-		{ "Bloom/VS_Pos-UV_UnchangedPosition", EShaderType::Vertex },
-		{ "Bloom/PS_ExtractBrightAreas", EShaderType::Fragment } };
+		{ "Bloom/VS_Pos-UV_UnchangedPosition", EShaderType::Sh_Vertex },
+		{ "Bloom/PS_ExtractBrightAreas", EShaderType::Sh_Fragment } };
 
 		material->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
 	}
@@ -471,7 +471,7 @@ void GaussianBlurQuad::CreateCommand()
 			{"BlurHorizontal"},
 			};
 
-			UBuffers.push_back({ defaultUniforms, ConstantBufferBinding::Pixel });
+			UBuffers.push_back({ defaultUniforms, EShaderType::Sh_Fragment });
 		}
 	};
 
@@ -482,8 +482,8 @@ void GaussianBlurQuad::CreateCommand()
 	if (!materialExists)
 	{
 		eastl::vector<ShaderSourceInput> shaders = {
-		{ "Bloom/VS_Pos-UV_UnchangedPosition", EShaderType::Vertex },
-		{ "Bloom/PS_GaussianBlur", EShaderType::Fragment } };
+		{ "Bloom/VS_Pos-UV_UnchangedPosition", EShaderType::Sh_Vertex },
+		{ "Bloom/PS_GaussianBlur", EShaderType::Sh_Fragment } };
 
 		material->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
 	}
@@ -533,8 +533,8 @@ void BloomMergeQuad::CreateCommand()
 	if (!materialExists)
 	{
 		eastl::vector<ShaderSourceInput> shaders = {
-		{ "Bloom/VS_Pos-UV_UnchangedPosition", EShaderType::Vertex },
-		{ "Bloom/PS_MergeBlur", EShaderType::Fragment } };
+		{ "Bloom/VS_Pos-UV_UnchangedPosition", EShaderType::Sh_Vertex },
+		{ "Bloom/PS_MergeBlur", EShaderType::Sh_Fragment } };
 
 		material->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
 	}
@@ -584,8 +584,8 @@ void VisualizeDepthQuad::CreateCommand()
 	if (!materialExists)
 	{
 		eastl::vector<ShaderSourceInput> shaders = {
-		{ "VisualizeDepth/VS_ModelPosition-UV", EShaderType::Vertex },
-		{ "VisualizeDepth/PS_VisualiseDepth", EShaderType::Fragment } };
+		{ "VisualizeDepth/VS_ModelPosition-UV", EShaderType::Sh_Vertex },
+		{ "VisualizeDepth/PS_VisualiseDepth", EShaderType::Sh_Fragment } };
 
 		material->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
 	}
@@ -636,8 +636,8 @@ void DefaultLightingModelQuad::CreateCommand()
 	if (!materialExists)
 	{
 		eastl::vector<ShaderSourceInput> shaders = {
-		{ "DefaultLightingModel/VS_Pos-UV_UnchangedPosition", EShaderType::Vertex },
-		{ "DefaultLightingModel/PS_DefaultLightingModel", EShaderType::Fragment } };
+		{ "DefaultLightingModel/VS_Pos-UV_UnchangedPosition", EShaderType::Sh_Vertex },
+		{ "DefaultLightingModel/PS_DefaultLightingModel", EShaderType::Sh_Fragment } };
 
 		material->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
 	}

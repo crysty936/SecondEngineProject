@@ -731,9 +731,9 @@ eastl::shared_ptr<RenderMaterial> ForwardRenderer::GetMaterial(const RenderComma
 
 				eastl::vector<ShaderSourceInput> shaders = {
 				//{ "VS-Pos-Normal-UV_Instanced_Depth", EShaderType::Vertex },
-				{ "VS_Pos-Normal-UV_Depth_Cascaded", EShaderType::Vertex },
-				{ "GS_Depth_Cascaded", EShaderType::Geometry },
-				{ "PS_Empty", EShaderType::Fragment } };
+				{ "VS_Pos-Normal-UV_Depth_Cascaded", EShaderType::Sh_Vertex },
+				{ "GS_Depth_Cascaded", EShaderType::Sh_Geometry },
+				{ "PS_Empty", EShaderType::Sh_Fragment } };
 
 				depthMaterial->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
 			}
@@ -758,9 +758,9 @@ eastl::shared_ptr<RenderMaterial> ForwardRenderer::GetMaterial(const RenderComma
 
 				eastl::vector<ShaderSourceInput> shaders = {
 				//{ "Depth_VS-Pos-Normal-UV_Instanced", EShaderType::Vertex },
-				{ "VS_Pos-Normal-UV_Depth_Cascaded_Instanced", EShaderType::Vertex },
-				{ "GS_Depth_Cascaded", EShaderType::Geometry },
-				{ "PS_Empty", EShaderType::Fragment } };
+				{ "VS_Pos-Normal-UV_Depth_Cascaded_Instanced", EShaderType::Sh_Vertex },
+				{ "GS_Depth_Cascaded", EShaderType::Sh_Geometry },
+				{ "PS_Empty", EShaderType::Sh_Fragment } };
 
 				depthMaterial->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
 			}
@@ -789,8 +789,8 @@ eastl::shared_ptr<RenderMaterial> ForwardRenderer::GetMaterial(const RenderComma
 			inputLayout.Push<float>(2, VertexInputType::TexCoords);
 
 			eastl::vector<ShaderSourceInput> shaders = {
-			{ "VS_Pos-UV_UnchangedPosition", EShaderType::Vertex },
-			{ "PS_VisualiseDepth", EShaderType::Fragment } };
+			{ "VS_Pos-UV_UnchangedPosition", EShaderType::Sh_Vertex },
+			{ "PS_VisualiseDepth", EShaderType::Sh_Fragment } };
 
 			depthMaterial->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
 			depthMaterial->OwnedTextures.push_back(DirectionalLightCascadedShadowTexture);
@@ -825,9 +825,9 @@ eastl::shared_ptr<RenderMaterial> ForwardRenderer::GetMaterial(const RenderComma
 			inputLayout.Push<float>(2, VertexInputType::TexCoords);
 
 			eastl::vector<ShaderSourceInput> shaders = {
-			{ "VisualizeNormalsGeometry/VS_Pos-UV-Normal_Geometry_NormalVisualize", EShaderType::Vertex },
-			{ "VisualizeNormalsGeometry/GS_VisualizeNormals", EShaderType::Geometry },
-			{ "VisualizeNormalsGeometry/PS_FlatColor", EShaderType::Fragment } };
+			{ "VisualizeNormalsGeometry/VS_Pos-UV-Normal_Geometry_NormalVisualize", EShaderType::Sh_Vertex },
+			{ "VisualizeNormalsGeometry/GS_VisualizeNormals", EShaderType::Sh_Geometry },
+			{ "VisualizeNormalsGeometry/PS_FlatColor", EShaderType::Sh_Fragment } };
 
 			visNormalMat->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
  		}

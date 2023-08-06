@@ -12,7 +12,7 @@ class UniformBufferContainer
 public:
 
 	void AddData(const void* inData, const size_t inSize, const bool inForceAlign = false);
-	void UpdateData(const ConstantBufferBinding inBufferType, const int32_t inBufferNr);
+	void UpdateData(const EShaderType inBufferType, const int32_t inBufferNr);
 	void Clear();
 	void Bind();
 	void Unbind();
