@@ -426,7 +426,7 @@ void DeferredRenderer::DrawDecals(const eastl::vector<RenderCommand>& inCommands
 		DrawDebugHelpers::DrawBoxArray(projCorners, false);
 
 		// Pre Stencil
-		RenderPreStencil(renderCommand);
+		//RenderPreStencil(renderCommand);
 
 
 

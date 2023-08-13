@@ -16,9 +16,7 @@ eastl::string ExePath() {
 	return eastl::string(buffer).substr(0, pos);
 }
 
-
-
-eastl::string GetTime()
+eastl::string GetTimeString()
 {
 	time_t rawtime;
 	struct tm* timeinfo = nullptr;
@@ -27,7 +25,7 @@ eastl::string GetTime()
 	time(&rawtime);
 	timeinfo = localtime(&rawtime);
 
-	EA::StdC::Strftime(buffer, sizeof(buffer), "%d-%m-%Y", timeinfo);
+	EA::StdC::Strftime(buffer, sizeof(buffer), "%d-%m-%H-%M-%S", timeinfo);
 	eastl::string str(buffer);
 
 	return str;
@@ -74,23 +72,24 @@ void RenderDocPlugin::Init()
 	RenderDocAPI->SetFocusToggleKeys(nullptr, 0);
 	RenderDocAPI->SetCaptureKeys(nullptr, 0);
 
-	eastl::string capturesOutputPath = ExePath();
-	capturesOutputPath += "\\RenderDocCaptures\\" + GetTime();
+	eastl::string directoryOutputPath = ExePath();
+	directoryOutputPath += "\\RenderDocCaptures" ;
 	//capturesOutputPath += "\\RenderDocCaptures\\" + eastl::string("Test");
-	eastl::string::const_iterator newEnd = eastl::remove_if(capturesOutputPath.begin(), capturesOutputPath.end(), isspace);
+	eastl::string::const_iterator newEnd = eastl::remove_if(directoryOutputPath.begin(), directoryOutputPath.end(), isspace);
 
 	// RenderDoc requires a path different than what Windows accepts(/ instead of \\)
-	eastl::string internalNormalizedPath = capturesOutputPath;
-	PathUtils::NormalizeDirectory(internalNormalizedPath);
 
-	const bool dirExists = WindowsPlatform::DirectoryExistsInternal(capturesOutputPath);
-	//if (!dirExists)
-	//{
-		bool directoryCreated = WindowsPlatform::CreateDirectoryTree(capturesOutputPath);
-	//}
+	const bool dirExists = WindowsPlatform::DirectoryExistsInternal(directoryOutputPath);
+	if (!dirExists)
+	{
+		bool directoryCreated = WindowsPlatform::CreateDirectoryTree(directoryOutputPath);
+	}
 
-	RenderDocAPI->SetLogFilePathTemplate(internalNormalizedPath.c_str());
+	// Final member in the path is the file name for all RenderDoc files coming from this instance
+	eastl::string capturesOutputPath = directoryOutputPath + "\\" + GetTimeString();
+	PathUtils::NormalizeDirectory(capturesOutputPath);
 
+	RenderDocAPI->SetLogFilePathTemplate(capturesOutputPath.c_str());
 	//const char* logFilePath = RenderDocAPI->GetLogFilePathTemplate();
 }
 
