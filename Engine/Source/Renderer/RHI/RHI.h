@@ -137,6 +137,9 @@ public:
 
 	virtual void TestStencilBufferStuff(class RHIFrameBuffer& inFrameBuffer) {}
 
+	// Null FB means default FB
+	virtual void CopyFrameBufferDepth(eastl::shared_ptr<class RHIFrameBuffer> inSource = nullptr, eastl::shared_ptr<class RHIFrameBuffer> inDest = nullptr) {}
+
 	// Used for pre-stencil
 	virtual eastl::shared_ptr<class RHIShader> GetVertexOnlyShader(const class RenderMaterial& inFullMaterial) { return nullptr; }
 

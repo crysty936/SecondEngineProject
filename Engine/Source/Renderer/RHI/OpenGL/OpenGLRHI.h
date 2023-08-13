@@ -96,6 +96,9 @@ public:
 
 	void TestStencilBufferStuff(class RHIFrameBuffer& inFrameBuffer) override;
 
+
+	void CopyFrameBufferDepth(eastl::shared_ptr<class RHIFrameBuffer> inSource = nullptr, eastl::shared_ptr<class RHIFrameBuffer> inDest = nullptr) override;
+
 public:
 	// ImGui
 	void ImGuiInit() override;

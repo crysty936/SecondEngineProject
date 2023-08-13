@@ -138,15 +138,20 @@ void DeferredRenderer::Draw()
 	RHI::Instance->BindDefaultFrameBuffer();
 	RHI::Get()->ClearBuffers();
 
+	RHI::Get()->CopyFrameBufferDepth(GBuffer, nullptr);
+
+
+	RHI::Get()->SetDepthWrite(false);
 
 	DrawCommand(DefaultModelQuad->GetCommand());
+
+	// Draw debug primitives
+	DrawDebugManager::Draw();
 
 	RHI::Get()->SetDepthTest(false);
 
  	DrawCommand(VisualizeDepthUtil->GetCommand());
 
- 	//RHI::Instance->CopyRenderTextureRegion(*GBufferNormal, *GlobalRenderTexture, 300, 100, 640, 480);
- 
  	VisualizeNormalsUtil->GetCommand().Material->ExternalTextures.clear();
  	VisualizeNormalsUtil->GetCommand().Material->ExternalTextures.push_back(GBufferNormal);
  	DrawCommand(VisualizeNormalsUtil->GetCommand());
@@ -155,12 +160,8 @@ void DeferredRenderer::Draw()
   	VisualizeAlbedoUtil->GetCommand().Material->ExternalTextures.push_back(GBufferColorSpec);
   	DrawCommand(VisualizeAlbedoUtil->GetCommand());
 
-
-
-	// Draw debug primitives
-	DrawDebugManager::Draw();
-
 	RHI::Get()->SetDepthTest(true);
+	RHI::Get()->SetDepthWrite(true);
 
 	ImGui::End();
 }

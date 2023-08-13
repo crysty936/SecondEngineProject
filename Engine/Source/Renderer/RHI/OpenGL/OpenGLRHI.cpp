@@ -469,7 +469,7 @@ eastl::shared_ptr<class RHITexture2D> OpenGLRHI::CreateDepthMap(const int32_t in
 
 	glBindTexture(GL_TEXTURE_2D, texHandle);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH32F_STENCIL8, inWidth, inHeight, 0, GL_DEPTH_STENCIL, GL_FLOAT_32_UNSIGNED_INT_24_8_REV, nullptr);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, inWidth, inHeight, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, nullptr);
 
  	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
  	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -1056,8 +1056,9 @@ void OpenGLRHI::ClearTexture(const RHITexture2D& inTexture, const glm::vec4& inC
 	case ERHITextureChannelsType::DepthStencil:
 	{
 		// First 24 bits to 1 and stencil to 0
-		const float test[] = { 1.f, 0.f};
-		glClearTexImage(glTex.GlHandle, 0, GL_DEPTH_STENCIL, GL_FLOAT_32_UNSIGNED_INT_24_8_REV, test);
+		//const float test[] = { 1.f, 0.f};
+		const uint32_t value = 0xFFFFFF00;
+		glClearTexImage(glTex.GlHandle, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, &value);
 		break;
 	}
 	default:
@@ -1242,6 +1243,39 @@ void OpenGLRHI::TestStencilBufferStuff(class RHIFrameBuffer& inFrameBuffer)
 	glBindFramebuffer(GL_FRAMEBUFFER, glBuffer.GLHandle);
 
 
+}
+
+void OpenGLRHI::CopyFrameBufferDepth(eastl::shared_ptr<class RHIFrameBuffer> inSource, eastl::shared_ptr<class RHIFrameBuffer> inDest)
+{
+	// Make sure that at least one is different than default
+	ASSERT(inSource != nullptr || inDest != nullptr);
+
+
+	uint32_t sourceHandle = 0;
+	uint32_t destHandle = 0;
+
+	if (inSource)
+	{
+		GLFrameBuffer& glBuffer = static_cast<GLFrameBuffer&>(*inSource);
+		sourceHandle = glBuffer.GLHandle;
+	}
+
+	if (inDest)
+	{
+		GLFrameBuffer& glBuffer = static_cast<GLFrameBuffer&>(*inDest);
+		destHandle = glBuffer.GLHandle;
+	}
+
+	const WindowsWindow& currentWindow = GEngine->GetMainWindow();
+	const WindowProperties& props = currentWindow.GetProperties();
+
+	// Copy the depth of the GBuffer in the default FrameBuffer to allow debug geometry to be depth tested
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, sourceHandle);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, destHandle);
+	glBlitFramebuffer(0, 0, props.Width, props.Height, 0, 0, props.Width, props.Height,
+		GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void OpenGLRHI::SetDepthWrite(const bool inValue)
