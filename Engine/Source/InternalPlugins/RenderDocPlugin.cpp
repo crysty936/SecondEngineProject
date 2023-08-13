@@ -1,0 +1,188 @@
+#include "RenderDocPlugin.h"
+#include "Core/EngineCore.h"
+#include "Controller/ControllerBase.h"
+#include "Editor/Editor.h"
+#include "Window/WindowsWindow.h"
+#include "EAStdC/EADateTime.h"
+#include "Utils/PathUtils.h"
+
+static const AddPluginHelper<RenderDocPlugin> AddPlugin;
+
+eastl::string ExePath() {
+	char buffer[MAX_PATH] = { 0 };
+	GetModuleFileNameA(NULL, buffer, MAX_PATH);
+	eastl::string stringBuffer = eastl::string(buffer);
+	eastl::string::size_type pos = stringBuffer.find_last_of("\\");
+	return eastl::string(buffer).substr(0, pos);
+}
+
+
+
+eastl::string GetTime()
+{
+	time_t rawtime;
+	struct tm* timeinfo = nullptr;
+	char buffer[80];
+
+	time(&rawtime);
+	timeinfo = localtime(&rawtime);
+
+	EA::StdC::Strftime(buffer, sizeof(buffer), "%d-%m-%Y", timeinfo);
+	eastl::string str(buffer);
+
+	return str;
+}
+
+void RenderDocPlugin::Init()
+{
+	PostInitCallback& postInitMulticast = GEngine->GetPostInitMulticast();
+	postInitMulticast.BindRaw(this, &RenderDocPlugin::OnEngineInitDone);
+
+	eastl::wstring renderDocPath;
+
+	WindowsPlatform::QueryRegKey(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Classes\\RenderDoc.RDCCapture.1\\DefaultIcon\\", L"", renderDocPath);
+
+	if (renderDocPath.length() == 0)
+	{
+		LOG_ERROR("RenderDoc plugin failed to initialized, could not find path.");
+	}
+
+	const size_t index = renderDocPath.find_last_of(L"\\");
+
+	renderDocPath = renderDocPath.left(index + 1) + L"renderdoc.dll";
+
+	mRenderDocDLL = LoadLibraryW(renderDocPath.c_str());
+
+	pRENDERDOC_GetAPI RENDERDOC_GetAPI = (pRENDERDOC_GetAPI)GetRenderDocFunctionPointer(mRenderDocDLL, "RENDERDOC_GetAPI");
+
+	const int32_t res = RENDERDOC_GetAPI(eRENDERDOC_API_Version_1_0_0, (void**)&RenderDocAPI);
+
+	if (res == 0)
+	{
+		LOG_ERROR("RenderDoc plugin failed to initialized. Using incompatible version of RenderDoc.");
+	}
+
+	//Unregister crash handler unless the user has enabled it. This is to avoid sending unneccesary crash reports to Baldur.
+	RenderDocAPI->UnloadCrashHandler();
+
+	RenderDocAPI->SetCaptureOptionU32(RENDERDOC_CaptureOption::eRENDERDOC_Option_CaptureCallstacks, 1);
+	RenderDocAPI->SetCaptureOptionU32(RENDERDOC_CaptureOption::eRENDERDOC_Option_CaptureAllCmdLists, 1);
+	RenderDocAPI->SetCaptureOptionU32(RENDERDOC_CaptureOption::eRENDERDOC_Option_SaveAllInitials, 1);
+	RenderDocAPI->MaskOverlayBits(eRENDERDOC_Overlay_None, eRENDERDOC_Overlay_None);
+	//RenderDocAPI->MaskOverlayBits(eRENDERDOC_Overlay_All, eRENDERDOC_Overlay_FrameRate);
+
+	RenderDocAPI->SetFocusToggleKeys(nullptr, 0);
+	RenderDocAPI->SetCaptureKeys(nullptr, 0);
+
+	eastl::string capturesOutputPath = ExePath();
+	capturesOutputPath += "\\RenderDocCaptures\\" + GetTime();
+	//capturesOutputPath += "\\RenderDocCaptures\\" + eastl::string("Test");
+	eastl::string::const_iterator newEnd = eastl::remove_if(capturesOutputPath.begin(), capturesOutputPath.end(), isspace);
+
+	// RenderDoc requires a path different than what Windows accepts(/ instead of \\)
+	eastl::string internalNormalizedPath = capturesOutputPath;
+	PathUtils::NormalizeDirectory(internalNormalizedPath);
+
+	const bool dirExists = WindowsPlatform::DirectoryExistsInternal(capturesOutputPath);
+	//if (!dirExists)
+	//{
+		bool directoryCreated = WindowsPlatform::CreateDirectoryTree(capturesOutputPath);
+	//}
+
+	RenderDocAPI->SetLogFilePathTemplate(internalNormalizedPath.c_str());
+
+	//const char* logFilePath = RenderDocAPI->GetLogFilePathTemplate();
+}
+
+
+void RenderDocPlugin::OnCapturePressed()
+{
+	bPendingCapture = true;
+}
+
+void RenderDocPlugin::OnEngineInitDone()
+{
+	ControllerBase& editorController = GEditor->GetController();
+	{
+		KeyActionDelegate del = KeyActionDelegate::CreateRaw(this, &RenderDocPlugin::OnCapturePressed);
+		EInputKey key = EInputKey::R;
+		OnKeyAction action = { del, {}, key, true };
+		editorController.AddListener(action);
+	}
+}
+
+void RenderDocPlugin::Shutdown()
+{
+	FreeLibrary(mRenderDocDLL);
+}
+
+HWND GetWindowHandle()
+{
+	// or HWND handle = GetActiveWindow();
+	HWND handle = static_cast<HWND>(GEngine->GetMainWindow().GetHandle());
+
+	return handle;
+}
+
+void RenderDocPlugin::Tick(const float inDeltaTime)
+{
+	if (bCaptureInProgress)
+	{
+		if (GFrameCounter == CaptureEndFrame)
+		{
+			RenderDocAPI->EndFrameCapture(nullptr, GetWindowHandle());
+			bCaptureInProgress = false;
+
+			LaunchRenderDoc();
+		}
+
+		return;
+	}
+
+	if (bPendingCapture)
+	{
+		bPendingCapture = false;
+		bCaptureInProgress = true;
+
+		CaptureEndFrame = GFrameCounter + 1;
+
+		RenderDocAPI->StartFrameCapture(nullptr, GetWindowHandle());
+	}
+
+}
+
+void RenderDocPlugin::LaunchRenderDoc()
+{
+	char LogFile[512];
+	uint64_t Timestamp;
+	uint32_t LogPathLength = 512;
+	uint32_t Index = 0;
+	eastl::string LaunchPath;
+
+	while (RenderDocAPI->GetCapture(Index, LogFile, &LogPathLength, &Timestamp))
+	{
+		LaunchPath = eastl::string(LogFile, LogPathLength);
+
+		Index++;
+	}
+
+	PathUtils::NormalizeDirectory(LaunchPath);
+	LaunchPath.insert(LaunchPath.begin(), '\"');
+	LaunchPath.insert(LaunchPath.end() - 1, '\"');
+
+	if (!LaunchPath.length() == 0)
+	{
+		if (!RenderDocAPI->IsRemoteAccessConnected())
+		{
+			uint32_t PID = RenderDocAPI->LaunchReplayUI(true, LaunchPath.c_str());
+		}
+	}
+}
+
+void* RenderDocPlugin::GetRenderDocFunctionPointer(HINSTANCE ModuleHandle, LPCSTR FunctionName)
+{
+	void* OutTarget = NULL;
+	OutTarget = (void*)GetProcAddress(ModuleHandle, FunctionName);
+
+	return OutTarget;
+}

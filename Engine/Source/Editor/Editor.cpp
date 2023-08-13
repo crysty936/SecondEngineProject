@@ -209,6 +209,10 @@ void Editor::OnMouseRightReleased()
 	LOG_INFO("Viewport navigate mode OFF.");
 }
 
+ControllerBase& Editor::GetController()
+{
+	return *Controller;
+}
 
 
 

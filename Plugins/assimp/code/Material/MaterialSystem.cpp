@@ -325,8 +325,6 @@ unsigned int aiGetMaterialTotalTextureCount(const C_STRUCT aiMaterial *pMat) {
         if (prop /* just a sanity check ... */
                 && 0 == strcmp(prop->mKey.data, _AI_MATKEY_TEXTURE_BASE)) {
 
-            const aiTextureType texType = static_cast<aiTextureType>(prop->mSemantic);
-
             ++num;
         }
     }

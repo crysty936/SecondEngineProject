@@ -68,7 +68,7 @@ void InputSystem::SetCursorMode(const ECursorMode inMode, void* inWindowHandle)
 {
 	if (!inWindowHandle)
 	{
-		inWindowHandle = Engine->GetMainWindow().GetHandle();
+		inWindowHandle = GEngine->GetMainWindow().GetHandle();
 	}
 
 	CurrentCursorMode = inMode;

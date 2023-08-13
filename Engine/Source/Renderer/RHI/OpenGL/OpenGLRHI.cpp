@@ -253,7 +253,7 @@ OpenGLRHI::OpenGLRHI()
 {
 	GLUtils::openglInstance = LoadLibraryA("opengl32.dll");
 	ASSERT(GLUtils::openglInstance);
-	GLUtils::gldc = GetDC(static_cast<HWND>(Engine->GetMainWindow().GetHandle()));
+	GLUtils::gldc = GetDC(static_cast<HWND>(GEngine->GetMainWindow().GetHandle()));
 	GLContext = GLUtils::init_opengl(GLUtils::gldc);
 
 	const bool gladSuccess = gladLoadGLLoader((GLADloadproc)GLUtils::getProcAddressGLWindows) == 1;
@@ -469,7 +469,7 @@ eastl::shared_ptr<class RHITexture2D> OpenGLRHI::CreateDepthMap(const int32_t in
 
 	glBindTexture(GL_TEXTURE_2D, texHandle);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, inWidth, inHeight, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, nullptr);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH32F_STENCIL8, inWidth, inHeight, 0, GL_DEPTH_STENCIL, GL_FLOAT_32_UNSIGNED_INT_24_8_REV, nullptr);
 
  	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
  	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -549,7 +549,7 @@ eastl::shared_ptr<RHIFrameBuffer> OpenGLRHI::CreateDepthStencilFrameBuffer()
 	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
 
 	// Allocate buffer size
-	const WindowProperties& windowProps = Engine->GetMainWindow().GetProperties();
+	const WindowProperties& windowProps = GEngine->GetMainWindow().GetProperties();
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, windowProps.Width, windowProps.Height);
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
@@ -1056,8 +1056,8 @@ void OpenGLRHI::ClearTexture(const RHITexture2D& inTexture, const glm::vec4& inC
 	case ERHITextureChannelsType::DepthStencil:
 	{
 		// First 24 bits to 1 and stencil to 0
-		const uint32_t test[] = { 0xffffff00};
-		glClearTexImage(glTex.GlHandle, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, test);
+		const float test[] = { 1.f, 0.f};
+		glClearTexImage(glTex.GlHandle, 0, GL_DEPTH_STENCIL, GL_FLOAT_32_UNSIGNED_INT_24_8_REV, test);
 		break;
 	}
 	default:
@@ -1242,26 +1242,6 @@ void OpenGLRHI::TestStencilBufferStuff(class RHIFrameBuffer& inFrameBuffer)
 	glBindFramebuffer(GL_FRAMEBUFFER, glBuffer.GLHandle);
 
 
-	// Create render buffer object for the frame buffer
-	uint32_t rbo;
-	glGenRenderbuffers(1, &rbo);
-	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-
-	// Allocate buffer size
-	const WindowProperties& windowProps = Engine->GetMainWindow().GetProperties();
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_STENCIL_INDEX8, windowProps.Width, windowProps.Height);
-	glBindRenderbuffer(GL_RENDERBUFFER, 0);
-
-	// Attach the rbo to the framebuffer
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
-
-	//// Clear the buffer
-	//glClearColor(0.f, 0.f, 0.f, 0.f);
-
-	ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
-
-
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void OpenGLRHI::SetDepthWrite(const bool inValue)

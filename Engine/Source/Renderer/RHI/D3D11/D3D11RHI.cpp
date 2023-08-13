@@ -34,7 +34,7 @@ D3D11RHI::D3D11RHI()
 	HRESULT hr = S_OK;
 
 	RECT rc;
-	GetClientRect(static_cast<HWND>(Engine->GetMainWindow().GetHandle()), &rc);
+	GetClientRect(static_cast<HWND>(GEngine->GetMainWindow().GetHandle()), &rc);
 	UINT width = rc.right - rc.left;
 	UINT height = rc.bottom - rc.top;
 
@@ -70,7 +70,7 @@ D3D11RHI::D3D11RHI()
 	sd.BufferDesc.RefreshRate.Numerator = 60;
 	sd.BufferDesc.RefreshRate.Denominator = 1;
 	sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-	sd.OutputWindow = static_cast<HWND>(Engine->GetMainWindow().GetHandle());
+	sd.OutputWindow = static_cast<HWND>(GEngine->GetMainWindow().GetHandle());
 	sd.SampleDesc.Count = 1;
 	sd.SampleDesc.Quality = 0;
 	sd.Windowed = TRUE;

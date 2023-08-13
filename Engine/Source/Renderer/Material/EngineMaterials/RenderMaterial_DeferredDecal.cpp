@@ -29,7 +29,7 @@ void RenderMaterial_DeferredDecal::SetUniformsValue(eastl::unordered_map<eastl::
 	inUniformsCache["perspInv"] = glm::inverse(inUniformsCache["projection"].GetValue<glm::mat4>());
 	inUniformsCache["viewInv"] = glm::inverse(inUniformsCache["view"].GetValue<glm::mat4>());
 
-	const WindowsWindow& currentWindow = Engine->GetMainWindow();
+	const WindowsWindow& currentWindow = GEngine->GetMainWindow();
 	const WindowProperties& props = currentWindow.GetProperties();
 	inUniformsCache["ViewportSize"] = glm::vec4(props.Width, props.Height, 0.f, 0.f);
 

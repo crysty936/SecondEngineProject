@@ -61,7 +61,7 @@ eastl::shared_ptr<DefaultLightingModelQuad> DefaultModelQuad;
 
 void DeferredRenderer::InitInternal()
 {
-	const WindowsWindow& currentWindow = Engine->GetMainWindow();
+	const WindowsWindow& currentWindow = GEngine->GetMainWindow();
 	const WindowProperties& props = currentWindow.GetProperties();
 
 	GBuffer = RHI::Get()->CreateEmptyFrameBuffer();
@@ -363,8 +363,9 @@ void DeferredRenderer::RenderPreStencil(const RenderCommand& inCommand)
 
 	//RHI::Get()->TestStencilBufferStuff(*GBuffer);
 
-
-
+	//glEnable(GL_STENCIL_TEST);
+	//glStencilMask(0xFF);
+	//glStencilFunc(GL_ALWAYS, 1, 0xFF);
 
 	switch (inCommand.DrawType)
 	{
@@ -429,6 +430,9 @@ void DeferredRenderer::DrawDecals(const eastl::vector<RenderCommand>& inCommands
 
 
 
+		// Loose optimization that compares camera against decal cube main diagonal(radius of sphere that encompasses bounding box)
+		// Allows effiecent depth test and face cull when we know for sure that we are not nowhere near inside the decal
+
 		// Is camera inside decal
 		//const glm::vec3 cameraPos = SceneManager::Get().GetCurrentScene().GetCurrentCamera()->GetAbsoluteTransform().Translation;
 		//const glm::vec3 decalPos = parent->GetAbsoluteTransform().Translation;
@@ -448,7 +452,6 @@ void DeferredRenderer::DrawDecals(const eastl::vector<RenderCommand>& inCommands
 		//{
 
 			// CW ensures that there's always a face of the decal cube that's visible(the inside one)
-			// so at first sight, there's no reason to draw decals with CCW, as that will work only when the viewer is outside the decal cube
 			RHI::Get()->SetRasterizerState(ERasterizerState::CW);
 
 			// This has to be combined with CW always because the pixels that will be used for drawing now will always be the ones *under* the surface that the decal intersects(ones above it are discarded 
@@ -809,7 +812,7 @@ void DeferredRenderer::AddDecalCommand(const RenderCommand& inCommand)
 
 void DeferredRenderer::SetViewportSizeToMain()
 {
-	const WindowsWindow& currentWindow = Engine->GetMainWindow();
+	const WindowsWindow& currentWindow = GEngine->GetMainWindow();
 	const WindowProperties& props = currentWindow.GetProperties();
 	RHI::Get()->SetViewportSize(props.Width, props.Height);
 }

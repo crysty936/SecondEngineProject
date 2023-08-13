@@ -11,6 +11,8 @@
  public:
      void Tick(float inDeltaT);
  
+	 class ControllerBase& GetController();
+
  private:
      Editor();
      ~Editor();
@@ -26,6 +28,7 @@
      void BoostCameraSpeed();
      void OnMouseRightPressed();
      void OnMouseRightReleased();
+
 
  private:
 	eastl::unique_ptr<class EditorController> Controller;

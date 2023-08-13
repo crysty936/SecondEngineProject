@@ -1,6 +1,9 @@
 #pragma once
 #include "EASTL/vector.h"
 #include "EASTL/shared_ptr.h"
+#include "EventSystem/EventSystem.h"
+
+using PostInitCallback = MulticastDelegate<>;
 
 class EngineCore
 {
@@ -17,8 +20,10 @@ public:
 	void StopEngine();
 
 	class WindowsWindow& GetMainWindow() { return *MainWindow; }
+	inline PostInitCallback& GetPostInitMulticast() { return InitDoneMulticast; }
 
 private:
+	PostInitCallback InitDoneMulticast;
 	float CurrentDeltaT;
 
 	class GameModeBase* CurrentGameMode = nullptr;
@@ -27,4 +32,21 @@ private:
 	eastl::unique_ptr<class WindowsWindow> MainWindow = nullptr;
 };
 
-inline EngineCore* Engine = nullptr;
+extern EngineCore* GEngine;
+extern uint64_t GFrameCounter;
+
+void AddInternalPlugin(class IInternalPlugin* inNewPlugin);
+
+template<class T>
+class AddPluginHelper
+{
+public:
+	AddPluginHelper()
+	{
+		AddInternalPlugin(new T());
+	}
+
+	~AddPluginHelper() = default;
+};
+
+

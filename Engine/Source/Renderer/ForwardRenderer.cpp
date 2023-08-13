@@ -99,7 +99,7 @@ void ForwardRenderer::InitInternal()
 {
 	GlobalFrameBuffer = RHI::Get()->CreateDepthStencilFrameBuffer();
 
-	const WindowsWindow& currentWindow = Engine->GetMainWindow();
+	const WindowsWindow& currentWindow = GEngine->GetMainWindow();
 	const WindowProperties& props = currentWindow.GetProperties();
 
 	// HDR Texture
@@ -416,8 +416,8 @@ eastl::vector<glm::mat4> ForwardRenderer::CreateCascadesMatrices()
 
 	const glm::mat4& cameraView = UniformsCache["view"].GetValue<glm::mat4>();
 
-	const float windowWidth = static_cast<float>(Engine->GetMainWindow().GetProperties().Width);
-	const float windowHeight = static_cast<float>(Engine->GetMainWindow().GetProperties().Height);
+	const float windowWidth = static_cast<float>(GEngine->GetMainWindow().GetProperties().Width);
+	const float windowHeight = static_cast<float>(GEngine->GetMainWindow().GetProperties().Height);
 
 	for (int32_t i = 0; i < CascadesCount; ++i)
 	{
@@ -916,7 +916,7 @@ eastl::string ForwardRenderer::GetMaterialsDirPrefix()
 
 void ForwardRenderer::SetViewportSizeToMain()
 {
-	const WindowsWindow& currentWindow = Engine->GetMainWindow();
+	const WindowsWindow& currentWindow = GEngine->GetMainWindow();
 	const WindowProperties& props = currentWindow.GetProperties();
 	RHI::Get()->SetViewportSize(props.Width, props.Height);
 }

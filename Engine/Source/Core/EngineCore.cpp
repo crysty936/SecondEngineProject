@@ -14,10 +14,26 @@
 #include "backends/imgui_impl_win32.h"
 #include "imgui.h"
 #include "Editor/Editor.h"
+#include "InternalPlugins/IInternalPlugin.h"
 
 constexpr float IdealFrameRate = 60.f;
 constexpr float IdealFrameTime = 1.0f / IdealFrameRate;
 bool bIsRunning = true;
+
+EngineCore* GEngine = nullptr;
+uint64_t GFrameCounter = 0;
+
+static eastl::vector<IInternalPlugin*>& GetInternalPluginsList()
+{
+	static eastl::vector<IInternalPlugin*> InternalPluginsList;
+
+	return InternalPluginsList;
+}
+
+void AddInternalPlugin(IInternalPlugin* inNewPlugin)
+{
+	GetInternalPluginsList().push_back(inNewPlugin);
+}
 
 EngineCore::EngineCore()
 	: CurrentDeltaT{ 0.f }
@@ -33,23 +49,29 @@ EngineCore::~EngineCore() = default;
 // Init all engine subsystems
 void EngineCore::Init()
 {
-	Engine = new EngineCore{};
+	GEngine = new EngineCore{};
 	//Engine->CurrentGameMode = GameModeBase::Get();
 
 	InputSystem::Init();
 
 	// Create Main Window
-	Engine->MainWindow = eastl::make_unique<WindowsWindow>();
+	GEngine->MainWindow = eastl::make_unique<WindowsWindow>();
 
 	SceneManager::Init();
 
 	MaterialsManager::Init();
 
+	// Initialize plugins before renderer to make sure that RenderDoc works
+	for (IInternalPlugin* plugin : GetInternalPluginsList())
+	{
+		plugin->Init();
+	}
+
 	RHI::Init();
 	RHI::Get()->ImGuiInit();
 
 	// Hide Cursor for input
-	InputSystem::Get().SetCursorMode(ECursorMode::Disabled, Engine->MainWindow->GetHandle());
+	InputSystem::Get().SetCursorMode(ECursorMode::Disabled, GEngine->MainWindow->GetHandle());
 
 	Renderer::Init();
 
@@ -64,15 +86,25 @@ void EngineCore::Init()
 	// TODO [Editor-Game Separation]: This should be initialized like this only when editor is missing otherwise by the editor
 	//Engine->CurrentGameMode->Init();
 	//SceneManager::Get().GetCurrentScene().InitObjects();
+
+	GEngine->InitDoneMulticast.Invoke();
 }
+
 
 void EngineCore::Terminate()
 {
+
 	// TODO [Editor-Game Separation]: Only if compiled with editor
 	Editor::Terminate();
 
 	TimersManager::Terminate();
 	Renderer::Terminate();
+
+	for (IInternalPlugin* plugin : GetInternalPluginsList())
+	{
+		plugin->Shutdown();
+	}
+
 	InputSystem::Terminate();
 
 	RHI::Terminate();
@@ -80,8 +112,8 @@ void EngineCore::Terminate()
 
 	SceneManager::Terminate();
 
-	ASSERT(Engine);
-	delete Engine;
+	ASSERT(GEngine);
+	delete GEngine;
 }
 
 void EngineCore::Run()
@@ -152,6 +184,13 @@ void EngineCore::Run()
 		Renderer::Get().Present();
 
 		CheckShouldCloseWindow();
+
+		for (IInternalPlugin* plugin : GetInternalPluginsList())
+		{
+			plugin->Tick(static_cast<float>(deltaTime));
+		}
+
+		++GFrameCounter;
 	}
 
 	Terminate();

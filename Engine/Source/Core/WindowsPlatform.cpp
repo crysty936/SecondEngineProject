@@ -19,6 +19,7 @@
 #include "backends/imgui_impl_opengl3.h"
 #include "Renderer/RHI/OpenGL/OpenGLRHI.h"
 #include "imgui_internal.h"
+#include "Utils/PathUtils.h"
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -373,7 +374,7 @@ namespace WindowsPlatform
 
 	void SetWindowsWindowText(const eastl::wstring& inText)
 	{
-		SetWindowTextW(static_cast<HWND>(Engine->GetMainWindow().GetHandle()), inText.c_str());
+		SetWindowTextW(static_cast<HWND>(GEngine->GetMainWindow().GetHandle()), inText.c_str());
 	}
 
 	void InitImGUIOpenGL(void* handle)
@@ -393,7 +394,7 @@ namespace WindowsPlatform
 			style.Colors[ImGuiCol_WindowBg].w = 1.0f;
 		}
 
-        ImGui_ImplWin32_InitForOpenGL(static_cast<HWND>(Engine->GetMainWindow().GetHandle()), handle);
+        ImGui_ImplWin32_InitForOpenGL(static_cast<HWND>(GEngine->GetMainWindow().GetHandle()), handle);
 		ImGui_ImplOpenGL3_Init("#version 420");
 	}
 
@@ -409,6 +410,134 @@ namespace WindowsPlatform
 
 		InputSystem::MousePosChangedCallback(inNewYaw, inNewPitch);
 	}
+
+	bool QueryRegKey(const Windows::HKEY InKey, const wchar_t* InSubKey, const wchar_t* InValueName, eastl::wstring& OutData)
+	{
+		bool bSuccess = false;
+
+		// Redirect key depending on system
+		for (int32_t RegistryIndex = 0; RegistryIndex < 2 && !bSuccess; ++RegistryIndex)
+		{
+			HKEY Key = 0;
+			const uint32_t RegFlags = (RegistryIndex == 0) ? KEY_WOW64_32KEY : KEY_WOW64_64KEY;
+			if (RegOpenKeyEx(InKey, InSubKey, 0, KEY_READ | RegFlags, &Key) == ERROR_SUCCESS)
+			{
+				::DWORD Size = 0;
+				// First, we'll call RegQueryValueEx to find out how large of a buffer we need
+				if ((RegQueryValueEx(Key, InValueName, NULL, NULL, NULL, &Size) == ERROR_SUCCESS) && Size)
+				{
+					// Allocate a buffer to hold the value and call the function again to get the data
+                    wchar_t* Buffer = new wchar_t[Size];
+					if (RegQueryValueEx(Key, InValueName, NULL, NULL, (LPBYTE)Buffer, &Size) == ERROR_SUCCESS)
+					{
+						const uint32_t Length = (Size / sizeof(wchar_t)) - 1;
+						OutData = eastl::wstring((wchar_t*)Buffer, Length);
+						bSuccess = true;
+					}
+					delete[] Buffer;
+				}
+				RegCloseKey(Key);
+			}
+		}
+
+		return bSuccess;
+	}
+
+	eastl::string WindowsNormalizedPath(const eastl::string& PathString)
+	{
+		eastl::string outputString = eastl::string(PathString);
+		PathUtils::ReplaceChar(const_cast<char*>(outputString.c_str()), '/', '\\');
+
+		//size_t length = outputString.length();
+		//for (size_t i = 0; i < length; ++i)
+		//{
+		//	char* currentChar = &outputString[i];
+		//	if (*currentChar == '\\')
+		//	{
+		//		outputString.insert(i, eastl::string("\\"));
+		//		++i;
+		//	}
+		//}
+
+		return outputString;
+
+		//FString Result = FPaths::ConvertRelativePathToFull(FString(PathString));
+
+		//// NormalizeFilename was already called by ConvertRelativePathToFull, but we still need to do the extra steps in NormalizeDirectoryName if it is a directory
+		//FPaths::NormalizeDirectoryName(Result);
+
+		//// Remove duplicate slashes
+		//const bool bIsUNCPath = Result.StartsWith(TEXT("//"));
+		//if (bIsUNCPath)
+		//{
+		//	// Keep // at the beginning.  If There are more than two / at the beginning, replace them with just //.
+		//	FPaths::RemoveDuplicateSlashes(Result);
+		//	Result = TEXT("/") + Result;
+		//}
+		//else
+		//{
+		//	FPaths::RemoveDuplicateSlashes(Result);
+		//}
+
+		//// We now have a canonical, strict-valid, absolute Unreal Path.  Convert it to a Windows Path.
+		//Result.ReplaceCharInline(TEXT('/'), TEXT('\\'), ESearchCase::CaseSensitive);
+
+		//// Handle Windows Path length over MAX_PATH
+		//if (Result.Len() > MAX_PATH)
+		//{
+		//	if (bIsUNCPath)
+		//	{
+		//		Result = TEXT("\\\\?\\UNC") + Result.RightChop(1);
+		//	}
+		//	else
+		//	{
+		//		Result = TEXT("\\\\?\\") + Result;
+		//	}
+		//}
+
+		//return Result;
+	}
+
+
+	bool DirectoryExistsInternal(const eastl::string& inPath)
+	{
+		eastl::string normalizedPath = WindowsNormalizedPath(inPath);
+		uint32_t Result = GetFileAttributesA(normalizedPath.c_str());
+		const bool bExists = (Result != 0xFFFFFFFF && (Result & FILE_ATTRIBUTE_DIRECTORY));
+
+        return bExists;
+	}
+
+	bool CreateDirectoryTree(const eastl::string& Directory)
+	{
+		if (CreateDirectoryInternal(Directory))
+			return true;
+
+		const size_t separatorIndex = Directory.find_last_of("\\");
+		if (separatorIndex != eastl::string::npos)
+		{
+			if (!CreateDirectoryTree(Directory.left(separatorIndex)))
+			{
+				return false;
+			}
+
+			if (CreateDirectoryInternal(Directory))
+			{
+				return true;
+			}
+		}
+
+		return DirectoryExistsInternal(Directory);
+	}
+
+	bool CreateDirectoryInternal(const eastl::string& Directory)
+	{
+		eastl::string normalizedPath = WindowsNormalizedPath(Directory);
+		bool success = ::CreateDirectoryA(normalizedPath.c_str(), NULL) || GetLastError() == ERROR_ALREADY_EXISTS;;
+
+		return success;
+	}
+
 
 	// Message Loop
 
@@ -564,7 +693,7 @@ namespace WindowsPlatform
  		case WM_CLOSE:
  		{
  			LOG_WINMSG(WM_CLOSE);
-            Engine->GetMainWindow().RequestClose();
+            GEngine->GetMainWindow().RequestClose();
  
  			return 0;
  		}

@@ -43,7 +43,7 @@ void Renderer::Terminate()
 
 void Renderer::SetViewportSizeToMain()
 {
-	const WindowsWindow& currentWindow = Engine->GetMainWindow();
+	const WindowsWindow& currentWindow = GEngine->GetMainWindow();
 	const WindowProperties& props = currentWindow.GetProperties();
 	RHI::Get()->SetViewportSize(props.Width, props.Height);
 }
@@ -51,8 +51,8 @@ void Renderer::SetViewportSizeToMain()
 void Renderer::SetBaseUniforms()
 {
 	// Note: glm is RH but uses a sneaky minus to change the handedness of the output to LH (how OpenGL actually is)
-	const float windowWidth = static_cast<float>(Engine->GetMainWindow().GetProperties().Width);
-	const float windowHeight = static_cast<float>(Engine->GetMainWindow().GetProperties().Height);
+	const float windowWidth = static_cast<float>(GEngine->GetMainWindow().GetProperties().Width);
+	const float windowHeight = static_cast<float>(GEngine->GetMainWindow().GetProperties().Height);
 
 	glm::mat4 projection = glm::perspectiveRH_ZO(glm::radians(CAMERA_FOV), windowWidth / windowHeight, CAMERA_NEAR, CAMERA_FAR);
 	RHI::Get()->PrepareProjectionForRendering(projection);
