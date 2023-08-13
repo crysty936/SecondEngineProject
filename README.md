@@ -13,7 +13,7 @@ Features:
 - Normal Mapping
 - Parallax Mapping
 - Bloom
-- Scene graph with properties edit functionality using imgui
+- Scene graph with inline edit using ImGui
 - Deferred Decals with Carmack reverse stencil
 - Integration with RenderDoc(Press R to automatically capture and launch RenderDoc UI)
 
