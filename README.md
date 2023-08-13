@@ -14,7 +14,8 @@ Features:
 - Parallax Mapping
 - Bloom
 - Scene graph with properties edit functionality using imgui
-- ...
+- Deferred Decals with Carmack reverse stencil
+- Integration with RenderDoc(Press R to automatically capture and launch RenderDoc UI)
 
 Note: Not all of these features may be fully functional at any given commit. That's to allow faster iteration. The commits at which these features are functional are named accordingly.
 
