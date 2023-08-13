@@ -140,7 +140,7 @@ void DeferredRenderer::Draw()
 
 
 	DrawCommand(DefaultModelQuad->GetCommand());
-	
+
 	RHI::Get()->SetDepthTest(false);
 
  	DrawCommand(VisualizeDepthUtil->GetCommand());
@@ -363,9 +363,11 @@ void DeferredRenderer::RenderPreStencil(const RenderCommand& inCommand)
 
 	//RHI::Get()->TestStencilBufferStuff(*GBuffer);
 
-	//glEnable(GL_STENCIL_TEST);
-	//glStencilMask(0xFF);
-	//glStencilFunc(GL_ALWAYS, 1, 0xFF);
+	// These create the output necessary for Carmack's reverse
+	RHI::Get()->SetDepthOp(EDepthOp::LessOrEqual);
+	glStencilMask(0x01);
+	glStencilFunc(GL_ALWAYS, 0, 0x01);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_INVERT);
 
 	switch (inCommand.DrawType)
 	{
@@ -400,14 +402,15 @@ void DeferredRenderer::RenderPreStencil(const RenderCommand& inCommand)
 	RHI::Get()->UnbindShader(*(material->Shader));
 
 
-
-
 	glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD);
 	glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
 
 	glDisable(GL_BLEND);
 
+	glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
 	RHI::Get()->SetCullState(true);
+	RHI::Get()->SetDepthOp(EDepthOp::Less);
+
 }
 
 void DeferredRenderer::DrawDecals(const eastl::vector<RenderCommand>& inCommands)
@@ -426,7 +429,9 @@ void DeferredRenderer::DrawDecals(const eastl::vector<RenderCommand>& inCommands
 		DrawDebugHelpers::DrawBoxArray(projCorners, false);
 
 		// Pre Stencil
-		//RenderPreStencil(renderCommand);
+		glEnable(GL_STENCIL_TEST);
+
+		RenderPreStencil(renderCommand);
 
 
 
@@ -465,10 +470,22 @@ void DeferredRenderer::DrawDecals(const eastl::vector<RenderCommand>& inCommands
 			//RHI::Get()->SetRasterizerState(ERasterizerState::CCW);
 		//}
 
+
+		// Necessary test to use the reverse
+		glStencilMask(0x01);
+		glStencilFunc(GL_EQUAL, 1, 0x01);
+		glStencilOp(GL_ZERO, GL_KEEP, GL_ZERO);
+
+		glStencilOp(GL_ZERO, GL_ZERO, GL_ZERO);
+
+
+
 		DrawCommand(renderCommand);
 
 		//DrawDebugHelpers::
 	}
+
+	glDisable(GL_STENCIL_TEST);
 
 	RHI::Get()->SetRasterizerState(ERasterizerState::CCW);
 	RHI::Get()->SetDepthOp(EDepthOp::Less);
