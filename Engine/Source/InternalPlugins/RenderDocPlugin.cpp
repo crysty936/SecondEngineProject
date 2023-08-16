@@ -5,8 +5,9 @@
 #include "Window/WindowsWindow.h"
 #include "EAStdC/EADateTime.h"
 #include "Utils/PathUtils.h"
+#include "imgui.h"
 
-static const AddPluginHelper<RenderDocPlugin> AddPlugin;
+static const AddPluginHelper<RenderDocPlugin> AddPlugin("RenderDocPlugin");
 
 eastl::string ExePath() {
 	char buffer[MAX_PATH] = { 0 };
@@ -96,7 +97,7 @@ void RenderDocPlugin::Init()
 
 void RenderDocPlugin::OnCapturePressed()
 {
-	bPendingCapture = true;
+	DoCapture();
 }
 
 void RenderDocPlugin::OnEngineInitDone()
@@ -125,6 +126,16 @@ HWND GetWindowHandle()
 
 void RenderDocPlugin::Tick(const float inDeltaTime)
 {
+	ImGui::Begin("RenderDoc");
+
+	if (ImGui::Button("Do RenderDoc Capture"))
+	{
+		DoCapture();
+	}
+
+	ImGui::End();
+
+
 	if (bCaptureInProgress)
 	{
 		if (GFrameCounter == CaptureEndFrame)
@@ -148,6 +159,11 @@ void RenderDocPlugin::Tick(const float inDeltaTime)
 		RenderDocAPI->StartFrameCapture(nullptr, GetWindowHandle());
 	}
 
+}
+
+void RenderDocPlugin::DoCapture()
+{
+	bPendingCapture = true;
 }
 
 void RenderDocPlugin::LaunchRenderDoc()

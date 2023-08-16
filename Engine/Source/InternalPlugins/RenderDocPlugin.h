@@ -10,10 +10,10 @@ class RenderDocPlugin : public IInternalPlugin
 {
 public:
 	void Init() override;
-
 	void Shutdown() override;
-
 	void Tick(const float inDeltaTime) override;
+
+	void DoCapture();
 
 private:
 	void OnCapturePressed();

@@ -23,16 +23,16 @@ bool bIsRunning = true;
 EngineCore* GEngine = nullptr;
 uint64_t GFrameCounter = 0;
 
-static eastl::vector<IInternalPlugin*>& GetInternalPluginsList()
+static eastl::vector<PluginAndName>& GetInternalPluginsList()
 {
-	static eastl::vector<IInternalPlugin*> InternalPluginsList;
+	static eastl::vector<PluginAndName> InternalPluginsList;
 
 	return InternalPluginsList;
 }
 
-void AddInternalPlugin(IInternalPlugin* inNewPlugin)
+void AddInternalPlugin(IInternalPlugin* inNewPlugin, const eastl::string& inName)
 {
-	GetInternalPluginsList().push_back(inNewPlugin);
+	GetInternalPluginsList().push_back({ inNewPlugin, inName });
 }
 
 EngineCore::EngineCore()
@@ -62,9 +62,9 @@ void EngineCore::Init()
 	MaterialsManager::Init();
 
 	// Initialize plugins before renderer to make sure that RenderDoc works
-	for (IInternalPlugin* plugin : GetInternalPluginsList())
+	for (PluginAndName& container : GetInternalPluginsList())
 	{
-		plugin->Init();
+		container.Plugin->Init();
 	}
 
 	RHI::Init();
@@ -100,9 +100,10 @@ void EngineCore::Terminate()
 	TimersManager::Terminate();
 	Renderer::Terminate();
 
-	for (IInternalPlugin* plugin : GetInternalPluginsList())
+
+	for (PluginAndName& container : GetInternalPluginsList())
 	{
-		plugin->Shutdown();
+		container.Plugin->Shutdown();
 	}
 
 	InputSystem::Terminate();
@@ -169,6 +170,11 @@ void EngineCore::Run()
 
 		Renderer::Get().Draw();
 
+		for (PluginAndName& container : GetInternalPluginsList())
+		{
+			container.Plugin->Tick(static_cast<float>(deltaTime));
+		}
+
 		// Draw ImGui
 		ImGui::EndFrame();
 		ImGui::Render();
@@ -184,11 +190,6 @@ void EngineCore::Run()
 		Renderer::Get().Present();
 
 		CheckShouldCloseWindow();
-
-		for (IInternalPlugin* plugin : GetInternalPluginsList())
-		{
-			plugin->Tick(static_cast<float>(deltaTime));
-		}
 
 		++GFrameCounter;
 	}
@@ -212,4 +213,17 @@ bool EngineCore::IsRunning()
 void EngineCore::StopEngine()
 {
 	bIsRunning = false;
+}
+
+IInternalPlugin* EngineCore::GetPluginPrivate(const eastl::string& inName)
+{
+	for (PluginAndName& container : GetInternalPluginsList())
+	{
+		if (container.Name == inName)
+		{
+			return container.Plugin;
+		}
+	}
+
+	return nullptr;
 }

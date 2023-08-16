@@ -148,17 +148,33 @@ void DeferredRenderer::Draw()
 	// Draw debug primitives
 	DrawDebugManager::Draw();
 
-	RHI::Get()->SetDepthTest(false);
+	static bool bViewGBuffer = false;
+	ImGui::Checkbox("View GBuffer", &bViewGBuffer);
 
- 	DrawCommand(VisualizeDepthUtil->GetCommand());
+	if (bViewGBuffer)
+	{
+		RHI::Get()->SetDepthTest(false);
 
- 	VisualizeNormalsUtil->GetCommand().Material->ExternalTextures.clear();
- 	VisualizeNormalsUtil->GetCommand().Material->ExternalTextures.push_back(GBufferNormal);
- 	DrawCommand(VisualizeNormalsUtil->GetCommand());
+ 		DrawCommand(VisualizeDepthUtil->GetCommand());
+
+ 		VisualizeNormalsUtil->GetCommand().Material->ExternalTextures.clear();
+ 		VisualizeNormalsUtil->GetCommand().Material->ExternalTextures.push_back(GBufferNormal);
+ 		DrawCommand(VisualizeNormalsUtil->GetCommand());
  
-  	VisualizeAlbedoUtil->GetCommand().Material->ExternalTextures.clear();
-  	VisualizeAlbedoUtil->GetCommand().Material->ExternalTextures.push_back(GBufferColorSpec);
-  	DrawCommand(VisualizeAlbedoUtil->GetCommand());
+  		VisualizeAlbedoUtil->GetCommand().Material->ExternalTextures.clear();
+  		VisualizeAlbedoUtil->GetCommand().Material->ExternalTextures.push_back(GBufferColorSpec);
+  		DrawCommand(VisualizeAlbedoUtil->GetCommand());
+	}
+
+	//if (ImGui::Button("Do RenderDoc Capture"))
+	//{
+	//	RenderDocPlugin* renderDoc = GEngine->GetInternalPlugin<RenderDocPlugin>("RenderDocPlugin");
+
+	//	if (renderDoc)
+	//	{
+	//		renderDoc->DoCapture();
+	//	}
+	//}
 
 	RHI::Get()->SetDepthTest(true);
 	RHI::Get()->SetDepthWrite(true);
