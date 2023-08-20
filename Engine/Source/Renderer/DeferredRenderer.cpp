@@ -52,12 +52,14 @@ static eastl::shared_ptr<RHIFrameBuffer> GBuffer = nullptr;
 static eastl::shared_ptr<RHITexture2D> GlobalRenderTexture = nullptr;
 static eastl::shared_ptr<RHITexture2D> GBufferDepth = nullptr;
 static eastl::shared_ptr<RHITexture2D> GBufferNormal = nullptr;
-static eastl::shared_ptr<RHITexture2D> GBufferColorSpec = nullptr;
+static eastl::shared_ptr<RHITexture2D> GBufferAlbedo = nullptr;
+static eastl::shared_ptr<RHITexture2D> GBufferMetallicRoughness = nullptr;
 
 eastl::shared_ptr<VisualizeDepthQuad> VisualizeDepthUtil;
 eastl::shared_ptr<GBufferVisualizeQuad> VisualizeNormalsUtil;
 eastl::shared_ptr<GBufferVisualizeQuad> VisualizeAlbedoUtil;
-eastl::shared_ptr<DefaultLightingModelQuad> DefaultModelQuad;
+//eastl::shared_ptr<DefaultLightingModelQuad> DefaultShadingModelQuad;
+eastl::shared_ptr<DefaultPBRLightingModelQuad> DefaultPBRShadingModelQuad;
 
 void DeferredRenderer::InitInternal()
 {
@@ -75,8 +77,11 @@ void DeferredRenderer::InitInternal()
 	GBufferNormal = RHI::Get()->CreateRenderTexture(props.Width, props.Height, ERHITexturePrecision::Float16, ERHITextureFilter::Nearest);
 	RHI::Get()->AttachTextureToFramebufferColor(*GBuffer, GBufferNormal);
 
- 	GBufferColorSpec = RHI::Get()->CreateRenderTexture(props.Width, props.Height, ERHITexturePrecision::UnsignedByte, ERHITextureFilter::Nearest);
- 	RHI::Get()->AttachTextureToFramebufferColor(*GBuffer, GBufferColorSpec);
+ 	GBufferAlbedo = RHI::Get()->CreateRenderTexture(props.Width, props.Height, ERHITexturePrecision::UnsignedByte, ERHITextureFilter::Nearest);
+ 	RHI::Get()->AttachTextureToFramebufferColor(*GBuffer, GBufferAlbedo);
+
+	GBufferMetallicRoughness = RHI::Get()->CreateRenderTexture(props.Width, props.Height, ERHITexturePrecision::UnsignedByte, ERHITextureFilter::Nearest);
+	RHI::Get()->AttachTextureToFramebufferColor(*GBuffer, GBufferMetallicRoughness);
 
 	VisualizeDepthUtil = SceneHelper::CreateObject<VisualizeDepthQuad>("VisualizeDepth");
 	VisualizeDepthUtil->CreateCommand();
@@ -93,16 +98,25 @@ void DeferredRenderer::InitInternal()
 
  	VisualizeAlbedoUtil = SceneHelper::CreateObject<GBufferVisualizeQuad>("VisualizeAlbedoTex");
  	VisualizeAlbedoUtil->CreateCommand();
- 	VisualizeAlbedoUtil->GetCommand().Material->ExternalTextures.push_back(GBufferColorSpec);
+ 	VisualizeAlbedoUtil->GetCommand().Material->ExternalTextures.push_back(GBufferAlbedo);
  	VisualizeAlbedoUtil->SetScale(glm::vec3(0.33f, 0.33f, 1.f));
  	VisualizeAlbedoUtil->SetRelativeLocation(glm::vec3(0.67f, 0.65f, 0.0f));
 
-	DefaultModelQuad = SceneHelper::CreateObject<DefaultLightingModelQuad>("DefaultLightingModelQuad");
-	DefaultModelQuad->CreateCommand();
-	DefaultModelQuad->GetCommand().Material->ExternalTextures.push_back(GBufferColorSpec);
-	DefaultModelQuad->GetCommand().Material->ExternalTextures.push_back(GBufferNormal);
-	DefaultModelQuad->GetCommand().Material->ExternalTextures.push_back(GBufferDepth);
-	DefaultModelQuad->CreateCommand();
+	DefaultPBRShadingModelQuad = SceneHelper::CreateObject<DefaultPBRLightingModelQuad>("DefaultLightingModelQuad");
+	DefaultPBRShadingModelQuad->CreateCommand();
+	DefaultPBRShadingModelQuad->GetCommand().Material->ExternalTextures.push_back(GBufferAlbedo);
+	DefaultPBRShadingModelQuad->GetCommand().Material->ExternalTextures.push_back(GBufferNormal);
+	DefaultPBRShadingModelQuad->GetCommand().Material->ExternalTextures.push_back(GBufferMetallicRoughness);
+	DefaultPBRShadingModelQuad->GetCommand().Material->ExternalTextures.push_back(GBufferDepth);
+	DefaultPBRShadingModelQuad->CreateCommand();
+
+
+	//DefaultShadingModelQuad = SceneHelper::CreateObject<DefaultightingModelQuad>("DefaultPBRLightingModelQuad");
+	//DefaultShadingModelQuad->CreateCommand();
+	//DefaultShadingModelQuad->GetCommand().Material->ExternalTextures.push_back(GBufferColorSpec);
+	//DefaultShadingModelQuad->GetCommand().Material->ExternalTextures.push_back(GBufferNormal);
+	//DefaultShadingModelQuad->GetCommand().Material->ExternalTextures.push_back(GBufferDepth);
+	//DefaultShadingModelQuad->CreateCommand();
 }
 
 void DeferredRenderer::Draw()
@@ -143,7 +157,7 @@ void DeferredRenderer::Draw()
 
 	RHI::Get()->SetDepthWrite(false);
 
-	DrawCommand(DefaultModelQuad->GetCommand());
+	DrawCommand(DefaultPBRShadingModelQuad->GetCommand());
 
 	// Draw debug primitives
 	DrawDebugManager::Draw();
@@ -162,7 +176,7 @@ void DeferredRenderer::Draw()
  		DrawCommand(VisualizeNormalsUtil->GetCommand());
  
   		VisualizeAlbedoUtil->GetCommand().Material->ExternalTextures.clear();
-  		VisualizeAlbedoUtil->GetCommand().Material->ExternalTextures.push_back(GBufferColorSpec);
+  		VisualizeAlbedoUtil->GetCommand().Material->ExternalTextures.push_back(GBufferAlbedo);
   		DrawCommand(VisualizeAlbedoUtil->GetCommand());
 	}
 

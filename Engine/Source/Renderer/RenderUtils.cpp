@@ -651,3 +651,58 @@ void DefaultLightingModelQuad::CreateCommand()
 
 
 
+
+DefaultPBRLightingModelQuad::DefaultPBRLightingModelQuad(const eastl::string& inName)
+	: DrawableObject(inName)
+{
+
+}
+
+void DefaultPBRLightingModelQuad::CreateCommand()
+{
+	const eastl::string RenderDataContainerID = "squareVAO";
+	eastl::shared_ptr<MeshDataContainer> dataContainer{ nullptr };
+
+	const bool existingContainer = Renderer::Get().GetOrCreateContainer(RenderDataContainerID, dataContainer);
+
+	VertexInputLayout inputLayout;
+	// Vertex points
+	inputLayout.Push<float>(3, VertexInputType::Position);
+	// Vertex Tex Coords
+	inputLayout.Push<float>(2, VertexInputType::TexCoords);
+
+	if (!existingContainer)
+	{
+		int32_t indicesCount = BasicShapesData::GetSquareIndicesCount();
+		eastl::shared_ptr<RHIIndexBuffer> ib = RHI::Get()->CreateIndexBuffer(BasicShapesData::GetSquareIndices(), indicesCount);
+
+
+		int32_t verticesCount = BasicShapesData::GetSquareVerticesCount();
+		const eastl::shared_ptr<RHIVertexBuffer> vb = RHI::Get()->CreateVertexBuffer(inputLayout, BasicShapesData::GetSquareVertices(), verticesCount, ib);
+
+		dataContainer->VBuffer = vb;
+	}
+
+	MaterialsManager& matManager = MaterialsManager::Get();
+
+	bool materialExists = false;
+	eastl::shared_ptr<RenderMaterial> material = matManager.GetOrAddMaterial<RenderMaterial_DefaultLighting>("RenderMaterial_DefaultLighting", materialExists);
+
+	if (!materialExists)
+	{
+		eastl::vector<ShaderSourceInput> shaders = {
+		{ "DefaultPBRLightingModel/VS_Pos-UV_UnchangedPosition", EShaderType::Sh_Vertex },
+		{ "DefaultPBRLightingModel/PS_DefaultLightingModel", EShaderType::Sh_Fragment } };
+
+		material->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
+	}
+
+	QuadCommand.Material = material;
+	QuadCommand.DataContainer = dataContainer;
+	QuadCommand.Parent = this_shared(this);
+	QuadCommand.DrawType = EDrawType::DrawElements;
+}
+
+
+
+

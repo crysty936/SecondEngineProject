@@ -9,7 +9,7 @@
 // At the moment, global flip vertically flag is making multithreading on this impossible
 static std::mutex stbiMutex;
 
-ImageData ImageLoading::LoadImageData(const char* inTexurePath, const bool inFlipped)
+ImageData ImageLoading::LoadImageData(const char* inTexurePath, const bool inFlipped, const int32_t inNrChannels)
 {
 	std::lock_guard<std::mutex> lock(stbiMutex);
 	stbi_set_flip_vertically_on_load(inFlipped);
@@ -20,9 +20,10 @@ ImageData ImageLoading::LoadImageData(const char* inTexurePath, const bool inFli
 
 	rawData = stbi_load(inTexurePath, &width, &height, &nrChannels, 4);
 
-	if (!ENSURE_MSG(rawData, "Image %s Loading Failed", inTexurePath))
+	if (!ENSURE_MSG(rawData, "Image %s Loading Failed with reason: %s", inTexurePath, stbi__g_failure_reason))
 	{
-		ASSERT(false);
+		// retry
+		rawData = stbi_load(inTexurePath, &width, &height, &nrChannels, 4);
 
 		return {};
 	}

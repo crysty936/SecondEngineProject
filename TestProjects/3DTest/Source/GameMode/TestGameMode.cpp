@@ -343,7 +343,7 @@ void TestGameMode::Init()
 //         		centerObj->SetScale(glm::vec3(100.f, 0.5f, 100.f));
  	}
 	{
-		eastl::shared_ptr<CubeShape> centerObj = SceneHelper::CreateVisualEntity<CubeShape>("Cube 1");
+		//eastl::shared_ptr<CubeShape> centerObj = SceneHelper::CreateVisualEntity<CubeShape>("Cube 1");
 
 		//eastl::shared_ptr<SquareShape> SquareTestObj = SceneHelper::CreateVisualEntity<SquareShape>("Quad 1");
 
@@ -401,8 +401,14 @@ void TestGameMode::Init()
 //   	AssimpModel->SetScale(glm::vec3(10.f, 10.f, 10.f));
 //   	AssimpModel->Move(glm::vec3(0.f, 10.f, 0.f));
 
- 	FloorModel = SceneHelper::CreateVisualEntity<AssimpModel3D>("../Data/Models/Floor/scene.gltf", "Floor");
- 	FloorModel->Move(glm::vec3(0.f, -2.f, 0.f));
+ 	//FloorModel = SceneHelper::CreateVisualEntity<AssimpModel3D>("../Data/Models/Floor/scene.gltf", "Floor");
+ 	//FloorModel->Move(glm::vec3(0.f, -2.f, 0.f));
+
+
+	FloorModel = SceneHelper::CreateVisualEntity<AssimpModel3D>("../Data/Models/Sponza/Sponza.gltf", "Sponza");
+	FloorModel->Move(glm::vec3(0.f, -2.f, 0.f));
+	FloorModel->SetScale(glm::vec3(10.f, 10.f, 10.f));
+
 
 // 	{
 // 		eastl::shared_ptr<LightSource> PointLight = SceneHelper::CreateVisualEntity<LightSource>("Point Light 3");
@@ -415,9 +421,9 @@ void TestGameMode::Init()
 // 	}
 
 
-	decal = SceneHelper::CreateVisualEntity<DeferredDecal>("Decal");
-	decal->Move(glm::vec3(4.f, -2.2f, 0.f));
-	decal->SetScale(glm::vec3(5.4f, 2.2f, 5.f));
+	//decal = SceneHelper::CreateVisualEntity<DeferredDecal>("Decal");
+	//decal->Move(glm::vec3(4.f, -2.2f, 0.f));
+	//decal->SetScale(glm::vec3(5.4f, 2.2f, 5.f));
 
 }
 
@@ -435,7 +441,7 @@ void TestGameMode::Tick(float inDeltaT)
 	glm::vec3 right = glm::vec3(1.f, 0.f, 0.f);
 	glm::vec3 up = glm::vec3(0.f, 1.f, 0.f);
 
-	const eastl::shared_ptr<TransformObject>& usedObj = decal;
+	const eastl::shared_ptr<TransformObject>& usedObj = DirLight;
 
 	if (usedObj)
 	{

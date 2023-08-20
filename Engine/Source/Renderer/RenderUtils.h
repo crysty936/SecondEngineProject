@@ -137,3 +137,16 @@ private:
 	RenderCommand QuadCommand;
 };
 
+class DefaultPBRLightingModelQuad : public DrawableObject
+{
+public:
+	DefaultPBRLightingModelQuad(const eastl::string& inName);
+	~DefaultPBRLightingModelQuad() = default;
+
+	void CreateCommand();
+	inline const RenderCommand& GetCommand() { return QuadCommand; };
+
+private:
+	RenderCommand QuadCommand;
+};
+

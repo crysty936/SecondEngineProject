@@ -11,6 +11,7 @@
 #include "Renderer/RHI/Resources/RHITexture.h"
 #include "Renderer/RHI/RHI.h"
 #include "Renderer/Material/EngineMaterials/RenderMaterial_WithShadow.h"
+#include "assimp/GltfMaterial.h"
 
 static Transform aiMatrixToTransform(const aiMatrix4x4& inMatrix)
 {
@@ -60,7 +61,7 @@ eastl::shared_ptr<MeshNode> AssimpModel3D::LoadData(OUT eastl::vector<RenderComm
 {
 	Assimp::Importer modelImporter;
 
-	const aiScene* scene = modelImporter.ReadFile(ModelPath.c_str(), 0);
+	const aiScene* scene = modelImporter.ReadFile(ModelPath.c_str(), aiProcess_ValidateDataStructure);
 
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 	{
@@ -108,6 +109,14 @@ eastl::shared_ptr<RHIShader> AssimpModel3D::CreateShaders(const VertexInputLayou
 	return RHI::Get()->CreateShaderFromPath(shaders, inLayout);
 }
 
+eastl::shared_ptr<RenderMaterial> AssimpModel3D::CreateMaterial(const aiMesh& inMesh, bool& outMatExists) const
+{
+	MaterialsManager& matManager = MaterialsManager::Get();
+	eastl::shared_ptr<RenderMaterial> thisMaterial = matManager.GetOrAddMaterial<RenderMaterial_WithShadow>(eastl::string("Assimp_Material_") + inMesh.mName.data, outMatExists);
+
+	return thisMaterial;
+}
+
 void AssimpModel3D::AddAdditionalBuffers(eastl::shared_ptr<MeshDataContainer>& inDataContainer) const
 {
 	// to be inherited for instancing, etc
@@ -139,9 +148,8 @@ void AssimpModel3D::ProcessMesh(const aiMesh& inMesh, const aiScene& inScene, ea
 	// Bitangent
 	inputLayout.Push<float>(3, VertexInputType::Bitangent);
 
- 	MaterialsManager& matManager = MaterialsManager::Get();
  	bool materialExists = false;
- 	eastl::shared_ptr<RenderMaterial> thisMaterial = matManager.GetOrAddMaterial<RenderMaterial_WithShadow>(eastl::string("Assimp_Material_") + inMesh.mName.data, materialExists);
+	eastl::shared_ptr<RenderMaterial> thisMaterial = CreateMaterial(inMesh, materialExists);
  
  	if (!materialExists)
  	{
@@ -149,19 +157,15 @@ void AssimpModel3D::ProcessMesh(const aiMesh& inMesh, const aiScene& inScene, ea
 		if (inMesh.mMaterialIndex >= 0)
 		{
 			aiMaterial* Material = inScene.mMaterials[inMesh.mMaterialIndex];
+
 			eastl::vector<eastl::shared_ptr<RHITexture2D>> diffuseMaps = LoadMaterialTextures(*Material, aiTextureType_DIFFUSE);
 			thisMaterial->OwnedTextures.insert(thisMaterial->OwnedTextures.end(), eastl::make_move_iterator(diffuseMaps.begin()), eastl::make_move_iterator(diffuseMaps.end()));
 
-			// 		std::vector<Texture> SpecularMaps = LoadMaterialTextures(Material, aiTextureType_SPECULAR, TextureType::Specular);
-			// 		Textures.insert(Textures.end(), SpecularMaps.begin(), SpecularMaps.end());
-
-			uint32_t totalTextureCount = aiGetMaterialTotalTextureCount(Material);
-
-//  			eastl::vector<eastl::shared_ptr<RHITexture2D>> specMap = LoadMaterialTextures(*Material, aiTextureType_UNKNOWN);
-// 			thisMaterial->OwnedTextures.insert(thisMaterial->OwnedTextures.end(), eastl::make_move_iterator(specMap.begin()), eastl::make_move_iterator(specMap.end()));
-
 			eastl::vector<eastl::shared_ptr<RHITexture2D>> normalMaps = LoadMaterialTextures(*Material, aiTextureType_NORMALS);
 			thisMaterial->OwnedTextures.insert(thisMaterial->OwnedTextures.end(), eastl::make_move_iterator(normalMaps.begin()), eastl::make_move_iterator(normalMaps.end()));
+
+  			eastl::vector<eastl::shared_ptr<RHITexture2D>> metRoughness = LoadMaterialTextures(*Material, aiTextureType_UNKNOWN);//AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_METALLICROUGHNESS_TEXTURE
+ 			thisMaterial->OwnedTextures.insert(thisMaterial->OwnedTextures.end(), eastl::make_move_iterator(metRoughness.begin()), eastl::make_move_iterator(metRoughness.end()));
 		}
 
 		thisMaterial->Shader = CreateShaders(inputLayout);

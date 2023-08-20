@@ -17,7 +17,7 @@ struct ImageData
 
 namespace ImageLoading
 {
-	ImageData LoadImageData(const char* inTexurePath, const bool inFlipped = true);
+	ImageData LoadImageData(const char* inTexurePath, const bool inFlipped = true, const int32_t inNrChannels = 4);
 	void FreeImageData(ImageData inData);
 }
 
