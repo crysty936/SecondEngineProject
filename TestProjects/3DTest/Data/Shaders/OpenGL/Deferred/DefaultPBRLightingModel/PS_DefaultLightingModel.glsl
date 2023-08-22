@@ -31,8 +31,7 @@ const float PI = 3.14159265359;
 
 vec3 fresnelSchlick(float cosTheta, vec3 F0)
 {
-	return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
-	//return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
+	return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 }
 
 // Trowbridge-Reitz
@@ -103,7 +102,7 @@ void main()
 	vec3 wsNormal = texture(GBufferNormal, ps_in.TexCoords).rgb;
 	wsNormal = wsNormal * 2.0 - 1.0;
 	wsNormal = normalize(wsNormal);
-	FragColor = vec4(wsNormal, 1.0);
+	//FragColor = vec4(wsNormal, 1.0);
 
 	vec2 clipCoord = ps_in.TexCoords.xy * 2.0 - 1.0;
 	vec4 clipsSpaceLoc = vec4(clipCoord.x, clipCoord.y, depthValue, 1.0);
@@ -115,7 +114,7 @@ void main()
 	//FragColor = vec4(albedo, 1.0);
 
 	vec3 viewToFragW = normalize(worldSpacePos.xyz - LightingConstants.ViewPos);
-	vec3 fragToViewW = normalize(-viewToFragW);
+	vec3 fragToViewW = -viewToFragW;
 
 	float metalness = texture(GBufferMetallicRoughness, ps_in.TexCoords).r;
 	float roughness = texture(GBufferMetallicRoughness, ps_in.TexCoords).g;

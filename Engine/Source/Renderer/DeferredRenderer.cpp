@@ -58,7 +58,7 @@ static eastl::shared_ptr<RHITexture2D> GBufferMetallicRoughness = nullptr;
 eastl::shared_ptr<VisualizeDepthQuad> VisualizeDepthUtil;
 eastl::shared_ptr<GBufferVisualizeQuad> VisualizeNormalsUtil;
 eastl::shared_ptr<GBufferVisualizeQuad> VisualizeAlbedoUtil;
-//eastl::shared_ptr<DefaultLightingModelQuad> DefaultShadingModelQuad;
+eastl::shared_ptr<GBufferVisualizeQuad> VisualizeRoughnessUtil;
 eastl::shared_ptr<DefaultPBRLightingModelQuad> DefaultPBRShadingModelQuad;
 
 void DeferredRenderer::InitInternal()
@@ -102,6 +102,12 @@ void DeferredRenderer::InitInternal()
  	VisualizeAlbedoUtil->SetScale(glm::vec3(0.33f, 0.33f, 1.f));
  	VisualizeAlbedoUtil->SetRelativeLocation(glm::vec3(0.67f, 0.65f, 0.0f));
 
+	VisualizeRoughnessUtil = SceneHelper::CreateObject<GBufferVisualizeQuad>("VisualizeRoughnessTex");
+	VisualizeRoughnessUtil->CreateCommand();
+	VisualizeRoughnessUtil->GetCommand().Material->ExternalTextures.push_back(GBufferAlbedo);
+	VisualizeRoughnessUtil->SetScale(glm::vec3(0.33f, 0.33f, 1.f));
+	VisualizeRoughnessUtil->SetRelativeLocation(glm::vec3(0.67f, -0.15f, 0.0f));
+
 	DefaultPBRShadingModelQuad = SceneHelper::CreateObject<DefaultPBRLightingModelQuad>("DefaultLightingModelQuad");
 	DefaultPBRShadingModelQuad->CreateCommand();
 	DefaultPBRShadingModelQuad->GetCommand().Material->ExternalTextures.push_back(GBufferAlbedo);
@@ -111,12 +117,6 @@ void DeferredRenderer::InitInternal()
 	DefaultPBRShadingModelQuad->CreateCommand();
 
 
-	//DefaultShadingModelQuad = SceneHelper::CreateObject<DefaultightingModelQuad>("DefaultPBRLightingModelQuad");
-	//DefaultShadingModelQuad->CreateCommand();
-	//DefaultShadingModelQuad->GetCommand().Material->ExternalTextures.push_back(GBufferColorSpec);
-	//DefaultShadingModelQuad->GetCommand().Material->ExternalTextures.push_back(GBufferNormal);
-	//DefaultShadingModelQuad->GetCommand().Material->ExternalTextures.push_back(GBufferDepth);
-	//DefaultShadingModelQuad->CreateCommand();
 }
 
 void DeferredRenderer::Draw()
@@ -178,6 +178,10 @@ void DeferredRenderer::Draw()
   		VisualizeAlbedoUtil->GetCommand().Material->ExternalTextures.clear();
   		VisualizeAlbedoUtil->GetCommand().Material->ExternalTextures.push_back(GBufferAlbedo);
   		DrawCommand(VisualizeAlbedoUtil->GetCommand());
+
+		VisualizeRoughnessUtil->GetCommand().Material->ExternalTextures.clear();
+		VisualizeRoughnessUtil->GetCommand().Material->ExternalTextures.push_back(GBufferMetallicRoughness);
+		DrawCommand(VisualizeRoughnessUtil->GetCommand());
 	}
 
 	//if (ImGui::Button("Do RenderDoc Capture"))

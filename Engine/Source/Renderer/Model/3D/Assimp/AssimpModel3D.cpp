@@ -52,16 +52,18 @@ void AssimpModel3D::LoadModelToRoot(const eastl::string inPath, TransformObjPtr 
 	eastl::vector<RenderCommand> resultingCommands;
 	eastl::shared_ptr<MeshNode> mesh = LoadData(resultingCommands);
 
-	Renderer::Get().AddCommands(resultingCommands);
-
-	inParent->AddChild(mesh);
+	if (ENSURE(mesh))
+	{
+		Renderer::Get().AddCommands(resultingCommands);
+		inParent->AddChild(mesh);
+	}
 }
 
 eastl::shared_ptr<MeshNode> AssimpModel3D::LoadData(OUT eastl::vector<RenderCommand>& outCommands)
 {
 	Assimp::Importer modelImporter;
 
-	const aiScene* scene = modelImporter.ReadFile(ModelPath.c_str(), aiProcess_ValidateDataStructure);
+	const aiScene* scene = modelImporter.ReadFile(ModelPath.c_str(), 0);
 
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 	{
