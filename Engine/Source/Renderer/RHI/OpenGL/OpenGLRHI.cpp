@@ -691,14 +691,14 @@ void OpenGLRHI::LoadImageToTextureFromPath(RHITexture2D& inTexture, const eastl:
 	}
 	}
 
-	if (inSRGB)
-	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB8_ALPHA8, data.Width, data.Height, 0, imageFormat, GL_UNSIGNED_BYTE, data.RawData);
-	}
-	else
-	{
+	//if (inSRGB)
+	//{
+		//glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB8_ALPHA8, data.Width, data.Height, 0, imageFormat, GL_UNSIGNED_BYTE, data.RawData);
+	//}
+	//else
+	//{
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, data.Width, data.Height, 0, imageFormat, GL_UNSIGNED_BYTE, data.RawData);
-	}
+	//}
 
 	glGenerateMipmap(GL_TEXTURE_2D);
 
