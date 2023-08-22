@@ -18,6 +18,7 @@
 #include "Renderer/Material/EngineMaterials/RenderMaterial_Parallax.h"
 #include "Renderer/Material/EngineMaterials/RenderMaterial_Billboard.h"
 #include "Renderer/DrawDebugHelpers.h"
+#include "Renderer/Model/3D/Assimp/AssimpModel3DEditorSphere.h"
 
 TestGameMode GGameMode = {};
 
@@ -408,6 +409,10 @@ void TestGameMode::Init()
 	FloorModel = SceneHelper::CreateVisualEntity<AssimpModel3D>("../Data/Models/Sponza/Sponza.gltf", "Sponza");
 	FloorModel->Move(glm::vec3(0.f, -2.f, 0.f));
 	FloorModel->SetScale(glm::vec3(10.f, 10.f, 10.f));
+
+	SphereModel = SceneHelper::CreateVisualEntity<AssimpModel3DEditorSphere>("../Data/Models/Sphere/scene.gltf", "EditorSphere");
+	SphereModel->Move(glm::vec3(0.f, -2.f, 0.f));
+	//SphereModel->SetScale(glm::vec3(10.f, 10.f, 10.f));
 
 
 // 	{
