@@ -28,7 +28,8 @@ void main()
 	vs_out.worldPos = fragPos;
 	vs_out.TexCoords = inTexCoords;
 	vs_out.clipToWorldMatrix = inverse(projection * view);
-	vs_out.VertexNormal = mat3(transpose(inverse(model))) * inNormal;
+	// it's a sphere so the vertex position can be used as vertex normal
+	vs_out.VertexNormal = mat3(transpose(inverse(model))) * normalize(inPosition);
 
 	// Gram - Schmidt process
 	// https://learnopengl.com/Advanced-Lighting/Normal-Mapping
