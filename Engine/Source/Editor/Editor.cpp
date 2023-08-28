@@ -48,32 +48,44 @@ void Editor::Internal_PostInit()
 
 	{
 		KeyActionDelegate del = KeyActionDelegate::CreateRaw(this, &Editor::MoveCameraLeft);
-		EInputKey key = EInputKey::A;
-		OnKeyAction action = { del, {}, key, false };
-		Controller->AddListener(action);
+		EInputKey key1 = EInputKey::A;
+		EInputKey key2 = EInputKey::Left;
+		OnKeyAction action1 = { del, {}, key1, false };
+		OnKeyAction action2 = { del, {}, key2, false };
+		Controller->AddListener(action1);
+		Controller->AddListener(action2);
 	}
 
 	{
 		KeyActionDelegate del = KeyActionDelegate::CreateRaw(this, &Editor::MoveCameraRight);
-		EInputKey key = EInputKey::D;
-		OnKeyAction action = { del, {}, key, false };
+		EInputKey key1 = EInputKey::D;
+		EInputKey key2 = EInputKey::Right;
+		OnKeyAction action1 = { del, {}, key1, false };
+		OnKeyAction action2 = { del, {}, key2, false };
 
-		Controller->AddListener(action);
+		Controller->AddListener(action1);
+		Controller->AddListener(action2);
 	}
 
 	{
 		KeyActionDelegate del = KeyActionDelegate::CreateRaw(this, &Editor::MoveCameraUp);
-		EInputKey key = EInputKey::W;
-		OnKeyAction action = { del, {}, key, false };
-		Controller->AddListener(action);
+		EInputKey key1 = EInputKey::W;
+		EInputKey key2 = EInputKey::Up;
+		OnKeyAction action1 = { del, {}, key1, false };
+		OnKeyAction action2 = { del, {}, key2, false };
+		Controller->AddListener(action1);
+		Controller->AddListener(action2);
 	}
 
 	{
 		KeyActionDelegate del = KeyActionDelegate::CreateRaw(this, &Editor::MoveCameraDown);
-		EInputKey key = EInputKey::S;
-		OnKeyAction action = { del, {}, key, false };
+		EInputKey key1 = EInputKey::S;
+		EInputKey key2 = EInputKey::Down;
+		OnKeyAction action1 = { del, {}, key1, false };
+		OnKeyAction action2 = { del, {}, key2, false };
 
-		Controller->AddListener(action);
+		Controller->AddListener(action1);
+		Controller->AddListener(action2);
 	}
 
 	{

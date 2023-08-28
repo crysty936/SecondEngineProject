@@ -145,9 +145,7 @@ void DeferredRenderer::Draw()
 
     DrawCommands(MainCommands);
 
-	RHI::Get()->SetDepthWrite(false);
 	DrawDecals(DecalCommands);
-	RHI::Get()->SetDepthWrite(true);
 
 	RHI::Instance->BindDefaultFrameBuffer();
 	RHI::Get()->ClearBuffers();
@@ -385,24 +383,39 @@ void DeferredRenderer::RenderPreStencil(const RenderCommand& inCommand)
 	const uint32_t indicesCount = dataContainer->VBuffer->GetIndicesCount();
 
 
-
-
 	// Disable culling
-	RHI::Get()->SetCullState(false);
+	RHI::Get()->SetCullEnabled(false);
+	//RHI::Get()->SetCullMode(ECullFace::Front);
+	//RHI::Get()->SetCullMode(ECullFace::Back);
+	RHI::Get()->SetBlendEnabled(true);
 
-	glEnable(GL_BLEND);
-
-	glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD);
+	// Make sure that the stencil draw(which draws just black because no fragment shader) doesn't modify the dest color or alpha
+	// Rcolor = SourceFactorColor * SourceColor + DestFactorColor * DestColor
+	// RAlpha = SourceFactorAlpha * SourceAlpha + DestFactorAlpha * DestAlpha
 	glBlendFuncSeparate(GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA, GL_ZERO, GL_ONE);
+	glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD);
 
 
-	//RHI::Get()->TestStencilBufferStuff(*GBuffer);
 
-	// These create the output necessary for Carmack's reverse
+	// Carmack's reverse
+	// The equal allows the stencil op to work on the exact depth values where the decal touches
 	RHI::Get()->SetDepthOp(EDepthOp::LessOrEqual);
+
+	// Mask that tells which bits can be written to in the stencil buffer
 	glStencilMask(0x01);
-	glStencilFunc(GL_ALWAYS, 0, 0x01);
-	glStencilOp(GL_KEEP, GL_KEEP, GL_INVERT);
+	//glStencilMaskSeparate(GL_FRONT, 0x01);
+	//glStencilMaskSeparate(GL_BACK, 0x01);
+
+	// Ensure that we don't care about existing stencil test values
+	//glStencilFunc(GL_ALWAYS, 0, 0);
+	glStencilFuncSeparate(GL_FRONT, GL_ALWAYS, 0, 0);
+	glStencilFuncSeparate(GL_BACK, GL_ALWAYS, 0, 0);
+
+	// Write stencil mask for values that fail or pass stencil test(all) and invert those that pass stencil and depth(values where depth is smaller than existing depth, 
+	// thus setting ~0x01 to all values stencil fragments that are not touching an existing depth
+	//glStencilOp(GL_KEEP, GL_KEEP, GL_INVERT);
+	glStencilOpSeparate(GL_FRONT,GL_KEEP, GL_ZERO, GL_KEEP);
+	glStencilOpSeparate(GL_BACK,GL_KEEP, GL_KEEP, GL_ZERO);
 
 	switch (inCommand.DrawType)
 	{
@@ -436,20 +449,24 @@ void DeferredRenderer::RenderPreStencil(const RenderCommand& inCommand)
 	material->UnbindBuffers(EShaderType::Sh_Vertex);
 	RHI::Get()->UnbindShader(*(material->Shader));
 
-
-	glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD);
+	// Reset to default blend func
 	glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
+	glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD);
 
-	glDisable(GL_BLEND);
+	RHI::Get()->SetBlendEnabled(false);
 
 	glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-	RHI::Get()->SetCullState(true);
+	glStencilMask(~0);
+	RHI::Get()->SetCullEnabled(true);
+	RHI::Get()->SetCullMode(ECullFace::Back);
 	RHI::Get()->SetDepthOp(EDepthOp::Less);
 
 }
 
 void DeferredRenderer::DrawDecals(const eastl::vector<RenderCommand>& inCommands)
 {
+	RHI::Get()->SetDepthWrite(false);
+
 	SetDrawMode(EDrawMode::Default);
 	for (const RenderCommand& renderCommand : inCommands)
 	{
@@ -467,8 +484,6 @@ void DeferredRenderer::DrawDecals(const eastl::vector<RenderCommand>& inCommands
 		glEnable(GL_STENCIL_TEST);
 
 		RenderPreStencil(renderCommand);
-
-
 
 		// Loose optimization that compares camera against decal cube main diagonal(radius of sphere that encompasses bounding box)
 		// Allows effiecent depth test and face cull when we know for sure that we are not nowhere near inside the decal
@@ -492,11 +507,13 @@ void DeferredRenderer::DrawDecals(const eastl::vector<RenderCommand>& inCommands
 		//{
 
 			// CW ensures that there's always a face of the decal cube that's visible(the inside one)
-			RHI::Get()->SetRasterizerState(ERasterizerState::CW);
+			//RHI::Get()->SetRasterizerFront(ERasterizerFront::CW);
+			RHI::Get()->SetCullMode(ECullFace::Front);
 
 			// This has to be combined with CW always because the pixels that will be used for drawing now will always be the ones *under* the surface that the decal intersects(ones above it are discarded 
 			// always by the operation that discards pixels outside cube bounds)
-			RHI::Get()->SetDepthOp(EDepthOp::Always);
+			//RHI::Get()->SetDepthOp(EDepthOp::Always);
+			RHI::Get()->SetDepthTest(false);
 
 		//}
 		//else
@@ -506,14 +523,12 @@ void DeferredRenderer::DrawDecals(const eastl::vector<RenderCommand>& inCommands
 		//}
 
 
-		// Necessary test to use the reverse
-		glStencilMask(0x01);
-		glStencilFunc(GL_EQUAL, 1, 0x01);
+			// Test against 0x01. We don't care about the second mask so just use 0xFF
+		glStencilFunc(GL_EQUAL, 0x01, 0x01);
+		//glStencilFuncSeparate(GL_FRONT, GL_EQUAL, 0x01, 0xFF);
+		//glStencilFuncSeparate(GL_BACK, GL_EQUAL, 0x01, 0xFF);
+		// Write 0 to the stencil test, we have used the result, just cleanup
 		glStencilOp(GL_ZERO, GL_KEEP, GL_ZERO);
-
-		glStencilOp(GL_ZERO, GL_ZERO, GL_ZERO);
-
-
 
 		DrawCommand(renderCommand);
 
@@ -522,8 +537,11 @@ void DeferredRenderer::DrawDecals(const eastl::vector<RenderCommand>& inCommands
 
 	glDisable(GL_STENCIL_TEST);
 
-	RHI::Get()->SetRasterizerState(ERasterizerState::CCW);
+	//RHI::Get()->SetRasterizerFront(ERasterizerFront::CCW);
+	RHI::Get()->SetCullMode(ECullFace::Back);
 	RHI::Get()->SetDepthOp(EDepthOp::Less);
+	RHI::Get()->SetDepthTest(true);
+	RHI::Get()->SetDepthWrite(true);
 }
 
 

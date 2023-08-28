@@ -18,10 +18,16 @@ enum EShaderType : uint8_t
 	Sh_Universal = Sh_Vertex | Sh_Fragment | Sh_Geometry
 };
 
-enum class ERasterizerState
+enum class ERasterizerFront
 {
 	CW,
 	CCW
+};
+
+enum class ECullFace
+{
+	Front,
+	Back
 };
 
 enum class EDepthOp
@@ -43,6 +49,86 @@ struct ShaderSourceInput
 
 	/** How it should be compiled */
 	EShaderType ShaderType;
+};
+
+enum class EBlendFunc
+{
+	Zero,
+	One,
+	Src_Alpha,
+	One_Minus_Src_Alpha
+	// To add more..
+};
+
+enum class EBlendEquation
+{
+	Add,
+	Subtract,
+	Reverse_Subtract,
+	Min,
+	Max
+};
+
+struct BlendState
+{
+	EBlendFunc SrcColorBlendFunc;
+	EBlendFunc DestColorBlendFunc;
+	EBlendFunc SrcAlphaBlendFunc;
+	EBlendFunc DestAlphaBlendFunc;
+
+	EBlendEquation ColorBlendEq;
+	EBlendEquation AlphaBlendEq;
+};
+
+enum class EStencilFunc
+{
+	Never,		// Always fails
+	Less,		// Passes if (ref & mask) < (stencil & mask)
+	LEqual,		// Passes if (ref & mask) <= (stencil & mask)
+	Greater,	// Passes if (ref & mask) > (stencil & mask)
+	GEqual,		// Passes if (ref & mask) >= (stencil & mask)
+	NotEqual,	// Passes if (ref & mask) != (stencil & mask)
+	Always		// Always passes
+};
+
+enum class EStencilOp
+{
+	Keep,		//Keeps the current value
+	Zero,		// Sets stencil buffer value to 0
+	Replace,	//Sets the stencil buffer value to Ref
+	Incr,		// Increment stencil buffer value, clamps to maximum representable value
+	Incr_Wrap,	// Increment and wrap to 0 when exceeding maximum representable value
+	Decr,		// Decrement stencil buffer value, clamps to 0
+	Decr_Wrap,	// Decrement stencil buffer value, wrap to maximum representable value when going under 0
+	Invert		// Bitwise invert current stencil value
+};
+
+struct SideStencilFunc
+{
+	EStencilFunc StencilFunction = EStencilFunc::Always;
+	uint32_t StencilRef = 0;
+	uint32_t StencilFuncMask = 0xFF; // Mask used on both sides in stencil comparison, default removes its effect
+};
+
+struct SideStencilOp
+{
+	EStencilOp StencilOpStencilFail = EStencilOp::Keep;
+	EStencilOp StencilOpZFail = EStencilOp::Keep;
+	EStencilOp StencilOpZPass = EStencilOp::Keep; // Happens if both stencil and Depth are passed or if Stencil is passed and depth test disabled
+};
+
+struct DepthStencilState
+{
+	EDepthOp DepthOperation = EDepthOp::Less;
+
+	uint32_t StencilMaskFront = 0xFF;
+	uint32_t StencilMaskBack = 0xFF;
+
+	SideStencilFunc StencilFuncFront;
+	SideStencilFunc StencilFuncBack;
+
+	SideStencilOp FrontStencilOp;
+	SideStencilOp BackStencilOp;
 };
 
 class RHI
@@ -132,10 +218,13 @@ public:
 	virtual void SetDepthTest(const bool inValue) {}
 	virtual void SetDepthOp(EDepthOp inValue) {}
 
-	virtual void SetRasterizerState(const ERasterizerState inState) {}
-	virtual void SetCullState(const bool inValue) {};
+	virtual void SetRasterizerFront(const ERasterizerFront inState) {}
+	virtual void SetCullEnabled(const bool inValue) {};
+	virtual void SetCullMode(const ECullFace inFace) {};
+	virtual void SetBlendEnabled(const bool inValue) {};
 
-	virtual void TestStencilBufferStuff(class RHIFrameBuffer& inFrameBuffer) {}
+	virtual void SetBlendState(const BlendState& inBlendState) {}
+	virtual void SetDepthStencilState(const DepthStencilState& inDepthStencilState) {}
 
 	// Null FB means default FB
 	virtual void CopyFrameBufferDepth(eastl::shared_ptr<class RHIFrameBuffer> inSource = nullptr, eastl::shared_ptr<class RHIFrameBuffer> inDest = nullptr) {}

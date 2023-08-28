@@ -334,7 +334,9 @@ void TestGameMode::Init()
 	if (TransformObjPtr parentShared = GameCamera->GetParent().lock())
 	{
 		// Move the camera parent
-		parentShared->Move(glm::vec3(0.f, 0.f, 10.f));
+		parentShared->Move(glm::vec3(8.f, 18.f, -9.f));
+		parentShared->SetRotationDegrees(glm::vec3(-180.f, -80.f, -180.f));
+		GameCamera->SetRotationDegrees(glm::vec3(-25.f, 0.f, 0.f));
 	}
 
  	{
@@ -426,9 +428,10 @@ void TestGameMode::Init()
 // 	}
 
 
-	//decal = SceneHelper::CreateVisualEntity<DeferredDecal>("Decal");
-	//decal->Move(glm::vec3(4.f, -2.2f, 0.f));
-	//decal->SetScale(glm::vec3(5.4f, 2.2f, 5.f));
+	decal = SceneHelper::CreateVisualEntity<DeferredDecal>("Decal");
+	decal->Move(glm::vec3(43.f, 2.7f, -3.f));
+	decal->SetScale(glm::vec3(15.f, 9.f, 21.f));
+
 
 }
 
@@ -463,7 +466,6 @@ void TestGameMode::Tick(float inDeltaT)
  		DrawDebugHelpers::DrawDebugLine(start, start + right * 4.f, glm::vec3(1.f, 0.f, 0.f));
  		DrawDebugHelpers::DrawDebugLine(start, start + up * 4.f, glm::vec3(0.f, 1.f, 0.f));
 	}
-
 
 
 

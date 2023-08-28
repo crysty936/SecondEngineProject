@@ -265,10 +265,10 @@ OpenGLRHI::OpenGLRHI()
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 
-	glDisable(GL_STENCIL_TEST);
-
+	// Ensure that we can clear every bit plane
 	//glEnable(GL_STENCIL_TEST);
-	//glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+	glStencilMask(~0);
+	glDisable(GL_SCISSOR_TEST);
 
 	glEnable(GL_CULL_FACE);
 
@@ -718,6 +718,8 @@ void OpenGLRHI::SetViewportSize(const int32_t inWidth, const int32_t inHeight)
 void OpenGLRHI::SetClearColor(const glm::vec4 inColor)
 {
 	glClearColor(inColor.x, inColor.y, inColor.z, inColor.w);
+	glClearStencil(~0);
+	glClearDepth(1);
 }
 
 void OpenGLRHI::SwapBuffers()
@@ -727,7 +729,7 @@ void OpenGLRHI::SwapBuffers()
 
 void OpenGLRHI::ClearBuffers()
 {
-	// Set values to ClearColor
+	// Set values to their respective clear color
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }
 
@@ -1057,7 +1059,9 @@ void OpenGLRHI::ClearTexture(const RHITexture2D& inTexture, const glm::vec4& inC
 	{
 		// First 24 bits to 1 and stencil to 0
 		//const float test[] = { 1.f, 0.f};
-		const uint32_t value = 0xFFFFFF00;
+		//const uint32_t value = 0xFFFFFF00; // For depth 1 1 1 and stencil 0
+
+		const uint32_t value = 0xFFFFFFFF;	// For depth 1 1 1 and stencil 1
 		glClearTexImage(glTex.GlHandle, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, &value);
 		break;
 	}
@@ -1237,14 +1241,6 @@ eastl::shared_ptr<class RHIShader> OpenGLRHI::GetVertexOnlyShader(const RenderMa
 
 }
 
-void OpenGLRHI::TestStencilBufferStuff(class RHIFrameBuffer& inFrameBuffer)
-{
-	const GLFrameBuffer& glBuffer = static_cast<const GLFrameBuffer&>(inFrameBuffer);
-	glBindFramebuffer(GL_FRAMEBUFFER, glBuffer.GLHandle);
-
-
-}
-
 void OpenGLRHI::CopyFrameBufferDepth(eastl::shared_ptr<class RHIFrameBuffer> inSource, eastl::shared_ptr<class RHIFrameBuffer> inDest)
 {
 	// Make sure that at least one is different than default
@@ -1278,6 +1274,143 @@ void OpenGLRHI::CopyFrameBufferDepth(eastl::shared_ptr<class RHIFrameBuffer> inS
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
+void OpenGLRHI::SetBlendState(const BlendState& inBlendState)
+{
+	auto getGlBlendFun = [](const EBlendFunc& inBlendFunc) -> uint32_t
+	{
+		switch (inBlendFunc)
+		{
+		case EBlendFunc::Zero:
+			return GL_ZERO;
+		case EBlendFunc::One:
+			return GL_ONE;
+		case EBlendFunc::Src_Alpha:
+			return GL_SRC_ALPHA;
+		case EBlendFunc::One_Minus_Src_Alpha:
+			return GL_ONE_MINUS_SRC_ALPHA;
+		default:
+			ASSERT(0);
+			return 0;
+		}
+	};
+
+
+	const uint32_t srcColorBlendFuncGl = getGlBlendFun(inBlendState.SrcColorBlendFunc);
+	const uint32_t destColorBlendFuncGl = getGlBlendFun(inBlendState.DestColorBlendFunc);
+
+	const uint32_t srcAlphaBlendFuncGl = getGlBlendFun(inBlendState.SrcAlphaBlendFunc);
+	const uint32_t destAlphaBlendFuncGl = getGlBlendFun(inBlendState.DestAlphaBlendFunc);
+
+	glBlendFuncSeparate(srcColorBlendFuncGl, destColorBlendFuncGl, srcAlphaBlendFuncGl, destAlphaBlendFuncGl);
+
+	auto getGlBlendEq = [](const EBlendEquation& inBlendEq) -> uint32_t
+	{
+		switch (inBlendEq)
+		{
+		case EBlendEquation::Add:
+			return GL_FUNC_ADD;
+		case EBlendEquation::Subtract:
+			return GL_FUNC_SUBTRACT;
+		case EBlendEquation::Reverse_Subtract:
+			return GL_FUNC_REVERSE_SUBTRACT;
+		case EBlendEquation::Min:
+			return GL_MIN;
+		case EBlendEquation::Max:
+			return GL_MAX;
+		default:
+			ASSERT(0);
+			return 0;
+		}
+	};
+
+	const uint32_t blendEqColorGl = getGlBlendEq(inBlendState.ColorBlendEq);
+	const uint32_t blendEqAlphaGl = getGlBlendEq(inBlendState.AlphaBlendEq);
+
+	glBlendEquationSeparate(blendEqColorGl, blendEqAlphaGl);
+}
+
+void OpenGLRHI::SetDepthStencilState(const DepthStencilState& inDepthStencilState)
+{
+	SetDepthOp(inDepthStencilState.DepthOperation);
+
+	glStencilMaskSeparate(GL_FRONT, inDepthStencilState.StencilMaskFront);
+	glStencilMaskSeparate(GL_BACK, inDepthStencilState.StencilMaskBack);
+
+	auto getGlstencilFun = [](const EStencilFunc& inStencilFunc) -> uint32_t
+	{
+		switch (inStencilFunc)
+		{
+		case EStencilFunc::Never:
+			return GL_NEVER;
+		case EStencilFunc::Less:
+			return GL_LESS;
+		case EStencilFunc::LEqual:
+			return GL_LEQUAL;
+		case EStencilFunc::Greater:
+			return GL_GREATER;
+		case EStencilFunc::GEqual:
+			return GL_GEQUAL;
+		case EStencilFunc::NotEqual:
+			return GL_NOTEQUAL;
+		case EStencilFunc::Always:
+			return GL_ALWAYS;
+		default:
+			ASSERT(0);
+			return 0;
+		}
+	};
+
+	const uint32_t glStencilFuncFront = getGlstencilFun(inDepthStencilState.StencilFuncFront.StencilFunction);
+	const uint32_t glStencilFuncBack = getGlstencilFun(inDepthStencilState.StencilFuncBack.StencilFunction);
+
+	glStencilFuncSeparate(GL_FRONT, glStencilFuncFront, inDepthStencilState.StencilFuncFront.StencilRef, inDepthStencilState.StencilFuncFront.StencilFuncMask);
+	glStencilFuncSeparate(GL_BACK, glStencilFuncBack, inDepthStencilState.StencilFuncBack.StencilRef, inDepthStencilState.StencilFuncBack.StencilFuncMask);
+
+	auto getGlStencilOp = [](const EStencilOp& inStencilOp) -> uint32_t
+	{
+		switch (inStencilOp)
+		{
+		case EStencilOp::Keep:
+			return GL_KEEP;
+		case EStencilOp::Zero:
+			return GL_ZERO;
+		case EStencilOp::Replace:
+			return GL_REPLACE;
+		case EStencilOp::Incr:
+			return GL_INCR;
+		case EStencilOp::Incr_Wrap:
+			return GL_INCR_WRAP;
+		case EStencilOp::Decr:
+			return GL_DECR;
+		case EStencilOp::Decr_Wrap:
+			return GL_DECR_WRAP;
+		case EStencilOp::Invert:
+			return GL_INVERT;
+		default:
+			ASSERT(0);
+			return 0;
+		}
+	};
+
+	// Front
+	{
+		const uint32_t glStencilFailOpFront = getGlStencilOp(inDepthStencilState.FrontStencilOp.StencilOpStencilFail);
+		const uint32_t glZFailOpFront = getGlStencilOp(inDepthStencilState.FrontStencilOp.StencilOpZFail);
+		const uint32_t glPassOpFront = getGlStencilOp(inDepthStencilState.FrontStencilOp.StencilOpZPass);
+
+		glStencilOpSeparate(GL_FRONT, glStencilFailOpFront, glZFailOpFront, glPassOpFront);
+	}
+
+	// Back
+	{
+		const uint32_t glStencilFailOpBack = getGlStencilOp(inDepthStencilState.BackStencilOp.StencilOpStencilFail);
+		const uint32_t glZFailOpBack = getGlStencilOp(inDepthStencilState.BackStencilOp.StencilOpZFail);
+		const uint32_t glPassOpBack = getGlStencilOp(inDepthStencilState.BackStencilOp.StencilOpZPass);
+
+		glStencilOpSeparate(GL_BACK, glStencilFailOpBack, glZFailOpBack, glPassOpBack);
+	}
+}
+
 void OpenGLRHI::SetDepthWrite(const bool inValue)
 {
 	if (inValue)
@@ -1302,9 +1435,9 @@ void OpenGLRHI::SetDepthTest(const bool inValue)
 	}
 }
 
-void OpenGLRHI::SetRasterizerState(const ERasterizerState inState)
+void OpenGLRHI::SetRasterizerFront(const ERasterizerFront inState)
 {
-	if (inState == ERasterizerState::CW)
+	if (inState == ERasterizerFront::CW)
 	{
 		glFrontFace(GL_CW);
 	}
@@ -1314,7 +1447,24 @@ void OpenGLRHI::SetRasterizerState(const ERasterizerState inState)
 	}
 }
 
-void OpenGLRHI::SetCullState(const bool inValue)
+void OpenGLRHI::SetCullMode(const ECullFace inFace)
+{
+	switch (inFace)
+	{
+	case ECullFace::Front:
+	{
+		glCullFace(GL_FRONT);
+		break;
+	}
+	case ECullFace::Back:
+	{
+		glCullFace(GL_BACK);
+		break;
+	}
+	}
+}
+
+void OpenGLRHI::SetCullEnabled(const bool inValue)
 {
 	if (inValue)
 	{
@@ -1323,6 +1473,18 @@ void OpenGLRHI::SetCullState(const bool inValue)
 	else
 	{
 		glDisable(GL_CULL_FACE);
+	}
+}
+
+void OpenGLRHI::SetBlendEnabled(const bool inValue)
+{
+	if (inValue)
+	{
+		glEnable(GL_BLEND);
+	}
+	else
+	{
+		glDisable(GL_BLEND);
 	}
 }
 
