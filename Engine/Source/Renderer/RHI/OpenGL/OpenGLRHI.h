@@ -91,6 +91,7 @@ public:
 	void SetCullMode(const ECullFace inFace) override;
 	void SetCullEnabled(const bool inValue) override;
 	void SetBlendEnabled(const bool inValue) override;
+	void SetStencilTestEnabled(const bool inValue) override;
 	void SetDepthOp(EDepthOp inValue) override;
 
 	eastl::shared_ptr<class RHIShader> GetVertexOnlyShader(const class RenderMaterial& inFullMaterial) override;
@@ -102,6 +103,8 @@ public:
 
 	void SetBlendState(const BlendState& inBlendState) override;
 	void SetDepthStencilState(const DepthStencilState& inDepthStencilState) override;
+
+
 
 public:
 	// ImGui

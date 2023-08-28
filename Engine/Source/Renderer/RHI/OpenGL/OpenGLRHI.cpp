@@ -1333,8 +1333,8 @@ void OpenGLRHI::SetDepthStencilState(const DepthStencilState& inDepthStencilStat
 {
 	SetDepthOp(inDepthStencilState.DepthOperation);
 
-	glStencilMaskSeparate(GL_FRONT, inDepthStencilState.StencilMaskFront);
-	glStencilMaskSeparate(GL_BACK, inDepthStencilState.StencilMaskBack);
+	glStencilMaskSeparate(GL_FRONT, inDepthStencilState.FrontStencilMask);
+	glStencilMaskSeparate(GL_BACK, inDepthStencilState.BackStencilMask);
 
 	auto getGlstencilFun = [](const EStencilFunc& inStencilFunc) -> uint32_t
 	{
@@ -1352,6 +1352,8 @@ void OpenGLRHI::SetDepthStencilState(const DepthStencilState& inDepthStencilStat
 			return GL_GEQUAL;
 		case EStencilFunc::NotEqual:
 			return GL_NOTEQUAL;
+		case EStencilFunc::Equal:
+			return GL_EQUAL;
 		case EStencilFunc::Always:
 			return GL_ALWAYS;
 		default:
@@ -1360,11 +1362,11 @@ void OpenGLRHI::SetDepthStencilState(const DepthStencilState& inDepthStencilStat
 		}
 	};
 
-	const uint32_t glStencilFuncFront = getGlstencilFun(inDepthStencilState.StencilFuncFront.StencilFunction);
-	const uint32_t glStencilFuncBack = getGlstencilFun(inDepthStencilState.StencilFuncBack.StencilFunction);
+	const uint32_t glStencilFuncFront = getGlstencilFun(inDepthStencilState.FrontStencilFunc.StencilFunction);
+	const uint32_t glStencilFuncBack = getGlstencilFun(inDepthStencilState.BackStencilFunc.StencilFunction);
 
-	glStencilFuncSeparate(GL_FRONT, glStencilFuncFront, inDepthStencilState.StencilFuncFront.StencilRef, inDepthStencilState.StencilFuncFront.StencilFuncMask);
-	glStencilFuncSeparate(GL_BACK, glStencilFuncBack, inDepthStencilState.StencilFuncBack.StencilRef, inDepthStencilState.StencilFuncBack.StencilFuncMask);
+	glStencilFuncSeparate(GL_FRONT, glStencilFuncFront, inDepthStencilState.FrontStencilFunc.StencilRef, inDepthStencilState.FrontStencilFunc.StencilFuncMask);
+	glStencilFuncSeparate(GL_BACK, glStencilFuncBack, inDepthStencilState.BackStencilFunc.StencilRef, inDepthStencilState.BackStencilFunc.StencilFuncMask);
 
 	auto getGlStencilOp = [](const EStencilOp& inStencilOp) -> uint32_t
 	{
@@ -1485,6 +1487,18 @@ void OpenGLRHI::SetBlendEnabled(const bool inValue)
 	else
 	{
 		glDisable(GL_BLEND);
+	}
+}
+
+void OpenGLRHI::SetStencilTestEnabled(const bool inValue)
+{
+	if (inValue)
+	{
+		glEnable(GL_STENCIL_TEST);
+	}
+	else
+	{
+		glDisable(GL_STENCIL_TEST);
 	}
 }
 

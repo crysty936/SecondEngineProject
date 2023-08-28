@@ -35,9 +35,6 @@
 #include "imgui.h"
 #include "ShaderTypes.h"
 
-// TO REMOVE
-#include "glad/glad.h"
-
 static std::mutex RenderCommandsMutex;
 static std::mutex GetVAOMutex;
 
@@ -392,31 +389,44 @@ void DeferredRenderer::RenderPreStencil(const RenderCommand& inCommand)
 	// Make sure that the stencil draw(which draws just black because no fragment shader) doesn't modify the dest color or alpha
 	// Rcolor = SourceFactorColor * SourceColor + DestFactorColor * DestColor
 	// RAlpha = SourceFactorAlpha * SourceAlpha + DestFactorAlpha * DestAlpha
-	glBlendFuncSeparate(GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA, GL_ZERO, GL_ONE);
-	glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD);
+	BlendState preStencilBlendState;
+	preStencilBlendState.SrcColorBlendFunc = EBlendFunc::One_Minus_Src_Alpha;
+	preStencilBlendState.DestColorBlendFunc = EBlendFunc::Src_Alpha;
+	preStencilBlendState.SrcAlphaBlendFunc = EBlendFunc::Zero;
+	preStencilBlendState.DestAlphaBlendFunc = EBlendFunc::Zero;
 
+	preStencilBlendState.ColorBlendEq = EBlendEquation::Add;
+	preStencilBlendState.AlphaBlendEq = EBlendEquation::Add;
 
+	RHI::Get()->SetBlendState(preStencilBlendState);
 
 	// Carmack's reverse
-	// The equal allows the stencil op to work on the exact depth values where the decal touches
-	RHI::Get()->SetDepthOp(EDepthOp::LessOrEqual);
+	DepthStencilState preStencilDepthStencilState;
 
 	// Mask that tells which bits can be written to in the stencil buffer
-	glStencilMask(0x01);
-	//glStencilMaskSeparate(GL_FRONT, 0x01);
-	//glStencilMaskSeparate(GL_BACK, 0x01);
+	preStencilDepthStencilState.FrontStencilMask = 0x01;
+	preStencilDepthStencilState.BackStencilMask = 0x01;
+
+	// The equal allows the stencil op to work on the exact depth values where the decal touches
+	preStencilDepthStencilState.DepthOperation = EDepthOp::LessOrEqual;
 
 	// Ensure that we don't care about existing stencil test values
-	//glStencilFunc(GL_ALWAYS, 0, 0);
-	glStencilFuncSeparate(GL_FRONT, GL_ALWAYS, 0, 0);
-	glStencilFuncSeparate(GL_BACK, GL_ALWAYS, 0, 0);
+	preStencilDepthStencilState.FrontStencilFunc.StencilFunction = EStencilFunc::Always;
+	preStencilDepthStencilState.BackStencilFunc.StencilFunction = EStencilFunc::Always;
 
 	// Write stencil mask for values that fail or pass stencil test(all) and invert those that pass stencil and depth(values where depth is smaller than existing depth, 
 	// thus setting ~0x01 to all values stencil fragments that are not touching an existing depth
 	//glStencilOp(GL_KEEP, GL_KEEP, GL_INVERT);
-	glStencilOpSeparate(GL_FRONT,GL_KEEP, GL_ZERO, GL_KEEP);
-	glStencilOpSeparate(GL_BACK,GL_KEEP, GL_KEEP, GL_ZERO);
+	preStencilDepthStencilState.FrontStencilOp.StencilOpStencilFail = EStencilOp::Keep;
+	preStencilDepthStencilState.FrontStencilOp.StencilOpZFail = EStencilOp::Zero;
+	preStencilDepthStencilState.FrontStencilOp.StencilOpZPass = EStencilOp::Keep;
 
+	preStencilDepthStencilState.BackStencilOp.StencilOpStencilFail = EStencilOp::Keep;
+	preStencilDepthStencilState.BackStencilOp.StencilOpZFail = EStencilOp::Keep;
+	preStencilDepthStencilState.BackStencilOp.StencilOpZPass = EStencilOp::Zero;
+
+
+	RHI::Get()->SetDepthStencilState(preStencilDepthStencilState);
 	switch (inCommand.DrawType)
 	{
 	case EDrawType::DrawElements:
@@ -449,19 +459,17 @@ void DeferredRenderer::RenderPreStencil(const RenderCommand& inCommand)
 	material->UnbindBuffers(EShaderType::Sh_Vertex);
 	RHI::Get()->UnbindShader(*(material->Shader));
 
-	// Reset to default blend func
-	glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
-	glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD);
-
+	BlendState defaultBlendState;
+	RHI::Get()->SetBlendState(defaultBlendState);
 	RHI::Get()->SetBlendEnabled(false);
 
-	glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-	glStencilMask(~0);
 	RHI::Get()->SetCullEnabled(true);
 	RHI::Get()->SetCullMode(ECullFace::Back);
 	RHI::Get()->SetDepthOp(EDepthOp::Less);
 
 }
+
+#define USE_DECAL_SPHERE_RADIUS_OPTIMIZATION 0
 
 void DeferredRenderer::DrawDecals(const eastl::vector<RenderCommand>& inCommands)
 {
@@ -481,31 +489,30 @@ void DeferredRenderer::DrawDecals(const eastl::vector<RenderCommand>& inCommands
 		DrawDebugHelpers::DrawBoxArray(projCorners, false);
 
 		// Pre Stencil
-		glEnable(GL_STENCIL_TEST);
+		RHI::Get()->SetStencilTestEnabled(true);
 
 		RenderPreStencil(renderCommand);
 
 		// Loose optimization that compares camera against decal cube main diagonal(radius of sphere that encompasses bounding box)
 		// Allows effiecent depth test and face cull when we know for sure that we are not nowhere near inside the decal
-
+#if USE_DECAL_SPHERE_RADIUS_OPTIMIZATION
 		// Is camera inside decal
-		//const glm::vec3 cameraPos = SceneManager::Get().GetCurrentScene().GetCurrentCamera()->GetAbsoluteTransform().Translation;
-		//const glm::vec3 decalPos = parent->GetAbsoluteTransform().Translation;
+		const glm::vec3 cameraPos = SceneManager::Get().GetCurrentScene().GetCurrentCamera()->GetAbsoluteTransform().Translation;
+		const glm::vec3 decalPos = parent->GetAbsoluteTransform().Translation;
 
-		//const float cameraDecalDistanceSquared = glm::lengthSquared(cameraPos - decalPos);
+		const float cameraDecalDistanceSquared = glm::lengthSquared(cameraPos - decalPos);
 
-		//const glm::vec3 decalXScaledAxis = glm::vec3(decalToWorld[0][0], decalToWorld[0][1], decalToWorld[0][2]);
-		//const glm::vec3 decalYScaledAxis = glm::vec3(decalToWorld[1][0], decalToWorld[1][1], decalToWorld[1][2]);
-		//const glm::vec3 decalZScaledAxis = glm::vec3(decalToWorld[2][0], decalToWorld[2][1], decalToWorld[2][2]);
+		const glm::vec3 decalXScaledAxis = glm::vec3(decalToWorld[0][0], decalToWorld[0][1], decalToWorld[0][2]);
+		const glm::vec3 decalYScaledAxis = glm::vec3(decalToWorld[1][0], decalToWorld[1][1], decalToWorld[1][2]);
+		const glm::vec3 decalZScaledAxis = glm::vec3(decalToWorld[2][0], decalToWorld[2][1], decalToWorld[2][2]);
 
-		//const float conservativeRadius = glm::sqrt(glm::lengthSquared(decalXScaledAxis) + glm::lengthSquared(decalYScaledAxis) + glm::lengthSquared(decalZScaledAxis));
-		//const float decalBoundingSphereRadius = (conservativeRadius + CAMERA_NEAR * 2.f) * (conservativeRadius + CAMERA_NEAR * 2.f);
-		//const bool bInsideDecal = cameraDecalDistanceSquared < decalBoundingSphereRadius;
+		const float conservativeRadius = glm::sqrt(glm::lengthSquared(decalXScaledAxis) + glm::lengthSquared(decalYScaledAxis) + glm::lengthSquared(decalZScaledAxis));
+		const float decalBoundingSphereRadius = (conservativeRadius + CAMERA_NEAR * 2.f) * (conservativeRadius + CAMERA_NEAR * 2.f);
+		const bool bInsideDecal = cameraDecalDistanceSquared < decalBoundingSphereRadius;
 
-
-		//if (bInsideDecal)
-		//{
-
+		if (bInsideDecal)
+		{
+#endif
 			// CW ensures that there's always a face of the decal cube that's visible(the inside one)
 			//RHI::Get()->SetRasterizerFront(ERasterizerFront::CW);
 			RHI::Get()->SetCullMode(ECullFace::Front);
@@ -515,29 +522,35 @@ void DeferredRenderer::DrawDecals(const eastl::vector<RenderCommand>& inCommands
 			//RHI::Get()->SetDepthOp(EDepthOp::Always);
 			RHI::Get()->SetDepthTest(false);
 
-		//}
-		//else
-		//{
-			//RHI::Get()->SetDepthOp(EDepthOp::Less);
-			//RHI::Get()->SetRasterizerState(ERasterizerState::CCW);
-		//}
+#if USE_DECAL_SPHERE_RADIUS_OPTIMIZATION
+		}
+		else
+		{
+			RHI::Get()->SetDepthOp(EDepthOp::Less);
+			RHI::Get()->SetCullMode(ECullFace::Back);
+		}
+#endif
 
+		DepthStencilState drawState;
+		// Test against 0x01.
+		drawState.FrontStencilFunc.StencilFunction = EStencilFunc::Equal;
+		drawState.FrontStencilFunc.StencilRef = 0x01; // Test against 1
+		drawState.FrontStencilFunc.StencilFuncMask = 0x01; // Sample the first bit
 
-			// Test against 0x01. We don't care about the second mask so just use 0xFF
-		glStencilFunc(GL_EQUAL, 0x01, 0x01);
-		//glStencilFuncSeparate(GL_FRONT, GL_EQUAL, 0x01, 0xFF);
-		//glStencilFuncSeparate(GL_BACK, GL_EQUAL, 0x01, 0xFF);
+		drawState.BackStencilFunc = drawState.FrontStencilFunc;
+
 		// Write 0 to the stencil test, we have used the result, just cleanup
-		glStencilOp(GL_ZERO, GL_KEEP, GL_ZERO);
+		drawState.FrontStencilOp.StencilOpStencilFail = EStencilOp::Zero;
+		drawState.FrontStencilOp.StencilOpZFail = EStencilOp::Zero;
+		drawState.FrontStencilOp.StencilOpZPass = EStencilOp::Zero;
+		drawState.BackStencilOp = drawState.FrontStencilOp;
+
+		RHI::Get()->SetDepthStencilState(drawState);
 
 		DrawCommand(renderCommand);
-
-		//DrawDebugHelpers::
 	}
 
-	glDisable(GL_STENCIL_TEST);
-
-	//RHI::Get()->SetRasterizerFront(ERasterizerFront::CCW);
+	RHI::Get()->SetStencilTestEnabled(false);
 	RHI::Get()->SetCullMode(ECullFace::Back);
 	RHI::Get()->SetDepthOp(EDepthOp::Less);
 	RHI::Get()->SetDepthTest(true);

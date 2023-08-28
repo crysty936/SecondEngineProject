@@ -71,13 +71,13 @@ enum class EBlendEquation
 
 struct BlendState
 {
-	EBlendFunc SrcColorBlendFunc;
-	EBlendFunc DestColorBlendFunc;
-	EBlendFunc SrcAlphaBlendFunc;
-	EBlendFunc DestAlphaBlendFunc;
+	EBlendFunc SrcColorBlendFunc = EBlendFunc::Src_Alpha;
+	EBlendFunc DestColorBlendFunc = EBlendFunc::One_Minus_Src_Alpha;
+	EBlendFunc SrcAlphaBlendFunc = EBlendFunc::One;
+	EBlendFunc DestAlphaBlendFunc = EBlendFunc::Zero;
 
-	EBlendEquation ColorBlendEq;
-	EBlendEquation AlphaBlendEq;
+	EBlendEquation ColorBlendEq = EBlendEquation::Add;
+	EBlendEquation AlphaBlendEq = EBlendEquation::Add;
 };
 
 enum class EStencilFunc
@@ -88,6 +88,7 @@ enum class EStencilFunc
 	Greater,	// Passes if (ref & mask) > (stencil & mask)
 	GEqual,		// Passes if (ref & mask) >= (stencil & mask)
 	NotEqual,	// Passes if (ref & mask) != (stencil & mask)
+	Equal,		// Passes if (ref & mask) == (stencil & mask)
 	Always		// Always passes
 };
 
@@ -121,11 +122,11 @@ struct DepthStencilState
 {
 	EDepthOp DepthOperation = EDepthOp::Less;
 
-	uint32_t StencilMaskFront = 0xFF;
-	uint32_t StencilMaskBack = 0xFF;
+	uint32_t FrontStencilMask = 0xFF;
+	uint32_t BackStencilMask = 0xFF;
 
-	SideStencilFunc StencilFuncFront;
-	SideStencilFunc StencilFuncBack;
+	SideStencilFunc FrontStencilFunc;
+	SideStencilFunc BackStencilFunc;
 
 	SideStencilOp FrontStencilOp;
 	SideStencilOp BackStencilOp;
@@ -222,6 +223,7 @@ public:
 	virtual void SetCullEnabled(const bool inValue) {};
 	virtual void SetCullMode(const ECullFace inFace) {};
 	virtual void SetBlendEnabled(const bool inValue) {};
+	virtual void SetStencilTestEnabled(const bool inValue) {};
 
 	virtual void SetBlendState(const BlendState& inBlendState) {}
 	virtual void SetDepthStencilState(const DepthStencilState& inDepthStencilState) {}
