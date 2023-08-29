@@ -381,8 +381,8 @@ void DeferredRenderer::RenderPreStencil(const RenderCommand& inCommand)
 
 
 	// Disable culling
-	RHI::Get()->SetCullEnabled(false);
-	//RHI::Get()->SetCullMode(ECullFace::Front);
+	//RHI::Get()->SetCullEnabled(false);
+	RHI::Get()->SetCullMode(ECullFace::Front);
 	//RHI::Get()->SetCullMode(ECullFace::Back);
 	RHI::Get()->SetBlendEnabled(true);
 
@@ -407,8 +407,8 @@ void DeferredRenderer::RenderPreStencil(const RenderCommand& inCommand)
 	preStencilDepthStencilState.FrontStencilMask = 0x01;
 	preStencilDepthStencilState.BackStencilMask = 0x01;
 
-	// The equal allows the stencil op to work on the exact depth values where the decal touches
-	preStencilDepthStencilState.DepthOperation = EDepthOp::LessOrEqual;
+	// This is one of the main things that allows it to work - it has to be opposite to what the other draws use
+	preStencilDepthStencilState.DepthOperation = EDepthOp::GreaterOrEqual;
 
 	// Ensure that we don't care about existing stencil test values
 	preStencilDepthStencilState.FrontStencilFunc.StencilFunction = EStencilFunc::Always;
@@ -418,12 +418,12 @@ void DeferredRenderer::RenderPreStencil(const RenderCommand& inCommand)
 	// thus setting ~0x01 to all values stencil fragments that are not touching an existing depth
 	//glStencilOp(GL_KEEP, GL_KEEP, GL_INVERT);
 	preStencilDepthStencilState.FrontStencilOp.StencilOpStencilFail = EStencilOp::Keep;
-	preStencilDepthStencilState.FrontStencilOp.StencilOpZFail = EStencilOp::Zero;
-	preStencilDepthStencilState.FrontStencilOp.StencilOpZPass = EStencilOp::Keep;
+	preStencilDepthStencilState.FrontStencilOp.StencilOpZFail = EStencilOp::Keep;
+	preStencilDepthStencilState.FrontStencilOp.StencilOpZPass = EStencilOp::Invert;
 
 	preStencilDepthStencilState.BackStencilOp.StencilOpStencilFail = EStencilOp::Keep;
 	preStencilDepthStencilState.BackStencilOp.StencilOpZFail = EStencilOp::Keep;
-	preStencilDepthStencilState.BackStencilOp.StencilOpZPass = EStencilOp::Zero;
+	preStencilDepthStencilState.BackStencilOp.StencilOpZPass = EStencilOp::Invert;
 
 
 	RHI::Get()->SetDepthStencilState(preStencilDepthStencilState);

@@ -718,8 +718,8 @@ void OpenGLRHI::SetViewportSize(const int32_t inWidth, const int32_t inHeight)
 void OpenGLRHI::SetClearColor(const glm::vec4 inColor)
 {
 	glClearColor(inColor.x, inColor.y, inColor.z, inColor.w);
-	glClearStencil(~0);
 	glClearDepth(1);
+	glClearStencil(0);
 }
 
 void OpenGLRHI::SwapBuffers()
@@ -1059,9 +1059,9 @@ void OpenGLRHI::ClearTexture(const RHITexture2D& inTexture, const glm::vec4& inC
 	{
 		// First 24 bits to 1 and stencil to 0
 		//const float test[] = { 1.f, 0.f};
-		//const uint32_t value = 0xFFFFFF00; // For depth 1 1 1 and stencil 0
+		const uint32_t value = 0xFFFFFF00; // For depth 1 1 1 and stencil 0
 
-		const uint32_t value = 0xFFFFFFFF;	// For depth 1 1 1 and stencil 1
+		//const uint32_t value = 0xFFFFFFFF;	// For depth 1 1 1 and stencil 1
 		glClearTexImage(glTex.GlHandle, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, &value);
 		break;
 	}
