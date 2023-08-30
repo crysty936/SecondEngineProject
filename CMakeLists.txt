@@ -50,7 +50,8 @@ source_group(TREE ${CMAKE_CURRENT_LIST_DIR} FILES ${source_files})
 
 # OBJECT to make sure that all the project's files and statics are used and linked as if they were from the executable's project, that is, no matter if they are used or not.( Eg. for internal 
 # plugins which are not referenced anywhere but self-register.
-add_library(SecondEngineProject OBJECT ${source_files})
+
+add_library(SecondEngineProject STATIC ${source_files})
 
 target_link_libraries(SecondEngineProject PUBLIC ${extra_libs})
 

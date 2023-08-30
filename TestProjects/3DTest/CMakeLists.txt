@@ -10,7 +10,6 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 add_subdirectory(../.. ${CMAKE_CURRENT_LIST_DIR}/EngineBuild)
-list(APPEND extra_libs SecondEngineProject)
 
 # used to add all .cpp and .h files under source
 file(GLOB_RECURSE source_files CONFIGURE_DEPENDS "${CMAKE_CURRENT_LIST_DIR}/Source/*.cpp" "${CMAKE_CURRENT_LIST_DIR}/Source/*.h")
@@ -20,7 +19,7 @@ source_group(TREE ${CMAKE_CURRENT_LIST_DIR} FILES ${source_files})
 
 add_executable(3DTest ${source_files})
 
-target_link_libraries(3DTest PUBLIC ${extra_libs})
+target_link_libraries(3DTest PUBLIC "$<LINK_LIBRARY:WHOLE_ARCHIVE,SecondEngineProject>")
 
 list(APPEND EXTRA_INCLUDES ${CMAKE_CURRENT_LIST_DIR}/Source)	
 
