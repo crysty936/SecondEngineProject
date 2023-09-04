@@ -113,7 +113,7 @@ D3D12_RECT m_scissorRect;
 ComPtr<IDXGISwapChain3> m_swapChain;
 ComPtr<ID3D12Device> m_device;
 ComPtr<ID3D12Resource> m_renderTargets[FrameCount];
-ComPtr<ID3D12CommandAllocator> m_commandAllocator;
+ComPtr<ID3D12CommandAllocator> m_commandAllocators[FrameCount];
 ComPtr<ID3D12CommandQueue> m_commandQueue;
 ComPtr<ID3D12RootSignature> m_rootSignature;
 ComPtr<ID3D12DescriptorHeap> m_rtvHeap;
@@ -143,8 +143,14 @@ UINT8* m_pCbvDataBegin;
 UINT m_frameIndex;
 HANDLE m_fenceEvent;
 ComPtr<ID3D12Fence> m_fence;
-//UINT64 m_fenceValues[FrameCount];
+
+#define FRAME_BUFFERING 1
+
+#if FRAME_BUFFERING
+UINT64 m_fenceValues[FrameCount];
+#else
 UINT64 m_fenceValue;
+#endif
 
 
 
@@ -256,10 +262,10 @@ void InitPipeline()
 			m_device->CreateRenderTargetView(m_renderTargets[n].Get(), nullptr, rtvHandle);
 
 			rtvHandle.ptr += size_t(m_rtvDescriptorSize);
+			DXAssert(m_device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&m_commandAllocators[n])));
 		}
 	}
 
-	DXAssert(m_device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&m_commandAllocator)));
 }
 
 //------------------------------------------------------------------------------------------------
@@ -564,7 +570,7 @@ D3D12RHI::D3D12RHI()
 	DXAssert(m_device->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&m_pipelineState)));
 
 	// Create the command list.
-	DXAssert(m_device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_commandAllocator.Get(), m_pipelineState.Get(), IID_PPV_ARGS(&m_commandList)));
+	DXAssert(m_device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_commandAllocators[m_frameIndex].Get(), m_pipelineState.Get(), IID_PPV_ARGS(&m_commandList)));
 
 	// Command lists are created in the recording state, but there is nothing
 	// to record yet. The main loop expects it to be closed, so close it now.
@@ -689,10 +695,15 @@ D3D12RHI::D3D12RHI()
 
 	// Create synchronization objects and wait until assets have been uploaded to the GPU.
 	{
-		//DXAssert(m_device->CreateFence(m_fenceValues[m_frameIndex], D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_fence)));
-		//m_fenceValues[m_frameIndex]++;
+		m_fenceValues[0] = m_fenceValues[1] = 1;
+
+#if FRAME_BUFFERING
+		DXAssert(m_device->CreateFence(m_fenceValues[m_frameIndex], D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_fence)));
+		m_fenceValues[m_frameIndex]++;
+#else
 		DXAssert(m_device->CreateFence(m_fenceValue, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_fence)));
 		m_fenceValue++;
+#endif
 
 		// Create an event handle to use for frame synchronization.
 		m_fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
@@ -715,24 +726,29 @@ D3D12RHI::D3D12RHI()
 
 }
 
-D3D12RHI::~D3D12RHI() = default;
+D3D12RHI::~D3D12RHI()
+{
+	WaitForPreviousFrame();
 
-//void D3D12RHI::WaitForPreviousFrame()
-//{
-//	const UINT64 currentFrameRequiredFenceValue = m_fenceValues[m_frameIndex];
-//	// We want that fence to be set to that value from the GPU side
-//	DXAssert(m_commandQueue->Signal(m_fence.Get(), m_fenceValues[m_frameIndex]));
-//
-//	// Tell m_fence to raise this event once it's equal fence value
-//	DXAssert(m_fence->SetEventOnCompletion(m_fenceValues[m_frameIndex], m_fenceEvent));
-//
-//	// Wait until that event is raised
-//	WaitForSingleObject(m_fenceEvent, INFINITE);
-//
-//	m_fenceValues[m_frameIndex]++;
-//}
+	CloseHandle(m_fenceEvent);
+}
 
+#if FRAME_BUFFERING
+void D3D12RHI::WaitForPreviousFrame()
+{
+	const UINT64 currentFrameRequiredFenceValue = m_fenceValues[m_frameIndex];
+	// We want that fence to be set to that value from the GPU side
+	DXAssert(m_commandQueue->Signal(m_fence.Get(), m_fenceValues[m_frameIndex]));
 
+	// Tell m_fence to raise this event once it's equal fence value
+	DXAssert(m_fence->SetEventOnCompletion(m_fenceValues[m_frameIndex], m_fenceEvent));
+
+	// Wait until that event is raised
+	WaitForSingleObject(m_fenceEvent, INFINITE);
+
+	m_fenceValues[m_frameIndex]++;
+}
+#else
 void D3D12RHI::WaitForPreviousFrame()
 {
 	// WAITING FOR THE FRAME TO COMPLETE BEFORE CONTINUING IS NOT BEST PRACTICE.
@@ -750,7 +766,8 @@ void D3D12RHI::WaitForPreviousFrame()
 	DXAssert(m_commandQueue->Signal(m_fence.Get(), fence));
 	m_fenceValue++;
 
-	if (m_fence->GetCompletedValue() < fence)
+	const UINT64 fenceValue = m_fence->GetCompletedValue();
+	if (fenceValue < fence)
 	{
 		// Tell m_fence to raise this event once it's equal fence value
 		DXAssert(m_fence->SetEventOnCompletion(fence, m_fenceEvent));
@@ -761,30 +778,38 @@ void D3D12RHI::WaitForPreviousFrame()
 
 	m_frameIndex = m_swapChain->GetCurrentBackBufferIndex();
 }
+#endif
 
 
+#if FRAME_BUFFERING
 // Prepare to render the next frame.
 void D3D12RHI::MoveToNextFrame()
 {
-	//const UINT64 submittedFrameFenceValue = m_fenceValues[m_frameIndex];
+	const UINT64 submittedFrameFenceValue = m_fenceValues[m_frameIndex];
 
-	//// Place signal for frame that was just submitted
-	//DXAssert(m_commandQueue->Signal(m_fence.Get(), submittedFrameFenceValue));
+	// Place signal for frame that was just submitted
+	DXAssert(m_commandQueue->Signal(m_fence.Get(), submittedFrameFenceValue));
 
-	//// Move onto next frame. Backbuffer index was changed as Present was called before this
-	//m_frameIndex = m_swapChain->GetCurrentBackBufferIndex();
+	// Move onto next frame. Backbuffer index was changed as Present was called before this
+	m_frameIndex = m_swapChain->GetCurrentBackBufferIndex();
 
-	//const UINT64 presentFenceValue = m_fence->GetCompletedValue();
-	//const UINT64 toStartFrameFenceValue = m_fenceValues[m_frameIndex];
+	const UINT64 presentFenceValue = m_fence->GetCompletedValue();
+	if (presentFenceValue == UINT64_MAX)
+	{
+		__debugbreak();
+	}
 
-	//if (presentFenceValue < toStartFrameFenceValue)
-	//{
-	//	DXAssert(m_fence->SetEventOnCompletion(toStartFrameFenceValue, m_fenceEvent));
-	//	WaitForSingleObjectEx(m_fenceEvent, INFINITE, false);
-	//}
+	const UINT64 toStartFrameFenceValue = m_fenceValues[m_frameIndex];
 
-	//m_fenceValues[m_frameIndex] = submittedFrameFenceValue + 1;
+	if (presentFenceValue < toStartFrameFenceValue)
+	{
+		DXAssert(m_fence->SetEventOnCompletion(toStartFrameFenceValue, m_fenceEvent));
+		WaitForSingleObjectEx(m_fenceEvent, INFINITE, false);
+	}
+
+	m_fenceValues[m_frameIndex] = submittedFrameFenceValue + 1;
 }
+#endif
 
 
 
@@ -806,12 +831,12 @@ void D3D12RHI::Test()
 	// Command list allocators can only be reset when the associated 
 	// command lists have finished execution on the GPU; apps should use 
 	// fences to determine GPU execution progress.
-	DXAssert(m_commandAllocator->Reset());
+	DXAssert(m_commandAllocators[m_frameIndex]->Reset());
 
 	// However, when ExecuteCommandList() is called on a particular command 
 	// list, that command list can then be reset at any time and must be before 
 	// re-recording.
-	DXAssert(m_commandList->Reset(m_commandAllocator.Get(), m_pipelineState.Get()));
+	DXAssert(m_commandList->Reset(m_commandAllocators[m_frameIndex].Get(), m_pipelineState.Get()));
 
 	m_commandList->SetGraphicsRootSignature(m_rootSignature.Get());
 	m_commandList->RSSetViewports(1, &m_viewport);
@@ -870,6 +895,10 @@ void D3D12RHI::Test()
 
 	m_swapChain->Present(1, 0);
 
+#if FRAME_BUFFERING
+	MoveToNextFrame();
+#else
 	WaitForPreviousFrame();
+#endif
 
 }
