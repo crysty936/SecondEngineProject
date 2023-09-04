@@ -55,6 +55,9 @@ add_library(SecondEngineProject STATIC ${source_files})
 
 target_link_libraries(SecondEngineProject PUBLIC ${extra_libs})
 
+target_link_libraries(SecondEngineProject PRIVATE "d3d12.lib")
+target_link_libraries(SecondEngineProject PRIVATE "dxgi.lib")
+
 list(APPEND EXTRA_INCLUDES ${CMAKE_CURRENT_LIST_DIR}/Engine/Source)	
 
 target_include_directories(SecondEngineProject PUBLIC

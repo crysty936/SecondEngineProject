@@ -239,6 +239,11 @@ public:
 	virtual void ImGuiBeginFrame() {}
 	virtual void ImGuiRenderDrawData() {}
 
+
+	// Test stuff
+	virtual void Test() {}
+	//
+
 public:
 	inline static class RHI* Instance = nullptr;
 	static class RHI* Get() { return Instance; }
