@@ -200,6 +200,17 @@ public:
 	}
 };
 
+class FullScreenQuadMat : public RenderMaterial
+{
+
+
+public:
+	void SetRequiredUniforms() override
+	{
+	}
+
+};
+
 FullScreenQuad::FullScreenQuad(const eastl::string& inName)
 	: DrawableObject(inName)
 {
@@ -236,9 +247,11 @@ void FullScreenQuad::CreateCommand()
 		dataContainer->VBuffer = vb;
 	}
 
+
+
 	MaterialsManager& matManager = MaterialsManager::Get();
 	bool materialExists = false;
-	eastl::shared_ptr<RenderMaterial> material = matManager.GetOrAddMaterial("ScreenQuad_Material", materialExists);
+	eastl::shared_ptr<FullScreenQuadMat> material = matManager.GetOrAddMaterial<FullScreenQuadMat>("ScreenQuad_Material", materialExists);
 
 	if (!materialExists)
 	{

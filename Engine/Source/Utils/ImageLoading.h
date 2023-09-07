@@ -9,7 +9,7 @@
 
 struct ImageData
 {
-	unsigned char* RawData = nullptr;
+	void* RawData = nullptr;
 	int32_t NrChannels = 0;
 	int32_t Width = 0;
 	int32_t Height = 0;

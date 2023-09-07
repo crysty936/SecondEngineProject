@@ -363,6 +363,83 @@ eastl::shared_ptr<RHIUniformBuffer> OpenGLRHI::CreateUniformBuffer(size_t inSize
 	return newBuffer;
 }
 
+eastl::shared_ptr<class RHITexture2D> OpenGLRHI::CreateTexture2D(const uint32_t inWidth, const uint32_t inHeight)
+{
+	uint32_t texHandle = 0;
+	glGenTextures(1, &texHandle);
+
+	eastl::shared_ptr<GLTexture2D> newTexture = eastl::make_shared<GLTexture2D>(texHandle);
+
+	glBindTexture(GL_TEXTURE_2D, texHandle);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, inWidth, inHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	return newTexture;
+}
+
+void OpenGLRHI::UploadDataToTexture(RHITexture2D& inTexture, const ImageData& inData, const bool inGenerateMips)
+{
+	GLTexture2D& tex = static_cast<GLTexture2D&>(inTexture);
+
+	if (!inData.RawData)
+	{
+		return;
+	}
+
+	tex.NrChannels = inData.NrChannels;
+	tex.Width = inData.Width;
+	tex.Height = inData.Height;
+
+	glBindTexture(GL_TEXTURE_2D, tex.GlHandle);
+
+	GLenum imageFormat = 0;
+	switch (inData.NrChannels)
+	{
+	case 1:
+	{
+		imageFormat = GL_RED;
+		break;
+	}
+	case 3:
+	{
+		imageFormat = GL_RGB;
+		break;
+	}
+	case 4:
+	{
+		imageFormat = GL_RGBA;
+		break;
+	}
+	}
+
+	//if (inSRGB)
+	//{
+		//glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB8_ALPHA8, data.Width, data.Height, 0, imageFormat, GL_UNSIGNED_BYTE, data.RawData);
+	//}
+	//else
+	//{
+	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, inData.Width, inData.Height, 0, imageFormat, GL_UNSIGNED_BYTE, inData.RawData);
+	//}
+
+	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, inData.Width, inData.Height, imageFormat, GL_UNSIGNED_BYTE, inData.RawData);
+
+
+	if (inGenerateMips)
+	{
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+
 eastl::shared_ptr<RHITexture2D> OpenGLRHI::CreateAndLoadTexture2D(const eastl::string& inDataPath, const bool inSRGB)
 {
 	uint32_t texHandle = 0;

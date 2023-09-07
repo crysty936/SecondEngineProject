@@ -10,6 +10,5 @@ uniform sampler2D quadTexture;
 
 void main()
 {
-	float depthValue = texture(quadTexture, inTexCoords).r;
-	FragColor = vec4(vec3(depthValue), 1.0);
+	FragColor = texture(quadTexture, ps_in.TexCoords);
 }

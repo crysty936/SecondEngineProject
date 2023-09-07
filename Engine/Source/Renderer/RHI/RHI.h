@@ -179,6 +179,8 @@ public:
 
 	virtual eastl::shared_ptr<class RHIShader> CreateShaderFromPath(const eastl::vector<ShaderSourceInput> inPathShaderSources, const VertexInputLayout& inInputLayout) { return nullptr; }
 
+	virtual eastl::shared_ptr<class RHITexture2D> CreateTexture2D(const uint32_t inWidth, const uint32_t inHeight) { return nullptr; }
+	virtual void UploadDataToTexture(class RHITexture2D& inTexture, const struct ImageData& inData, const bool inGenerateMips) {}
 	virtual eastl::shared_ptr<class RHITexture2D> CreateAndLoadTexture2D(const eastl::string& inDataPath, const bool inSRGB) { return nullptr; }
 
 	/**  A frame buffer that already has Depth Stencil attachments, can be used with texture color attachment */

@@ -408,13 +408,20 @@ void TestGameMode::Init()
  	//FloorModel->Move(glm::vec3(0.f, -2.f, 0.f));
 
 
-	FloorModel = SceneHelper::CreateVisualEntity<AssimpModel3D>("../Data/Models/Sponza/Sponza.gltf", "Sponza");
-	FloorModel->Move(glm::vec3(0.f, -2.f, 0.f));
-	FloorModel->SetScale(glm::vec3(10.f, 10.f, 10.f));
+	//FloorModel = SceneHelper::CreateVisualEntity<AssimpModel3D>("../Data/Models/Sponza/Sponza.gltf", "Sponza");
+	//FloorModel->Move(glm::vec3(0.f, -2.f, 0.f));
+	//FloorModel->SetScale(glm::vec3(10.f, 10.f, 10.f));
 
-	SphereModel = SceneHelper::CreateVisualEntity<AssimpModel3DEditorSphere>("../Data/Models/Sphere/scene.gltf", "EditorSphere");
-	SphereModel->Move(glm::vec3(0.f, -2.f, 0.f));
-	//SphereModel->SetScale(glm::vec3(10.f, 10.f, 10.f));
+ 	//FloorModel = SceneHelper::CreateVisualEntity<AssimpModel3D>("../Data/Models/high_poly_blender_monkey_suzanne/scene.gltf", "Monke");
+ 	//FloorModel->Move(glm::vec3(0.f, -2.f, 0.f));
+ 	//FloorModel->SetScale(glm::vec3(10.f, 10.f, 10.f));
+
+	
+	
+
+
+	//SphereModel = SceneHelper::CreateVisualEntity<AssimpModel3DEditorSphere>("../Data/Models/Sphere/scene.gltf", "EditorSphere");
+	//SphereModel->Move(glm::vec3(0.f, -2.f, 0.f));
 
 
 // 	{
@@ -426,11 +433,6 @@ void TestGameMode::Init()
 // 
 // 		PointLight->SetRelativeLocation({ 0.5f, 1.0f, -52.f });
 // 	}
-
-
-	decal = SceneHelper::CreateVisualEntity<DeferredDecal>("Decal");
-	decal->Move(glm::vec3(43.f, 2.7f, -3.f));
-	decal->SetScale(glm::vec3(15.f, 9.f, 21.f));
 
 
 }

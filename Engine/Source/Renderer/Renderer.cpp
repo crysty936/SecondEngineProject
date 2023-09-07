@@ -3,12 +3,14 @@
 #include "RHI/RHI.h"
 #include "ForwardRenderer.h"
 #include "DeferredRenderer.h"
+#include "PathTracingRenderer.h"
 #include "Window/WindowsWindow.h"
 #include "Core/EngineCore.h"
 
-#define CHOSEN_RENDERER 2
+#define CHOSEN_RENDERER 3
 #define RENDERER_FORWARD 1
 #define RENDERER_DEFERRED 2
+#define RENDERER_PATHTRACING 3
 
 
 Renderer::Renderer(const WindowProperties& inMainWindowProperties)
@@ -30,6 +32,8 @@ void Renderer::Init(const WindowProperties& inMainWindowProperties)
 	Instance = new ForwardRenderer{ inMainWindowProperties };
 #elif CHOSEN_RENDERER == RENDERER_DEFERRED
 	Instance = new DeferredRenderer{ inMainWindowProperties };
+#elif CHOSEN_RENDERER == RENDERER_PATHTRACING
+	Instance = new PathTracingRenderer{ inMainWindowProperties };
 #endif
 
 	Instance->InitInternal();
