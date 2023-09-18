@@ -86,77 +86,119 @@ void PathTracingRenderer::InitInternal()
 	VisualizeQuad->GetCommand().Material->ExternalTextures.push_back(RHITexture);
 	FinalImageData = new uint32_t[props.Width * props.Height];
 
-	const uint32_t color = ConvertToRGBA(glm::vec4(1.f, 0.f, 0.f, 1.f));
-	const uint32_t color2 = ConvertToRGBA(glm::vec4(0.f, 0.f, 1.f, 1.f));
-	//const uint32_t color = 0xFFFFFFFF;
+}
 
-	for (int32_t i = 0; i < props.Height; ++i)
+struct Sphere
+{
+	glm::vec3 Origin = glm::vec3(0.f, 0.f, 0.f);
+	float Radius = 0.f;
+};
+
+struct PathTracingRay
+{
+	glm::vec3 Origin = glm::vec3(0.f, 0.f, 0.f);
+	glm::vec3 Direction = glm::vec3(0.f, 0.f, 0.f);
+};
+
+
+glm::vec3 CameraPos = glm::vec3(0.f, 0.f, -20.f);
+float focalLength = 1.f;
+
+uint32_t PathTracingRenderer::PerPixel(const uint32_t x, const uint32_t y)
+{
+	static eastl::vector<Sphere> spheres = { {glm::vec3(0.f, 0.f, 0.f), 5.f} };
+
+	const WindowsWindow& currentWindow = GEngine->GetMainWindow();
+	const WindowProperties& props = currentWindow.GetProperties();
+
+	glm::vec2 normalizedCoords = glm::vec2(float(x) / float(props.Width) , float(y) / float(props.Height) );
+
+	normalizedCoords = normalizedCoords * 2.f - 1.f; // 0..1 -> -1..1
+	normalizedCoords.y /= props.AspectRatio;
+
+	const glm::vec3 pixelPos = glm::vec3(normalizedCoords.x , normalizedCoords.y, 0.f);
+	glm::vec3 focalPointPos = glm::vec3(0.f, 0.f, -focalLength);
+
+	const glm::vec3 rayDir = glm::normalize(pixelPos - focalPointPos);
+
+	PathTracingRay tempRay = { CameraPos, rayDir };
+
+	glm::vec4 color;
+
+	// o + mt -> ray equation with o = origin and m is direction
+	// x^2 + y^2 + z^2 - r^2 = 0 -> circle equation
+	// 
+	// => (ox + mxt)^2 + (oy + myt)^2 + (oz + mzt)^2 - r^2 = 0
+	// =>...=>
+	// (mx^2 + my^2 + mz^2)t^2 + (2 * (oxmx + oymy + ozmz))t + (ox^2 + oy^2 + oz^2 - r^2)
+
+	// => quadratic equating at^2 + bt + c
+	// with result = (-b +- sqrt(b^2 - 4ac)) / 2a
+	// and discriminant = sqrt(b^2 - 4ac))
+	// if discriminant 
+	// > 0 -> 2 solutions	(2 hits)
+	// = 0 -> 1 solution	(1 hit)
+	// < 0 -> no solutions	(0 hits)
+
+
+	int32_t closestSphere = -1;
+	float closestDistance = std::numeric_limits<float>::max();
+	for (int32_t i = 0; i < spheres.size(); ++i) 
 	{
-		for (int32_t j = 0; j < props.Width; ++j)
+		const Sphere& currentSphere = spheres[i];
+		const glm::vec3 origin = tempRay.Origin - currentSphere.Origin;
+
+		const float a = glm::dot(tempRay.Direction, tempRay.Direction);
+		const float b = 2 * glm::dot(tempRay.Origin, tempRay.Direction);
+		const float c = glm::dot(tempRay.Origin, tempRay.Origin) - (currentSphere.Radius * currentSphere.Radius);
+
+		float discriminant = sqrt((b * b) - (4 * a * c));
+
+		if (discriminant > 0.f)
 		{
-			FinalImageData[(props.Width * i) + j] = i % 50 == 0 ? color : color2;
+			float firstHit = (-b - glm::sqrt(discriminant)) / (2.f * a);
+			//float secondhit = (+b - glm::sqrt(discriminant)) / (2.f * a);
+
+			if (firstHit > 0.f && firstHit < closestDistance)
+			{
+				closestDistance = firstHit;
+				closestSphere = i;
+			}
 		}
 	}
 
-	//GBuffer = RHI::Get()->CreateEmptyFrameBuffer();
-	//GlobalRenderTexture = RHI::Get()->CreateRenderTexture(props.Width, props.Height, ERHITexturePrecision::Float16, ERHITextureFilter::Nearest);
-	////RHI::Get()->AttachTextureToFramebufferColor(*GBuffer, *GlobalRenderTexture);
+	if (closestSphere == -1)
+	{
+		float a = 0.5f * (rayDir.y + 1.f);
+		const glm::vec3 skyColor = (1.f - a) * glm::vec3(1.f, 1.f, 1.f) + a * glm::vec3(0.5f, 0.7f, 1.f);
+		color = glm::vec4(skyColor.x, skyColor.y, skyColor.z, 1.f);
+	}
+	else
+	{
+		color = glm::vec4(1.f, 0.f, 0.f, 1.f);
+	}
 
-	//GBufferDepth = RHI::Get()->CreateDepthMap(props.Width, props.Height);
-
-	//RHI::Get()->AttachTextureToFramebufferDepth(*GBuffer, GBufferDepth);
-
-	//GBufferNormal = RHI::Get()->CreateRenderTexture(props.Width, props.Height, ERHITexturePrecision::Float16, ERHITextureFilter::Nearest);
-	//RHI::Get()->AttachTextureToFramebufferColor(*GBuffer, GBufferNormal);
-
- //	GBufferAlbedo = RHI::Get()->CreateRenderTexture(props.Width, props.Height, ERHITexturePrecision::UnsignedByte, ERHITextureFilter::Nearest);
- //	RHI::Get()->AttachTextureToFramebufferColor(*GBuffer, GBufferAlbedo);
-
-	//GBufferMetallicRoughness = RHI::Get()->CreateRenderTexture(props.Width, props.Height, ERHITexturePrecision::UnsignedByte, ERHITextureFilter::Nearest);
-	//RHI::Get()->AttachTextureToFramebufferColor(*GBuffer, GBufferMetallicRoughness);
-
-	//VisualizeDepthUtil = SceneHelper::CreateObject<VisualizeDepthQuad>("VisualizeDepth");
-	//VisualizeDepthUtil->CreateCommand();
-	//VisualizeDepthUtil->GetCommand().Material->ExternalTextures.push_back(GBufferDepth);
-	//VisualizeDepthUtil->SetScale(glm::vec3(0.33f, 0.33f, 1.f));
-	//VisualizeDepthUtil->SetRelativeLocation(glm::vec3(-0.67, 0.65f, 0.0f));
-
-
-	//VisualizeNormalsUtil = SceneHelper::CreateObject<GBufferVisualizeQuad>("VisualizeNormalsTex");
-	//VisualizeNormalsUtil->CreateCommand();
-	//VisualizeNormalsUtil->GetCommand().Material->ExternalTextures.push_back(GBufferNormal);
-	//VisualizeNormalsUtil->SetScale(glm::vec3(0.33f, 0.33f, 1.f));
-	//VisualizeNormalsUtil->SetRelativeLocation(glm::vec3(0.f, 0.65f, 0.0f));
-
- //	VisualizeAlbedoUtil = SceneHelper::CreateObject<GBufferVisualizeQuad>("VisualizeAlbedoTex");
- //	VisualizeAlbedoUtil->CreateCommand();
- //	VisualizeAlbedoUtil->GetCommand().Material->ExternalTextures.push_back(GBufferAlbedo);
- //	VisualizeAlbedoUtil->SetScale(glm::vec3(0.33f, 0.33f, 1.f));
- //	VisualizeAlbedoUtil->SetRelativeLocation(glm::vec3(0.67f, 0.65f, 0.0f));
-
-	//VisualizeRoughnessUtil = SceneHelper::CreateObject<GBufferVisualizeQuad>("VisualizeRoughnessTex");
-	//VisualizeRoughnessUtil->CreateCommand();
-	//VisualizeRoughnessUtil->GetCommand().Material->ExternalTextures.push_back(GBufferAlbedo);
-	//VisualizeRoughnessUtil->SetScale(glm::vec3(0.33f, 0.33f, 1.f));
-	//VisualizeRoughnessUtil->SetRelativeLocation(glm::vec3(0.67f, -0.15f, 0.0f));
-
-	//DefaultPBRShadingModelQuad = SceneHelper::CreateObject<DefaultPBRLightingModelQuad>("DefaultLightingModelQuad");
-	//DefaultPBRShadingModelQuad->CreateCommand();
-	//DefaultPBRShadingModelQuad->GetCommand().Material->ExternalTextures.push_back(GBufferAlbedo);
-	//DefaultPBRShadingModelQuad->GetCommand().Material->ExternalTextures.push_back(GBufferNormal);
-	//DefaultPBRShadingModelQuad->GetCommand().Material->ExternalTextures.push_back(GBufferMetallicRoughness);
-	//DefaultPBRShadingModelQuad->GetCommand().Material->ExternalTextures.push_back(GBufferDepth);
-	//DefaultPBRShadingModelQuad->CreateCommand();
-
-
+	return ConvertToRGBA(color);
 }
 
 void PathTracingRenderer::Draw()
 {
 	ImGui::Begin("Renderer settings");
 
+	ImGui::DragFloat3("Camera Pos", &CameraPos.x);
+	ImGui::DragFloat("Focal Length", &focalLength);
+
+
 	const WindowsWindow& currentWindow = GEngine->GetMainWindow();
 	const WindowProperties& props = currentWindow.GetProperties();
+
+	for (uint32_t i = 0; i < props.Height; ++i)
+	{
+		for (uint32_t j = 0; j < props.Width; ++j)
+		{
+			FinalImageData[(props.Width * i) + j] = PerPixel(j, i);
+		}
+	}
 
 	ImageData data;
 	data.NrChannels = 4;
@@ -294,7 +336,7 @@ void PathTracingRenderer::Present()
 	RHI::Get()->SwapBuffers();
 }
 
-void PathTracingRenderer::AddCommand(const RenderCommand & inCommand)
+void PathTracingRenderer::AddCommand(const RenderCommand& inCommand)
 {
 	MainCommands.push_back(inCommand);
 }

@@ -4,7 +4,8 @@
 struct WindowProperties
 {
 	eastl::string_view Title = "MainWindow";
-	int32_t Width = 1920;
-	int32_t Height = 1080;
+	uint32_t Width = 1920;
+	uint32_t Height = 1080;
+	float AspectRatio = 1920.f / 1080.f;
 	bool VSyncEnabled = false;
 };

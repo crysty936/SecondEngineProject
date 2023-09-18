@@ -44,6 +44,7 @@ public:
 protected:
 	void InitInternal() override;
 
+	uint32_t PerPixel(const uint32_t x, const uint32_t y);
 	void DrawCommand(const RenderCommand& inCommand);
 	void SetViewportSizeToMain();
 

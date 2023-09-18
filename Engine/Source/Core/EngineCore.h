@@ -23,6 +23,7 @@ public:
 
 	class WindowsWindow& GetMainWindow() { return *MainWindow; }
 	inline PostInitCallback& GetPostInitMulticast() { return InitDoneMulticast; }
+	inline float GetCurrentDeltaT() { return CurrentDeltaT; }
 
 	template<class PluginType>
 	PluginType* GetInternalPlugin(const eastl::string& inName);
