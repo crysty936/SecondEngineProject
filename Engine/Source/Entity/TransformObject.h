@@ -23,7 +23,8 @@ public:
 
 	const Transform GetRelativeTransform() const;
 	const Transform& GetAbsoluteTransform() const;
-	void CalculateAbsTransform() const;
+
+	// Utility Methods
 	void Move(const glm::vec3 inMoveVector);
 	void Rotate(const float inAmount, const glm::vec3 inAxis);
 	void SetRotationDegrees(const glm::vec3 inNewRotation);
@@ -32,7 +33,6 @@ public:
 	void SetRelTransform(const Transform& inNewTransf);
 	void SetRelativeLocation(const glm::vec3 inRelLoc);
 	void SetScale(const glm::vec3 inScale);
-	inline bool IsTranfsDirty() const { return TransfDirty; }
 	void LookAt(const glm::vec3 inTarget);
 
 	template<typename T>
@@ -47,7 +47,9 @@ public:
 	}
 
 protected:
+	void CalculateAbsTransform() const;
 	void MakeTransfDirty() const;
+	inline bool IsTranfsDirty() const { return TransfDirty; }
 	inline void CleanTranfsDirty() const { TransfDirty = false; }
 
 protected:

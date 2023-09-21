@@ -101,27 +101,33 @@ struct PathTracingRay
 };
 
 
-glm::vec3 CameraPos = glm::vec3(0.f, 0.f, -20.f);
 float focalLength = 1.f;
 
-uint32_t PathTracingRenderer::PerPixel(const uint32_t x, const uint32_t y)
+uint32_t PathTracingRenderer::PerPixel(const uint32_t x, const uint32_t y, const WindowProperties& inProps, const glm::mat4& inInvProj, const glm::mat4& inInvView, const glm::vec3& inCamPos)
 {
 	static eastl::vector<Sphere> spheres = { {glm::vec3(0.f, 0.f, 0.f), 5.f} };
 
-	const WindowsWindow& currentWindow = GEngine->GetMainWindow();
-	const WindowProperties& props = currentWindow.GetProperties();
-
-	glm::vec2 normalizedCoords = glm::vec2(float(x) / float(props.Width) , float(y) / float(props.Height) );
-
+	glm::vec2 normalizedCoords = glm::vec2(float(x) / float(inProps.Width) , float(y) / float(inProps.Height) );
 	normalizedCoords = normalizedCoords * 2.f - 1.f; // 0..1 -> -1..1
-	normalizedCoords.y /= props.AspectRatio;
+
+	//normalizedCoords.y /= inProps.AspectRatio;
 
 	const glm::vec3 pixelPos = glm::vec3(normalizedCoords.x , normalizedCoords.y, 0.f);
-	glm::vec3 focalPointPos = glm::vec3(0.f, 0.f, -focalLength);
+	//glm::vec3 focalPointPos = glm::vec3(0.f, 0.f, -focalLength);
 
-	const glm::vec3 rayDir = glm::normalize(pixelPos - focalPointPos);
+	//const glm::vec3 rayDir = glm::normalize(pixelPos - focalPointPos);
 
-	PathTracingRay tempRay = { CameraPos, rayDir };
+
+	glm::vec4 worldSpace = inInvProj * glm::vec4(normalizedCoords.x, normalizedCoords.y, 1.f, 1.f);
+	worldSpace /= worldSpace.w;
+
+	glm::vec3 rayDir = glm::normalize(glm::vec3(worldSpace) - pixelPos);
+
+	rayDir = glm::vec3(inInvView * glm::vec4(rayDir.x, rayDir.y, rayDir.z, 0.f));
+	
+
+
+	PathTracingRay tempRay = { inCamPos, rayDir };
 
 	glm::vec4 color;
 
@@ -152,11 +158,11 @@ uint32_t PathTracingRenderer::PerPixel(const uint32_t x, const uint32_t y)
 		const float b = 2 * glm::dot(tempRay.Origin, tempRay.Direction);
 		const float c = glm::dot(tempRay.Origin, tempRay.Origin) - (currentSphere.Radius * currentSphere.Radius);
 
-		float discriminant = sqrt((b * b) - (4 * a * c));
+		const float discriminant = sqrt((b * b) - (4 * a * c));
 
 		if (discriminant > 0.f)
 		{
-			float firstHit = (-b - glm::sqrt(discriminant)) / (2.f * a);
+			const float firstHit = (-b - glm::sqrt(discriminant)) / (2.f * a);
 			//float secondhit = (+b - glm::sqrt(discriminant)) / (2.f * a);
 
 			if (firstHit > 0.f && firstHit < closestDistance)
@@ -181,22 +187,30 @@ uint32_t PathTracingRenderer::PerPixel(const uint32_t x, const uint32_t y)
 	return ConvertToRGBA(color);
 }
 
+
+
+
 void PathTracingRenderer::Draw()
 {
 	ImGui::Begin("Renderer settings");
 
-	ImGui::DragFloat3("Camera Pos", &CameraPos.x);
 	ImGui::DragFloat("Focal Length", &focalLength);
-
 
 	const WindowsWindow& currentWindow = GEngine->GetMainWindow();
 	const WindowProperties& props = currentWindow.GetProperties();
+
+	const glm::mat4 projection = glm::perspectiveRH_ZO(glm::radians(CAMERA_FOV), props.AspectRatio, CAMERA_NEAR, CAMERA_FAR);
+	const glm::mat4 invProj = glm::inverse(projection);
+
+	const glm::mat4 view = SceneManager::Get().GetCurrentScene().GetCurrentCamera()->GetLookAt();
+	const glm::mat4 invView = glm::inverse(view);
+	const glm::vec3 camPos = SceneManager::Get().GetCurrentScene().GetCurrentCamera()->GetAbsoluteTransform().Translation;
 
 	for (uint32_t i = 0; i < props.Height; ++i)
 	{
 		for (uint32_t j = 0; j < props.Width; ++j)
 		{
-			FinalImageData[(props.Width * i) + j] = PerPixel(j, i);
+			FinalImageData[(props.Width * i) + j] = PerPixel(j, i, props, invProj, invView, camPos);
 		}
 	}
 
