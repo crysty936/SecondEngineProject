@@ -25,7 +25,7 @@ void Editor::Tick(float inDeltaT)
 	Controller->ExecuteCallbacks();
 
 	// TODO [Editor-Game Separation]: Only do this based on if the game is started
-	CurrentGameMode->Tick(inDeltaT);
+	//CurrentGameMode->Tick(inDeltaT);
 }
 
 Editor::Editor()

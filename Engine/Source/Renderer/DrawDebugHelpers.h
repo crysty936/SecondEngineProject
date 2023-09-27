@@ -6,9 +6,15 @@
 
 struct DebugLine
 {
-	glm::vec3 Start;
-	glm::vec3 End;
-	glm::vec3 Color;
+	glm::vec3 Start = glm::vec3(0.f, 0.f, 0.f);
+	glm::vec3 End = glm::vec3(0.f, 0.f, 0.f);
+	glm::vec3 Color = glm::vec3(0.f, 0.f, 0.f);
+};
+
+struct DebugPoint
+{
+	glm::vec3 Location = glm::vec3(0.f, 0.f, 0.f);
+	float Size = 1.f;
 };
 
 class DrawDebugManager
@@ -25,7 +31,7 @@ private:
 		return Instance;
 	}
 
-	void AddDebugPoint(const glm::vec3& inPoint);
+	void AddDebugPoint(const glm::vec3& inPoint, const float inSize);
 	void AddDebugLine(const DebugLine& inLine);
 
 private:
@@ -37,7 +43,7 @@ private:
 	}
 
 private:
-	eastl::vector<glm::vec3> DebugPoints;
+	eastl::vector<DebugPoint> DebugPoints;
 	eastl::vector<DebugLine> DebugLines;
 
 	friend class ForwardRenderer;
@@ -47,7 +53,7 @@ private:
 
 struct DrawDebugHelpers
 {
-	static void DrawDebugPoint(const glm::vec3 inPoint);
+	static void DrawDebugPoint(const glm::vec3 inPoint, const float inSize = 1.f);
 	static void DrawDebugLine(const DebugLine& inLine);
 	static void DrawDebugLine(const glm::vec3& inStart, const glm::vec3& inEnd, const glm::vec3& inColor);
 	static void DrawProjectionPoints(const glm::mat4& inProj);

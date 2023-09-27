@@ -12,9 +12,9 @@ eastl::shared_ptr<RHIVertexBuffer> DebugPointsBuffer = nullptr;
 eastl::shared_ptr<RHIVertexBuffer> DebugPointsInstanceBuffer = nullptr;
 eastl::shared_ptr<RHIVertexBuffer> DebugLinesBuffer = nullptr;
 
-void DrawDebugHelpers::DrawDebugPoint(const glm::vec3 inPoint)
+void DrawDebugHelpers::DrawDebugPoint(const glm::vec3 inPoint, const float inSize)
 {
-	DrawDebugManager::Get().AddDebugPoint(inPoint);
+	DrawDebugManager::Get().AddDebugPoint(inPoint, inSize);
 }
 
 void DrawDebugHelpers::DrawDebugLine(const DebugLine& inLine)
@@ -113,58 +113,7 @@ void DrawDebugHelpers::DrawProjection(const glm::mat4& inProj)
 
 void DrawDebugManager::Draw()
 {
-#if 0
-	// Points
-	{
-		const eastl::vector<glm::vec3> debugPoints = Get().DebugPoints;
-
-		const int32_t numPoints = static_cast<int32_t>(debugPoints.size());
-
-		VertexInputLayout inputLayout;
-		// Vertex points
-		inputLayout.Push<float>(3, VertexInputType::Position);
-
-		const size_t pointsSize = sizeof(glm::vec3) * numPoints;
-
-		if (!DebugPointsBuffer)
-		{
-			DebugPointsBuffer = RHI::Get()->CreateVertexBuffer(inputLayout, debugPoints.data(), pointsSize);
-		}
-		else
-		{
-			RHI::Get()->ClearVertexBuffer(*DebugPointsBuffer);
-			RHI::Get()->UpdateVertexBufferData(*DebugPointsBuffer, debugPoints.data(), pointsSize);
-		}
-
-		MaterialsManager& matManager = MaterialsManager::Get();
-		bool materialExists = false;
-		eastl::shared_ptr<RenderMaterial> material = matManager.GetOrAddMaterial<RenderMaterial_Debug>("debug_points_material", materialExists);
-
-		if (!materialExists)
-		{
-			eastl::vector<ShaderSourceInput> shaders = {
-			{ "DebugPrimitives/VS_Pos_ManuallyWritten_DebugPoints", EShaderType::Sh_Vertex },
-			{ "DebugPrimitives/PS_FlatColor", EShaderType::Sh_Fragment } };
-
-			material->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
-		}
-
-		constexpr bool useIndexBuffer = false;
-		RHI::Get()->BindVertexBuffer(*DebugPointsBuffer, useIndexBuffer);
-		RHI::Get()->BindShader(*material->Shader);
-
-		material->ResetUniforms();
-
-		material->SetUniformsValue(Renderer::Get().GetUniformsCache());
-		material->BindBuffers();
-
-		RHI::Get()->DrawPoints(numPoints);
-
-		RHI::Get()->UnbindVertexBuffer(*DebugPointsBuffer, useIndexBuffer);
-		material->UnbindBuffers();
-		RHI::Get()->UnbindShader(*material->Shader);
-	}
-#endif
+	RHI::Get()->SetCullEnabled(false);
 
 	{
 		static bool initialized = false;
@@ -208,7 +157,7 @@ void DrawDebugManager::Draw()
 		}
 
 		// Instance data
-		const eastl::vector<glm::vec3> debugPoints = Get().DebugPoints;
+		const eastl::vector<DebugPoint>& debugPoints = Get().DebugPoints;
 		const int32_t numPoints = static_cast<int32_t>(debugPoints.size());
 
 		eastl::vector<glm::mat4> models;
@@ -217,8 +166,9 @@ void DrawDebugManager::Draw()
 		for (int32_t i = 0; i < numPoints; ++i)
 		{
 			glm::mat4 model = glm::mat4(1.f);
-			model = glm::translate(model, debugPoints[i]);
-			model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
+			model = glm::translate(model, debugPoints[i].Location);
+			const float scale = debugPoints[i].Size;
+			model = glm::scale(model, glm::vec3(scale, scale, scale));
 
 			models[i] = model;
 		}
@@ -253,11 +203,9 @@ void DrawDebugManager::Draw()
 		material->BindBuffers();
 
 
-		RHI::Get()->SetCullEnabled(false);
 
 		RHI::Get()->DrawInstanced(indicesCount, numPoints);
 
-		RHI::Get()->SetCullEnabled(true);
 
 
 		RHI::Get()->UnbindVertexBuffer(*DebugPointsBuffer);
@@ -318,13 +266,14 @@ void DrawDebugManager::Draw()
 		material->UnbindBuffers();
 		RHI::Get()->UnbindShader(*material->Shader);
 	}
+	RHI::Get()->SetCullEnabled(true);
 
 	Get().ClearDebugData();
 }
 
-void DrawDebugManager::AddDebugPoint(const glm::vec3& inPoint)
+void DrawDebugManager::AddDebugPoint(const glm::vec3& inPoint, const float inSize)
 {
-	DebugPoints.push_back(inPoint);
+	DebugPoints.push_back({ inPoint, inSize });
 }
 
 void DrawDebugManager::AddDebugLine(const DebugLine& inLine)
