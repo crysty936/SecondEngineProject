@@ -76,24 +76,6 @@ float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
 	return ggx1 * ggx2;
 }
 
-vec3 CalcDirLight(vec3 lightDir, vec3 normal, vec3 viewDir, float roughness, float metalness)
-{
-	vec4 albedo = texture(GBufferAlbedo, ps_in.TexCoords);
-	vec3 ambient = 0.2 * albedo.xyz;
-
-	// diffuse shading
-	float diff = clamp(dot(normal, -lightDir), 0.0, 1.0);
-	vec3 diffuse = diff * albedo.xyz;
-
-	// specular shading
-	// Blinn-Phong
-	vec3 halfwayDir = normalize(lightDir + viewDir);
-	float spec = pow(max(dot(normal, halfwayDir), 0.0), 16.0);
-	vec3 specular = spec * vec3(albedo.a, albedo.a, albedo.a);
-	return (ambient + diffuse + specular);
-}
-
-
 void main()
 {
 	const float depthValue = texture(GBufferDepth, ps_in.TexCoords).r;
@@ -118,10 +100,6 @@ void main()
 
 	float metalness = texture(GBufferMetallicRoughness, ps_in.TexCoords).r;
 	float roughness = texture(GBufferMetallicRoughness, ps_in.TexCoords).g;
-
-
-	//vec3 DirLightRadiance = CalcDirLight(LightingConstants.DirectionalLightDir, wsNormal, viewToFragW, roughness, metalness);
-	//vec3 finalColor = DirLightRadiance;
 
 	vec3 DirLightRadiance = vec3(0.0);
 

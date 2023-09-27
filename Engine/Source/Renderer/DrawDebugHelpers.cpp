@@ -5,8 +5,11 @@
 #include "RHI/RHI.h"
 #include "Material/MaterialsManager.h"
 #include "Material/EngineMaterials/RenderMaterial_Debug.h"
+#include "Drawable/ShapesUtils/BasicShapesData.h"
+#include "Material/EngineMaterials/RenderMaterial_Billboard.h"
 
 eastl::shared_ptr<RHIVertexBuffer> DebugPointsBuffer = nullptr;
+eastl::shared_ptr<RHIVertexBuffer> DebugPointsInstanceBuffer = nullptr;
 eastl::shared_ptr<RHIVertexBuffer> DebugLinesBuffer = nullptr;
 
 void DrawDebugHelpers::DrawDebugPoint(const glm::vec3 inPoint)
@@ -110,6 +113,7 @@ void DrawDebugHelpers::DrawProjection(const glm::mat4& inProj)
 
 void DrawDebugManager::Draw()
 {
+#if 0
 	// Points
 	{
 		const eastl::vector<glm::vec3> debugPoints = Get().DebugPoints;
@@ -159,6 +163,108 @@ void DrawDebugManager::Draw()
 		RHI::Get()->UnbindVertexBuffer(*DebugPointsBuffer, useIndexBuffer);
 		material->UnbindBuffers();
 		RHI::Get()->UnbindShader(*material->Shader);
+	}
+#endif
+
+	{
+		static bool initialized = false;
+
+		MaterialsManager& matManager = MaterialsManager::Get();
+		bool materialExists = false;
+		eastl::shared_ptr<RenderMaterial> material = matManager.GetOrAddMaterial<RenderMaterial_Billboard>("instanced_debug_quad_material", materialExists);
+
+		const int32_t verticesCount = BasicShapesData::GetQuadVerticesCount();
+		const int32_t indicesCount = BasicShapesData::GetQuadIndicesCount();
+
+		if (!initialized)
+		{
+			initialized = true;
+
+			const eastl::string RenderDataContainerID = "instancedDebugQuadVAO";
+
+			VertexInputLayout inputLayout;
+
+			// Vertex points
+			inputLayout.Push<float>(3, VertexInputType::Position);
+			// Vertex Tex Coords
+			inputLayout.Push<float>(2, VertexInputType::TexCoords);
+
+			eastl::shared_ptr<RHIIndexBuffer> ib = RHI::Instance->CreateIndexBuffer(BasicShapesData::GetQuadIndices(), indicesCount);
+
+			DebugPointsBuffer = RHI::Instance->CreateVertexBuffer(inputLayout, BasicShapesData::GetQuadVertices(), verticesCount, ib);
+
+			if (!materialExists)
+			{
+				//eastl::shared_ptr<RHITexture2D> tex = RHI::Instance->CreateAndLoadTexture2D("../Data/Textures/MinecraftGrass.jpg", true);
+				//material->OwnedTextures.push_back(tex);
+
+				eastl::vector<ShaderSourceInput> shaders = {
+				{ "DebugPrimitives/VS_Pos_ManuallyWritten_DebugPoints", EShaderType::Sh_Vertex },
+				{ "DebugPrimitives/PS_FlatColor", EShaderType::Sh_Fragment } };
+
+				material->Shader = RHI::Instance->CreateShaderFromPath(shaders, inputLayout);
+			}
+
+		}
+
+		// Instance data
+		const eastl::vector<glm::vec3> debugPoints = Get().DebugPoints;
+		const int32_t numPoints = static_cast<int32_t>(debugPoints.size());
+
+		eastl::vector<glm::mat4> models;
+		models.resize(numPoints);
+
+		for (int32_t i = 0; i < numPoints; ++i)
+		{
+			glm::mat4 model = glm::mat4(1.f);
+			model = glm::translate(model, debugPoints[i]);
+			model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
+
+			models[i] = model;
+		}
+
+		VertexInputLayout vertexInstanceLayout;
+		vertexInstanceLayout.Push<float>(4, VertexInputType::InstanceData, EAttribDivisor::PerInstance);
+		vertexInstanceLayout.Push<float>(4, VertexInputType::InstanceData, EAttribDivisor::PerInstance);
+		vertexInstanceLayout.Push<float>(4, VertexInputType::InstanceData, EAttribDivisor::PerInstance);
+		vertexInstanceLayout.Push<float>(4, VertexInputType::InstanceData, EAttribDivisor::PerInstance);
+		vertexInstanceLayout.AttribsOffset = 2;
+		vertexInstanceLayout.Properties[0].Divisor = EAttribDivisor::PerInstance;
+
+
+		if (!DebugPointsInstanceBuffer)
+		{
+			DebugPointsInstanceBuffer = RHI::Instance->CreateVertexBuffer(vertexInstanceLayout, &models[0], sizeof(glm::mat4) * numPoints);
+		}
+		else
+		{
+			RHI::Get()->ClearVertexBuffer(*DebugPointsInstanceBuffer);
+			RHI::Get()->UpdateVertexBufferData(*DebugPointsInstanceBuffer, &models[0], sizeof(glm::mat4)* numPoints);
+		}
+
+		RHI::Get()->BindVertexBuffer(*DebugPointsBuffer);
+		constexpr bool bindIndexBuffer = false;
+		RHI::Get()->BindVertexBuffer(*DebugPointsInstanceBuffer, bindIndexBuffer);
+		RHI::Get()->BindShader(*material->Shader);
+
+		material->ResetUniforms();
+
+		material->SetUniformsValue(Renderer::Get().GetUniformsCache());
+		material->BindBuffers();
+
+
+		RHI::Get()->SetCullEnabled(false);
+
+		RHI::Get()->DrawInstanced(indicesCount, numPoints);
+
+		RHI::Get()->SetCullEnabled(true);
+
+
+		RHI::Get()->UnbindVertexBuffer(*DebugPointsBuffer);
+		RHI::Get()->UnbindVertexBuffer(*DebugPointsInstanceBuffer, bindIndexBuffer);
+		material->UnbindBuffers();
+		RHI::Get()->UnbindShader(*material->Shader);
+
 	}
 
 	// Lines
