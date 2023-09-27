@@ -19,6 +19,7 @@
 #include "Renderer/Material/EngineMaterials/RenderMaterial_Billboard.h"
 #include "Renderer/DrawDebugHelpers.h"
 #include "Renderer/Model/3D/Assimp/AssimpModel3DEditorSphere.h"
+#include "imgui.h"
 
 TestGameMode GGameMode = {};
 
@@ -334,7 +335,7 @@ void TestGameMode::Init()
 	if (TransformObjPtr parentShared = GameCamera->GetParent().lock())
 	{
 		// Move the camera parent
-		parentShared->Move(glm::vec3(0.f, 0.f, -8.f));
+		parentShared->Move(glm::vec3(0.f, 0.f, 8.f));
 		//parentShared->Move(glm::vec3(8.f, 18.f, -9.f));
 		//parentShared->SetRotationDegrees(glm::vec3(-180.f, -80.f, -180.f));
 		//GameCamera->SetRotationDegrees(glm::vec3(-25.f, 0.f, 0.f));
@@ -405,8 +406,8 @@ void TestGameMode::Init()
 //   	AssimpModel->SetScale(glm::vec3(10.f, 10.f, 10.f));
 //   	AssimpModel->Move(glm::vec3(0.f, 10.f, 0.f));
 
- 	//FloorModel = SceneHelper::CreateVisualEntity<AssimpModel3D>("../Data/Models/Floor/scene.gltf", "Floor");
- 	//FloorModel->Move(glm::vec3(0.f, -2.f, 0.f));
+ 	FloorModel = SceneHelper::CreateVisualEntity<AssimpModel3D>("../Data/Models/Floor/scene.gltf", "Floor");
+ 	FloorModel->Move(glm::vec3(0.f, -20.f, 0.f));
 
 
 	//FloorModel = SceneHelper::CreateVisualEntity<AssimpModel3D>("../Data/Models/Sponza/Sponza.gltf", "Sponza");
@@ -418,9 +419,6 @@ void TestGameMode::Init()
  	//FloorModel->SetScale(glm::vec3(10.f, 10.f, 10.f));
 
 	
-	
-
-
 	//SphereModel = SceneHelper::CreateVisualEntity<AssimpModel3DEditorSphere>("../Data/Models/Sphere/scene.gltf", "EditorSphere");
 	//SphereModel->Move(glm::vec3(0.f, -2.f, 0.f));
 
@@ -436,7 +434,29 @@ void TestGameMode::Init()
 // 	}
 
 
+
+
+
+
+
+
+
 }
+
+struct Sphere
+{
+	glm::vec3 Origin = glm::vec3(0.f, 0.f, 0.f);
+	float Radius = 0.f;
+	glm::vec3 Color = glm::vec3(0.f, 0.f, 0.f);
+	bool bIsEmissive = false;
+};
+
+
+static eastl::vector<Sphere> spheres = {
+	{glm::vec3(0.f, 0.f, 0.f), 5.f, glm::vec3(1.f, 0.f, 0.f), false},
+	//{glm::vec3(15.f, 0.f, 0.f), 5.f, glm::vec3(0.0f, 0.2f, 0.5f), true},
+	//{glm::vec3(0.f, -50.f, 0.f), 45.f, glm::vec3(0.f, 1.f, 0.f), false}
+};
 
 void TestGameMode::Tick(float inDeltaT)
 {
@@ -471,5 +491,127 @@ void TestGameMode::Tick(float inDeltaT)
 	}
 
 
+	const int32_t height = 9;
+	const int32_t width = 16;
+
+	const int32_t horRez = 50;
+	const int32_t verticalRes = 50;
+
+
+	const glm::mat4 projection = glm::perspectiveRH_ZO(glm::radians(45.f), 16.f/9.f, 0.f, 100.f);
+	const glm::mat4 invProj = glm::inverse(projection);
+
+	const glm::vec3 camPos = SceneManager::Get().GetCurrentScene().GetCurrentCamera()->GetAbsoluteTransform().Translation;
+	glm::mat4 invView = SceneManager::Get().GetCurrentScene().GetCurrentCamera()->GetAbsoluteTransform().GetMatrix();
+
+
+	const float verticalOffset = float(height) / float(verticalRes);
+	const float horOffset = float(width) / float(horRez);
+
+	const float aspectRatio = horRez / verticalRes;
+
+	ImGui::Begin("Test Game Settings");
+
+	static float focalPoint = 1.f;
+	ImGui::DragFloat("Focal Point Pos", &focalPoint, 0.1f, 0.f, 100.f);
+
+#if 1
+ 	for (uint32_t i = 0; i < verticalRes; ++i)
+ 	{
+ 		for (uint32_t j = 0; j < horRez; ++j)
+ 		{
+ 			//FinalImageData[(props.Width * i) + j] = PerPixel(j, i, props, invProj, invView, camPos);
+
+			const int32_t x = j;
+			const int32_t y = i;
+
+			glm::vec2 normalizedCoords = glm::vec2(float(x) / float(verticalRes), float(y) / float(horRez));
+			normalizedCoords = normalizedCoords * 2.f - 1.f; // 0..1 -> -1..1
+
+			normalizedCoords.y /= aspectRatio;
+			glm::vec3 worldSpace = glm::vec3(normalizedCoords.x , normalizedCoords.y , 0.f);
+
+			DrawDebugHelpers::DrawDebugPoint(worldSpace, 0.01f);
+
+			const glm::vec3 pixelPos = glm::vec3(worldSpace.x, worldSpace.y, 0.f);
+
+			glm::vec3 focalPointPos = glm::vec3(0.f, 0.f, focalPoint);
+
+			const glm::vec3 rayDir = glm::normalize(pixelPos - focalPointPos);
+
+			//DrawDebugHelpers::DrawDebugLine(focalPointPos, focalPointPos + rayDir * 1000.f, glm::vec3(0.f, 0.f, 1.f));
+
+			{
+				int32_t closestSphere = -1;
+				float closestDistance = std::numeric_limits<float>::max();
+				float closestDistanceSecondHit = 0.f;
+				for (int32_t i = 0; i < spheres.size(); ++i)
+				{
+
+					// o + mt -> ray equation with o = origin and m is direction
+					// x^2 + y^2 + z^2 - r^2 = 0 -> circle equation
+					// 
+					// => (ox + mxt)^2 + (oy + myt)^2 + (oz + mzt)^2 - r^2 = 0
+					// =>...=>
+					// (mx^2 + my^2 + mz^2)t^2 + (2 * (oxmx + oymy + ozmz))t + (ox^2 + oy^2 + oz^2 - r^2)
+
+					// => quadratic equating at^2 + bt + c
+					// with result = (-b +- sqrt(b^2 - 4ac)) / 2a
+					// and discriminant = sqrt(b^2 - 4ac))
+					// if discriminant 
+					// > 0 -> 2 solutions	(2 hits)
+					// = 0 -> 1 solution	(1 hit)
+					// < 0 -> no solutions	(0 hits)
+
+					const Sphere& currentSphere = spheres[i];
+					const glm::vec3 finalPosition = glm::vec3(0.f, 0.f, 20.f);
+					//DrawDebugHelpers::DrawDebugPoint(finalPosition, 1.f);
+
+					const float a = glm::dot(rayDir, rayDir);
+					const float b = 2 * glm::dot(finalPosition, rayDir);
+					const float c = glm::dot(finalPosition, finalPosition) - (currentSphere.Radius * currentSphere.Radius);
+
+					const float discriminant = sqrt((b * b) - (4 * a * c));
+
+					if (discriminant > 0.f)
+					{
+						const float firstHitDistance = (-b - glm::sqrt(discriminant)) / (2.f * a);
+						const float secondhitDistance = (-b + glm::sqrt(discriminant)) / (2.f * a);
+
+						if (firstHitDistance > 0.f && firstHitDistance < closestDistance)
+						{
+							closestDistance = firstHitDistance;
+							closestDistanceSecondHit = secondhitDistance;
+							closestSphere = i;
+
+
+							const glm::vec3 finalPos = focalPointPos + rayDir * closestDistance;
+							const glm::vec3 finalPosSecondPoint = focalPointPos + rayDir * closestDistanceSecondHit;
+							//DrawDebugHelpers::DrawDebugPoint(finalPos, 0.1f);
+							DrawDebugHelpers::DrawDebugPoint(finalPosSecondPoint, 0.1f);
+
+						}
+					}
+				}
+
+			}
+
+			//glm::vec4 worldSpace = inInvProj * glm::vec4(normalizedCoords.x, normalizedCoords.y, 1.f, 1.f);
+			//worldSpace /= worldSpace.w;
+
+			//glm::vec3 rayDir = glm::normalize(glm::vec3(worldSpace));
+			////const glm::vec3 pixelPos = glm::vec3(normalizedCoords.x , normalizedCoords.y, 0.f);
+			////glm::vec3 rayDir = glm::normalize(glm::vec3(worldSpace) - pixelPos); // Same thing
+
+			//rayDir = glm::normalize(glm::vec3(inInvView * glm::vec4(rayDir.x, rayDir.y, rayDir.z, 0.f)));
+
+//
+
+ 		}
+ 	}
+
+#endif
+
+	ImGui::End();
 
 }

@@ -36,11 +36,9 @@
 #include "ShaderTypes.h"
 #include "Utils/ImageLoading.h"
 
+#include <algorithm>
+#include <execution>
 
-PathTracingRenderer::PathTracingRenderer(const WindowProperties& inMainWindowProperties)
-	: Renderer(inMainWindowProperties)
-{
-}
 
 PathTracingRenderer::~PathTracingRenderer() = default;
 //
@@ -92,6 +90,8 @@ struct Sphere
 {
 	glm::vec3 Origin = glm::vec3(0.f, 0.f, 0.f);
 	float Radius = 0.f;
+	glm::vec3 Color = glm::vec3(0.f, 0.f, 0.f);
+	bool bIsEmissive = false;
 };
 
 struct PathTracingRay
@@ -100,101 +100,181 @@ struct PathTracingRay
 	glm::vec3 Direction = glm::vec3(0.f, 0.f, 0.f);
 };
 
-
-float focalLength = 1.f;
-
-uint32_t PathTracingRenderer::PerPixel(const uint32_t x, const uint32_t y, const WindowProperties& inProps, const glm::mat4& inInvProj, const glm::mat4& inInvView, const glm::vec3& inCamPos)
+struct Payload
 {
-	static eastl::vector<Sphere> spheres = { {glm::vec3(0.f, 0.f, 0.f), 5.f} };
+	int32_t SphereIndex = -1;
+	glm::vec3 Location = glm::vec3(0.f, 0.f, 0.f);
+	float distance = 0.f;
+};
 
-	glm::vec2 normalizedCoords = glm::vec2(float(x) / float(inProps.Width) , float(y) / float(inProps.Height) );
-	normalizedCoords = normalizedCoords * 2.f - 1.f; // 0..1 -> -1..1
+static eastl::vector<Sphere> spheres = {
+	{glm::vec3(0.f, 0.f, 0.f), 5.f, glm::vec3(1.f, 0.f, 0.f), false},
+	{glm::vec3(15.f, 0.f, 0.f), 5.f, glm::vec3(0.0f, 0.2f, 0.5f), true},
+	{glm::vec3(0.f, -50.f, 0.f), 45.f, glm::vec3(0.f, 1.f, 0.f), false}
+};
 
-	//normalizedCoords.y /= inProps.AspectRatio;
-
-	const glm::vec3 pixelPos = glm::vec3(normalizedCoords.x , normalizedCoords.y, 0.f);
-	//glm::vec3 focalPointPos = glm::vec3(0.f, 0.f, -focalLength);
-
-	//const glm::vec3 rayDir = glm::normalize(pixelPos - focalPointPos);
-
-
-	glm::vec4 worldSpace = inInvProj * glm::vec4(normalizedCoords.x, normalizedCoords.y, 1.f, 1.f);
-	worldSpace /= worldSpace.w;
-
-	glm::vec3 rayDir = glm::normalize(glm::vec3(worldSpace) - pixelPos);
-
-	rayDir = glm::vec3(inInvView * glm::vec4(rayDir.x, rayDir.y, rayDir.z, 0.f));
-	
-
-
-	PathTracingRay tempRay = { inCamPos, rayDir };
-
-	glm::vec4 color;
-
-	// o + mt -> ray equation with o = origin and m is direction
-	// x^2 + y^2 + z^2 - r^2 = 0 -> circle equation
-	// 
-	// => (ox + mxt)^2 + (oy + myt)^2 + (oz + mzt)^2 - r^2 = 0
-	// =>...=>
-	// (mx^2 + my^2 + mz^2)t^2 + (2 * (oxmx + oymy + ozmz))t + (ox^2 + oy^2 + oz^2 - r^2)
-
-	// => quadratic equating at^2 + bt + c
-	// with result = (-b +- sqrt(b^2 - 4ac)) / 2a
-	// and discriminant = sqrt(b^2 - 4ac))
-	// if discriminant 
-	// > 0 -> 2 solutions	(2 hits)
-	// = 0 -> 1 solution	(1 hit)
-	// < 0 -> no solutions	(0 hits)
-
-
+Payload Trace(const PathTracingRay& inRay)
+{
 	int32_t closestSphere = -1;
 	float closestDistance = std::numeric_limits<float>::max();
-	for (int32_t i = 0; i < spheres.size(); ++i) 
+	for (int32_t i = 0; i < spheres.size(); ++i)
 	{
-		const Sphere& currentSphere = spheres[i];
-		const glm::vec3 origin = tempRay.Origin - currentSphere.Origin;
+		// o + mt -> ray equation with o = origin and m is direction
+		// x^2 + y^2 + z^2 - r^2 = 0 -> circle equation
+		// 
+		// => (ox + mxt)^2 + (oy + myt)^2 + (oz + mzt)^2 - r^2 = 0
+		// =>...=>
+		// (mx^2 + my^2 + mz^2)t^2 + (2 * (oxmx + oymy + ozmz))t + (ox^2 + oy^2 + oz^2 - r^2)
 
-		const float a = glm::dot(tempRay.Direction, tempRay.Direction);
-		const float b = 2 * glm::dot(tempRay.Origin, tempRay.Direction);
-		const float c = glm::dot(tempRay.Origin, tempRay.Origin) - (currentSphere.Radius * currentSphere.Radius);
+		// => quadratic equating at^2 + bt + c
+		// with result = (-b +- sqrt(b^2 - 4ac)) / 2a
+		// and discriminant = sqrt(b^2 - 4ac))
+		// if discriminant 
+		// > 0 -> 2 solutions	(2 hits)
+		// = 0 -> 1 solution	(1 hit)
+		// < 0 -> no solutions	(0 hits)
+
+		const Sphere& currentSphere = spheres[i];
+		const glm::vec3 finalPosition = inRay.Origin - currentSphere.Origin; // Account for camera(ray origin)
+
+		const float a = glm::dot(inRay.Direction, inRay.Direction);
+		const float b = 2 * glm::dot(finalPosition, inRay.Direction);
+		const float c = glm::dot(finalPosition, finalPosition) - (currentSphere.Radius * currentSphere.Radius);
 
 		const float discriminant = sqrt((b * b) - (4 * a * c));
 
 		if (discriminant > 0.f)
 		{
-			const float firstHit = (-b - glm::sqrt(discriminant)) / (2.f * a);
-			//float secondhit = (+b - glm::sqrt(discriminant)) / (2.f * a);
+			const float firstHitDistance = (-b - discriminant) / (2.f * a);
+			//float secondhitDistance = (-b + discriminant) / (2.f * a);
 
-			if (firstHit > 0.f && firstHit < closestDistance)
+			if (firstHitDistance > 0.f && firstHitDistance < closestDistance)
 			{
-				closestDistance = firstHit;
+				closestDistance = firstHitDistance;
 				closestSphere = i;
 			}
 		}
 	}
 
-	if (closestSphere == -1)
+	glm::vec3 worldPosition = glm::vec3(0.f, 0.f, 0.f);
+	if (closestSphere != -1)
 	{
-		float a = 0.5f * (rayDir.y + 1.f);
-		const glm::vec3 skyColor = (1.f - a) * glm::vec3(1.f, 1.f, 1.f) + a * glm::vec3(0.5f, 0.7f, 1.f);
-		color = glm::vec4(skyColor.x, skyColor.y, skyColor.z, 1.f);
+		worldPosition = inRay.Origin + (inRay.Direction * closestDistance);
 	}
-	else
+
+	const Payload result = {closestSphere, worldPosition, closestDistance};
+
+	return result;
+}
+
+glm::vec3 DirLightDir = glm::vec3(0.f, 1.f, 0.8f);
+glm::vec3 NormalizedDirLightDir;
+
+uint32_t PathTracingRenderer::PerPixel(const uint32_t x, const uint32_t y, const WindowProperties& inProps, const glm::mat4& inInvProj, const glm::mat4& inInvView, const glm::vec3& inCamPos)
+{
+	glm::vec2 normalizedCoords = glm::vec2(float(x) / float(inProps.Width) , float(y) / float(inProps.Height) );
+	normalizedCoords = normalizedCoords * 2.f - 1.f; // 0..1 -> -1..1
+
+	glm::vec4 worldSpace = inInvProj * glm::vec4(normalizedCoords.x, normalizedCoords.y, 1.f, 1.f);
+	worldSpace /= worldSpace.w;
+
+	glm::vec3 rayDir = glm::normalize(glm::vec3(worldSpace));
+	//const glm::vec3 pixelPos = glm::vec3(normalizedCoords.x , normalizedCoords.y, 0.f);
+	//glm::vec3 rayDir = glm::normalize(glm::vec3(worldSpace) - pixelPos); // Same thing
+
+	rayDir = glm::normalize(glm::vec3(inInvView * glm::vec4(rayDir.x, rayDir.y, rayDir.z, 0.f)));
+
+	glm::vec4 color = glm::vec4(0.f, 0.f, 0.f, 0.f);
+	PathTracingRay traceRay = { inCamPos, rayDir };
+
+	float multiplier = 1.f;
+
+	for (int32_t i = 0; i < 2; ++i)
 	{
-		color = glm::vec4(1.f, 0.f, 0.f, 1.f);
+		Payload result = Trace(traceRay);
+
+		if (result.SphereIndex== -1)
+		{
+			if (i == 0)
+			{
+				float a = 0.5f * (rayDir.y + 1.f);
+				const glm::vec3 skyColor = (1.f - a) * glm::vec3(1.f, 1.f, 1.f) + a * glm::vec3(0.5f, 0.7f, 1.f);
+				color = glm::vec4(skyColor.x, skyColor.y, skyColor.z, 1.f);
+			}
+
+			break;
+		}
+		else
+		{
+			const glm::vec3 surfaceNormal = glm::normalize(result.Location - spheres[result.SphereIndex].Origin);
+			const glm::vec3 newRayDir = glm::reflect(traceRay.Direction, surfaceNormal);
+
+			traceRay.Origin = result.Location + surfaceNormal * 0.0001f;
+			traceRay.Direction = newRayDir;
+
+
+			//const glm::vec3 newRayDir = surfaceNormal;
+
+
+			//glm::vec3 visualNormal = surfaceNormal * 0.5f + 0.5f;
+			//color = glm::vec4(visualNormal.x, visualNormal.y, visualNormal.z, 1.f);
+			//color = glm::vec4(glm::clamp(result.Location.x, 0.f, 1.f), glm::clamp(result.Location.y, 0.f, 1.f), glm::clamp(result.Location.z, 0.f, 1.f), 1.f);
+			//color = glm::vec4(result.Location.x, result.Location.y, result.Location.z, 1.f);
+			//color = glm::vec4(result.distance/100.f, result.distance / 100.f, result.distance / 100.f, 1.f);
+
+			const glm::vec3& hitSphereColor = spheres[result.SphereIndex].Color;
+			const float cosNLightDir = glm::clamp(glm::dot(surfaceNormal, NormalizedDirLightDir), 0.1f, 1.f);
+			color += glm::vec4(hitSphereColor.x, hitSphereColor.y, hitSphereColor.z, 0.f) * cosNLightDir /** multiplier*/;
+			multiplier *= 0.6f;
+		}
+
+
 	}
+
 
 	return ConvertToRGBA(color);
 }
 
+eastl::vector<uint32_t> m_ImageHorizontalIter, m_ImageVerticalIter;
 
+PathTracingRenderer::PathTracingRenderer(const WindowProperties& inMainWindowProperties)
+	: Renderer(inMainWindowProperties)
+{
+	m_ImageHorizontalIter.resize(inMainWindowProperties.Width);
+	m_ImageVerticalIter.resize(inMainWindowProperties.Height);
+
+	for (uint32_t i = 0; i < inMainWindowProperties.Width; i++)
+	{
+		m_ImageHorizontalIter[i] = i;
+	}
+
+	for (uint32_t i = 0; i < inMainWindowProperties.Height; i++)
+	{
+		m_ImageVerticalIter[i] = i;
+	}
+}
 
 
 void PathTracingRenderer::Draw()
 {
 	ImGui::Begin("Renderer settings");
 
-	ImGui::DragFloat("Focal Length", &focalLength);
+	int32_t sphereNr = 0;
+	for (Sphere& sphere : spheres)
+	{
+		ImGui::PushID(sphereNr);
+		ImGui::Text((eastl::string("Sphere ") + eastl::string(eastl::to_string(sphereNr))).c_str());
+
+		//ImGui::TreeNode((eastl::string("Sphere #") + eastl::string(eastl::to_string(sphereNr))).c_str());
+		ImGui::DragFloat3("Position", &sphere.Origin.x, 0.5f);
+		ImGui::DragFloat("Radius", &sphere.Radius, 0.1f);
+		//ImGui::TreePop();
+
+		++sphereNr;
+	}
+
+	ImGui::DragFloat3("DirLightDir", &DirLightDir.x, 0.1f);
+	NormalizedDirLightDir = glm::normalize(DirLightDir);
 
 	const WindowsWindow& currentWindow = GEngine->GetMainWindow();
 	const WindowProperties& props = currentWindow.GetProperties();
@@ -202,17 +282,33 @@ void PathTracingRenderer::Draw()
 	const glm::mat4 projection = glm::perspectiveRH_ZO(glm::radians(CAMERA_FOV), props.AspectRatio, CAMERA_NEAR, CAMERA_FAR);
 	const glm::mat4 invProj = glm::inverse(projection);
 
-	const glm::mat4 view = SceneManager::Get().GetCurrentScene().GetCurrentCamera()->GetLookAt();
-	const glm::mat4 invView = glm::inverse(view);
 	const glm::vec3 camPos = SceneManager::Get().GetCurrentScene().GetCurrentCamera()->GetAbsoluteTransform().Translation;
 
-	for (uint32_t i = 0; i < props.Height; ++i)
-	{
-		for (uint32_t j = 0; j < props.Width; ++j)
+	glm::mat4 invView = SceneManager::Get().GetCurrentScene().GetCurrentCamera()->GetAbsoluteTransform().GetMatrix();
+
+	//const glm::quat& rot = SceneManager::Get().GetCurrentScene().GetCurrentCamera()->GetAbsoluteTransform().Rotation;
+	//const glm::vec3 forward = glm::normalize(rot * glm::vec3(0.f, 0.f, 1.f));
+	//const glm::mat4 view = glm::lookAt(glm::vec3(0.f, 0.f, 0.f), forward, glm::vec3(0, 1, 0));
+	//const glm::mat4 invView = glm::inverse(view);
+
+	std::for_each(std::execution::par, m_ImageVerticalIter.begin(), m_ImageVerticalIter.end(),
+		[this, props, invProj, invView, camPos](uint32_t i)
 		{
-			FinalImageData[(props.Width * i) + j] = PerPixel(j, i, props, invProj, invView, camPos);
-		}
-	}
+			std::for_each(std::execution::par, m_ImageHorizontalIter.begin(), m_ImageHorizontalIter.end(),
+			[this, i, props, invProj, invView, camPos](uint32_t j)
+			{
+				FinalImageData[(props.Width * i) + j] = PerPixel(j, i, props, invProj, invView, camPos);
+			});
+		});
+
+
+// 	for (uint32_t i = 0; i < props.Height; ++i)
+// 	{
+// 		for (uint32_t j = 0; j < props.Width; ++j)
+// 		{
+// 			FinalImageData[(props.Width * i) + j] = PerPixel(j, i, props, invProj, invView, camPos);
+// 		}
+// 	}
 
 	ImageData data;
 	data.NrChannels = 4;
