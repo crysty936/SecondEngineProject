@@ -142,7 +142,7 @@ void EngineCore::Run()
 
 		CurrentDeltaT = static_cast<float>(currentTime - lastTime);
 		eastl::wstring text;
-		text.sprintf(L"Ms: %f", CurrentDeltaT);
+		text.sprintf(L"Seconds: %f", CurrentDeltaT);
 		WindowsPlatform::SetWindowsWindowText(text);
 
 		//Logger::GetLogger().Log("Delta time: %lf", CurrentDeltaT);

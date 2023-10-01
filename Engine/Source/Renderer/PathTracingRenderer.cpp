@@ -38,26 +38,52 @@
 
 #include <algorithm>
 #include <execution>
+#include <random>
 
+inline float random_float() {
+	static std::uniform_real_distribution<float> distribution(0.0, 1.0);
+	static std::mt19937 generator;
+	return distribution(generator);
+}
 
-PathTracingRenderer::~PathTracingRenderer() = default;
-//
-//static eastl::shared_ptr<RHIFrameBuffer> GBuffer = nullptr;
-//static eastl::shared_ptr<RHITexture2D> GlobalRenderTexture = nullptr;
-//static eastl::shared_ptr<RHITexture2D> GBufferDepth = nullptr;
-//static eastl::shared_ptr<RHITexture2D> GBufferNormal = nullptr;
-//static eastl::shared_ptr<RHITexture2D> GBufferAlbedo = nullptr;
-//static eastl::shared_ptr<RHITexture2D> GBufferMetallicRoughness = nullptr;
-//
-//eastl::shared_ptr<VisualizeDepthQuad> VisualizeDepthUtil;
-//eastl::shared_ptr<GBufferVisualizeQuad> VisualizeNormalsUtil;
-//eastl::shared_ptr<GBufferVisualizeQuad> VisualizeAlbedoUtil;
-//eastl::shared_ptr<GBufferVisualizeQuad> VisualizeRoughnessUtil;
-//eastl::shared_ptr<DefaultPBRLightingModelQuad> DefaultPBRShadingModelQuad;
+inline float random_float(float min, float max) {
+	// Returns a random real in [min,max).
+	return min + (max - min) * random_float();
+}
 
-eastl::shared_ptr<FullScreenQuad> VisualizeQuad;
-eastl::shared_ptr<RHITexture2D> RHITexture;
+static glm::vec3 randomVec3() {
+	return glm::vec3(random_float(), random_float(), random_float());
+}
 
+static glm::vec3 randomVec3(float min, float max) {
+	return glm::vec3(random_float(min, max), random_float(min, max), random_float(min, max));
+}
+
+inline glm::vec3 random_in_unit_sphere() {
+	while (true) {
+		auto p = randomVec3(-1, 1);
+		if (glm::lengthSquared(p)< 1)
+			return p;
+	}
+}
+
+inline glm::vec3 random_unit_vector() {
+	return glm::normalize(random_in_unit_sphere());
+}
+
+inline glm::vec3 random_on_hemisphere(const glm::vec3& normal) {
+	glm::vec3 on_unit_sphere = random_unit_vector();
+	if (dot(on_unit_sphere, normal) > 0.0) // In the same hemisphere as the normal
+		return on_unit_sphere;
+	else
+		return -on_unit_sphere;
+}
+
+bool near_zero(glm::vec3 inVec) {
+	// Return true if the vector is close to zero in all dimensions.
+	auto s = 1e-8;
+	return (fabs(inVec.x) < s) && (fabs(inVec.y) < s) && (fabs(inVec.z) < s);
+}
 
 static uint32_t ConvertToRGBA(const glm::vec4& color)
 {
@@ -70,7 +96,15 @@ static uint32_t ConvertToRGBA(const glm::vec4& color)
 	return result;
 }
 
+PathTracingRenderer::~PathTracingRenderer() = default;
+
+eastl::shared_ptr<FullScreenQuad> VisualizeQuad;
+eastl::shared_ptr<RHITexture2D> RHITexture;
+
+glm::vec4* AccumulationData;
 uint32_t* FinalImageData;
+uint32_t AccumulatedFramesCount = 1;
+bool bUseAccumulation = true;
 
 void PathTracingRenderer::InitInternal()
 {
@@ -82,8 +116,8 @@ void PathTracingRenderer::InitInternal()
 	RHITexture = RHI::Get()->CreateTexture2D(props.Width, props.Height);
 
 	VisualizeQuad->GetCommand().Material->ExternalTextures.push_back(RHITexture);
+	AccumulationData = new glm::vec4[props.Width * props.Height];
 	FinalImageData = new uint32_t[props.Width * props.Height];
-
 }
 
 struct Sphere
@@ -170,7 +204,7 @@ Payload Trace(const PathTracingRay& inRay)
 glm::vec3 DirLightDir = glm::vec3(0.f, 1.f, 0.8f);
 glm::vec3 NormalizedDirLightDir;
 
-uint32_t PathTracingRenderer::PerPixel(const uint32_t x, const uint32_t y, const WindowProperties& inProps, const glm::mat4& inInvProj, const glm::mat4& inInvView, const glm::vec3& inCamPos)
+glm::vec4 PathTracingRenderer::PerPixel(const uint32_t x, const uint32_t y, const WindowProperties& inProps, const glm::mat4& inInvProj, const glm::mat4& inInvView, const glm::vec3& inCamPos)
 {
 	glm::vec2 normalizedCoords = glm::vec2(float(x) / float(inProps.Width) , float(y) / float(inProps.Height) );
 	normalizedCoords = normalizedCoords * 2.f - 1.f; // 0..1 -> -1..1
@@ -189,7 +223,9 @@ uint32_t PathTracingRenderer::PerPixel(const uint32_t x, const uint32_t y, const
 
 	float multiplier = 1.f;
 
-	for (int32_t i = 0; i < 2; ++i)
+	glm::vec3 SourceSurfaceNormal = glm::vec3(0.f, 1.f, 0.f);
+	const int32_t nrSamples = 5;
+	for (int32_t i = 0; i < nrSamples; ++i)
 	{
 		Payload result = Trace(traceRay);
 
@@ -201,38 +237,54 @@ uint32_t PathTracingRenderer::PerPixel(const uint32_t x, const uint32_t y, const
 				const glm::vec3 skyColor = (1.f - a) * glm::vec3(1.f, 1.f, 1.f) + a * glm::vec3(0.5f, 0.7f, 1.f);
 				color = glm::vec4(skyColor.x, skyColor.y, skyColor.z, 1.f);
 			}
+			else
+			{
+				const float cosNLightDir = glm::clamp(glm::dot(SourceSurfaceNormal, NormalizedDirLightDir), 0.1f, 1.f);
+				const float occlusionScale = 1.f / float(i);
 
-			break;
+				color *= cosNLightDir * occlusionScale;
+			}
+
+			color = glm::pow(glm::vec4(color.x, color.y, color.z, color.w), glm::vec4(1.f/2.2f)); // Gamma correction
+
+			return color;
 		}
 		else
 		{
-			const glm::vec3 surfaceNormal = glm::normalize(result.Location - spheres[result.SphereIndex].Origin);
-			const glm::vec3 newRayDir = glm::reflect(traceRay.Direction, surfaceNormal);
+			const glm::vec3 SourceSurfaceNormal = glm::normalize(result.Location - spheres[result.SphereIndex].Origin);
+			//const glm::vec3 newRayDir = glm::reflect(traceRay.Direction, SourceSurfaceNormal);
+			
+			glm::vec3 newRayDir = SourceSurfaceNormal + random_unit_vector(); // Lambertian diffuse
 
-			traceRay.Origin = result.Location + surfaceNormal * 0.0001f;
+			if (near_zero(newRayDir))
+			{
+				newRayDir = SourceSurfaceNormal;
+			}
+
+			traceRay.Origin = result.Location + SourceSurfaceNormal * 0.0001f;
 			traceRay.Direction = newRayDir;
 
 
-			//const glm::vec3 newRayDir = surfaceNormal;
+			//const glm::vec3 newRayDir = SourceSurfaceNormal;
 
 
-			//glm::vec3 visualNormal = surfaceNormal * 0.5f + 0.5f;
+			//glm::vec3 visualNormal = SourceSurfaceNormal * 0.5f + 0.5f;
 			//color = glm::vec4(visualNormal.x, visualNormal.y, visualNormal.z, 1.f);
 			//color = glm::vec4(glm::clamp(result.Location.x, 0.f, 1.f), glm::clamp(result.Location.y, 0.f, 1.f), glm::clamp(result.Location.z, 0.f, 1.f), 1.f);
 			//color = glm::vec4(result.Location.x, result.Location.y, result.Location.z, 1.f);
 			//color = glm::vec4(result.distance/100.f, result.distance / 100.f, result.distance / 100.f, 1.f);
 
 			const glm::vec3& hitSphereColor = spheres[result.SphereIndex].Color;
-			const float cosNLightDir = glm::clamp(glm::dot(surfaceNormal, NormalizedDirLightDir), 0.1f, 1.f);
-			color += glm::vec4(hitSphereColor.x, hitSphereColor.y, hitSphereColor.z, 0.f) * cosNLightDir /** multiplier*/;
-			multiplier *= 0.6f;
+			const float cosNLightDir = glm::clamp(glm::dot(SourceSurfaceNormal, NormalizedDirLightDir), 0.1f, 1.f);
+			color += glm::vec4(hitSphereColor.x, hitSphereColor.y, hitSphereColor.z, 0.f) * cosNLightDir * multiplier;
+
+			multiplier *= 0.5f;
 		}
-
-
 	}
 
+	color = glm::vec4(0.f, 0.f, 0.f, 1.f);
 
-	return ConvertToRGBA(color);
+	return color;
 }
 
 eastl::vector<uint32_t> m_ImageHorizontalIter, m_ImageVerticalIter;
@@ -254,10 +306,20 @@ PathTracingRenderer::PathTracingRenderer(const WindowProperties& inMainWindowPro
 	}
 }
 
-
 void PathTracingRenderer::Draw()
 {
 	ImGui::Begin("Renderer settings");
+
+	ImGui::Checkbox("Use Accumulation", &bUseAccumulation);
+
+	if (bUseAccumulation)
+	{
+		++AccumulatedFramesCount;
+	}
+	else
+	{
+		AccumulatedFramesCount = 1;
+	}
 
 	int32_t sphereNr = 0;
 	for (Sphere& sphere : spheres)
@@ -291,13 +353,24 @@ void PathTracingRenderer::Draw()
 	//const glm::mat4 view = glm::lookAt(glm::vec3(0.f, 0.f, 0.f), forward, glm::vec3(0, 1, 0));
 	//const glm::mat4 invView = glm::inverse(view);
 
+
+
 	std::for_each(std::execution::par, m_ImageVerticalIter.begin(), m_ImageVerticalIter.end(),
 		[this, props, invProj, invView, camPos](uint32_t i)
 		{
 			std::for_each(std::execution::par, m_ImageHorizontalIter.begin(), m_ImageHorizontalIter.end(),
 			[this, i, props, invProj, invView, camPos](uint32_t j)
 			{
-				FinalImageData[(props.Width * i) + j] = PerPixel(j, i, props, invProj, invView, camPos);
+				if(AccumulatedFramesCount == 1)
+				{
+					AccumulationData[(props.Width * i) + j] = glm::vec4(0.f, 0.f, 0.f, 0.f);
+				}
+
+				AccumulationData[(props.Width * i) + j] += PerPixel(j, i, props, invProj, invView, camPos);
+
+				glm::vec4 finalColor = AccumulationData[(props.Width * i) + j] / glm::vec4(float(AccumulatedFramesCount));
+
+				FinalImageData[(props.Width * i) + j] = ConvertToRGBA(finalColor);
 			});
 		});
 
