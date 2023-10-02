@@ -104,7 +104,7 @@ eastl::shared_ptr<RHITexture2D> RHITexture;
 glm::vec4* AccumulationData;
 uint32_t* FinalImageData;
 uint32_t AccumulatedFramesCount = 1;
-bool bUseAccumulation = true;
+bool bUseAccumulation = false;
 
 void PathTracingRenderer::InitInternal()
 {
@@ -201,6 +201,29 @@ Payload Trace(const PathTracingRay& inRay)
 	return result;
 }
 
+bool TraceTriangle(const PathTracingRay& inRay, const Triangle& inTri)
+{
+	const glm::vec3& A = inTri.V[0];
+	const glm::vec3& E1 = inTri.E[0];
+	const glm::vec3& E2 = inTri.E[1];
+	const glm::vec3& N = inTri.WSNormal;
+
+	float det = -dot(inRay.Direction, N);
+	float invdet = 1.f / det;
+
+	glm::vec3 AO = inRay.Origin - A;
+	glm::vec3 DAO = glm::cross(AO, inRay.Direction);
+
+	float u = dot(E2, DAO) * invdet;
+	float v = -dot(E1, DAO) * invdet;
+	float t = dot(AO, N) * invdet;
+	return (det >= 1e-6 && t >= 0.0 && u >= 0.0 && v >= 0.0 && (u + v) <= 1.0);
+
+	//const Payload result = { closestSphere, worldPosition, closestDistance };
+
+	//return result;
+}
+
 glm::vec3 DirLightDir = glm::vec3(0.f, 1.f, 0.8f);
 glm::vec3 NormalizedDirLightDir;
 
@@ -221,6 +244,49 @@ glm::vec4 PathTracingRenderer::PerPixel(const uint32_t x, const uint32_t y, cons
 	glm::vec4 color = glm::vec4(0.f, 0.f, 0.f, 0.f);
 	PathTracingRay traceRay = { inCamPos, rayDir };
 
+	for (RenderCommand& command : MainCommands)
+	{
+		if (command.Triangles.size() == 0)
+		{
+			continue;
+		}
+
+		const bool parentValid = !command.Parent.expired();
+		if (!ENSURE(parentValid))
+		{
+			continue;
+		}
+
+		const eastl::shared_ptr<const DrawableObject> parent = command.Parent.lock();
+		const eastl::shared_ptr<RenderMaterial> material = command.Material;
+		const eastl::shared_ptr<MeshDataContainer>& dataContainer = command.DataContainer;
+
+		if (!parent->IsVisible() || !material)
+		{
+			continue;
+		}
+
+		glm::mat4 modelMat = parent->GetModelMatrix();
+		// Remove z scale from model for two dimensional shape
+		glm::vec4 thirdColumn = modelMat[2];
+		modelMat[2] = glm::vec4(0.f, 0.f, 0.f, thirdColumn.w);
+
+
+		for (Triangle tri : command.Triangles)
+		{
+			tri.Transform(modelMat);
+
+			if (TraceTriangle(traceRay, tri))
+			{
+				return glm::vec4(0.f, 1.f, 0.f, 1.f);
+			}
+		}
+
+
+	}
+
+
+#if 0
 	float multiplier = 1.f;
 
 	glm::vec3 SourceSurfaceNormal = glm::vec3(0.f, 1.f, 0.f);
@@ -281,6 +347,7 @@ glm::vec4 PathTracingRenderer::PerPixel(const uint32_t x, const uint32_t y, cons
 			multiplier *= 0.5f;
 		}
 	}
+#endif
 
 	color = glm::vec4(0.f, 0.f, 0.f, 1.f);
 
@@ -353,8 +420,7 @@ void PathTracingRenderer::Draw()
 	//const glm::mat4 view = glm::lookAt(glm::vec3(0.f, 0.f, 0.f), forward, glm::vec3(0, 1, 0));
 	//const glm::mat4 invView = glm::inverse(view);
 
-
-
+#if 1
 	std::for_each(std::execution::par, m_ImageVerticalIter.begin(), m_ImageVerticalIter.end(),
 		[this, props, invProj, invView, camPos](uint32_t i)
 		{
@@ -373,16 +439,24 @@ void PathTracingRenderer::Draw()
 				FinalImageData[(props.Width * i) + j] = ConvertToRGBA(finalColor);
 			});
 		});
+#else
+	for (uint32_t i = 0; i < props.Height; ++i)
+	{
+		for (uint32_t j = 0; j < props.Width; ++j)
+		{
+			if(AccumulatedFramesCount == 1)
+			{
+				AccumulationData[(props.Width * i) + j] = glm::vec4(0.f, 0.f, 0.f, 0.f);
+			}
 
+			AccumulationData[(props.Width * i) + j] += PerPixel(j, i, props, invProj, invView, camPos);
 
-// 	for (uint32_t i = 0; i < props.Height; ++i)
-// 	{
-// 		for (uint32_t j = 0; j < props.Width; ++j)
-// 		{
-// 			FinalImageData[(props.Width * i) + j] = PerPixel(j, i, props, invProj, invView, camPos);
-// 		}
-// 	}
+			glm::vec4 finalColor = AccumulationData[(props.Width * i) + j] / glm::vec4(float(AccumulatedFramesCount));
 
+			FinalImageData[(props.Width * i) + j] = ConvertToRGBA(finalColor);
+		}
+	}
+#endif
 	ImageData data;
 	data.NrChannels = 4;
 	data.RawData = FinalImageData;

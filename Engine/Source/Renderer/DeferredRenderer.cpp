@@ -112,12 +112,11 @@ void DeferredRenderer::InitInternal()
 	DefaultPBRShadingModelQuad->GetCommand().Material->ExternalTextures.push_back(GBufferMetallicRoughness);
 	DefaultPBRShadingModelQuad->GetCommand().Material->ExternalTextures.push_back(GBufferDepth);
 	DefaultPBRShadingModelQuad->CreateCommand();
-
-
 }
 
 void DeferredRenderer::Draw()
 {
+	//RHI::Get()->SetCullEnabled(false);
 	ImGui::Begin("Renderer settings");
 
 	SetBaseUniforms();

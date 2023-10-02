@@ -15,6 +15,7 @@
 #include "EASTL/unordered_map.h"
 #include "Renderer/Material/EngineMaterials/RenderMaterial_LightSource.h"
 #include "Renderer/Material/EngineMaterials/RenderMaterial_DeferredDecal.h"
+#include "Renderer/Material/EngineMaterials/RenderMaterial_2DShape.h"
 
 TriangleShape::TriangleShape(const eastl::string& inName)
 	: DrawableObject(inName)
@@ -51,7 +52,7 @@ void TriangleShape::CreateProxy()
 
 	MaterialsManager& matManager = MaterialsManager::Get();
 	bool materialExists = false;
-	eastl::shared_ptr<RenderMaterial> material = matManager.GetOrAddMaterial("triangle_material", materialExists);
+	eastl::shared_ptr<RenderMaterial> material = matManager.GetOrAddMaterial<RenderMaterial_2DShape>("triangle_material", materialExists);
 
 	if (!materialExists)
 	{
@@ -61,8 +62,9 @@ void TriangleShape::CreateProxy()
 		//material->Textures.push_back(std::move(tex));
 
 		eastl::vector<ShaderSourceInput> shaders = {
-		{ "ModelWorldPositionVertexShader", EShaderType::Sh_Vertex },
-		{ "FlatColorPixelShader", EShaderType::Sh_Fragment } };
+		{ "ScreenQuad/VS_Pos-UV", EShaderType::Sh_Vertex },
+		{ "ScreenQuad/PS_FlatColor", EShaderType::Sh_Fragment } };
+
 		material->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
 	}
 
@@ -71,6 +73,33 @@ void TriangleShape::CreateProxy()
 	newCommand.DataContainer = dataContainer;
 	newCommand.Parent = this_shared(this);
 	newCommand.DrawType = EDrawType::DrawElements;
+
+
+	// For Pathtracer
+	{
+
+		const uint32_t* indices = BasicShapesData::GetTriangleIndices();
+		const int32_t indicesCount = BasicShapesData::GetTriangleIndicesCount();
+
+		const float* vertices = BasicShapesData::GetTriangleVertices();
+		const int32_t verticesCount = BasicShapesData::GetTriangleVerticesCount();
+
+		for (int32_t i = 0; i < indicesCount; i += 3)
+		{
+			glm::vec3 v[3];
+
+			const size_t vertexSize = sizeof(glm::vec3);
+			const size_t uvSize = sizeof(glm::vec2);
+
+			memcpy(&v[0], vertices, vertexSize);
+			memcpy(&v[1], vertices + 5, vertexSize);
+			memcpy(&v[2], vertices + 10, vertexSize);
+
+			Triangle pathTraceTriangle = Triangle(v);
+
+			newCommand.Triangles.push_back(pathTraceTriangle);
+		}
+	}
 
 	Renderer::Get().AddCommand(newCommand);
 }
@@ -115,9 +144,8 @@ void SquareShape::CreateProxy()
  	if (!materialExists)
  	{
 		eastl::vector<ShaderSourceInput> shaders = {
-		{ "VS_Pos-UV", EShaderType::Sh_Vertex },
-		//{ "GeometryTest_GS", EShaderType::Geometry },
-		{ "PS_FlatColor", EShaderType::Sh_Fragment } };
+		{ "ScreenQuad/VS_Pos-UV", EShaderType::Sh_Vertex },
+		{ "ScreenQuad/PS_FlatColor", EShaderType::Sh_Fragment } };
 
 		material->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
 	}

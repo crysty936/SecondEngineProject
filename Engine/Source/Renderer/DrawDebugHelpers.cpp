@@ -115,6 +115,10 @@ void DrawDebugManager::Draw()
 {
 	RHI::Get()->SetCullEnabled(false);
 
+	// Points
+	const eastl::vector<DebugPoint>& debugPoints = Get().DebugPoints;
+	const int32_t numPoints = static_cast<int32_t>(debugPoints.size());
+	if(numPoints > 0)
 	{
 		static bool initialized = false;
 
@@ -157,8 +161,6 @@ void DrawDebugManager::Draw()
 		}
 
 		// Instance data
-		const eastl::vector<DebugPoint>& debugPoints = Get().DebugPoints;
-		const int32_t numPoints = static_cast<int32_t>(debugPoints.size());
 
 		eastl::vector<glm::mat4> models;
 		models.resize(numPoints);
