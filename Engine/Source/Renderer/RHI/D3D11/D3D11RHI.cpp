@@ -360,7 +360,7 @@ void D3D11RHI::BindTexture2D(const RHITexture2D & inTex, const int32_t inTexId)
 	ImmediateContext->PSSetSamplers(0, 1, &GlobalSamplerLinear);
 }
 
-eastl::shared_ptr<class RHIShader> D3D11RHI::CreateShaderFromSource(const eastl::vector<ShaderSourceInput> inShaderSources, const VertexInputLayout & inInputLayout, const eastl::string & inVSName, const eastl::string & inPSName)
+eastl::shared_ptr<class RHIShader> D3D11RHI::CreateShaderFromSource(const eastl::vector<ShaderSourceInput>& inShaderSources, const VertexInputLayout & inInputLayout, const eastl::string & inVSName, const eastl::string & inPSName)
 {
 	HRESULT hr = S_OK;
 
@@ -497,7 +497,7 @@ eastl::shared_ptr<class RHIShader> D3D11RHI::CreateShaderFromSource(const eastl:
 	return newShader;
 }
 
-eastl::shared_ptr<RHIShader> D3D11RHI::CreateShaderFromPath(const eastl::vector<ShaderSourceInput> inPathShaderSources, const VertexInputLayout& inInputLayout)
+eastl::shared_ptr<RHIShader> D3D11RHI::CreateShaderFromPath(const eastl::vector<ShaderSourceInput>& inPathShaderSources, const VertexInputLayout& inInputLayout)
 {
 	eastl::vector<ShaderSourceInput> rhiSpecificSources;
 	rhiSpecificSources.reserve(inPathShaderSources.size());

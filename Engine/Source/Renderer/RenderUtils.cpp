@@ -224,7 +224,7 @@ void FullScreenQuad::CreateProxy()
 
 void FullScreenQuad::CreateCommand()
 {
-	const eastl::string RenderDataContainerID = "squareVAO";
+	const eastl::string RenderDataContainerID = "quadContainer";
 	eastl::shared_ptr<MeshDataContainer> dataContainer{ nullptr };
 
 	const bool existingContainer = Renderer::Get().GetOrCreateContainer(RenderDataContainerID, dataContainer);
@@ -237,12 +237,12 @@ void FullScreenQuad::CreateCommand()
 
 	if (!existingContainer)
 	{
-		int32_t indicesCount = BasicShapesData::GetSquareIndicesCount();
-		eastl::shared_ptr<RHIIndexBuffer> ib = RHI::Get()->CreateIndexBuffer(BasicShapesData::GetSquareIndices(), indicesCount);
+		int32_t indicesCount = BasicShapesData::GetQuadIndicesCount();
+		eastl::shared_ptr<RHIIndexBuffer> ib = RHI::Get()->CreateIndexBuffer(BasicShapesData::GetQuadIndices(), indicesCount);
 
 
-		int32_t verticesCount = BasicShapesData::GetSquareVerticesCount();
-		const eastl::shared_ptr<RHIVertexBuffer> vb = RHI::Get()->CreateVertexBuffer(inputLayout, BasicShapesData::GetSquareVertices(), verticesCount, ib);
+		int32_t verticesCount = BasicShapesData::GetQuadVerticesCount();
+		const eastl::shared_ptr<RHIVertexBuffer> vb = RHI::Get()->CreateVertexBuffer(inputLayout, BasicShapesData::GetQuadVertices(), verticesCount, ib);
 
 		dataContainer->VBuffer = vb;
 	}
@@ -280,7 +280,7 @@ void GBufferVisualizeQuad::CreateProxy()
 
 void GBufferVisualizeQuad::CreateCommand()
 {
-	const eastl::string RenderDataContainerID = "squareVAO";
+	const eastl::string RenderDataContainerID = "quadContainer";
 	eastl::shared_ptr<MeshDataContainer> dataContainer{ nullptr };
 
 	const bool existingContainer = Renderer::Get().GetOrCreateContainer(RenderDataContainerID, dataContainer);
@@ -293,12 +293,12 @@ void GBufferVisualizeQuad::CreateCommand()
 
 	if (!existingContainer)
 	{
-		int32_t indicesCount = BasicShapesData::GetSquareIndicesCount();
-		eastl::shared_ptr<RHIIndexBuffer> ib = RHI::Get()->CreateIndexBuffer(BasicShapesData::GetSquareIndices(), indicesCount);
+		int32_t indicesCount = BasicShapesData::GetQuadIndicesCount();
+		eastl::shared_ptr<RHIIndexBuffer> ib = RHI::Get()->CreateIndexBuffer(BasicShapesData::GetQuadIndices(), indicesCount);
 
 
-		int32_t verticesCount = BasicShapesData::GetSquareVerticesCount();
-		const eastl::shared_ptr<RHIVertexBuffer> vb = RHI::Get()->CreateVertexBuffer(inputLayout, BasicShapesData::GetSquareVertices(), verticesCount, ib);
+		int32_t verticesCount = BasicShapesData::GetQuadVerticesCount();
+		const eastl::shared_ptr<RHIVertexBuffer> vb = RHI::Get()->CreateVertexBuffer(inputLayout, BasicShapesData::GetQuadVertices(), verticesCount, ib);
 
 		dataContainer->VBuffer = vb;
 	}
@@ -332,7 +332,7 @@ ToneMapQuad::ToneMapQuad(const eastl::string& inName)
 
 void ToneMapQuad::CreateCommand()
 {
-	const eastl::string RenderDataContainerID = "squareVAO";
+	const eastl::string RenderDataContainerID = "quadContainer";
 	eastl::shared_ptr<MeshDataContainer> dataContainer{ nullptr };
 
 	const bool existingContainer = Renderer::Get().GetOrCreateContainer(RenderDataContainerID, dataContainer);
@@ -345,12 +345,12 @@ void ToneMapQuad::CreateCommand()
 
 	if (!existingContainer)
 	{
-		int32_t indicesCount = BasicShapesData::GetSquareIndicesCount();
-		eastl::shared_ptr<RHIIndexBuffer> ib = RHI::Get()->CreateIndexBuffer(BasicShapesData::GetSquareIndices(), indicesCount);
+		int32_t indicesCount = BasicShapesData::GetQuadIndicesCount();
+		eastl::shared_ptr<RHIIndexBuffer> ib = RHI::Get()->CreateIndexBuffer(BasicShapesData::GetQuadIndices(), indicesCount);
 
 
-		int32_t verticesCount = BasicShapesData::GetSquareVerticesCount();
-		const eastl::shared_ptr<RHIVertexBuffer> vb = RHI::Get()->CreateVertexBuffer(inputLayout, BasicShapesData::GetSquareVertices(), verticesCount, ib);
+		int32_t verticesCount = BasicShapesData::GetQuadVerticesCount();
+		const eastl::shared_ptr<RHIVertexBuffer> vb = RHI::Get()->CreateVertexBuffer(inputLayout, BasicShapesData::GetQuadVertices(), verticesCount, ib);
 
 		dataContainer->VBuffer = vb;
 	}
@@ -397,7 +397,7 @@ ExtractBrightAreasQuad::ExtractBrightAreasQuad(const eastl::string& inName)
 
 void ExtractBrightAreasQuad::CreateCommand()
 {
-	const eastl::string RenderDataContainerID = "squareVAO";
+	const eastl::string RenderDataContainerID = "quadContainer";
 	eastl::shared_ptr<MeshDataContainer> dataContainer{ nullptr };
 
 	const bool existingContainer = Renderer::Get().GetOrCreateContainer(RenderDataContainerID, dataContainer);
@@ -410,12 +410,12 @@ void ExtractBrightAreasQuad::CreateCommand()
 
 	if (!existingContainer)
 	{
-		int32_t indicesCount = BasicShapesData::GetSquareIndicesCount();
-		eastl::shared_ptr<RHIIndexBuffer> ib = RHI::Get()->CreateIndexBuffer(BasicShapesData::GetSquareIndices(), indicesCount);
+		int32_t indicesCount = BasicShapesData::GetQuadIndicesCount();
+		eastl::shared_ptr<RHIIndexBuffer> ib = RHI::Get()->CreateIndexBuffer(BasicShapesData::GetQuadIndices(), indicesCount);
 
 
-		int32_t verticesCount = BasicShapesData::GetSquareVerticesCount();
-		const eastl::shared_ptr<RHIVertexBuffer> vb = RHI::Get()->CreateVertexBuffer(inputLayout, BasicShapesData::GetSquareVertices(), verticesCount, ib);
+		int32_t verticesCount = BasicShapesData::GetQuadVerticesCount();
+		const eastl::shared_ptr<RHIVertexBuffer> vb = RHI::Get()->CreateVertexBuffer(inputLayout, BasicShapesData::GetQuadVertices(), verticesCount, ib);
 
 		dataContainer->VBuffer = vb;
 	}
@@ -449,7 +449,7 @@ GaussianBlurQuad::GaussianBlurQuad(const eastl::string& inName)
 
 void GaussianBlurQuad::CreateCommand()
 {
-	const eastl::string RenderDataContainerID = "squareVAO";
+	const eastl::string RenderDataContainerID = "quadContainer";
 	eastl::shared_ptr<MeshDataContainer> dataContainer{ nullptr };
 
 	const bool existingContainer = Renderer::Get().GetOrCreateContainer(RenderDataContainerID, dataContainer);
@@ -462,12 +462,12 @@ void GaussianBlurQuad::CreateCommand()
 
 	if (!existingContainer)
 	{
-		int32_t indicesCount = BasicShapesData::GetSquareIndicesCount();
-		eastl::shared_ptr<RHIIndexBuffer> ib = RHI::Get()->CreateIndexBuffer(BasicShapesData::GetSquareIndices(), indicesCount);
+		int32_t indicesCount = BasicShapesData::GetQuadIndicesCount();
+		eastl::shared_ptr<RHIIndexBuffer> ib = RHI::Get()->CreateIndexBuffer(BasicShapesData::GetQuadIndices(), indicesCount);
 
 
-		int32_t verticesCount = BasicShapesData::GetSquareVerticesCount();
-		const eastl::shared_ptr<RHIVertexBuffer> vb = RHI::Get()->CreateVertexBuffer(inputLayout, BasicShapesData::GetSquareVertices(), verticesCount, ib);
+		int32_t verticesCount = BasicShapesData::GetQuadVerticesCount();
+		const eastl::shared_ptr<RHIVertexBuffer> vb = RHI::Get()->CreateVertexBuffer(inputLayout, BasicShapesData::GetQuadVertices(), verticesCount, ib);
 
 		dataContainer->VBuffer = vb;
 	}
@@ -515,7 +515,7 @@ BloomMergeQuad::BloomMergeQuad(const eastl::string& inName)
 
 void BloomMergeQuad::CreateCommand()
 {
-	const eastl::string RenderDataContainerID = "squareVAO";
+	const eastl::string RenderDataContainerID = "quadContainer";
 	eastl::shared_ptr<MeshDataContainer> dataContainer{ nullptr };
 
 	const bool existingContainer = Renderer::Get().GetOrCreateContainer(RenderDataContainerID, dataContainer);
@@ -528,12 +528,12 @@ void BloomMergeQuad::CreateCommand()
 
 	if (!existingContainer)
 	{
-		int32_t indicesCount = BasicShapesData::GetSquareIndicesCount();
-		eastl::shared_ptr<RHIIndexBuffer> ib = RHI::Get()->CreateIndexBuffer(BasicShapesData::GetSquareIndices(), indicesCount);
+		int32_t indicesCount = BasicShapesData::GetQuadIndicesCount();
+		eastl::shared_ptr<RHIIndexBuffer> ib = RHI::Get()->CreateIndexBuffer(BasicShapesData::GetQuadIndices(), indicesCount);
 
 
-		int32_t verticesCount = BasicShapesData::GetSquareVerticesCount();
-		const eastl::shared_ptr<RHIVertexBuffer> vb = RHI::Get()->CreateVertexBuffer(inputLayout, BasicShapesData::GetSquareVertices(), verticesCount, ib);
+		int32_t verticesCount = BasicShapesData::GetQuadVerticesCount();
+		const eastl::shared_ptr<RHIVertexBuffer> vb = RHI::Get()->CreateVertexBuffer(inputLayout, BasicShapesData::GetQuadVertices(), verticesCount, ib);
 
 		dataContainer->VBuffer = vb;
 	}
@@ -566,7 +566,7 @@ VisualizeDepthQuad::VisualizeDepthQuad(const eastl::string& inName)
 
 void VisualizeDepthQuad::CreateCommand()
 {
-	const eastl::string RenderDataContainerID = "squareVAO";
+	const eastl::string RenderDataContainerID = "quadContainer";
 	eastl::shared_ptr<MeshDataContainer> dataContainer{ nullptr };
 
 	const bool existingContainer = Renderer::Get().GetOrCreateContainer(RenderDataContainerID, dataContainer);
@@ -579,12 +579,12 @@ void VisualizeDepthQuad::CreateCommand()
 
 	if (!existingContainer)
 	{
-		int32_t indicesCount = BasicShapesData::GetSquareIndicesCount();
-		eastl::shared_ptr<RHIIndexBuffer> ib = RHI::Get()->CreateIndexBuffer(BasicShapesData::GetSquareIndices(), indicesCount);
+		int32_t indicesCount = BasicShapesData::GetQuadIndicesCount();
+		eastl::shared_ptr<RHIIndexBuffer> ib = RHI::Get()->CreateIndexBuffer(BasicShapesData::GetQuadIndices(), indicesCount);
 
 
-		int32_t verticesCount = BasicShapesData::GetSquareVerticesCount();
-		const eastl::shared_ptr<RHIVertexBuffer> vb = RHI::Get()->CreateVertexBuffer(inputLayout, BasicShapesData::GetSquareVertices(), verticesCount, ib);
+		int32_t verticesCount = BasicShapesData::GetQuadVerticesCount();
+		const eastl::shared_ptr<RHIVertexBuffer> vb = RHI::Get()->CreateVertexBuffer(inputLayout, BasicShapesData::GetQuadVertices(), verticesCount, ib);
 
 		dataContainer->VBuffer = vb;
 	}
@@ -618,7 +618,7 @@ DefaultLightingModelQuad::DefaultLightingModelQuad(const eastl::string& inName)
 
 void DefaultLightingModelQuad::CreateCommand()
 {
-	const eastl::string RenderDataContainerID = "squareVAO";
+	const eastl::string RenderDataContainerID = "quadContainer";
 	eastl::shared_ptr<MeshDataContainer> dataContainer{ nullptr };
 
 	const bool existingContainer = Renderer::Get().GetOrCreateContainer(RenderDataContainerID, dataContainer);
@@ -631,12 +631,12 @@ void DefaultLightingModelQuad::CreateCommand()
 
 	if (!existingContainer)
 	{
-		int32_t indicesCount = BasicShapesData::GetSquareIndicesCount();
-		eastl::shared_ptr<RHIIndexBuffer> ib = RHI::Get()->CreateIndexBuffer(BasicShapesData::GetSquareIndices(), indicesCount);
+		int32_t indicesCount = BasicShapesData::GetQuadIndicesCount();
+		eastl::shared_ptr<RHIIndexBuffer> ib = RHI::Get()->CreateIndexBuffer(BasicShapesData::GetQuadIndices(), indicesCount);
 
 
-		int32_t verticesCount = BasicShapesData::GetSquareVerticesCount();
-		const eastl::shared_ptr<RHIVertexBuffer> vb = RHI::Get()->CreateVertexBuffer(inputLayout, BasicShapesData::GetSquareVertices(), verticesCount, ib);
+		int32_t verticesCount = BasicShapesData::GetQuadVerticesCount();
+		const eastl::shared_ptr<RHIVertexBuffer> vb = RHI::Get()->CreateVertexBuffer(inputLayout, BasicShapesData::GetQuadVertices(), verticesCount, ib);
 
 		dataContainer->VBuffer = vb;
 	}
@@ -673,7 +673,7 @@ DefaultPBRLightingModelQuad::DefaultPBRLightingModelQuad(const eastl::string& in
 
 void DefaultPBRLightingModelQuad::CreateCommand()
 {
-	const eastl::string RenderDataContainerID = "squareVAO";
+	const eastl::string RenderDataContainerID = "quadContainer";
 	eastl::shared_ptr<MeshDataContainer> dataContainer{ nullptr };
 
 	const bool existingContainer = Renderer::Get().GetOrCreateContainer(RenderDataContainerID, dataContainer);
@@ -686,12 +686,12 @@ void DefaultPBRLightingModelQuad::CreateCommand()
 
 	if (!existingContainer)
 	{
-		int32_t indicesCount = BasicShapesData::GetSquareIndicesCount();
-		eastl::shared_ptr<RHIIndexBuffer> ib = RHI::Get()->CreateIndexBuffer(BasicShapesData::GetSquareIndices(), indicesCount);
+		int32_t indicesCount = BasicShapesData::GetQuadIndicesCount();
+		eastl::shared_ptr<RHIIndexBuffer> ib = RHI::Get()->CreateIndexBuffer(BasicShapesData::GetQuadIndices(), indicesCount);
 
 
-		int32_t verticesCount = BasicShapesData::GetSquareVerticesCount();
-		const eastl::shared_ptr<RHIVertexBuffer> vb = RHI::Get()->CreateVertexBuffer(inputLayout, BasicShapesData::GetSquareVertices(), verticesCount, ib);
+		int32_t verticesCount = BasicShapesData::GetQuadVerticesCount();
+		const eastl::shared_ptr<RHIVertexBuffer> vb = RHI::Get()->CreateVertexBuffer(inputLayout, BasicShapesData::GetQuadVertices(), verticesCount, ib);
 
 		dataContainer->VBuffer = vb;
 	}

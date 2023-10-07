@@ -152,7 +152,7 @@ void DeferredRenderer::Draw()
 	RHI::Get()->SetDepthWrite(false);
 
 	DrawCommand(DefaultPBRShadingModelQuad->GetCommand());
-
+	
 	// Draw debug primitives
 	DrawDebugManager::Draw();
 
@@ -587,8 +587,30 @@ void DeferredRenderer::DrawCommand(const RenderCommand& inCommand)
 
 	material->ResetUniforms();
 
-	UniformsCache["model"] = parent->GetModelMatrix();
+	glm::mat4 model = parent->GetModelMatrix();
+	UniformsCache["model"] = model;
 	UniformsCache["ObjPos"] = parent->GetAbsoluteTransform().Translation;
+
+	// Path Tracing Debug
+
+	if (inCommand.Triangles.size() != 0)
+	{
+		RenderCommand& nonConstCommand = const_cast<RenderCommand&>(inCommand);
+		if (!nonConstCommand.AccStructure.IsValid())
+		{
+			eastl::vector<PathTraceTriangle> transformedTriangles = nonConstCommand.Triangles;
+			for (PathTraceTriangle& triangle : transformedTriangles)
+			{
+				triangle.Transform(model);
+			}
+
+			nonConstCommand.AccStructure.Build(transformedTriangles);
+		}
+
+		nonConstCommand.AccStructure.Root->DebugDraw();
+	}
+
+	// Path Tracing Debug
 
 	{
 		int texNr = 0;
@@ -849,6 +871,7 @@ void DeferredRenderer::SetDrawMode(const EDrawMode::Type inDrawMode)
 
 bool DeferredRenderer::GetOrCreateContainer(const eastl::string& inInstanceName, OUT eastl::shared_ptr<MeshDataContainer>& outContainer)
 {
+	LOG_INFO("Get or Create Render Container.");
 	ASSERT(!inInstanceName.empty());
 	std::lock_guard<std::mutex> uniqueMutex(GetVAOMutex);
 	//GetVAOMutex.lock(); // TODO: Why does this not work?
@@ -859,11 +882,14 @@ bool DeferredRenderer::GetOrCreateContainer(const eastl::string& inInstanceName,
 
 	if (materialExists)
 	{
+		LOG_INFO("Container already exists, returning.");
+
 		outContainer = (*containerIter).second;
 
 		return true;
 	}
 
+	LOG_INFO("Container not present, creating new.");
 	eastl::shared_ptr<MeshDataContainer> newContainer = eastl::make_shared<MeshDataContainer>();
 	RenderDataContainerMap[inInstanceName] = newContainer;
 	outContainer = newContainer;

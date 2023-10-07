@@ -175,9 +175,8 @@ public:
 
 	virtual void ClearTexture(const RHITexture2D& inTexture, const glm::vec4& inColor) {}
 
-	virtual eastl::shared_ptr<class RHIShader> CreateShaderFromSource(const eastl::vector<ShaderSourceInput> inShaderSources, const VertexInputLayout& inInputLayout, const eastl::string& inVSName = "VS", const eastl::string& inPSName = "PS") { return nullptr; }
-
-	virtual eastl::shared_ptr<class RHIShader> CreateShaderFromPath(const eastl::vector<ShaderSourceInput> inPathShaderSources, const VertexInputLayout& inInputLayout) { return nullptr; }
+	virtual eastl::shared_ptr<class RHIShader> CreateShaderFromSource(const eastl::vector<ShaderSourceInput>& inShaderSources, const VertexInputLayout& inInputLayout, const eastl::string& inVSName = "VS", const eastl::string& inPSName = "PS") { return nullptr; }
+	virtual eastl::shared_ptr<class RHIShader> CreateShaderFromPath(const eastl::vector<ShaderSourceInput>& inPathShaderSources, const VertexInputLayout& inInputLayout) { return nullptr; }
 
 	virtual eastl::shared_ptr<class RHITexture2D> CreateTexture2D(const uint32_t inWidth, const uint32_t inHeight) { return nullptr; }
 	virtual void UploadDataToTexture(class RHITexture2D& inTexture, const struct ImageData& inData, const bool inGenerateMips) {}

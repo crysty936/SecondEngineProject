@@ -350,9 +350,6 @@ void TestGameMode::Init()
 	{
 		//eastl::shared_ptr<CubeShape> centerObj = SceneHelper::CreateVisualEntity<CubeShape>("Cube 1");
 
-		eastl::shared_ptr<TriangleShape> TriangleTestObj = SceneHelper::CreateVisualEntity<TriangleShape>("Triangle 1");
-		//eastl::shared_ptr<SquareShape> SquareTestObj = SceneHelper::CreateVisualEntity<SquareShape>("Quad 1");
-
 		//eastl::shared_ptr<CubeShape> lightObj = BasicShapesHelpers::CreateCubeObject();
 		//lightObj->SetRelativeLocation(glm::vec3(10.f, 20.f, 15.f));
 	}
@@ -415,10 +412,6 @@ void TestGameMode::Init()
 	//FloorModel->Move(glm::vec3(0.f, -2.f, 0.f));
 	//FloorModel->SetScale(glm::vec3(10.f, 10.f, 10.f));
 
- 	//FloorModel = SceneHelper::CreateVisualEntity<AssimpModel3D>("../Data/Models/high_poly_blender_monkey_suzanne/scene.gltf", "Monke");
- 	//FloorModel->Move(glm::vec3(0.f, -2.f, 0.f));
- 	//FloorModel->SetScale(glm::vec3(10.f, 10.f, 10.f));
-
 	
 	//SphereModel = SceneHelper::CreateVisualEntity<AssimpModel3DEditorSphere>("../Data/Models/Sphere/scene.gltf", "EditorSphere");
 	//SphereModel->Move(glm::vec3(0.f, -2.f, 0.f));
@@ -434,6 +427,15 @@ void TestGameMode::Init()
 // 		PointLight->SetRelativeLocation({ 0.5f, 1.0f, -52.f });
 // 	}
 
+
+		//FloorModel = SceneHelper::CreateVisualEntity<AssimpModel3D>("../Data/Models/high_poly_blender_monkey_suzanne/scene.gltf", "Monke");
+	//FloorModel->Move(glm::vec3(0.f, -2.f, 0.f));
+	//FloorModel->SetScale(glm::vec3(10.f, 10.f, 10.f));
+
+
+		//eastl::shared_ptr<TriangleShape> TriangleTestObj = SceneHelper::CreateVisualEntity<TriangleShape>("Triangle 1");
+		eastl::shared_ptr<SquareShape> SquareTestObj = SceneHelper::CreateVisualEntity<SquareShape>("Quad 1");
+		//eastl::shared_ptr<CubeShape> cubeTestObj= SceneHelper::CreateVisualEntity<CubeShape>("Cube 1");
 
 
 

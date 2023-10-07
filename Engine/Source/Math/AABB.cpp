@@ -1,6 +1,28 @@
 #include "Math/AABB.h"
+#include "Renderer/DrawDebugHelpers.h"
 
-eastl::array<glm::vec3, 8> AABB::GetVertices()
+AABB& AABB::operator+=(const glm::vec3& inVec)
+{
+	if (IsInitialized)
+	{
+		Min.x = glm::min(Min.x, inVec.x);
+		Min.y = glm::min(Min.y, inVec.y);
+		Min.z = glm::min(Min.z, inVec.z);
+
+		Max.x = glm::max(Max.x, inVec.x);
+		Max.y = glm::max(Max.y, inVec.y);
+		Max.z = glm::max(Max.z, inVec.z);
+	}
+	else
+	{
+		Min = Max = inVec;
+		IsInitialized = true;
+	}
+
+	return *this;
+}
+
+eastl::array<glm::vec3, 8> AABB::GetVertices() const
 {
 	// Use a unit cube
 	const glm::vec3 verts[8] = {
@@ -29,4 +51,9 @@ eastl::array<glm::vec3, 8> AABB::GetVertices()
 	}
 
 	return worldPoints;
+}
+
+void AABB::DebugDraw() const
+{
+	DrawDebugHelpers::DrawBoxArray(GetVertices(), false);
 }

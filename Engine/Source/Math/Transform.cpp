@@ -132,31 +132,42 @@ Transform::Transform(const glm::mat4 inModel)
 
 glm::mat4 Transform::GetMatrix() const
 {
-	glm::mat4 model(1.f);
+	if (bDirty)
+	{
+		bDirty = false;
 
-	model = glm::translate(model, Translation);
+		glm::mat4 model(1.f);
 
-	model = model * glm::mat4_cast(Rotation);
-	
-	model = glm::scale(model, Scale);
+		model = glm::translate(model, Translation);
+		model = model * glm::mat4_cast(Rotation);
+		model = glm::scale(model, Scale);
 
-	return model;
+		MatrixCache = model;
+
+		return model;
+	}
+
+
+	return MatrixCache;
 }
 
 void Transform::Rotate(const float inAmount, const glm::vec3 inAxis)
 {
+	bDirty = true;
+
 	glm::quat additiveRotation = glm::angleAxis(glm::radians(inAmount), inAxis);
 	Rotation = Rotation * additiveRotation;
 }
 
 Transform Transform::operator*(const Transform& inOther) const
 {
+	bDirty = true;
+
 	Transform out;
 
  	out.Translation = inOther.Rotation * (inOther.Scale * this->Translation) + inOther.Translation;
  	out.Rotation = inOther.Rotation * this->Rotation;
  	out.Scale = this->Scale * inOther.Scale;
- 
 
 	return out;
 }

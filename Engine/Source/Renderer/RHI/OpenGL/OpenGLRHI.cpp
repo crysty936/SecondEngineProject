@@ -4,22 +4,22 @@
 #include "Core/EngineUtils.h"
 #include "Core/EngineCore.h"
 #include "Window/WindowsWindow.h"
+#include "Utils/IOUtils.h"
+#include "Utils/ImageLoading.h"
 #include "Renderer/RHI/OpenGL/Resources/GLIndexBuffer.h"
 #include "Renderer/RHI/OpenGL/Resources/GLShader.h"
-#include "Utils/IOUtils.h"
 #include "Renderer/RHI/OpenGL/Resources/GLUniformBuffer.h"
 #include "Renderer/RHI/OpenGL/Resources/GLVertexBuffer.h"
-#include "Utils/ImageLoading.h"
-
-#include "glad/glad.h"
 #include "Renderer/RHI/OpenGL/Resources/GLTexture2D.h"
-#include "glm/ext/matrix_transform.hpp"
 #include "Resources/GLFrameBuffer.h"
 #include "Core/WindowsPlatform.h"
-#include "imgui.h"
-#include "backends/imgui_impl_opengl3.h"
 #include "Renderer/Renderer.h"
 #include "Renderer/Material/RenderMaterial.h"
+
+#include "glad/glad.h"
+#include "glm/ext/matrix_transform.hpp"
+#include "imgui.h"
+#include "backends/imgui_impl_opengl3.h"
 
 namespace GLUtils
 {
@@ -976,7 +976,7 @@ uint32_t CreateShaderInternal(const eastl::string& Source, uint32_t ShaderType)
 	return shaderHandle;
 }
 
-eastl::shared_ptr<RHIShader> OpenGLRHI::CreateShaderFromSource(const eastl::vector<ShaderSourceInput> inShaderSources, const VertexInputLayout& inInputLayout, const eastl::string&, const eastl::string&)
+eastl::shared_ptr<RHIShader> OpenGLRHI::CreateShaderFromSource(const eastl::vector<ShaderSourceInput>& inShaderSources, const VertexInputLayout& inInputLayout, const eastl::string&, const eastl::string&)
 {
 	GLuint vertexShader = 0;
 	GLuint fragmentShader = 0;
@@ -1071,7 +1071,7 @@ eastl::shared_ptr<RHIShader> OpenGLRHI::CreateShaderFromSource(const eastl::vect
 	return newShader;
 }
 
-eastl::shared_ptr<class RHIShader> OpenGLRHI::CreateShaderFromPath(const eastl::vector<ShaderSourceInput> inPathShaderSources, const VertexInputLayout& inInputLayout)
+eastl::shared_ptr<class RHIShader> OpenGLRHI::CreateShaderFromPath(const eastl::vector<ShaderSourceInput>& inPathShaderSources, const VertexInputLayout& inInputLayout)
 {
 	eastl::vector<ShaderSourceInput> rhiSpecificSources;
 	rhiSpecificSources.reserve(inPathShaderSources.size());

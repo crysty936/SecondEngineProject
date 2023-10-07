@@ -18,6 +18,9 @@ struct Transform
 
 	glm::mat4 GetMatrix() const;
 
+	mutable glm::mat4 MatrixCache;
+	mutable bool bDirty = true;
+
 	void Rotate(const float inAmount, const glm::vec3 inAxis);
 
 	Transform operator*(const Transform& inOther) const;

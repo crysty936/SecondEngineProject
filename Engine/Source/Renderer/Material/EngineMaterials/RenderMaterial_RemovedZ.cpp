@@ -1,14 +1,14 @@
-#include "Renderer/Material/EngineMaterials/RenderMaterial_2DShape.h"
+#include "Renderer/Material/EngineMaterials/RenderMaterial_RemovedZ.h"
 #include "Renderer/SelfRegisteringUniform/SelfRegisteringUniform.h"
 #include "Core/EngineUtils.h"
 #include "Renderer/Material/MaterialHelpers.h"
 #include "Renderer/RHI/RHI.h"
 #include "imgui.h"
 
-RenderMaterial_2DShape::RenderMaterial_2DShape() = default;
-RenderMaterial_2DShape::~RenderMaterial_2DShape() = default;
+RenderMaterial_RemovedZ::RenderMaterial_RemovedZ() = default;
+RenderMaterial_RemovedZ::~RenderMaterial_RemovedZ() = default;
 
-void RenderMaterial_2DShape::SetUniformsValue(eastl::unordered_map<eastl::string, struct SelfRegisteringUniform>& inUniformsCache, const EShaderType inShaderTypes)
+void RenderMaterial_RemovedZ::SetUniformsValue(eastl::unordered_map<eastl::string, struct SelfRegisteringUniform>& inUniformsCache, const EShaderType inShaderTypes)
 {
 	// 2D Shapes don't need the z axis scale, it screws things up
 

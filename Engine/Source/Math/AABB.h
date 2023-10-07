@@ -1,34 +1,16 @@
 #pragma once
-#include "glm/common.hpp"
-#include "glm/ext/vector_float3.hpp"
+
 #include "Core/EngineUtils.h"
 #include "EASTL/array.h"
+#include "EASTL/vector.h"
+#include "glm/ext/vector_float3.hpp"
 
 struct AABB
 {
 	glm::vec3 Min;
 	glm::vec3 Max;
 
-	inline AABB& operator +=(const glm::vec3& inVec)
-	{
-		if (IsInitialized)
-		{
-			Min.x = glm::min(Min.x, inVec.x);
-			Min.y = glm::min(Min.y, inVec.y);
-			Min.z = glm::min(Min.z, inVec.z);
-
-			Max.x = glm::max(Max.x, inVec.x);
-			Max.y = glm::max(Max.y, inVec.y);
-			Max.z = glm::max(Max.z, inVec.z);
-		}
-		else
-		{
-			Min = Max = inVec;
-			IsInitialized = true;
-		}
-
-		return *this;
-	}
+	AABB& operator +=(const glm::vec3& inVec);
 
 	inline glm::vec3 GetExtent() const
 	{
@@ -41,7 +23,9 @@ struct AABB
 		outCenter = Min + outExtent;
 	}
 
-	eastl::array<glm::vec3, 8> GetVertices();
+	eastl::array<glm::vec3, 8> GetVertices() const;
+
+	void DebugDraw() const;
 
 private:
 	bool IsInitialized = false;

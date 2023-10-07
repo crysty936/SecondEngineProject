@@ -3,11 +3,11 @@
 #include "EASTL/string.h"
 #include "Renderer/Material/RenderMaterial.h"
 
-class RenderMaterial_2DShape : public RenderMaterial
+class RenderMaterial_RemovedZ : public RenderMaterial
 {
 public:
-	RenderMaterial_2DShape();
-	~RenderMaterial_2DShape();
+	RenderMaterial_RemovedZ();
+	~RenderMaterial_RemovedZ();
 
 	virtual void SetUniformsValue(eastl::unordered_map<eastl::string, struct SelfRegisteringUniform>& inUniformsCache, const EShaderType inShaderTypes = Sh_Universal) override;
 };

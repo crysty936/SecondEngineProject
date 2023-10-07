@@ -177,6 +177,8 @@ void AssimpModel3D::ProcessMesh(const aiMesh& inMesh, const aiScene& inScene, ea
 	eastl::shared_ptr<MeshDataContainer> dataContainer;
 	const bool existingContainer = Renderer::Get().GetOrCreateContainer(renderDataContainerID, dataContainer);
 
+	eastl::vector<PathTraceTriangle> triangles;
+
 	if (!existingContainer)
 	{
 		eastl::vector<Vertex> vertices;
@@ -239,6 +241,30 @@ void AssimpModel3D::ProcessMesh(const aiMesh& inMesh, const aiScene& inScene, ea
 		const eastl::shared_ptr<RHIVertexBuffer> vb = RHI::Get()->CreateVertexBuffer(inputLayout, vertices, ib);
 
 		dataContainer->VBuffer = vb;
+
+		// For Pathtracer
+		{
+			for (int32_t i = 0; i < indicesCount; i += 3)
+			{
+				glm::vec3 v[3];
+
+				const size_t vertexSize = sizeof(glm::vec3);
+				const size_t uvSize = sizeof(glm::vec2);
+
+				for (int32_t j = 0; j < 3; ++j)
+				{
+					constexpr int32_t stride = 14; // 3 floats for Pos vec3, 3 for Normal vec3 and 2 for UVs vec2, 3 for Tangent and 3 for Bitangent
+
+					const int32_t index = indices[i + j];
+					const float* startPos = &vertices[0].Position.x + index * stride;
+					memcpy(&v[j], startPos, vertexSize);
+				}
+
+				PathTraceTriangle pathTraceTriangle = PathTraceTriangle(v);
+
+				triangles.push_back(pathTraceTriangle);
+			}
+		}
 	}
 
 	AddAdditionalBuffers(dataContainer);
@@ -247,6 +273,7 @@ void AssimpModel3D::ProcessMesh(const aiMesh& inMesh, const aiScene& inScene, ea
 	inCurrentNode->AddChild(newMesh);
 
 	RenderCommand newCommand = CreateRenderCommand(thisMaterial, inCurrentNode, dataContainer);
+	newCommand.Triangles = triangles;
 	outCommands.push_back(newCommand);
 }
 

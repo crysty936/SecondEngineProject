@@ -15,7 +15,6 @@
 #include "EASTL/unordered_map.h"
 #include "Renderer/Material/EngineMaterials/RenderMaterial_LightSource.h"
 #include "Renderer/Material/EngineMaterials/RenderMaterial_DeferredDecal.h"
-#include "Renderer/Material/EngineMaterials/RenderMaterial_2DShape.h"
 
 TriangleShape::TriangleShape(const eastl::string& inName)
 	: DrawableObject(inName)
@@ -32,10 +31,9 @@ void TriangleShape::CreateProxy()
 	const bool existingContainer = Renderer::Get().GetOrCreateContainer(RenderDataContainerID, dataContainer);
 
 	VertexInputLayout inputLayout;
-	// Vertex points
 	inputLayout.Push<float>(3, VertexInputType::Position);
-	// Vertex Tex Coords
-	//layout.Push<float>(2);
+	inputLayout.Push<float>(3, VertexInputType::Normal);
+	inputLayout.Push<float>(2, VertexInputType::TexCoords);
 
 	if (!existingContainer)
 	{
@@ -52,7 +50,7 @@ void TriangleShape::CreateProxy()
 
 	MaterialsManager& matManager = MaterialsManager::Get();
 	bool materialExists = false;
-	eastl::shared_ptr<RenderMaterial> material = matManager.GetOrAddMaterial<RenderMaterial_2DShape>("triangle_material", materialExists);
+	eastl::shared_ptr<RenderMaterial> material = matManager.GetOrAddMaterial("triangle_material", materialExists);
 
 	if (!materialExists)
 	{
@@ -62,8 +60,8 @@ void TriangleShape::CreateProxy()
 		//material->Textures.push_back(std::move(tex));
 
 		eastl::vector<ShaderSourceInput> shaders = {
-		{ "ScreenQuad/VS_Pos-UV", EShaderType::Sh_Vertex },
-		{ "ScreenQuad/PS_FlatColor", EShaderType::Sh_Fragment } };
+		{ "2DShape/VS_Pos-UV", EShaderType::Sh_Vertex },
+		{ "2DShape/PS_FlatColor", EShaderType::Sh_Fragment } };
 
 		material->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
 	}
@@ -89,13 +87,13 @@ void TriangleShape::CreateProxy()
 			glm::vec3 v[3];
 
 			const size_t vertexSize = sizeof(glm::vec3);
-			const size_t uvSize = sizeof(glm::vec2);
+			constexpr int32_t stride = 8;
 
 			memcpy(&v[0], vertices, vertexSize);
-			memcpy(&v[1], vertices + 5, vertexSize);
-			memcpy(&v[2], vertices + 10, vertexSize);
+			memcpy(&v[1], vertices + stride, vertexSize);
+			memcpy(&v[2], vertices + 2 * stride, vertexSize);
 
-			Triangle pathTraceTriangle = Triangle(v);
+			PathTraceTriangle pathTraceTriangle = PathTraceTriangle(v);
 
 			newCommand.Triangles.push_back(pathTraceTriangle);
 		}
@@ -114,24 +112,23 @@ SquareShape::~SquareShape() = default;
 
 void SquareShape::CreateProxy()
 {
- 	const eastl::string RenderDataContainerID = "squareVAO";
+ 	const eastl::string RenderDataContainerID = "squareContainer";
 	eastl::shared_ptr<MeshDataContainer> dataContainer{ nullptr };
 
 	const bool existingContainer = Renderer::Get().GetOrCreateContainer(RenderDataContainerID, dataContainer);
  
  	VertexInputLayout inputLayout;
- 	// Vertex points
 	inputLayout.Push<float>(3, VertexInputType::Position);
-	// Vertex Tex Coords
+	inputLayout.Push<float>(3, VertexInputType::Normal);
  	inputLayout.Push<float>(2, VertexInputType::TexCoords);
 
 	if (!existingContainer)
  	{
- 		int32_t indicesCount = BasicShapesData::GetSquareIndicesCount();
+ 		const int32_t indicesCount = BasicShapesData::GetSquareIndicesCount();
 		eastl::shared_ptr<RHIIndexBuffer> ib = RHI::Get()->CreateIndexBuffer(BasicShapesData::GetSquareIndices(), indicesCount);
 
  
- 		int32_t verticesCount = BasicShapesData::GetSquareVerticesCount();
+ 		const int32_t verticesCount = BasicShapesData::GetSquareVerticesCount();
 		const eastl::shared_ptr<RHIVertexBuffer> vb = RHI::Get()->CreateVertexBuffer(inputLayout, BasicShapesData::GetSquareVertices(), verticesCount, ib);
 
 		dataContainer->VBuffer = vb;
@@ -144,8 +141,8 @@ void SquareShape::CreateProxy()
  	if (!materialExists)
  	{
 		eastl::vector<ShaderSourceInput> shaders = {
-		{ "ScreenQuad/VS_Pos-UV", EShaderType::Sh_Vertex },
-		{ "ScreenQuad/PS_FlatColor", EShaderType::Sh_Fragment } };
+		{ "2DShape/VS_Pos-UV", EShaderType::Sh_Vertex },
+		{ "2DShape/PS_FlatColor", EShaderType::Sh_Fragment } };
 
 		material->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
 	}
@@ -156,6 +153,36 @@ void SquareShape::CreateProxy()
  	newCommand.Parent = this_shared(this);
  	newCommand.DrawType = EDrawType::DrawElements;
  
+	// For Pathtracer
+	{
+
+		const uint32_t* indices = BasicShapesData::GetSquareIndices();
+		const int32_t indicesCount = BasicShapesData::GetSquareIndicesCount();
+
+		const float* vertices = BasicShapesData::GetSquareVertices();
+		const int32_t verticesCount = BasicShapesData::GetSquareVerticesCount();
+
+		for (int32_t i = 0; i < indicesCount; i += 3)
+		{
+			glm::vec3 v[3];
+
+			const size_t vertexSize = sizeof(glm::vec3);
+
+			for (int32_t j = 0; j < 3; ++j)
+			{
+				constexpr int32_t stride = 8;
+
+				const int32_t index = indices[i + j];
+				const float* startPos = vertices + index * stride;
+				memcpy(&v[j], startPos, vertexSize);
+			}
+
+			PathTraceTriangle pathTraceTriangle = PathTraceTriangle(v);
+
+			newCommand.Triangles.push_back(pathTraceTriangle);
+		}
+	}
+
 	Renderer::Get().AddCommand(newCommand);
 }
 
@@ -216,6 +243,37 @@ void CubeShape::CreateProxy()
 	newCommand.DataContainer = dataContainer;
 	newCommand.Parent = cubeNode;
 	newCommand.DrawType = EDrawType::DrawElements;
+
+	// For Pathtracer
+	{
+
+		const uint32_t* indices = BasicShapesData::GetCubeIndices();
+		const int32_t indicesCount = BasicShapesData::GetCubeIndicesCount();
+
+		const float* vertices = BasicShapesData::GetCubeVertices();
+		const int32_t verticesCount = BasicShapesData::GetCubeVerticesCount();
+
+		for (int32_t i = 0; i < indicesCount; i += 3)
+		{
+			glm::vec3 v[3];
+
+			const size_t vertexSize = sizeof(glm::vec3);
+
+			for (int32_t j = 0; j < 3; ++j)
+			{
+				constexpr int32_t stride = 8; // 3 floats for Pos vec3, 3 for Normal vec3 and 2 for UVs vec2 
+
+				const int32_t index = indices[i + j];
+				const float* startPos = vertices + index * stride;
+				memcpy(&v[j], startPos, vertexSize);
+			}
+
+			PathTraceTriangle pathTraceTriangle = PathTraceTriangle(v);
+
+			newCommand.Triangles.push_back(pathTraceTriangle);
+		}
+	}
+
 
 	Renderer::Get().AddCommand(newCommand);
 }

@@ -3,9 +3,9 @@
 // Triangle
 const float TriangleVertices[] =
 {
-	-1.0f, -1.0f, 0.0f, 0.f, 0.f, 
-	 1.0f, -1.0f, 0.0f, 1.f, 0.f,
-	 0.0f,  1.0f, 0.0f, 0.5f, 1.f
+	-1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.f, 0.f, 0.f, 
+	 1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.f, 1.f, 0.f,
+	 0.0f,  1.0f, 0.0f, 0.0f, 0.0f, 1.f, 0.5f, 1.f
 };
 
 
@@ -37,6 +37,7 @@ int32_t BasicShapesData::GetTriangleIndicesCount()
 // ~Triangle
 
 // Quad
+// To be used for screen quads
 const float QuadVertices[] = {
  1.f,  1.f, 0.0f,  1.f, 1.f, // top right
 -1.f,  1.f, 0.0f,  0.f, 1.f,  // top left 
@@ -109,11 +110,12 @@ int32_t BasicShapesData::GetTBNQuadIndicesCount()
 
 // Square
 // CCW Vertices with secondary diagonal split drawing
+// To be used for world space entities
 const float SquareVertices[] = {
- 1.f,  1.f, 0.0f,  1.f, 1.f, // top right
--1.f,  1.f, 0.0f,  0.f, 1.f,  // top left 
- 1.f, -1.f, 0.0f,  1.f, 0.f, // bottom right
--1.f, -1.f, 0.0f,  0.f, 0.f, // bottom left
+ 1.f,  1.f, 0.0f,  0.0f, 0.0f, 1.f, 1.f, 1.f, // top right
+-1.f,  1.f, 0.0f,  0.0f, 0.0f, 1.f, 0.f, 1.f,  // top left 
+ 1.f, -1.f, 0.0f,  0.0f, 0.0f, 1.f, 1.f, 0.f, // bottom right
+-1.f, -1.f, 0.0f,  0.0f, 0.0f, 1.f, 0.f, 0.f, // bottom left
 };
 
 const uint32_t SquareIndices[] = {

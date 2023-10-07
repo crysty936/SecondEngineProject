@@ -201,7 +201,7 @@ Payload Trace(const PathTracingRay& inRay)
 	return result;
 }
 
-bool TraceTriangle(const PathTracingRay& inRay, const Triangle& inTri)
+bool TraceTriangle(const PathTracingRay& inRay, const PathTraceTriangle& inTri)
 {
 	const glm::vec3& A = inTri.V[0];
 	const glm::vec3& E1 = inTri.E[0];
@@ -252,29 +252,28 @@ glm::vec4 PathTracingRenderer::PerPixel(const uint32_t x, const uint32_t y, cons
 		}
 
 		const bool parentValid = !command.Parent.expired();
-		if (!ENSURE(parentValid))
+		if (!parentValid)
 		{
 			continue;
 		}
 
 		const eastl::shared_ptr<const DrawableObject> parent = command.Parent.lock();
-		const eastl::shared_ptr<RenderMaterial> material = command.Material;
-		const eastl::shared_ptr<MeshDataContainer>& dataContainer = command.DataContainer;
+		//const eastl::shared_ptr<RenderMaterial> material = command.Material;
+		//const eastl::shared_ptr<MeshDataContainer>& dataContainer = command.DataContainer;
 
-		if (!parent->IsVisible() || !material)
-		{
-			continue;
-		}
+		//if (!parent->IsVisible() || !material)
+		//{
+		//	continue;
+		//}
 
 		glm::mat4 modelMat = parent->GetModelMatrix();
 		// Remove z scale from model for two dimensional shape
 		glm::vec4 thirdColumn = modelMat[2];
-		modelMat[2] = glm::vec4(0.f, 0.f, 0.f, thirdColumn.w);
+		//modelMat[2] = glm::vec4(0.f, 0.f, 0.f, thirdColumn.w);
 
-
-		for (Triangle tri : command.Triangles)
+		for (PathTraceTriangle tri : command.Triangles)
 		{
-			tri.Transform(modelMat);
+			//tri.Transform(modelMat);
 
 			if (TraceTriangle(traceRay, tri))
 			{
@@ -388,19 +387,19 @@ void PathTracingRenderer::Draw()
 		AccumulatedFramesCount = 1;
 	}
 
-	int32_t sphereNr = 0;
-	for (Sphere& sphere : spheres)
-	{
-		ImGui::PushID(sphereNr);
-		ImGui::Text((eastl::string("Sphere ") + eastl::string(eastl::to_string(sphereNr))).c_str());
+	//int32_t sphereNr = 0;
+	//for (Sphere& sphere : spheres)
+	//{
+	//	ImGui::PushID(sphereNr);
+	//	ImGui::Text((eastl::string("Sphere ") + eastl::string(eastl::to_string(sphereNr))).c_str());
 
-		//ImGui::TreeNode((eastl::string("Sphere #") + eastl::string(eastl::to_string(sphereNr))).c_str());
-		ImGui::DragFloat3("Position", &sphere.Origin.x, 0.5f);
-		ImGui::DragFloat("Radius", &sphere.Radius, 0.1f);
-		//ImGui::TreePop();
+	//	//ImGui::TreeNode((eastl::string("Sphere #") + eastl::string(eastl::to_string(sphereNr))).c_str());
+	//	ImGui::DragFloat3("Position", &sphere.Origin.x, 0.5f);
+	//	ImGui::DragFloat("Radius", &sphere.Radius, 0.1f);
+	//	//ImGui::TreePop();
 
-		++sphereNr;
-	}
+	//	++sphereNr;
+	//}
 
 	ImGui::DragFloat3("DirLightDir", &DirLightDir.x, 0.1f);
 	NormalizedDirLightDir = glm::normalize(DirLightDir);
@@ -419,6 +418,27 @@ void PathTracingRenderer::Draw()
 	//const glm::vec3 forward = glm::normalize(rot * glm::vec3(0.f, 0.f, 1.f));
 	//const glm::mat4 view = glm::lookAt(glm::vec3(0.f, 0.f, 0.f), forward, glm::vec3(0, 1, 0));
 	//const glm::mat4 invView = glm::inverse(view);
+
+	// Precache transforms
+	for (RenderCommand& command : MainCommands)
+	{
+		if (command.Triangles.size() == 0)
+		{
+			continue;
+		}
+
+		const eastl::shared_ptr<const DrawableObject> parent = command.Parent.lock();
+		parent->GetModelMatrix();
+
+
+		if (!command.AccStructure.IsValid())
+		{
+			command.AccStructure.Build(command.Triangles);
+		}
+
+		//command.AccStructure.Root->DebugDraw();
+
+	}
 
 #if 1
 	std::for_each(std::execution::par, m_ImageVerticalIter.begin(), m_ImageVerticalIter.end(),
@@ -469,6 +489,9 @@ void PathTracingRenderer::Draw()
 	RHI::Get()->ClearBuffers();
 
 	DrawCommand(VisualizeQuad->GetCommand());
+
+	// Draw debug primitives
+	//DrawDebugManager::Draw();
 
 	ImGui::End();
 }
