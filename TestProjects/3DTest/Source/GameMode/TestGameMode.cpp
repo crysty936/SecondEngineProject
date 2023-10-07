@@ -434,8 +434,8 @@ void TestGameMode::Init()
 
 
 		//eastl::shared_ptr<TriangleShape> TriangleTestObj = SceneHelper::CreateVisualEntity<TriangleShape>("Triangle 1");
-		eastl::shared_ptr<SquareShape> SquareTestObj = SceneHelper::CreateVisualEntity<SquareShape>("Quad 1");
-		//eastl::shared_ptr<CubeShape> cubeTestObj= SceneHelper::CreateVisualEntity<CubeShape>("Cube 1");
+		//eastl::shared_ptr<SquareShape> SquareTestObj = SceneHelper::CreateVisualEntity<SquareShape>("Quad 1");
+		eastl::shared_ptr<CubeShape> cubeTestObj= SceneHelper::CreateVisualEntity<CubeShape>("Cube 1");
 
 
 

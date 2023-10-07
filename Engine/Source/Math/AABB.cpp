@@ -22,6 +22,14 @@ AABB& AABB::operator+=(const glm::vec3& inVec)
 	return *this;
 }
 
+AABB& AABB::operator+=(const AABB& inAABB)
+{
+	*this += inAABB.Min;
+	*this += inAABB.Max;
+
+	return *this;
+}
+
 eastl::array<glm::vec3, 8> AABB::GetVertices() const
 {
 	// Use a unit cube

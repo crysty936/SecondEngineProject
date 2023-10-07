@@ -12,9 +12,9 @@ eastl::shared_ptr<RHIVertexBuffer> DebugPointsBuffer = nullptr;
 eastl::shared_ptr<RHIVertexBuffer> DebugPointsInstanceBuffer = nullptr;
 eastl::shared_ptr<RHIVertexBuffer> DebugLinesBuffer = nullptr;
 
-void DrawDebugHelpers::DrawDebugPoint(const glm::vec3 inPoint, const float inSize)
+void DrawDebugHelpers::DrawDebugPoint(const glm::vec3& inPoint, const float inSize, const glm::vec3& inColor)
 {
-	DrawDebugManager::Get().AddDebugPoint(inPoint, inSize);
+	DrawDebugManager::Get().AddDebugPoint(inPoint, inColor, inSize);
 }
 
 void DrawDebugHelpers::DrawDebugLine(const DebugLine& inLine)
@@ -153,7 +153,7 @@ void DrawDebugManager::Draw()
 
 				eastl::vector<ShaderSourceInput> shaders = {
 				{ "DebugPrimitives/VS_Pos_ManuallyWritten_DebugPoints", EShaderType::Sh_Vertex },
-				{ "DebugPrimitives/PS_FlatColor", EShaderType::Sh_Fragment } };
+				{ "DebugPrimitives/PS_DebugPoint", EShaderType::Sh_Fragment } };
 
 				material->Shader = RHI::Instance->CreateShaderFromPath(shaders, inputLayout);
 			}
@@ -162,8 +162,14 @@ void DrawDebugManager::Draw()
 
 		// Instance data
 
-		eastl::vector<glm::mat4> models;
-		models.resize(numPoints);
+		struct InstanceData
+		{
+			glm::vec4 Color;
+			glm::mat4 Model;
+		};
+
+		eastl::vector<InstanceData> data;
+		data.resize(numPoints);
 
 		for (int32_t i = 0; i < numPoints; ++i)
 		{
@@ -172,10 +178,12 @@ void DrawDebugManager::Draw()
 			const float scale = debugPoints[i].Size;
 			model = glm::scale(model, glm::vec3(scale, scale, scale));
 
-			models[i] = model;
+			data[i].Model = model;
+			data[i].Color = glm::vec4(debugPoints[i].Color.x, debugPoints[i].Color.y, debugPoints[i].Color.z, 1.f);
 		}
 
 		VertexInputLayout vertexInstanceLayout;
+		vertexInstanceLayout.Push<float>(4, VertexInputType::InstanceData, EAttribDivisor::PerInstance);
 		vertexInstanceLayout.Push<float>(4, VertexInputType::InstanceData, EAttribDivisor::PerInstance);
 		vertexInstanceLayout.Push<float>(4, VertexInputType::InstanceData, EAttribDivisor::PerInstance);
 		vertexInstanceLayout.Push<float>(4, VertexInputType::InstanceData, EAttribDivisor::PerInstance);
@@ -186,12 +194,12 @@ void DrawDebugManager::Draw()
 
 		if (!DebugPointsInstanceBuffer)
 		{
-			DebugPointsInstanceBuffer = RHI::Instance->CreateVertexBuffer(vertexInstanceLayout, &models[0], sizeof(glm::mat4) * numPoints);
+			DebugPointsInstanceBuffer = RHI::Instance->CreateVertexBuffer(vertexInstanceLayout, &data[0], sizeof(InstanceData) * numPoints);
 		}
 		else
 		{
 			RHI::Get()->ClearVertexBuffer(*DebugPointsInstanceBuffer);
-			RHI::Get()->UpdateVertexBufferData(*DebugPointsInstanceBuffer, &models[0], sizeof(glm::mat4)* numPoints);
+			RHI::Get()->UpdateVertexBufferData(*DebugPointsInstanceBuffer, &data[0], sizeof(InstanceData)* numPoints);
 		}
 
 		RHI::Get()->BindVertexBuffer(*DebugPointsBuffer);
@@ -273,9 +281,9 @@ void DrawDebugManager::Draw()
 	Get().ClearDebugData();
 }
 
-void DrawDebugManager::AddDebugPoint(const glm::vec3& inPoint, const float inSize)
+void DrawDebugManager::AddDebugPoint(const glm::vec3& inPoint, const glm::vec3& inColor, const float inSize)
 {
-	DebugPoints.push_back({ inPoint, inSize });
+	DebugPoints.push_back({ inPoint, inColor, inSize });
 }
 
 void DrawDebugManager::AddDebugLine(const DebugLine& inLine)

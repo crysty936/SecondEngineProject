@@ -607,6 +607,25 @@ void DeferredRenderer::DrawCommand(const RenderCommand& inCommand)
 			nonConstCommand.AccStructure.Build(transformedTriangles);
 		}
 
+		// TEST
+		// draw centers of all triangles and center of all combined
+		const float InvTriangleCount = inCommand.Triangles.size();
+		glm::vec3 center = glm::vec3(0.f, 0.f, 0.f);
+		for (const PathTraceTriangle& triangle : inCommand.Triangles)
+		{
+			glm::vec3 triangleCenter = (triangle.V[0] + triangle.V[1] + triangle.V[2]) * 0.3333333333333333333333f;
+			
+			DrawDebugHelpers::DrawDebugPoint(triangleCenter, 0.03f, glm::vec3(1.f, 0.f, 0.f));
+
+			center += triangleCenter * InvTriangleCount;
+
+
+
+		}
+		
+		DrawDebugHelpers::DrawDebugPoint(center, 0.1f);
+
+
 		nonConstCommand.AccStructure.Root->DebugDraw();
 	}
 

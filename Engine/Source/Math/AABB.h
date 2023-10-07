@@ -10,6 +10,7 @@ struct AABB
 	glm::vec3 Min;
 	glm::vec3 Max;
 
+	AABB& operator +=(const AABB& inAABB);
 	AABB& operator +=(const glm::vec3& inVec);
 
 	inline glm::vec3 GetExtent() const

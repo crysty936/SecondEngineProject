@@ -14,6 +14,7 @@ struct DebugLine
 struct DebugPoint
 {
 	glm::vec3 Location = glm::vec3(0.f, 0.f, 0.f);
+	glm::vec3 Color = glm::vec3(0.f, 0.f, 0.f);
 	float Size = 1.f;
 };
 
@@ -31,7 +32,7 @@ private:
 		return Instance;
 	}
 
-	void AddDebugPoint(const glm::vec3& inPoint, const float inSize);
+	void AddDebugPoint(const glm::vec3& inPoint, const glm::vec3& inColor, const float inSize);
 	void AddDebugLine(const DebugLine& inLine);
 
 private:
@@ -53,7 +54,7 @@ private:
 
 struct DrawDebugHelpers
 {
-	static void DrawDebugPoint(const glm::vec3 inPoint, const float inSize = 1.f);
+	static void DrawDebugPoint(const glm::vec3& inPoint, const float inSize = 1.f, const glm::vec3& inColor = glm::vec3(1.f, 1.f, 0.f));
 	static void DrawDebugLine(const DebugLine& inLine);
 	static void DrawDebugLine(const glm::vec3& inStart, const glm::vec3& inEnd, const glm::vec3& inColor);
 	static void DrawProjectionPoints(const glm::mat4& inProj);
