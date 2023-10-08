@@ -18,7 +18,7 @@ void PathTraceTriangle::Transform(const glm::mat4& inMatrix)
 	WSNormal = glm::normalize(glm::cross(E[0], E[1]));
 }
 
-AABB PathTraceTriangle::CalculateBoundingBox() const
+AABB PathTraceTriangle::GetBoundingBox() const
 {
 	AABB res;
 
@@ -28,4 +28,27 @@ AABB PathTraceTriangle::CalculateBoundingBox() const
 	}
 
 	return res;
+}
+
+bool TraceTriangle(const PathTracingRay& inRay, const PathTraceTriangle& inTri)
+{
+	const glm::vec3& A = inTri.V[0];
+	const glm::vec3& E1 = inTri.E[0];
+	const glm::vec3& E2 = inTri.E[1];
+	const glm::vec3& N = inTri.WSNormal;
+
+	float det = -dot(inRay.Direction, N);
+	float invdet = 1.f / det;
+
+	glm::vec3 AO = inRay.Origin - A;
+	glm::vec3 DAO = glm::cross(AO, inRay.Direction);
+
+	float u = dot(E2, DAO) * invdet;
+	float v = -dot(E1, DAO) * invdet;
+	float t = dot(AO, N) * invdet;
+	return (det >= 1e-6 && t >= 0.0 && u >= 0.0 && v >= 0.0 && (u + v) <= 1.0);
+
+	//const Payload result = { closestSphere, worldPosition, closestDistance };
+
+	//return result;
 }

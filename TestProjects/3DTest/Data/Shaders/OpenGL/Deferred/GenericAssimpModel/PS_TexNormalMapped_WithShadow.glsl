@@ -14,6 +14,12 @@ in VS_OUT
 } ps_in;
 
 
+layout(std140, binding = 1) uniform LightingUniforms
+{
+	int bHasNormalMap;
+} LightingUniformsBuffer;
+
+
 layout(binding = 0) uniform sampler2D Albedo;
 layout(binding = 1) uniform sampler2D NormalMap;
 layout(binding = 2) uniform sampler2D MetallicRoughness;
@@ -21,10 +27,18 @@ layout(binding = 2) uniform sampler2D MetallicRoughness;
 
 void main()
 {
+	vec3 wsNormal;
 
-	vec3 mapNormal = texture(NormalMap, ps_in.TexCoords).xyz;
-	mapNormal = mapNormal * 2.0 - 1.0;
-	vec3 wsNormal = normalize(ps_in.TangentToWorld * mapNormal);
+	if (bool(LightingUniformsBuffer.bHasNormalMap))
+	{
+		vec3 mapNormal = texture(NormalMap, ps_in.TexCoords).xyz;
+		mapNormal = mapNormal * 2.0 - 1.0;
+		wsNormal = normalize(ps_in.TangentToWorld * mapNormal);
+	}
+	else
+	{
+		wsNormal = normalize(ps_in.VertexNormal);
+	}
 
 	gNormal = vec4(wsNormal / 2.0 + 0.5, 1.0);
 	vec4 albedo = texture(Albedo, ps_in.TexCoords);

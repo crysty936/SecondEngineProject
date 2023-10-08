@@ -1,6 +1,6 @@
 #pragma once
 
-#ifndef NDEBUG
+//#ifndef NDEBUG
 
 #define LOG_INFO(x, ...)	{Logger::Get().Print(x, Severity::Info,		__VA_ARGS__);}
 #define LOG_WARNING(x, ...)	{Logger::Get().Print(x, Severity::Warning,	__VA_ARGS__);}
@@ -34,11 +34,11 @@ bExecuted = true;											\
 LOG_ERROR(inMessage, __VA_ARGS__);}							\
   }()))														\
 
-#else
-#define LOG_INFO(x, ...)
-#define LOG_WARNING(x, ...)
-#define LOG_ERROR(x, ...)
-#endif
+//#else
+//#define LOG_INFO(x, ...)
+//#define LOG_WARNING(x, ...)
+//#define LOG_ERROR(x, ...)
+//#endif
 
 enum class Severity
 {

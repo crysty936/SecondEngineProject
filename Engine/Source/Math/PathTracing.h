@@ -8,6 +8,12 @@
 #include "glm/ext/matrix_float4x4.hpp"
 #include "AABB.h"
 
+struct PathTracingRay
+{
+	glm::vec3 Origin = glm::vec3(0.f, 0.f, 0.f);
+	glm::vec3 Direction = glm::vec3(0.f, 0.f, 0.f);
+};
+
 struct PathTraceTriangle
 {
 	//Triangle(const glm::vec3& inV0, const glm::vec3& inV1, const glm::vec3& inV2)
@@ -40,7 +46,7 @@ struct PathTraceTriangle
 
 	void Transform(const glm::mat4& inMatrix);
 
-	AABB CalculateBoundingBox() const;
+	AABB GetBoundingBox() const;
 
 	//inline Triangle& operator*(const glm::mat4& inMatrix)
 	//{
@@ -53,3 +59,5 @@ struct PathTraceTriangle
 
 
 };
+
+bool TraceTriangle(const PathTracingRay& inRay, const PathTraceTriangle& inTri);

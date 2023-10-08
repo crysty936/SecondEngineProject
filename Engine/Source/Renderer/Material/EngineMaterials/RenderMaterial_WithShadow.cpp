@@ -23,16 +23,12 @@ void RenderMaterial_WithShadow::SetRequiredUniforms()
 // 	UBuffers.push_back({ defaultUniforms, ConstantBufferBinding::Pixel });
 // 
 // 
-// 	eastl::vector<UniformWithFlag> LightingUniforms = {
-// 		{"bUseDirLight"},
-// 		{"DirectionalLightDirection"},
-// 		{"ViewPos"},
-// 		{"PointLights", 3},
-// 		{"NumPointLights"},
-// 		{"bHasNormalMap"},
-// 	};
-// 
-// 	UBuffers.push_back({ LightingUniforms, ConstantBufferBinding::Pixel });
+	eastl::vector<UniformWithFlag> LightingUniforms = {
+		{"bHasNormalMap"},
+	};
+
+	UBuffers.push_back({ LightingUniforms, EShaderType::Sh_Fragment });
+
 // 
 // 	eastl::vector<UniformWithFlag> debugConstants = {
 // 	{"bShadowVisualizeMode"},
@@ -46,7 +42,7 @@ void RenderMaterial_WithShadow::SetRequiredUniforms()
 
 void RenderMaterial_WithShadow::SetUniformsValue(eastl::unordered_map<eastl::string, struct SelfRegisteringUniform>& inUniformsCache, const EShaderType inShaderTypes)
 {
-// 	inUniformsCache["bHasNormalMap"] = OwnedTextures.size() > 1;
+ 	inUniformsCache["bHasNormalMap"] = OwnedTextures.size() > 1;
 // 
 // 	const eastl::weak_ptr<RHITexture2D> depthTexture = inUniformsCache["DirectionalLightCascadedShadowTexture"].GetValue<eastl::shared_ptr<RHITexture2D>>();
 // 	

@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <iostream>
 
-#ifndef NDEBUG
+//#ifndef NDEBUG
 
 // We use the basic assumption that if x is true, then there's no need to validate the second condition
 
@@ -41,12 +41,12 @@ bExecuted = true;											\
  return false;												\
   }()))														\
 
-#else
-#define ASSERT_MSG(x, ...)	(!!(x))
-#define ASSERT(x, ...)		(!!(x))
-#define ENSURE_MSG(x, ...)	(!!(x))
-#define ENSURE(x)			(!!(x))
-#endif
+//#else
+//#define ASSERT_MSG(x, ...)	(!!(x))
+//#define ASSERT(x, ...)		(!!(x))
+//#define ENSURE_MSG(x, ...)	(!!(x))
+//#define ENSURE(x)			(!!(x))
+//#endif
 
 
 

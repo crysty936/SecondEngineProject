@@ -429,16 +429,23 @@ void TestGameMode::Init()
 
 
 		//FloorModel = SceneHelper::CreateVisualEntity<AssimpModel3D>("../Data/Models/high_poly_blender_monkey_suzanne/scene.gltf", "Monke");
+		FloorModel = SceneHelper::CreateVisualEntity<AssimpModel3D>("../Data/Models/low_poly_suzanne/Monkey.obj", "Monke");
 	//FloorModel->Move(glm::vec3(0.f, -2.f, 0.f));
 	//FloorModel->SetScale(glm::vec3(10.f, 10.f, 10.f));
 
 
 		//eastl::shared_ptr<TriangleShape> TriangleTestObj = SceneHelper::CreateVisualEntity<TriangleShape>("Triangle 1");
 		//eastl::shared_ptr<SquareShape> SquareTestObj = SceneHelper::CreateVisualEntity<SquareShape>("Quad 1");
-		eastl::shared_ptr<CubeShape> cubeTestObj= SceneHelper::CreateVisualEntity<CubeShape>("Cube 1");
 
+		//eastl::shared_ptr<CubeShape> cubeTestObj= SceneHelper::CreateVisualEntity<CubeShape>("Cube 1");
+		//cubeTestObj->Move(glm::vec3(3.f, 3.f, 0.f));
+		eastl::shared_ptr<AssimpModel3D> weirdCube = SceneHelper::CreateVisualEntity<AssimpModel3D>("../Data/Models/WeirdCube/Cube.obj", "Cube");
+		weirdCube->Move(glm::vec3(1.f, 1.f, 0.f));
 
+		eastl::shared_ptr<AssimpModel3D> plane = SceneHelper::CreateVisualEntity<AssimpModel3D>("../Data/Models/HighPolyPlane/Plane.obj", "Plane");
+		plane->Move(glm::vec3(0.f, -0.5f, 0.f));
 
+		//cubeTestObj->Move(glm::vec3(2.f, 2.f, 0.f));
 
 
 

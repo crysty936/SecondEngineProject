@@ -12,9 +12,9 @@ eastl::shared_ptr<RHIVertexBuffer> DebugPointsBuffer = nullptr;
 eastl::shared_ptr<RHIVertexBuffer> DebugPointsInstanceBuffer = nullptr;
 eastl::shared_ptr<RHIVertexBuffer> DebugLinesBuffer = nullptr;
 
-void DrawDebugHelpers::DrawDebugPoint(const glm::vec3& inPoint, const float inSize, const glm::vec3& inColor)
+void DrawDebugHelpers::DrawDebugPoint(const glm::vec3& inPoint, const float inSize, const glm::vec3& inColor, const bool inPersistent)
 {
-	DrawDebugManager::Get().AddDebugPoint(inPoint, inColor, inSize);
+	DrawDebugManager::Get().AddDebugPoint(inPoint, inColor, inSize, inPersistent);
 }
 
 void DrawDebugHelpers::DrawDebugLine(const DebugLine& inLine)
@@ -281,12 +281,20 @@ void DrawDebugManager::Draw()
 	Get().ClearDebugData();
 }
 
-void DrawDebugManager::AddDebugPoint(const glm::vec3& inPoint, const glm::vec3& inColor, const float inSize)
+void DrawDebugManager::ClearDebugData()
 {
-	DebugPoints.push_back({ inPoint, inColor, inSize });
+	erase_if(DebugPoints, [](const DebugPoint& inPoint) {return !inPoint.bPersistent; });
+
+	DebugLines.clear();
+}
+
+void DrawDebugManager::AddDebugPoint(const glm::vec3& inPoint, const glm::vec3& inColor, const float inSize, const bool inPersistent)
+{
+	DebugPoints.push_back({ inPoint, inColor, inSize , inPersistent });
 }
 
 void DrawDebugManager::AddDebugLine(const DebugLine& inLine)
 {
 	DebugLines.push_back(inLine);
 }
+

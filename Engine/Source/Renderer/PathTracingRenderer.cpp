@@ -128,12 +128,6 @@ struct Sphere
 	bool bIsEmissive = false;
 };
 
-struct PathTracingRay
-{
-	glm::vec3 Origin = glm::vec3(0.f, 0.f, 0.f);
-	glm::vec3 Direction = glm::vec3(0.f, 0.f, 0.f);
-};
-
 struct Payload
 {
 	int32_t SphereIndex = -1;
@@ -201,29 +195,6 @@ Payload Trace(const PathTracingRay& inRay)
 	return result;
 }
 
-bool TraceTriangle(const PathTracingRay& inRay, const PathTraceTriangle& inTri)
-{
-	const glm::vec3& A = inTri.V[0];
-	const glm::vec3& E1 = inTri.E[0];
-	const glm::vec3& E2 = inTri.E[1];
-	const glm::vec3& N = inTri.WSNormal;
-
-	float det = -dot(inRay.Direction, N);
-	float invdet = 1.f / det;
-
-	glm::vec3 AO = inRay.Origin - A;
-	glm::vec3 DAO = glm::cross(AO, inRay.Direction);
-
-	float u = dot(E2, DAO) * invdet;
-	float v = -dot(E1, DAO) * invdet;
-	float t = dot(AO, N) * invdet;
-	return (det >= 1e-6 && t >= 0.0 && u >= 0.0 && v >= 0.0 && (u + v) <= 1.0);
-
-	//const Payload result = { closestSphere, worldPosition, closestDistance };
-
-	//return result;
-}
-
 glm::vec3 DirLightDir = glm::vec3(0.f, 1.f, 0.8f);
 glm::vec3 NormalizedDirLightDir;
 
@@ -271,16 +242,20 @@ glm::vec4 PathTracingRenderer::PerPixel(const uint32_t x, const uint32_t y, cons
 		glm::vec4 thirdColumn = modelMat[2];
 		//modelMat[2] = glm::vec4(0.f, 0.f, 0.f, thirdColumn.w);
 
-		for (PathTraceTriangle tri : command.Triangles)
+		//for (PathTraceTriangle tri : command.Triangles)
+		//{
+		//	//tri.Transform(modelMat);
+
+		//	if (TraceTriangle(traceRay, tri))
+		//	{
+		//		return glm::vec4(0.f, 1.f, 0.f, 1.f);
+		//	}
+		//}
+			
+		if (command.AccStructure.Intersects(traceRay))
 		{
-			//tri.Transform(modelMat);
-
-			if (TraceTriangle(traceRay, tri))
-			{
-				return glm::vec4(0.f, 1.f, 0.f, 1.f);
-			}
+			return glm::vec4(0.f, 1.f, 0.f, 1.f);
 		}
-
 
 	}
 
@@ -428,16 +403,20 @@ void PathTracingRenderer::Draw()
 		}
 
 		const eastl::shared_ptr<const DrawableObject> parent = command.Parent.lock();
-		parent->GetModelMatrix();
+		glm::mat4 model = parent->GetModelMatrix();
 
 
 		if (!command.AccStructure.IsValid())
 		{
-			command.AccStructure.Build(command.Triangles);
+			eastl::vector<PathTraceTriangle> transformedTriangles = command.Triangles;
+			for (PathTraceTriangle& triangle : transformedTriangles)
+			{
+				triangle.Transform(model);
+			}
+			command.AccStructure.Build(transformedTriangles);
 		}
 
 		//command.AccStructure.Root->DebugDraw();
-
 	}
 
 #if 1

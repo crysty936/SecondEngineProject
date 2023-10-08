@@ -29,9 +29,9 @@ Logger::~Logger() = default;
 
 void Logger::Print(const char* inFormat, Severity inSeverity, ...)
 {
- #ifdef NDEBUG
-     return;
- #endif
+ //#ifdef NDEBUG
+ //    return;
+ //#endif
 
 	// Try to use a stack allocated buffer
  	constexpr int32_t bufferSize = 1024;
