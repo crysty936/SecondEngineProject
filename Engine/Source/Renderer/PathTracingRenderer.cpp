@@ -198,6 +198,76 @@ Payload Trace(const PathTracingRay& inRay)
 glm::vec3 DirLightDir = glm::vec3(0.f, 1.f, 0.8f);
 glm::vec3 NormalizedDirLightDir;
 
+glm::vec3 TestColors[] = {
+	glm::vec3(1.f, 0.f, 0.f),
+	glm::vec3(0.f, 1.f, 0.f),
+	glm::vec3(0.f, 1.f, 1.f),
+	glm::vec3(1.f, 1.f, 1.f),
+	glm::vec3(1.f, 0.f, 1.f),
+};
+
+bool PathTracingRenderer::TriangleTrace(const PathTracingRay& inRay, PathTracePayload& outPayload, glm::vec3& outColor)
+{
+	int32_t colorIndex = 0;
+	bool bHit = false;
+	for (RenderCommand& command : MainCommands)
+	{
+		if (command.Triangles.size() == 0)
+		{
+			continue;
+		}
+
+		//const bool parentValid = !command.Parent.expired();
+		//if (!parentValid)
+		//{
+		//	continue;
+		//}
+
+		const eastl::shared_ptr<const DrawableObject> parent = command.Parent.lock();
+		//const eastl::shared_ptr<RenderMaterial> material = command.Material;
+		//const eastl::shared_ptr<MeshDataContainer>& dataContainer = command.DataContainer;
+
+		//if (!parent->IsVisible() || !material)
+		//{
+		//	continue;
+		//}
+
+
+#if 0
+		glm::mat4 modelMat = parent->GetModelMatrix();
+		// Remove z scale from model for two dimensional shape
+		glm::vec4 thirdColumn = modelMat[2];
+		//modelMat[2] = glm::vec4(0.f, 0.f, 0.f, thirdColumn.w);
+
+		for (PathTraceTriangle tri : command.Triangles)
+		{
+			//tri.Transform(modelMat);
+
+			if (IntersectsTriangle(inRay, tri))
+			{
+				return glm::vec4(0.f, 1.f, 0.f, 1.f);
+			}
+		}
+
+#else
+		PathTracePayload currMeshPayload;
+		if (command.AccStructure.Trace(inRay, currMeshPayload))
+		{
+			bHit = true;
+			if (currMeshPayload.Distance < outPayload.Distance)
+			{
+				outPayload = currMeshPayload;
+			}
+		}
+#endif
+
+		++colorIndex;
+	}
+
+	outColor = TestColors[colorIndex];
+	return bHit;
+}
+
 glm::vec4 PathTracingRenderer::PerPixel(const uint32_t x, const uint32_t y, const WindowProperties& inProps, const glm::mat4& inInvProj, const glm::mat4& inInvView, const glm::vec3& inCamPos)
 {
 	glm::vec2 normalizedCoords = glm::vec2(float(x) / float(inProps.Width) , float(y) / float(inProps.Height) );
@@ -215,47 +285,39 @@ glm::vec4 PathTracingRenderer::PerPixel(const uint32_t x, const uint32_t y, cons
 	glm::vec4 color = glm::vec4(0.f, 0.f, 0.f, 0.f);
 	PathTracingRay traceRay = { inCamPos, rayDir };
 
-	for (RenderCommand& command : MainCommands)
+
+	glm::vec3 firstHitColor;
+	PathTracePayload payload;
+	const bool bHit = TriangleTrace(traceRay, payload, firstHitColor);
+
+	if (bHit)
 	{
-		if (command.Triangles.size() == 0)
+		return glm::vec4(firstHitColor.x, firstHitColor.y, firstHitColor.z, 1.f);
+
+		glm::vec3 hitNormal = payload.Triangle->WSNormalNormalized;
+		//hitNormal = hitNormal * 0.5f + 0.5f;
+		//return glm::vec4(hitNormal.x, hitNormal.y, hitNormal.z, 1.f);
+
+		glm::vec3 newRayDir = hitNormal + random_unit_vector(); // Lambertian diffuse
+
+		if (near_zero(newRayDir))
 		{
-			continue;
+			newRayDir = hitNormal;
+
 		}
+		const glm::vec3 hitPos = inCamPos + (rayDir * payload.Distance);
 
-		const bool parentValid = !command.Parent.expired();
-		if (!parentValid)
-		{
-			continue;
-		}
+		traceRay.Origin = hitPos + hitNormal * 0.0001f;
+		traceRay.Direction = newRayDir;
 
-		const eastl::shared_ptr<const DrawableObject> parent = command.Parent.lock();
-		//const eastl::shared_ptr<RenderMaterial> material = command.Material;
-		//const eastl::shared_ptr<MeshDataContainer>& dataContainer = command.DataContainer;
+		glm::vec3 secondHitColor;
+		PathTracePayload payload2;
+		const bool bHit2 = TriangleTrace(traceRay, payload2, secondHitColor);
 
-		//if (!parent->IsVisible() || !material)
-		//{
-		//	continue;
-		//}
 
-		glm::mat4 modelMat = parent->GetModelMatrix();
-		// Remove z scale from model for two dimensional shape
-		glm::vec4 thirdColumn = modelMat[2];
-		//modelMat[2] = glm::vec4(0.f, 0.f, 0.f, thirdColumn.w);
-
-		//for (PathTraceTriangle tri : command.Triangles)
-		//{
-		//	//tri.Transform(modelMat);
-
-		//	if (TraceTriangle(traceRay, tri))
-		//	{
-		//		return glm::vec4(0.f, 1.f, 0.f, 1.f);
-		//	}
-		//}
-			
-		if (command.AccStructure.Intersects(traceRay))
-		{
-			return glm::vec4(0.f, 1.f, 0.f, 1.f);
-		}
+	}
+	else
+	{
 
 	}
 
@@ -291,7 +353,7 @@ glm::vec4 PathTracingRenderer::PerPixel(const uint32_t x, const uint32_t y, cons
 		}
 		else
 		{
-			const glm::vec3 SourceSurfaceNormal = glm::normalize(result.Location - spheres[result.SphereIndex].Origin);
+			SourceSurfaceNormal = glm::normalize(result.Location - spheres[result.SphereIndex].Origin);
 			//const glm::vec3 newRayDir = glm::reflect(traceRay.Direction, SourceSurfaceNormal);
 			
 			glm::vec3 newRayDir = SourceSurfaceNormal + random_unit_vector(); // Lambertian diffuse
@@ -415,11 +477,9 @@ void PathTracingRenderer::Draw()
 			}
 			command.AccStructure.Build(transformedTriangles);
 		}
-
-		//command.AccStructure.Root->DebugDraw();
 	}
 
-#if 1
+#if 1 // Multithreaded
 	std::for_each(std::execution::par, m_ImageVerticalIter.begin(), m_ImageVerticalIter.end(),
 		[this, props, invProj, invView, camPos](uint32_t i)
 		{

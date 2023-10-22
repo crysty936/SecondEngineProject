@@ -44,6 +44,7 @@ public:
 protected:
 	void InitInternal() override;
 
+	bool TriangleTrace(const PathTracingRay& inRay, PathTracePayload& outPayload, glm::vec3& outColor);
 	__forceinline glm::vec4 PerPixel(const uint32_t x, const uint32_t y, const WindowProperties& inProps, const glm::mat4& inInvProj, const glm::mat4& inInvView, const glm::vec3& inCamPos);
 	void DrawCommand(const RenderCommand& inCommand);
 	void SetViewportSizeToMain();

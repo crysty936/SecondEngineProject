@@ -1,4 +1,5 @@
 #include "Math/BVH.h"
+#include <float.h>
 #include "Renderer/DrawDebugHelpers.h"
 
 BVHNode::BVHNode() = default;
@@ -98,23 +99,23 @@ void RecursivelyBuildBVH(BVHNode& inNode, const eastl::vector<PathTraceTriangle>
 		if (size_y > size_x) {
 			if (size_y > size_z) {
 				// Longest Axis Y
-				LOG_INFO("Splitting using Y Axis.");
+				//LOG_INFO("Splitting using Y Axis.");
 				getAxisFunc = getY;
 			}
 			else {
 				// Longest axis Z
-				LOG_INFO("Splitting using Z Axis.");
+				//LOG_INFO("Splitting using Z Axis.");
 				getAxisFunc = getZ;
 			}
 		}
 		else if (size_z > size_x) {
 			// Longest axis Z
-			LOG_INFO("Splitting using Z Axis.");
+			//LOG_INFO("Splitting using Z Axis.");
 			getAxisFunc = getZ;
 		}
 		else
 		{
-			LOG_INFO("Splitting using X Axis.");
+			//LOG_INFO("Splitting using X Axis.");
 			getAxisFunc = getX;
 		}
 
@@ -154,28 +155,28 @@ void RecursivelyBuildBVH(BVHNode& inNode, const eastl::vector<PathTraceTriangle>
 
 		validSplit = leftSideTriangles.size() != inTriangles.size() && rightSideTriangles.size() != inTriangles.size();
 
-		if (!validSplit)
-		{
-			if (tries == 1)
-			{
-				++tries;
-				LOG_WARNING("Partition by axis failed, attempting second method using centers instead of triangles AABB");
-			}
-			else if (tries == 2)
-			{
-				ASSERT_MSG(false, "Partition by axis failed, this would lead to infinite recursion, exiting.");
+		//if (!validSplit)
+		//{
+		//	if (tries == 1)
+		//	{
+		//		++tries;
+		//		LOG_WARNING("Partition by axis failed, attempting second method using centers instead of triangles AABB");
+		//	}
+		//	else if (tries == 2)
+		//	{
+		//		ASSERT_MSG(false, "Partition by axis failed, this would lead to infinite recursion, exiting.");
 
-				for (const glm::vec3& triangleCenter : triangleCenters)
-				{
-					DrawDebugHelpers::DrawDebugPoint(triangleCenter, 0.05f, glm::vec3(0.f, 1.f, 0.f), true);
-				}
+		//		for (const glm::vec3& triangleCenter : triangleCenters)
+		//		{
+		//			DrawDebugHelpers::DrawDebugPoint(triangleCenter, 0.05f, glm::vec3(0.f, 1.f, 0.f), true);
+		//		}
 
-				DrawDebugHelpers::DrawDebugPoint(combinedCenter, 0.1f, glm::vec3(1.f, 0.f, 0.f), true);
+		//		DrawDebugHelpers::DrawDebugPoint(combinedCenter, 0.1f, glm::vec3(1.f, 0.f, 0.f), true);
 
-				continueRecursion = false;
-				return;
-			}
-		}
+		//		continueRecursion = false;
+		//		return;
+		//	}
+		//}
 	}
 
 
@@ -195,20 +196,24 @@ void RecursivelyBuildBVH(BVHNode& inNode, const eastl::vector<PathTraceTriangle>
 
 void BVH::Build(const eastl::vector<PathTraceTriangle>& inTriangles)
 {
-	LOG_INFO("Building BVH");
+	LOG_INFO("Building BVH.");
 
 	Root = new BVHNode();
 
 	bool recurse = true;
 	RecursivelyBuildBVH(*Root, inTriangles, recurse);
+
+	LOG_INFO("BVH Building done.");
 }
 
 
-bool rayIntersectsAABB(const PathTracingRay& inRay, const AABB& inAABB) 
+// Slab Method
+// https://tavianator.com/2011/ray_box.html
+bool RayIntersectsAABB(const PathTracingRay& inRay, const AABB& inAABB) 
 {
-	float inv_direction_x = 1.0f / inRay.Direction.x;
-	float inv_direction_y = 1.0f / inRay.Direction.y;
-	float inv_direction_z = 1.0f / inRay.Direction.z;
+	const float inv_direction_x = 1.0f / inRay.Direction.x;
+	const float inv_direction_y = 1.0f / inRay.Direction.y;
+	const float inv_direction_z = 1.0f / inRay.Direction.z;
 
 	float tmin = (inAABB.Min.x - inRay.Origin.x) * inv_direction_x;
 	float tmax = (inAABB.Max.x - inRay.Origin.x) * inv_direction_x;
@@ -243,7 +248,7 @@ bool BVH::Intersects(const PathTracingRay& inRay)
 
 bool BVHNode::Intersects(const PathTracingRay& inRay)
 {
-	if (rayIntersectsAABB(inRay, BoundingBox))
+	if (RayIntersectsAABB(inRay, BoundingBox))
 	{
 		if(LeftNode)
 		{
@@ -253,14 +258,67 @@ bool BVHNode::Intersects(const PathTracingRay& inRay)
 		{
 			for (const PathTraceTriangle& triangle : Triangles)
 			{
-				if (TraceTriangle(inRay, triangle))
+				if (IntersectsTriangle(inRay, triangle))
 				{
 					return true;
 				}
 			}
+
 		}
 
 	}
 
 	return false;
+}
+
+bool BVHNode::Trace(const PathTracingRay& inRay, PathTracePayload& outPayload)
+{
+	if (RayIntersectsAABB(inRay, BoundingBox))
+	{
+		if (LeftNode)
+		{
+			PathTracePayload leftPayload;
+			const bool leftHit = LeftNode->Trace(inRay, outPayload);
+
+			PathTracePayload rightPayload;
+			const bool rightHit = RightNode->Trace(inRay, rightPayload);
+
+			if (leftHit && leftPayload.Distance < outPayload.Distance)
+			{
+				outPayload = leftPayload;
+			}
+
+			if (rightHit && rightPayload.Distance < outPayload.Distance)
+			{
+				outPayload = rightPayload;
+			}
+
+			return leftHit || rightHit;
+		}
+		else
+		{
+			bool bHit = false;
+			for (const PathTraceTriangle& triangle : Triangles)
+			{
+				PathTracePayload currPayload;
+				if (TraceTriangle(inRay, triangle, currPayload))
+				{
+					bHit = true;
+					if (currPayload.Distance < outPayload.Distance)
+					{
+						outPayload = currPayload;
+					}
+				}
+			}
+
+			return bHit;
+		}
+	}
+
+	return false;
+}
+
+float BVH::Trace(const PathTracingRay& inRay, PathTracePayload& outPayload)
+{
+	return Root->Trace(inRay, outPayload);
 }

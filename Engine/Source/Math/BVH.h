@@ -19,6 +19,7 @@ struct BVHNode
 	eastl::vector<PathTraceTriangle> Triangles;
 
 	bool Intersects(const PathTracingRay& inRay);
+	bool Trace(const PathTracingRay& inRay, PathTracePayload& outPayload);
 
 
 	void DebugDraw() const;
@@ -33,6 +34,7 @@ struct BVH
 	void Build(const eastl::vector<PathTraceTriangle>& inTriangles);
 
 	bool Intersects(const PathTracingRay& inRay);
+	float Trace(const PathTracingRay& inRay, PathTracePayload& outPayload);
 
 	inline bool IsValid() { return Root != nullptr; }
 

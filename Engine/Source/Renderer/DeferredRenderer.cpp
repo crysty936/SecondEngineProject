@@ -151,7 +151,7 @@ void DeferredRenderer::Draw()
 
 	RHI::Get()->SetDepthWrite(false);
 
-	DrawCommand(DefaultPBRShadingModelQuad->GetCommand());
+	//DrawCommand(DefaultPBRShadingModelQuad->GetCommand());
 	
 	// Draw debug primitives
 	DrawDebugManager::Draw();
@@ -626,7 +626,7 @@ void DeferredRenderer::DrawCommand(const RenderCommand& inCommand)
 		//DrawDebugHelpers::DrawDebugPoint(center, 0.1f);
 
 
-		//nonConstCommand.AccStructure.Root->DebugDraw();
+		nonConstCommand.AccStructure.Root->DebugDraw();
 	}
 
 	// Path Tracing Debug

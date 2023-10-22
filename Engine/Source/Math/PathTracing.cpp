@@ -1,5 +1,18 @@
 #include "Math/PathTracing.h"
 
+PathTraceTriangle::PathTraceTriangle(glm::vec3 inVerts[3])
+{
+	V[0] = inVerts[0];
+	V[1] = inVerts[1];
+	V[2] = inVerts[2];
+
+	E[0] = V[1] - V[0];
+	E[1] = V[2] - V[0];
+
+	WSNormal = glm::cross(E[0], E[1]);
+	WSNormalNormalized = glm::normalize(WSNormal);
+}
+
 void PathTraceTriangle::Transform(const glm::mat4& inMatrix)
 {
 	for (int32_t i = 0; i < 3; ++i)
@@ -15,7 +28,8 @@ void PathTraceTriangle::Transform(const glm::mat4& inMatrix)
 	E[0] = V[1] - V[0];
 	E[1] = V[2] - V[0];
 
-	WSNormal = glm::normalize(glm::cross(E[0], E[1]));
+	WSNormal = glm::cross(E[0], E[1]);
+	WSNormalNormalized = glm::normalize(WSNormal);
 }
 
 AABB PathTraceTriangle::GetBoundingBox() const
@@ -30,7 +44,7 @@ AABB PathTraceTriangle::GetBoundingBox() const
 	return res;
 }
 
-bool TraceTriangle(const PathTracingRay& inRay, const PathTraceTriangle& inTri)
+bool TraceTriangle(const PathTracingRay& inRay, const PathTraceTriangle& inTri, OUT PathTracePayload& outPayload)
 {
 	const glm::vec3& A = inTri.V[0];
 	const glm::vec3& E1 = inTri.E[0];
@@ -43,12 +57,18 @@ bool TraceTriangle(const PathTracingRay& inRay, const PathTraceTriangle& inTri)
 	glm::vec3 AO = inRay.Origin - A;
 	glm::vec3 DAO = glm::cross(AO, inRay.Direction);
 
-	float u = dot(E2, DAO) * invdet;
-	float v = -dot(E1, DAO) * invdet;
-	float t = dot(AO, N) * invdet;
-	return (det >= 1e-6 && t >= 0.0 && u >= 0.0 && v >= 0.0 && (u + v) <= 1.0);
+	outPayload.U = dot(E2, DAO) * invdet;
+	outPayload.V = -dot(E1, DAO) * invdet;
+	outPayload.Distance = dot(AO, N) * invdet;
+	outPayload.Triangle = &inTri;
+	//outPayload.Normal = inTri.WSNormalNormalized;
 
-	//const Payload result = { closestSphere, worldPosition, closestDistance };
-
-	//return result;
+	return (det >= 1e-6 && outPayload.Distance >= 0.0 && outPayload.U >= 0.0 && outPayload.V >= 0.0 && (outPayload.U + outPayload.V) <= 1.0);
 }
+
+bool IntersectsTriangle(const PathTracingRay& inRay, const PathTraceTriangle& inTri)
+{
+	PathTracePayload payload;
+	return TraceTriangle(inRay, inTri, payload);
+}
+
