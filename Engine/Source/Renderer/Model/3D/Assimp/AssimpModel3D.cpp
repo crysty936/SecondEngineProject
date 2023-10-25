@@ -27,8 +27,8 @@ static Transform aiMatrixToTransform(const aiMatrix4x4& inMatrix)
 	return Transform(translation, rotation, scaling);
 }
 
-AssimpModel3D::AssimpModel3D(const eastl::string& inPath, const eastl::string& inName)
-	: Model3D(inName), ModelPath{ inPath }
+AssimpModel3D::AssimpModel3D(const eastl::string& inPath, const eastl::string& inName, glm::vec3 inOverrideColor)
+	: Model3D(inName), ModelPath{ inPath }, OverrideColor(inOverrideColor)
 {}
 
 AssimpModel3D::~AssimpModel3D() = default;
@@ -132,6 +132,7 @@ RenderCommand AssimpModel3D::CreateRenderCommand(eastl::shared_ptr<RenderMateria
 	newCommand.DataContainer = inDataContainer;
 	newCommand.DrawType = EDrawType::DrawElements;
 	newCommand.DrawPasses = static_cast<EDrawMode::Type>(EDrawMode::Default /*| EDrawMode::NORMAL_VISUALIZE*/);
+	newCommand.OverrideColor = OverrideColor;
 
 	return newCommand;
 }
@@ -178,10 +179,10 @@ void AssimpModel3D::ProcessMesh(const aiMesh& inMesh, const aiScene& inScene, ea
 	const bool existingContainer = Renderer::Get().GetOrCreateContainer(renderDataContainerID, dataContainer);
 
 	eastl::vector<PathTraceTriangle> triangles;
+	eastl::vector<Vertex> vertices;
 
 	if (!existingContainer)
 	{
-		eastl::vector<Vertex> vertices;
 		eastl::vector<uint32_t> indices;
 
 		for (uint32_t i = 0; i < inMesh.mNumVertices; i++)
@@ -273,7 +274,8 @@ void AssimpModel3D::ProcessMesh(const aiMesh& inMesh, const aiScene& inScene, ea
 	inCurrentNode->AddChild(newMesh);
 
 	RenderCommand newCommand = CreateRenderCommand(thisMaterial, inCurrentNode, dataContainer);
-	newCommand.Triangles = triangles;
+	newCommand.Triangles = std::move(triangles);
+	newCommand.Vertices = std::move(vertices);
 	outCommands.push_back(newCommand);
 }
 

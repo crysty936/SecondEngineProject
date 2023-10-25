@@ -34,6 +34,9 @@
 #include "Math/AABB.h"
 #include "imgui.h"
 #include "ShaderTypes.h"
+#include "Math/SphericalHarmonics.h"
+
+void InitGI();
 
 static std::mutex RenderCommandsMutex;
 static std::mutex GetVAOMutex;
@@ -112,12 +115,59 @@ void DeferredRenderer::InitInternal()
 	DefaultPBRShadingModelQuad->GetCommand().Material->ExternalTextures.push_back(GBufferMetallicRoughness);
 	DefaultPBRShadingModelQuad->GetCommand().Material->ExternalTextures.push_back(GBufferDepth);
 	DefaultPBRShadingModelQuad->CreateCommand();
+
+	InitGI();
+}
+
+static glm::vec3 NormalizedDirLightDir = glm::vec3(0.f, 1.f, 0.f);
+
+bool DeferredRenderer::TriangleTrace(const PathTracingRay& inRay, PathTracePayload& outPayload, glm::vec3& outColor)
+{
+	bool bHit = false;
+	for (RenderCommand& command : MainCommands)
+	{
+		if (command.Triangles.size() == 0)
+		{
+			continue;
+		}
+
+		PathTracePayload currMeshPayload;
+		if (command.AccStructure.Trace(inRay, currMeshPayload))
+		{
+			bHit = true;
+			if (currMeshPayload.Distance < outPayload.Distance)
+			{
+				outPayload = currMeshPayload;
+				outColor = command.OverrideColor;
+			}
+		}
+	}
+
+	return bHit;
+}
+
+void InitGI()
+{
+	SHSample* samples = new SHSample[SH_TOTAL_SAMPLE_COUNT];
+	SphericalHarmonics::InitSamples(samples);
+
+
+
+}
+
+static bool bBVHDebugDraw = false;
+void DisplaySettings()
+{
+	ImGui::Checkbox("BVH Debug Draw", &bBVHDebugDraw);
+
 }
 
 void DeferredRenderer::Draw()
 {
 	//RHI::Get()->SetCullEnabled(false);
 	ImGui::Begin("Renderer settings");
+
+	DisplaySettings();
 
 	SetBaseUniforms();
 	UpdateUniforms();
@@ -151,7 +201,7 @@ void DeferredRenderer::Draw()
 
 	RHI::Get()->SetDepthWrite(false);
 
-	//DrawCommand(DefaultPBRShadingModelQuad->GetCommand());
+	DrawCommand(DefaultPBRShadingModelQuad->GetCommand());
 	
 	// Draw debug primitives
 	DrawDebugManager::Draw();
@@ -294,6 +344,12 @@ void DeferredRenderer::SetLightingConstants()
 
 	//UniformsCache["NumPointLights"] =  static_cast<int32_t>(shaderPointLightData.size());
 	//UniformsCache["PointLights"] = shaderPointLightData;
+
+
+	static bool bOverrideColor = true;
+	ImGui::Checkbox("Override Color", &bOverrideColor);
+
+	UniformsCache["bOverrideColor"] = bOverrideColor;
 }
 
 void DeferredRenderer::UpdateUniforms()
@@ -556,7 +612,6 @@ void DeferredRenderer::DrawDecals(const eastl::vector<RenderCommand>& inCommands
 	RHI::Get()->SetDepthWrite(true);
 }
 
-
 void DeferredRenderer::DrawCommand(const RenderCommand& inCommand)
 {
 	const bool parentValid = !inCommand.Parent.expired();
@@ -591,9 +646,11 @@ void DeferredRenderer::DrawCommand(const RenderCommand& inCommand)
 	UniformsCache["model"] = model;
 	UniformsCache["ObjPos"] = parent->GetAbsoluteTransform().Translation;
 
+	UniformsCache["OverrideColor"] = inCommand.OverrideColor;
+
 	// Path Tracing Debug
 
-	if (inCommand.Triangles.size() != 0)
+	if (bBVHDebugDraw && inCommand.Triangles.size() != 0)
 	{
 		RenderCommand& nonConstCommand = const_cast<RenderCommand&>(inCommand);
 		if (!nonConstCommand.AccStructure.IsValid())

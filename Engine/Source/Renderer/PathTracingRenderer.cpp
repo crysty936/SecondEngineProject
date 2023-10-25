@@ -195,21 +195,10 @@ Payload Trace(const PathTracingRay& inRay)
 	return result;
 }
 
-glm::vec3 DirLightDir = glm::vec3(0.f, 1.f, 0.8f);
-glm::vec3 NormalizedDirLightDir;
-
-glm::vec3 TestColors[] = {
-	glm::vec3(1.f, 0.f, 0.f),
-	glm::vec3(0.f, 1.f, 0.f),
-	glm::vec3(0.f, 1.f, 1.f),
-	glm::vec3(1.f, 1.f, 1.f),
-	glm::vec3(1.f, 0.f, 1.f),
-};
+static glm::vec3 NormalizedDirLightDir = glm::vec3(0.f, 1.f, 0.f);
 
 bool PathTracingRenderer::TriangleTrace(const PathTracingRay& inRay, PathTracePayload& outPayload, glm::vec3& outColor)
 {
-	int32_t colorIndex = 0;
-	int32_t closestHitColorIndex = 0;
 	bool bHit = false;
 	for (RenderCommand& command : MainCommands)
 	{
@@ -218,23 +207,8 @@ bool PathTracingRenderer::TriangleTrace(const PathTracingRay& inRay, PathTracePa
 			continue;
 		}
 
-		//const bool parentValid = !command.Parent.expired();
-		//if (!parentValid)
-		//{
-		//	continue;
-		//}
-
-		const eastl::shared_ptr<const DrawableObject> parent = command.Parent.lock();
-		//const eastl::shared_ptr<RenderMaterial> material = command.Material;
-		//const eastl::shared_ptr<MeshDataContainer>& dataContainer = command.DataContainer;
-
-		//if (!parent->IsVisible() || !material)
-		//{
-		//	continue;
-		//}
-
-
 #if 0
+		const eastl::shared_ptr<const DrawableObject> parent = command.Parent.lock();
 		glm::mat4 modelMat = parent->GetModelMatrix();
 		// Remove z scale from model for two dimensional shape
 		glm::vec4 thirdColumn = modelMat[2];
@@ -258,15 +232,12 @@ bool PathTracingRenderer::TriangleTrace(const PathTracingRay& inRay, PathTracePa
 			if (currMeshPayload.Distance < outPayload.Distance)
 			{
 				outPayload = currMeshPayload;
-				closestHitColorIndex = colorIndex;
+				outColor = command.OverrideColor;
 			}
 		}
 #endif
-
-		++colorIndex;
 	}
 
-	outColor = TestColors[closestHitColorIndex];
 	return bHit;
 }
 
@@ -278,61 +249,17 @@ glm::vec4 PathTracingRenderer::PerPixel(const uint32_t x, const uint32_t y, cons
 	glm::vec4 worldSpace = inInvProj * glm::vec4(normalizedCoords.x, normalizedCoords.y, 1.f, 1.f);
 	worldSpace /= worldSpace.w;
 
-	glm::vec3 rayDir = glm::normalize(glm::vec3(worldSpace));
+	glm::vec3 firstRayDir = glm::normalize(glm::vec3(worldSpace));
 	//const glm::vec3 pixelPos = glm::vec3(normalizedCoords.x , normalizedCoords.y, 0.f);
 	//glm::vec3 rayDir = glm::normalize(glm::vec3(worldSpace) - pixelPos); // Same thing
 
-	rayDir = glm::normalize(glm::vec3(inInvView * glm::vec4(rayDir.x, rayDir.y, rayDir.z, 0.f)));
+	firstRayDir = glm::normalize(glm::vec3(inInvView * glm::vec4(firstRayDir.x, firstRayDir.y, firstRayDir.z, 0.f)));
 
 	glm::vec4 color = glm::vec4(0.f, 0.f, 0.f, 0.f);
-	PathTracingRay traceRay = { inCamPos, rayDir };
+	PathTracingRay traceRay = { inCamPos, firstRayDir };
 
-
-
-
-	//glm::vec3 firstHitColor;
-	//PathTracePayload payload;
-	//const bool bHit = TriangleTrace(traceRay, payload, firstHitColor);
-
-	//if (bHit)
-	//{
-	//	glm::vec3 hitNormal = payload.Triangle->WSNormalNormalized;
-	//	//hitNormal = hitNormal * 0.5f + 0.5f;
-	//	//return glm::vec4(hitNormal.x, hitNormal.y, hitNormal.z, 1.f);
-
-	//	glm::vec3 newRayDir = hitNormal + random_unit_vector(); // Lambertian diffuse
-
-	//	if (near_zero(newRayDir))
-	//	{
-	//		newRayDir = hitNormal;
-
-	//	}
-	//	const glm::vec3 hitPos = inCamPos + (rayDir * payload.Distance);
-
-	//	traceRay.Origin = hitPos + hitNormal * 0.0001f;
-	//	traceRay.Direction = newRayDir;
-
-	//	glm::vec3 secondHitColor;
-	//	PathTracePayload payload2;
-	//	const bool bHit2 = TriangleTrace(traceRay, payload2, secondHitColor);
-
-	//	if (bHit2)
-	//	{
-	//		return glm::vec4(secondHitColor.x, secondHitColor.y, secondHitColor.z, 1.f);
-	//	}
-	//	else
-	//	{
-	//		return glm::vec4(firstHitColor.x, firstHitColor.y, firstHitColor.z, 1.f);
-	//	}
-
-	//}
-	//else
-	//{
-
-	//}
-
-
-	glm::vec3 SourceSurfaceNormal = glm::vec3(0.f, 1.f, 0.f);
+	PathTracePayload firstHitPayload;
+	glm::vec3 SourceSurfaceNormal;
 	float multiplier = 1.f;
 	const int32_t nrSamples = 5;
 	for (int32_t i = 0; i < nrSamples; ++i)
@@ -345,26 +272,44 @@ glm::vec4 PathTracingRenderer::PerPixel(const uint32_t x, const uint32_t y, cons
 		{
 			if (i == 0)
 			{
-				//float a = 0.5f * (rayDir.y + 1.f);
-				//const glm::vec3 skyColor = (1.f - a) * glm::vec3(1.f, 1.f, 1.f) + a * glm::vec3(0.5f, 0.7f, 1.f);
-				//color = glm::vec4(skyColor.x, skyColor.y, skyColor.z, 1.f);
-
-				color = glm::vec4(0.f, 0.f, 0.f, 1.f);
+				return glm::vec4(0.f, 0.f, 0.f, 1.f);
 			}
 			else
 			{
-				const float cosNLightDir = glm::clamp(glm::dot(SourceSurfaceNormal, NormalizedDirLightDir), 0.1f, 1.f);
+				 //Lessen light intensity based on the normal of the first surface the light ray has touched(last before it doesn't hit anything)
+				 //and the amount of rays necessary to reach the point
+
+				const float cosNLightDir = glm::clamp(glm::dot(SourceSurfaceNormal, -NormalizedDirLightDir), 0.1f, 1.f);
 				const float occlusionScale = 1.f / float(i);
 
-				color *= cosNLightDir * occlusionScale;
+				color *= /*cosNLightDir * */occlusionScale;
 			}
 
 			color = glm::pow(glm::vec4(color.x, color.y, color.z, color.w), glm::vec4(1.f / 2.2f)); // Gamma correction
+
+			// Shadow trace
+			//glm::vec3 shadowRayOrigin = inCamPos + (firstRayDir * firstHitPayload.Distance);
+			//shadowRayOrigin = shadowRayOrigin + firstHitPayload.Triangle->WSNormalNormalized * 0.0001f;
+			//const glm::vec3 shadowRayDir = -NormalizedDirLightDir;
+
+			//PathTracingRay shadowRay = { shadowRayOrigin, shadowRayDir };
+			//const bool inShadow = TriangleTrace(shadowRay, payload, hitColor);
+			//if (inShadow)
+			//{
+			//	color *= 0.1f;
+			//	//color = glm::vec4(1.f, 0.f, 0.f, 1.f);
+			//}
+
 
 			return color;
 		}
 		else
 		{
+			if (i == 0)
+			{
+				firstHitPayload = payload;
+			}
+
 			SourceSurfaceNormal = payload.Triangle->WSNormalNormalized;;
 
 			glm::vec3 newRayDir = SourceSurfaceNormal + random_unit_vector(); // Lambertian diffuse
@@ -375,28 +320,22 @@ glm::vec4 PathTracingRenderer::PerPixel(const uint32_t x, const uint32_t y, cons
 				newRayDir = SourceSurfaceNormal;
 			}
 
-			const glm::vec3 hitPos = inCamPos + (rayDir * payload.Distance);
+			//const glm::vec3 hitPos = inCamPos + (rayDir * payload.Distance);
+			const glm::vec3 hitPos = traceRay.Origin + (traceRay.Direction * payload.Distance);
 			traceRay.Origin = hitPos + SourceSurfaceNormal * 0.0001f;
 			traceRay.Direction = newRayDir;
 
-
-			//const glm::vec3 newRayDir = SourceSurfaceNormal;
-
-
-			//glm::vec3 visualNormal = SourceSurfaceNormal * 0.5f + 0.5f;
-			//color = glm::vec4(visualNormal.x, visualNormal.y, visualNormal.z, 1.f);
-			//color = glm::vec4(glm::clamp(result.Location.x, 0.f, 1.f), glm::clamp(result.Location.y, 0.f, 1.f), glm::clamp(result.Location.z, 0.f, 1.f), 1.f);
-			//color = glm::vec4(result.Location.x, result.Location.y, result.Location.z, 1.f);
-			//color = glm::vec4(result.distance/100.f, result.distance / 100.f, result.distance / 100.f, 1.f);
-
-			const float cosNLightDir = glm::clamp(glm::dot(SourceSurfaceNormal, NormalizedDirLightDir), 0.1f, 1.f);
+			const float cosNLightDir = glm::clamp(glm::dot(SourceSurfaceNormal, -NormalizedDirLightDir), 0.1f, 1.f);
 			color += glm::vec4(hitColor.x, hitColor.y, hitColor.z, 0.f) * cosNLightDir * multiplier;
 
-			multiplier *= 0.5f;
+			//multiplier *= 0.8f;
 		}
 	}
 
-	return color;
+	//SourceSurfaceNormal = (SourceSurfaceNormal * 0.5f) + 0.5f;
+	//return glm::vec4(SourceSurfaceNormal.x, SourceSurfaceNormal.y, SourceSurfaceNormal.z, 1.f);
+	return glm::vec4(0.f, 0.f, 0.f, 1.f);
+	//return color;
 
 #if 0
 	float multiplier = 1.f;
@@ -514,7 +453,8 @@ void PathTracingRenderer::Draw()
 	//	++sphereNr;
 	//}
 
-	ImGui::DragFloat3("DirLightDir", &DirLightDir.x, 0.1f);
+	const eastl::vector<eastl::shared_ptr<LightSource>>& lights = SceneManager::Get().GetCurrentScene().GetLights();
+	const glm::vec3 DirLightDir = lights[0]->GetAbsoluteTransform().Rotation * glm::vec3(0.f, 0.f, 1.f);
 	NormalizedDirLightDir = glm::normalize(DirLightDir);
 
 	const WindowsWindow& currentWindow = GEngine->GetMainWindow();

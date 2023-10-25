@@ -4,6 +4,7 @@
 #include "EASTL/vector.h"
 #include "Math/PathTracing.h"
 #include "Math/BVH.h"
+#include "RenderingPrimitives.h"
 
 namespace EDrawMode
 {
@@ -34,6 +35,8 @@ struct RenderCommand
 	// FOR PATHTRACER, TO MOVE
 
 	eastl::vector<PathTraceTriangle> Triangles;
+	eastl::vector<Vertex> Vertices;
 	BVH AccStructure;
+	glm::vec3 OverrideColor = glm::vec3(0.f, 0.f, 0.f);
 };
 

@@ -17,13 +17,14 @@ in VS_OUT
 layout(std140, binding = 1) uniform LightingUniforms
 {
 	int bHasNormalMap;
+	int bOverrideColor;
+	vec3 OverrideColor;
 } LightingUniformsBuffer;
 
 
 layout(binding = 0) uniform sampler2D Albedo;
 layout(binding = 1) uniform sampler2D NormalMap;
 layout(binding = 2) uniform sampler2D MetallicRoughness;
-
 
 void main()
 {
@@ -41,10 +42,29 @@ void main()
 	}
 
 	gNormal = vec4(wsNormal / 2.0 + 0.5, 1.0);
-	vec4 albedo = texture(Albedo, ps_in.TexCoords);
-	// Linearize
-	vec3 albedoLinearized = pow(albedo.rgb, vec3(2.2));
-	gAlbedo = vec4(albedoLinearized, albedo.a);
+	
+	
+	if (bool(LightingUniformsBuffer.bOverrideColor))
+	{
+		vec4 albedo = vec4(LightingUniformsBuffer.OverrideColor.rgb, 1.0);
+		vec3 albedoLinearized = pow(albedo.rgb, vec3(2.2));
+		//vec3 albedoLinearized = albedo.xyz;
+		gAlbedo = vec4(albedoLinearized, albedo.a);
+	}
+	else
+	{
+		vec4 albedo = texture(Albedo, ps_in.TexCoords);
+		// Linearize
+		vec3 albedoLinearized = pow(albedo.rgb, vec3(2.2));
+		gAlbedo = vec4(albedoLinearized, albedo.a);
+	}
 
-	gMetallicRoughness = texture(MetallicRoughness, ps_in.TexCoords);
+	if (bool(LightingUniformsBuffer.bOverrideColor))
+	{
+		gMetallicRoughness = vec4(0, 1, 0, 0);
+	}
+	else
+	{
+		gMetallicRoughness = texture(MetallicRoughness, ps_in.TexCoords);
+	}
 }

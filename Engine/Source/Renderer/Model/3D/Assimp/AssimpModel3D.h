@@ -8,7 +8,7 @@
 class AssimpModel3D : public Model3D
 {
 public:
-	AssimpModel3D(const eastl::string& inPath, const eastl::string& inName);
+	AssimpModel3D(const eastl::string& inPath, const eastl::string& inName, glm::vec3 inOverrideColor = glm::vec3(1.f, 1.f, 1.f));
 	virtual ~AssimpModel3D();
 
 	virtual void CreateProxy() override;
@@ -31,4 +31,5 @@ private:
 	eastl::vector<eastl::shared_ptr<class RHITexture2D>> LoadedTextures;
 	eastl::string ModelDir;
 	eastl::string ModelPath;
+	glm::vec3 OverrideColor = glm::vec3(0.f, 0.f, 0.f);
 };

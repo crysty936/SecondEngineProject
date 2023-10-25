@@ -25,6 +25,8 @@ void RenderMaterial_WithShadow::SetRequiredUniforms()
 // 
 	eastl::vector<UniformWithFlag> LightingUniforms = {
 		{"bHasNormalMap"},
+		{"bOverrideColor"},
+		{"OverrideColor"},
 	};
 
 	UBuffers.push_back({ LightingUniforms, EShaderType::Sh_Fragment });
