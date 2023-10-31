@@ -12,6 +12,7 @@
 #include "Renderer/RHI/OpenGL/Resources/GLVertexBuffer.h"
 #include "Renderer/RHI/OpenGL/Resources/GLTexture2D.h"
 #include "Resources/GLFrameBuffer.h"
+#include "Resources/GLTextureBuffer.h"
 #include "Core/WindowsPlatform.h"
 #include "Renderer/Renderer.h"
 #include "Renderer/Material/RenderMaterial.h"
@@ -363,6 +364,29 @@ eastl::shared_ptr<RHIUniformBuffer> OpenGLRHI::CreateUniformBuffer(size_t inSize
 	return newBuffer;
 }
 
+eastl::shared_ptr<class RHITextureBuffer> OpenGLRHI::CreateTextureBuffer(size_t inSize)
+{
+	uint32_t bufferHandle = 0;
+
+	// Bind the transfer coefficients to a Texture Buffer Object (TBO)
+	glGenBuffers(1, &bufferHandle);
+	glBindBuffer(GL_TEXTURE_BUFFER, bufferHandle);
+	glBufferData(GL_TEXTURE_BUFFER, inSize, NULL, GL_STATIC_DRAW);
+
+	uint32_t bufferTextureHandle = 0;
+
+	// Attach the TBO to the TBO texture
+	glGenTextures(1, &bufferTextureHandle);
+	glBindTexture(GL_TEXTURE_BUFFER, bufferTextureHandle);
+	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGB32F, bufferHandle);
+
+	glBindTexture(GL_TEXTURE_BUFFER, 0);
+	glBindBuffer(GL_TEXTURE_BUFFER, 0);
+
+	eastl::shared_ptr<GlTextureBuffer> newTextureBuffer = eastl::make_shared<GlTextureBuffer>(bufferTextureHandle, bufferHandle, inSize);
+	return newTextureBuffer;
+}
+
 eastl::shared_ptr<class RHITexture2D> OpenGLRHI::CreateTexture2D(const uint32_t inWidth, const uint32_t inHeight)
 {
 	uint32_t texHandle = 0;
@@ -439,6 +463,11 @@ void OpenGLRHI::UploadDataToTexture(RHITexture2D& inTexture, const ImageData& in
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
+void OpenGLRHI::UploadDataToBuffer(RHITextureBuffer& inBuffer, const void* inData, const size_t inSize)
+{
+	GlTextureBuffer& buffer = static_cast<GlTextureBuffer&>(inBuffer);
+	glNamedBufferSubData(buffer.GLBufferHandle, 0, inSize, inData);
+}
 
 eastl::shared_ptr<RHITexture2D> OpenGLRHI::CreateAndLoadTexture2D(const eastl::string& inDataPath, const bool inSRGB)
 {
@@ -910,6 +939,14 @@ void OpenGLRHI::BindTexture2D(const RHITexture2D& inTex, const int32_t inTexId)
 
 }
 
+void OpenGLRHI::BindTextureBuffer(const RHITextureBuffer& inBuffer, const int32_t inBindingSlot)
+{
+	const GlTextureBuffer& glBuffer = static_cast<const GlTextureBuffer&>(inBuffer);
+
+	glActiveTexture(GL_TEXTURE0 + inBindingSlot);
+	glBindTexture(GL_TEXTURE_BUFFER, glBuffer.GLTextureHandle);
+}
+
 void OpenGLRHI::UnbindVertexBuffer(const RHIVertexBuffer& inBuffer, const bool inUnbindIndexBuffer)
 {
 	if (inUnbindIndexBuffer && inBuffer.IndexBuffer)
@@ -939,6 +976,12 @@ void OpenGLRHI::UnbindTexture2D(const RHITexture2D& inTex, const int32_t inTexId
 {
 	glActiveTexture(GL_TEXTURE0 + inTexId);
 	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void OpenGLRHI::UnbindTextureBuffer(const RHITextureBuffer& inBuffer, const int32_t inBindingSlot)
+{
+	glActiveTexture(GL_TEXTURE0 + inBindingSlot);
+	glBindTexture(GL_TEXTURE_BUFFER, 0);
 }
 
 uint32_t CreateShaderInternal(const eastl::string& Source, uint32_t ShaderType)

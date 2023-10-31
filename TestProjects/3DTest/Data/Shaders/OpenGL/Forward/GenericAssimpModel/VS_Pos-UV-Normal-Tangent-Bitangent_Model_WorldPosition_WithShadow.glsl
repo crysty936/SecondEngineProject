@@ -13,6 +13,7 @@ out VS_OUT
 	vec3 worldPos;
 	vec3 VertexNormal;
 	mat3 TangentToWorld;
+	vec3 VertexColor;
 } vs_out;
 
 layout(std140, binding = 0) uniform GeometryDataBuffer
@@ -22,6 +23,23 @@ layout(std140, binding = 0) uniform GeometryDataBuffer
 	mat4 model;
 };
 
+#define SH_NUM_BANDS 5
+#define SH_COEFFICIENT_COUNT (SH_NUM_BANDS * SH_NUM_BANDS)
+
+layout(std140, binding = 1) uniform GIBuffer
+{
+	vec4 LightCoeffs[SH_COEFFICIENT_COUNT];
+}LightingBuffer;
+
+layout(std140, binding = 2) uniform LightingUniforms
+{
+	int bHasNormalMap;
+	int bOverrideColor;
+	vec3 OverrideColor;
+} LightingUniformsBuffer;
+
+layout(binding = 0) uniform samplerBuffer tbo_texture;
+
 void main()
 {
 	vec3 fragPos = vec3(model * vec4(inPosition, 1.0));
@@ -29,6 +47,18 @@ void main()
 	vs_out.TexCoords = inTexCoords;
 	vs_out.clipToWorldMatrix = inverse(projection * view);
 	vs_out.VertexNormal = mat3(transpose(inverse(model))) * inNormal;
+
+	vec3 resColor = vec3(0.0, 0.0, 0.0);
+	for (int i = 0; i < SH_COEFFICIENT_COUNT; ++i)
+	{
+		resColor += LightingBuffer.LightCoeffs[i].xyz * texelFetch(tbo_texture, gl_VertexID * SH_COEFFICIENT_COUNT + i).rgb;
+	}
+
+	//vs_out.VertexColor = resColor;
+	vs_out.VertexColor = LightingUniformsBuffer.OverrideColor;
+
+
+	//vs_out.VertexColor = LightingUniformsBuffer.OverrideColor;
 
 	// Gram - Schmidt process
 	// https://learnopengl.com/Advanced-Lighting/Normal-Mapping

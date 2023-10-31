@@ -149,21 +149,24 @@ public:
 	virtual eastl::shared_ptr<class RHIIndexBuffer> CreateIndexBuffer(const uint32_t* inData, uint32_t inCount) { return nullptr; }
 
 	virtual eastl::shared_ptr<class RHIUniformBuffer> CreateUniformBuffer(size_t inSize) { return nullptr; }
+	virtual eastl::shared_ptr<class RHITextureBuffer> CreateTextureBuffer(size_t inSize) { return nullptr; }
 
-	virtual void BindVertexBuffer(const class RHIVertexBuffer& inBuffer, const bool inBindIndexBuffer = true) {};
-	virtual void BindIndexBuffer(const class RHIIndexBuffer& inBuffer) {};
-	virtual void BindShader(const class RHIShader& inShader) {};
-	virtual void BindUniformBuffer(const RHIUniformBuffer& inBuffer) {};
-	virtual void BindTexture2D(const class RHITexture2D& inTex, const int32_t inTexId) {};
+	virtual void BindVertexBuffer(const class RHIVertexBuffer& inBuffer, const bool inBindIndexBuffer = true) {}
+	virtual void BindIndexBuffer(const class RHIIndexBuffer& inBuffer) {}
+	virtual void BindShader(const class RHIShader& inShader) {}
+	virtual void BindUniformBuffer(const RHIUniformBuffer& inBuffer) {}
+	virtual void BindTexture2D(const class RHITexture2D& inTex, const int32_t inTexId) {}
 	virtual void BindFrameBuffer(const class RHIFrameBuffer& inFrameBuffer) {};
-	virtual void BindDefaultFrameBuffer() {};
+	virtual void BindDefaultFrameBuffer() {}
+	virtual void BindTextureBuffer(const RHITextureBuffer& inBuffer, const int32_t inBindingSlot) {}
 
-	virtual void UnbindVertexBuffer(const class RHIVertexBuffer& inBuffer, const bool inUnbindIndexBuffer = true) {};
-	virtual void UnbindIndexBuffer(const class RHIIndexBuffer& inBuffer) {};
-	virtual void UnbindShader(const class RHIShader& inShader) {};
-	virtual void UnbindUniformBuffer(const RHIUniformBuffer& inBuffer) {};
-	virtual void UnbindTexture2D(const class RHITexture2D& inTex, const int32_t inTexId) {};
-	virtual void UnbindFrameBuffer(const class RHIFrameBuffer& inFrameBuffer) {};
+	virtual void UnbindVertexBuffer(const class RHIVertexBuffer& inBuffer, const bool inUnbindIndexBuffer = true) {}
+	virtual void UnbindIndexBuffer(const class RHIIndexBuffer& inBuffer) {}
+	virtual void UnbindShader(const class RHIShader& inShader) {}
+	virtual void UnbindUniformBuffer(const RHIUniformBuffer& inBuffer) {}
+	virtual void UnbindTexture2D(const class RHITexture2D& inTex, const int32_t inTexId) {}
+	virtual void UnbindFrameBuffer(const class RHIFrameBuffer& inFrameBuffer) {}
+	virtual void UnbindTextureBuffer(const RHITextureBuffer& inBuffer, const int32_t inBindingSlot) {}
 
 	virtual void UniformBufferUpdateData(class RHIUniformBuffer& inBuffer, const void* inData, const size_t inDataSize, const int32_t inBufferNr) {};
 
@@ -180,6 +183,7 @@ public:
 
 	virtual eastl::shared_ptr<class RHITexture2D> CreateTexture2D(const uint32_t inWidth, const uint32_t inHeight) { return nullptr; }
 	virtual void UploadDataToTexture(class RHITexture2D& inTexture, const struct ImageData& inData, const bool inGenerateMips) {}
+	virtual void UploadDataToBuffer(RHITextureBuffer& inBuffer, const void* inData, const size_t inSize) {}
 	virtual eastl::shared_ptr<class RHITexture2D> CreateAndLoadTexture2D(const eastl::string& inDataPath, const bool inSRGB) { return nullptr; }
 
 	/**  A frame buffer that already has Depth Stencil attachments, can be used with texture color attachment */

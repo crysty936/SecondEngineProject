@@ -13,6 +13,7 @@ out VS_OUT
 	vec3 worldPos;
 	vec3 VertexNormal;
 	mat3 TangentToWorld;
+	vec3 modelPos;
 } vs_out;
 
 layout(std140, binding = 0) uniform GeometryDataBuffer
@@ -30,6 +31,8 @@ void main()
 	vs_out.clipToWorldMatrix = inverse(projection * view);
 	// it's a sphere so the vertex position can be used as vertex normal
 	vs_out.VertexNormal = mat3(transpose(inverse(model))) * normalize(inPosition);
+	vs_out.modelPos = inPosition;
+
 
 	// Gram - Schmidt process
 	// https://learnopengl.com/Advanced-Lighting/Normal-Mapping

@@ -35,6 +35,7 @@
 #include "imgui.h"
 #include "ShaderTypes.h"
 #include "Math/SphericalHarmonics.h"
+#include "Math/MathUtils.h"
 
 void InitGI();
 
@@ -77,8 +78,8 @@ void DeferredRenderer::InitInternal()
 	GBufferNormal = RHI::Get()->CreateRenderTexture(props.Width, props.Height, ERHITexturePrecision::Float16, ERHITextureFilter::Nearest);
 	RHI::Get()->AttachTextureToFramebufferColor(*GBuffer, GBufferNormal);
 
- 	GBufferAlbedo = RHI::Get()->CreateRenderTexture(props.Width, props.Height, ERHITexturePrecision::UnsignedByte, ERHITextureFilter::Nearest);
- 	RHI::Get()->AttachTextureToFramebufferColor(*GBuffer, GBufferAlbedo);
+	GBufferAlbedo = RHI::Get()->CreateRenderTexture(props.Width, props.Height, ERHITexturePrecision::UnsignedByte, ERHITextureFilter::Nearest);
+	RHI::Get()->AttachTextureToFramebufferColor(*GBuffer, GBufferAlbedo);
 
 	GBufferMetallicRoughness = RHI::Get()->CreateRenderTexture(props.Width, props.Height, ERHITexturePrecision::UnsignedByte, ERHITextureFilter::Nearest);
 	RHI::Get()->AttachTextureToFramebufferColor(*GBuffer, GBufferMetallicRoughness);
@@ -96,11 +97,11 @@ void DeferredRenderer::InitInternal()
 	VisualizeNormalsUtil->SetScale(glm::vec3(0.33f, 0.33f, 1.f));
 	VisualizeNormalsUtil->SetRelativeLocation(glm::vec3(0.f, 0.65f, 0.0f));
 
- 	VisualizeAlbedoUtil = SceneHelper::CreateObject<GBufferVisualizeQuad>("VisualizeAlbedoTex");
- 	VisualizeAlbedoUtil->CreateCommand();
- 	VisualizeAlbedoUtil->GetCommand().Material->ExternalTextures.push_back(GBufferAlbedo);
- 	VisualizeAlbedoUtil->SetScale(glm::vec3(0.33f, 0.33f, 1.f));
- 	VisualizeAlbedoUtil->SetRelativeLocation(glm::vec3(0.67f, 0.65f, 0.0f));
+	VisualizeAlbedoUtil = SceneHelper::CreateObject<GBufferVisualizeQuad>("VisualizeAlbedoTex");
+	VisualizeAlbedoUtil->CreateCommand();
+	VisualizeAlbedoUtil->GetCommand().Material->ExternalTextures.push_back(GBufferAlbedo);
+	VisualizeAlbedoUtil->SetScale(glm::vec3(0.33f, 0.33f, 1.f));
+	VisualizeAlbedoUtil->SetRelativeLocation(glm::vec3(0.67f, 0.65f, 0.0f));
 
 	VisualizeRoughnessUtil = SceneHelper::CreateObject<GBufferVisualizeQuad>("VisualizeRoughnessTex");
 	VisualizeRoughnessUtil->CreateCommand();
@@ -116,7 +117,8 @@ void DeferredRenderer::InitInternal()
 	DefaultPBRShadingModelQuad->GetCommand().Material->ExternalTextures.push_back(GBufferDepth);
 	DefaultPBRShadingModelQuad->CreateCommand();
 
-	InitGI();
+	PostInitCallback& postInitMulticast = GEngine->GetPostInitMulticast();
+	//postInitMulticast.BindRaw(this, &DeferredRenderer::InitGI);
 }
 
 static glm::vec3 NormalizedDirLightDir = glm::vec3(0.f, 1.f, 0.f);
@@ -124,7 +126,7 @@ static glm::vec3 NormalizedDirLightDir = glm::vec3(0.f, 1.f, 0.f);
 bool DeferredRenderer::TriangleTrace(const PathTracingRay& inRay, PathTracePayload& outPayload, glm::vec3& outColor)
 {
 	bool bHit = false;
-	for (RenderCommand& command : MainCommands)
+	for (const RenderCommand& command : MainCommands)
 	{
 		if (command.Triangles.size() == 0)
 		{
@@ -146,17 +148,174 @@ bool DeferredRenderer::TriangleTrace(const PathTracingRay& inRay, PathTracePaylo
 	return bHit;
 }
 
-void InitGI()
+void DeferredRenderer::InitGI()
 {
 	SHSample* samples = new SHSample[SH_TOTAL_SAMPLE_COUNT];
 	SphericalHarmonics::InitSamples(samples);
+
+	int sceneCoeffCount = 0;
+	for (RenderCommand& command : MainCommands)
+	{
+
+		// Precache transforms
+		if (command.Triangles.size() == 0)
+		{
+			continue;
+		}
+
+		const eastl::shared_ptr<const DrawableObject> parent = command.Parent.lock();
+		glm::mat4 model = parent->GetModelMatrix();
+
+		if (!command.AccStructure.IsValid())
+		{
+			eastl::vector<PathTraceTriangle> transformedTriangles = command.Triangles;
+			for (PathTraceTriangle& triangle : transformedTriangles)
+			{
+				triangle.Transform(model);
+			}
+			command.AccStructure.Build(transformedTriangles);
+		}
+
+		// Each vertex has its own SH Probe and SH_COEFFICIENT_COUNT coefficients
+		command.TransferCoeffs.resize(command.Vertices.size() * SH_COEFFICIENT_COUNT);
+	}
+
+	for (RenderCommand& command : MainCommands)
+	{
+		//Ray ray;
+		//// Iterate over vertices
+		//for (int v = 0; v < vertex_count; v++)
+		//{
+		//	// Initialize SH coefficients to 0
+		//	for (int i = 0; i < transfer_coeff_count; i++)
+		//	{
+		//		transfer_coeffs[v * transfer_coeff_count + i] = glm::vec3(0.0f, 0.0f, 0.0f);
+		//	}
+
+		//	// Iterate over SH samples
+		//	for (int s = 0; s < SAMPLE_COUNT; s++)
+		//	{
+		//		float dot = glm::dot(mesh_data->vertices[v].normal, samples[s].direction);
+
+		//		// Only accept samples within the hemisphere defined by the Vertex normal
+		//		if (dot >= 0.0f)
+		//		{
+		//			ray.origin = mesh_data->vertices[v].position + mesh_data->vertices[v].normal * EPSILON;
+		//			ray.direction = samples[s].direction;
+
+		//			bool hit = scene.intersects(ray);
+		//			hits[v * SAMPLE_COUNT + s] = hit;
+
+		//			// If the Ray was not occluded
+		//			if (!hit)
+		//			{
+		//				switch (material.shader.type)
+		//				{
+		//					// For diffuse materials, compose the transfer vector.
+		//					// This vector includes the BDRF, incorporating the albedo colour, a lambertian diffuse factor (dot) and a SH sample
+		//				case MeshShader::Type::DIFFUSE:
+		//				{
+		//					for (int i = 0; i < SH_COEFFICIENT_COUNT; i++)
+		//					{
+		//						// Add the contribution of this sample
+		//						transfer_coeffs[v * SH_COEFFICIENT_COUNT + i] += material.albedo * dot * samples[s].coeffs[i];
+		//					}
+		//				} break;
+
+		//				//// For glossy materials, compose the transfer matrix.
+		//				//// This matrix does not include the BDRF, incorporating only two SH samples
+		//				//case MeshShader::Type::GLOSSY: {
+		//				//	for (int j = 0; j < SH_COEFFICIENT_COUNT; j++) {
+		//				//		for (int i = 0; i < SH_COEFFICIENT_COUNT; i++) {
+		//				//			// Add the contribution of this sample
+		//				//			transfer_coeffs[(v * SH_COEFFICIENT_COUNT + j) * SH_COEFFICIENT_COUNT + i] += samples[s].coeffs[j] * samples[s].coeffs[i];
+		//				//		}
+		//				//	}
+		//				//} break;
+		//				}
+		//			}
+		//		}
+		//		else
+		//		{
+		//			hits[v * SAMPLE_COUNT + s] = false;
+		//		}
+		//	}
+
+		//	const float normalization_factor = 4.0f * PI / SAMPLE_COUNT;
+
+		//	// Normalize coefficients
+		//	for (int i = 0; i < transfer_coeff_count; i++) {
+		//		transfer_coeffs[v * transfer_coeff_count + i] *= normalization_factor;
+		//	}
+		//}
+
+		PathTracingRay traceRay;
+		PathTracePayload payload;
+		glm::vec3 color;
+
+		for (int32_t v = 0; v < command.Vertices.size(); ++v)
+		{
+			const Vertex& vert = command.Vertices[v];
+			// For each vertex, evaluate all samples of its SH Sphere
+
+
+			for (int s = 0; s < SH_TOTAL_SAMPLE_COUNT; s++)
+			{
+				float dot = glm::dot(vert.Normal, samples[s].Direction);
+				// Proceed only with samples within the hemisphere defined by the Vertex Normal
+				// all other samples will be 0
+				if (dot >= 0.0f)
+				{
+					traceRay.Origin = vert.Position + vert.Normal * 0.001f;
+					traceRay.Direction = samples[s].Direction;
+
+					bool hit = TriangleTrace(traceRay, payload, color);
+
+					// If the Ray was not occluded
+					if (!hit)
+					{
+						// For diffuse materials, compose the transfer vector.
+						// This vector includes the BDRF, incorporating the albedo colour, a lambertian diffuse factor (dot) and a SH sample
+						for (int i = 0; i < SH_COEFFICIENT_COUNT; i++)
+						{
+							// Add the contribution of this sample
+							//transfer_coeffs[v * SH_COEFFICIENT_COUNT + i] += material.albedo * dot * samples[s].coeffs[i];
+							command.TransferCoeffs[v * SH_COEFFICIENT_COUNT + i] += color * dot * samples[s].Coeffs[i];
+						}
+					}
+				}
+			}
+
+			// Probability to sample any point on the surface of the unit sphere is the same for all samples,
+			// meaning that the weighting function is 1/surface area of unit sphere which is 4*PI => probability function p(x) is 1/(4*PI).
+			// => The constant weighting function which we need to multiply our Coeffs by is 1 / p(x) = 4 * PI
+			
+			// Monte Carlo sampling means that we need to normalize all coefficients by N
+			// => normalization factor of (4 * PI) / N multiplied with the Sum of samples.
+
+			const float normalization_factor = 4.0f * PI / SH_TOTAL_SAMPLE_COUNT;
+
+			// Normalize coefficients
+			for (int i = 0; i < SH_COEFFICIENT_COUNT; i++) {
+				command.TransferCoeffs[v * SH_COEFFICIENT_COUNT + i] *= normalization_factor;
+			}
+		}
+
+
+
+
+
+	}
+
+
+
 
 
 
 }
 
 static bool bBVHDebugDraw = false;
-void DisplaySettings()
+static void DisplaySettings()
 {
 	ImGui::Checkbox("BVH Debug Draw", &bBVHDebugDraw);
 
@@ -175,7 +334,7 @@ void DeferredRenderer::Draw()
 	SetLightingConstants();
 
 
- 	RHI::Instance->BindFrameBuffer(*GBuffer);
+	RHI::Instance->BindFrameBuffer(*GBuffer);
 	RHI::Get()->ClearBuffers();
 	RHI::Instance->ClearTexture(*GBufferDepth, glm::vec4(1.f, 1.f, 1.f, 1.f));
 
@@ -189,7 +348,7 @@ void DeferredRenderer::Draw()
 	//DrawDebugHelpers::DrawDebugPoint(viewOrigin);
 
 
-    DrawCommands(MainCommands);
+	DrawCommands(MainCommands);
 
 	DrawDecals(DecalCommands);
 
@@ -202,7 +361,7 @@ void DeferredRenderer::Draw()
 	RHI::Get()->SetDepthWrite(false);
 
 	DrawCommand(DefaultPBRShadingModelQuad->GetCommand());
-	
+
 	// Draw debug primitives
 	DrawDebugManager::Draw();
 
@@ -213,15 +372,15 @@ void DeferredRenderer::Draw()
 	{
 		RHI::Get()->SetDepthTest(false);
 
- 		DrawCommand(VisualizeDepthUtil->GetCommand());
+		DrawCommand(VisualizeDepthUtil->GetCommand());
 
- 		VisualizeNormalsUtil->GetCommand().Material->ExternalTextures.clear();
- 		VisualizeNormalsUtil->GetCommand().Material->ExternalTextures.push_back(GBufferNormal);
- 		DrawCommand(VisualizeNormalsUtil->GetCommand());
- 
-  		VisualizeAlbedoUtil->GetCommand().Material->ExternalTextures.clear();
-  		VisualizeAlbedoUtil->GetCommand().Material->ExternalTextures.push_back(GBufferAlbedo);
-  		DrawCommand(VisualizeAlbedoUtil->GetCommand());
+		VisualizeNormalsUtil->GetCommand().Material->ExternalTextures.clear();
+		VisualizeNormalsUtil->GetCommand().Material->ExternalTextures.push_back(GBufferNormal);
+		DrawCommand(VisualizeNormalsUtil->GetCommand());
+
+		VisualizeAlbedoUtil->GetCommand().Material->ExternalTextures.clear();
+		VisualizeAlbedoUtil->GetCommand().Material->ExternalTextures.push_back(GBufferAlbedo);
+		DrawCommand(VisualizeAlbedoUtil->GetCommand());
 
 		VisualizeRoughnessUtil->GetCommand().Material->ExternalTextures.clear();
 		VisualizeRoughnessUtil->GetCommand().Material->ExternalTextures.push_back(GBufferMetallicRoughness);
@@ -317,6 +476,8 @@ void DeferredRenderer::SetLightingConstants()
 		const eastl::shared_ptr<LightSource>& dirLight = dirLights[0];
 
 		const glm::vec3 dir = dirLight->GetAbsoluteTransform().Rotation * glm::vec3(0.f, 0.f, 1.f);
+		NormalizedDirLightDir = glm::normalize(dir);
+
 		UniformsCache["DirectionalLightDirection"] = glm::normalize(dir);
 	}
 	else
@@ -354,8 +515,8 @@ void DeferredRenderer::SetLightingConstants()
 
 void DeferredRenderer::UpdateUniforms()
 {
- 	const glm::mat4 view = SceneManager::Get().GetCurrentScene().GetCurrentCamera()->GetLookAt();
- 	UniformsCache["view"] = view;
+	const glm::mat4 view = SceneManager::Get().GetCurrentScene().GetCurrentCamera()->GetLookAt();
+	UniformsCache["view"] = view;
 }
 
 void DeferredRenderer::DrawCommands(const eastl::vector<RenderCommand>& inCommands)
@@ -632,11 +793,11 @@ void DeferredRenderer::DrawCommand(const RenderCommand& inCommand)
 	RHI::Get()->BindVertexBuffer(*(dataContainer->VBuffer));
 
 	// Additional vertex data buffers
-  	for (const eastl::shared_ptr<RHIVertexBuffer>& additionalBuffer : dataContainer->AdditionalBuffers)
-  	{
-  		constexpr bool bindIndexBuffer = false;
-  		RHI::Get()->BindVertexBuffer(*(additionalBuffer), bindIndexBuffer);
-  	}
+	for (const eastl::shared_ptr<RHIVertexBuffer>& additionalBuffer : dataContainer->AdditionalBuffers)
+	{
+		constexpr bool bindIndexBuffer = false;
+		RHI::Get()->BindVertexBuffer(*(additionalBuffer), bindIndexBuffer);
+	}
 
 	RHI::Get()->BindShader(*(material->Shader));
 
@@ -650,41 +811,41 @@ void DeferredRenderer::DrawCommand(const RenderCommand& inCommand)
 
 	// Path Tracing Debug
 
-	if (bBVHDebugDraw && inCommand.Triangles.size() != 0)
-	{
-		RenderCommand& nonConstCommand = const_cast<RenderCommand&>(inCommand);
-		if (!nonConstCommand.AccStructure.IsValid())
-		{
-			eastl::vector<PathTraceTriangle> transformedTriangles = nonConstCommand.Triangles;
-			for (PathTraceTriangle& triangle : transformedTriangles)
-			{
-				triangle.Transform(model);
-			}
+	//if (bBVHDebugDraw && inCommand.Triangles.size() != 0)
+	//{
+	//	RenderCommand& nonConstCommand = const_cast<RenderCommand&>(inCommand);
+	//	if (!nonConstCommand.AccStructure.IsValid())
+	//	{
+	//		eastl::vector<PathTraceTriangle> transformedTriangles = nonConstCommand.Triangles;
+	//		for (PathTraceTriangle& triangle : transformedTriangles)
+	//		{
+	//			triangle.Transform(model);
+	//		}
 
-			nonConstCommand.AccStructure.Build(transformedTriangles);
-		}
+	//		nonConstCommand.AccStructure.Build(transformedTriangles);
+	//	}
 
-		//// TEST
-		//// draw centers of all triangles and center of all combined
-		//const float InvTriangleCount = inCommand.Triangles.size();
-		//glm::vec3 center = glm::vec3(0.f, 0.f, 0.f);
-		//for (const PathTraceTriangle& triangle : inCommand.Triangles)
-		//{
-		//	glm::vec3 triangleCenter = (triangle.V[0] + triangle.V[1] + triangle.V[2]) * 0.3333333333333333333333f;
-		//	
-		//	DrawDebugHelpers::DrawDebugPoint(triangleCenter, 0.03f, glm::vec3(1.f, 0.f, 0.f));
+	//	//// TEST
+	//	//// draw centers of all triangles and center of all combined
+	//	//const float InvTriangleCount = inCommand.Triangles.size();
+	//	//glm::vec3 center = glm::vec3(0.f, 0.f, 0.f);
+	//	//for (const PathTraceTriangle& triangle : inCommand.Triangles)
+	//	//{
+	//	//	glm::vec3 triangleCenter = (triangle.V[0] + triangle.V[1] + triangle.V[2]) * 0.3333333333333333333333f;
+	//	//	
+	//	//	DrawDebugHelpers::DrawDebugPoint(triangleCenter, 0.03f, glm::vec3(1.f, 0.f, 0.f));
 
-		//	center += triangleCenter * InvTriangleCount;
-
-
-
-		//}
-		//
-		//DrawDebugHelpers::DrawDebugPoint(center, 0.1f);
+	//	//	center += triangleCenter * InvTriangleCount;
 
 
-		nonConstCommand.AccStructure.Root->DebugDraw();
-	}
+
+	//	//}
+	//	//
+	//	//DrawDebugHelpers::DrawDebugPoint(center, 0.1f);
+
+
+	//	nonConstCommand.AccStructure.Root->DebugDraw();
+	//}
 
 	// Path Tracing Debug
 
@@ -790,7 +951,7 @@ eastl::shared_ptr<RenderMaterial> DeferredRenderer::GetMaterial(const RenderComm
 		// #define CASCADED_SHADOWS
 
 		// Or some buffer uniforms could be based on defines
-		
+
 		// if shadow_enabled then do shadow mapping based on if Cascaded_shadows or other is defined
 		// similarly, use NUM_CASCADES or define a default if that is not defined(or Assert to signal that it's missing)
 		// This means that those shader variants need to be compiled and cached first and then used, they can't be compiled any time a variable is changed
@@ -810,10 +971,10 @@ eastl::shared_ptr<RenderMaterial> DeferredRenderer::GetMaterial(const RenderComm
 				inputLayout.Push<float>(2, VertexInputType::TexCoords);
 
 				eastl::vector<ShaderSourceInput> shaders = {
-				//{ "VS-Pos-Normal-UV_Instanced_Depth", EShaderType::Vertex },
-				{ "VS_Pos-Normal-UV_Depth_Cascaded", EShaderType::Sh_Vertex },
-				{ "GS_Depth_Cascaded", EShaderType::Sh_Geometry },
-				{ "PS_Empty", EShaderType::Sh_Fragment } };
+					//{ "VS-Pos-Normal-UV_Instanced_Depth", EShaderType::Vertex },
+					{ "VS_Pos-Normal-UV_Depth_Cascaded", EShaderType::Sh_Vertex },
+					{ "GS_Depth_Cascaded", EShaderType::Sh_Geometry },
+					{ "PS_Empty", EShaderType::Sh_Fragment } };
 
 				depthMaterial->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
 			}
@@ -837,10 +998,10 @@ eastl::shared_ptr<RenderMaterial> DeferredRenderer::GetMaterial(const RenderComm
 				inputLayout.Push<float>(2, VertexInputType::TexCoords);
 
 				eastl::vector<ShaderSourceInput> shaders = {
-				//{ "Depth_VS-Pos-Normal-UV_Instanced", EShaderType::Vertex },
-				{ "VS_Pos-Normal-UV_Depth_Cascaded_Instanced", EShaderType::Sh_Vertex },
-				{ "GS_Depth_Cascaded", EShaderType::Sh_Geometry },
-				{ "PS_Empty", EShaderType::Sh_Fragment } };
+					//{ "Depth_VS-Pos-Normal-UV_Instanced", EShaderType::Vertex },
+					{ "VS_Pos-Normal-UV_Depth_Cascaded_Instanced", EShaderType::Sh_Vertex },
+					{ "GS_Depth_Cascaded", EShaderType::Sh_Geometry },
+					{ "PS_Empty", EShaderType::Sh_Fragment } };
 
 				depthMaterial->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
 			}
@@ -878,27 +1039,27 @@ eastl::shared_ptr<RenderMaterial> DeferredRenderer::GetMaterial(const RenderComm
 
 		return depthMaterial;
 	}
-// 	case EDrawMode::OUTLINE:
-// 	{ 
-// 		MaterialsManager& matManager = MaterialsManager::Get();
-// 		bool materialExists = false;
-// 		eastl::shared_ptr<RenderMaterial> outlineMaterial = matManager.GetOrAddMaterial("outline_material", materialExists);
-// 
-// 		if (!materialExists)
-// 		{
-// 			outlineMaterial->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/BasicProjectionVertexShader.glsl", "../Data/Shaders/OutlineFragmentShader.glsl");
-// 		}
-// 
-// 		return outlineMaterial;
-	//}
+	// 	case EDrawMode::OUTLINE:
+	// 	{ 
+	// 		MaterialsManager& matManager = MaterialsManager::Get();
+	// 		bool materialExists = false;
+	// 		eastl::shared_ptr<RenderMaterial> outlineMaterial = matManager.GetOrAddMaterial("outline_material", materialExists);
+	// 
+	// 		if (!materialExists)
+	// 		{
+	// 			outlineMaterial->Shader = OpenGLShader::ConstructShaderFromPath("../Data/Shaders/BasicProjectionVertexShader.glsl", "../Data/Shaders/OutlineFragmentShader.glsl");
+	// 		}
+	// 
+	// 		return outlineMaterial;
+		//}
 	case EDrawMode::NORMAL_VISUALIZE:
- 	{
- 		MaterialsManager& matManager = MaterialsManager::Get();
- 		bool materialExists = false;
- 		eastl::shared_ptr<RenderMaterial> visNormalMat = matManager.GetOrAddMaterial("normal_visualize_material", materialExists);
- 
- 		if (!materialExists)
- 		{
+	{
+		MaterialsManager& matManager = MaterialsManager::Get();
+		bool materialExists = false;
+		eastl::shared_ptr<RenderMaterial> visNormalMat = matManager.GetOrAddMaterial("normal_visualize_material", materialExists);
+
+		if (!materialExists)
+		{
 			VertexInputLayout inputLayout;
 			inputLayout.Push<float>(3, VertexInputType::Position);
 			inputLayout.Push<float>(3, VertexInputType::Normal);
@@ -910,16 +1071,16 @@ eastl::shared_ptr<RenderMaterial> DeferredRenderer::GetMaterial(const RenderComm
 			{ "VisualizeNormalsGeometry/PS_FlatColor", EShaderType::Sh_Fragment } };
 
 			visNormalMat->Shader = RHI::Get()->CreateShaderFromPath(shaders, inputLayout);
- 		}
- 
- 		return visNormalMat;
+		}
+
+		return visNormalMat;
 	}
 	}
 
 	return { nullptr };
 }
 
-void DeferredRenderer::AddCommand(const RenderCommand & inCommand)
+void DeferredRenderer::AddCommand(const RenderCommand& inCommand)
 {
 	std::lock_guard<std::mutex> lock(RenderCommandsMutex);
 

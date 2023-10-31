@@ -355,13 +355,15 @@ void LightSource::CreateProxy()
 
 	material->bCastShadow = false;
 
-	RenderCommand newCommand;
-	newCommand.Material = material;
-	newCommand.DataContainer = dataContainer;
-	newCommand.Parent = cubeNode;
-	newCommand.DrawType = EDrawType::DrawElements;
 
-	Renderer::Get().AddCommand(newCommand);
+
+	//RenderCommand newCommand;
+	//newCommand.Material = material;
+	//newCommand.DataContainer = dataContainer;
+	//newCommand.Parent = cubeNode;
+	//newCommand.DrawType = EDrawType::DrawElements;
+
+	//Renderer::Get().AddCommand(newCommand);
 }
 
 DeferredDecal::DeferredDecal(const eastl::string& inName)

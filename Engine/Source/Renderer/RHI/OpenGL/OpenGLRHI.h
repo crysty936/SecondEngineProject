@@ -18,12 +18,14 @@ public:
 	eastl::shared_ptr<class RHIIndexBuffer> CreateIndexBuffer(const uint32_t* inData, uint32_t inCount) override;
 
 	eastl::shared_ptr<class RHIUniformBuffer> CreateUniformBuffer(size_t inSize) override;
+	eastl::shared_ptr<class RHITextureBuffer> CreateTextureBuffer(size_t inSize) override;
 
 	eastl::shared_ptr<class RHIShader> CreateShaderFromSource(const eastl::vector<ShaderSourceInput>& inShaderSources, const VertexInputLayout& inInputLayout, const eastl::string& inVSName = "VS", const eastl::string& inPSName = "PS") override;
 	eastl::shared_ptr<class RHIShader> CreateShaderFromPath(const eastl::vector<ShaderSourceInput>& inPathShaderSources, const VertexInputLayout& inInputLayout) override;
 
 	eastl::shared_ptr<class RHITexture2D> CreateTexture2D(const uint32_t inWidth, const uint32_t inHeight) override;
 	virtual void UploadDataToTexture(class RHITexture2D& inTexture, const struct ImageData& inData, const bool inGenerateMips) override;
+	virtual void UploadDataToBuffer(RHITextureBuffer& inBuffer, const void* inData, const size_t inSize) override;
 	virtual eastl::shared_ptr<class RHITexture2D> CreateAndLoadTexture2D(const eastl::string& inDataPath, const bool inSRGB) override;
 	virtual eastl::shared_ptr<class RHITexture2D> CreateRenderTexture(const int32_t inWidth, const int32_t inHeight, const ERHITexturePrecision inPrecision = ERHITexturePrecision::UnsignedByte, const ERHITextureFilter inFilter = ERHITextureFilter::Linear) override;
 	virtual void CopyRenderTexture(class RHITexture2D& inSrc, class RHITexture2D& inTrg) override;
@@ -41,12 +43,14 @@ public:
 	virtual void BindShader(const RHIShader& inShader) override;
 	virtual void BindUniformBuffer(const RHIUniformBuffer& inBuffer) override;
 	virtual void BindTexture2D(const RHITexture2D& inTex, const int32_t inTexId) override;
+	virtual void BindTextureBuffer(const RHITextureBuffer& inBuffer, const int32_t inBindingSlot) override;
 
 	virtual void UnbindVertexBuffer(const RHIVertexBuffer& inBuffer, const bool inUnbindIndexBuffer = true) override;
 	virtual void UnbindIndexBuffer(const RHIIndexBuffer& inBuffer) override;
 	virtual void UnbindShader(const RHIShader& inShader) override;
 	virtual void UnbindUniformBuffer(const RHIUniformBuffer& inBuffer) override;
 	virtual void UnbindTexture2D(const RHITexture2D& inTex, const int32_t inTexId) override;
+	virtual void UnbindTextureBuffer(const RHITextureBuffer& inBuffer, const int32_t inBindingSlot) override;
 
 	virtual void UniformBufferUpdateData(RHIUniformBuffer& inBuffer, const void* inData, const size_t inDataSize, const int32_t inBufferNr) override;
 	virtual void AttachTextureToFramebufferColor(RHIFrameBuffer& inFrameBuffer, eastl::shared_ptr<class RHITexture2D>& inTex) override;

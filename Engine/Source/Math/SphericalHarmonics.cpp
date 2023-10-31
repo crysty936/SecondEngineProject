@@ -1,8 +1,7 @@
 #include "Math/SphericalHarmonics.h"
 #include "Renderer/DrawDebugHelpers.h"
+#include "MathUtils.h"
 #include <random>
-
-const float PI = 3.14159265359f;
 
 float factorial[34] = {
 	1.0f,

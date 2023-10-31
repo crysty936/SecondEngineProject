@@ -209,7 +209,7 @@ void BVH::Build(const eastl::vector<PathTraceTriangle>& inTriangles)
 
 // Slab Method
 // https://tavianator.com/2011/ray_box.html
-bool RayIntersectsAABB(const PathTracingRay& inRay, const AABB& inAABB) 
+bool RayIntersectsAABB(const PathTracingRay& inRay, const AABB& inAABB)
 {
 	const float inv_direction_x = 1.0f / inRay.Direction.x;
 	const float inv_direction_y = 1.0f / inRay.Direction.y;
@@ -241,12 +241,12 @@ bool RayIntersectsAABB(const PathTracingRay& inRay, const AABB& inAABB)
 }
 
 
-bool BVH::Intersects(const PathTracingRay& inRay)
+bool BVH::Intersects(const PathTracingRay& inRay) const
 {
 	return Root->Intersects(inRay);
 }
 
-bool BVHNode::Intersects(const PathTracingRay& inRay)
+bool BVHNode::Intersects(const PathTracingRay& inRay) const
 {
 	if (RayIntersectsAABB(inRay, BoundingBox))
 	{
@@ -271,7 +271,7 @@ bool BVHNode::Intersects(const PathTracingRay& inRay)
 	return false;
 }
 
-bool BVHNode::Trace(const PathTracingRay& inRay, PathTracePayload& outPayload)
+bool BVHNode::Trace(const PathTracingRay& inRay, PathTracePayload& outPayload) const
 {
 	if (RayIntersectsAABB(inRay, BoundingBox))
 	{
@@ -318,7 +318,7 @@ bool BVHNode::Trace(const PathTracingRay& inRay, PathTracePayload& outPayload)
 	return false;
 }
 
-float BVH::Trace(const PathTracingRay& inRay, PathTracePayload& outPayload)
+float BVH::Trace(const PathTracingRay& inRay, PathTracePayload& outPayload) const
 {
 	return Root->Trace(inRay, outPayload);
 }

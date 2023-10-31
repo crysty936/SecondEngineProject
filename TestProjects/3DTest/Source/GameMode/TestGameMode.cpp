@@ -428,9 +428,9 @@ void TestGameMode::Init()
 // 	}
 
 
-		//FloorModel = SceneHelper::CreateVisualEntity<AssimpModel3D>("../Data/Models/high_poly_blender_monkey_suzanne/scene.gltf", "Monke");
-	//FloorModel->Move(glm::vec3(0.f, -2.f, 0.f));
-	//FloorModel->SetScale(glm::vec3(10.f, 10.f, 10.f));
+		//MainModel = SceneHelper::CreateVisualEntity<AssimpModel3D>("../Data/Models/high_poly_blender_monkey_suzanne/scene.gltf", "Monke");
+	//MainModel->Move(glm::vec3(0.f, -2.f, 0.f));
+	//MainModel->SetScale(glm::vec3(10.f, 10.f, 10.f));
 
 
 		//eastl::shared_ptr<TriangleShape> TriangleTestObj = SceneHelper::CreateVisualEntity<TriangleShape>("Triangle 1");
@@ -440,20 +440,11 @@ void TestGameMode::Init()
 		//cubeTestObj->Move(glm::vec3(3.f, 3.f, 0.f));
 
 
+
+
 		MainModel = SceneHelper::CreateVisualEntity<AssimpModel3D>("../Data/Models/low_poly_suzanne/Monkey.obj", "Monke", glm::vec3(1.f, 1.f, 1.f));
 		eastl::shared_ptr<AssimpModel3D> weirdCube = SceneHelper::CreateVisualEntity<AssimpModel3D>("../Data/Models/WeirdCube/Cube.obj", "Cube", glm::vec3(0.f, 1.f, 1.f));
-
-		//weirdCube->Move(glm::vec3(-1.f, -1.f, 2.f));
-		//weirdCube->SetRotationDegrees(glm::vec3(0.f, 90.f, 0.f));
-
 		eastl::shared_ptr<AssimpModel3D> plane = SceneHelper::CreateVisualEntity<AssimpModel3D>("../Data/Models/HighPolyPlane/Plane.obj", "Plane", glm::vec3(0.f, 1.f, 0.f));
-		//plane->Move(glm::vec3(0.f, -0.5f, 0.f));
-
-		//cubeTestObj->Move(glm::vec3(2.f, 2.f, 0.f));
-
-
-
-
 
 }
 
@@ -478,33 +469,27 @@ void TestGameMode::Tick(float inDeltaT)
 
 	//Controller->ExecuteCallbacks();
 
-	//AssimpModel->Rotate(0.1f, glm::vec3(1.f, 0.f, 0.f));
-
-	//FloorModel->Rotate(0.1f, glm::vec3(1.f, 0.f, 0.f));
-
-	//Quad->Rotate(0.1f, glm::vec3(-1.f, 0.f, 0.f));
-
 	glm::vec3 forward = glm::vec3(0.f, 0.f, 1.f);
 	glm::vec3 right = glm::vec3(1.f, 0.f, 0.f);
 	glm::vec3 up = glm::vec3(0.f, 1.f, 0.f);
 
-	const eastl::shared_ptr<TransformObject>& usedObj = DirLight;
+	//const eastl::shared_ptr<TransformObject>& usedObj = DirLight;
 
-	if (usedObj)
-	{
- 		const glm::quat& rot = usedObj->GetAbsoluteTransform().Rotation;
- 
- 		// order of operations matters, considered like a matrix
- 		forward = glm::normalize(rot * forward);
- 		right = glm::normalize(rot * right);
- 		up = glm::normalize(rot * up);
- 
- 		const glm::vec3 start = usedObj->GetAbsoluteTransform().Translation;
- 
- 		DrawDebugHelpers::DrawDebugLine(start, start + forward * 4.f, glm::vec3(0.f, 0.f, 1.f));
- 		DrawDebugHelpers::DrawDebugLine(start, start + right * 4.f, glm::vec3(1.f, 0.f, 0.f));
- 		DrawDebugHelpers::DrawDebugLine(start, start + up * 4.f, glm::vec3(0.f, 1.f, 0.f));
-	}
+	//if (usedObj)
+	//{
+ //		const glm::quat& rot = usedObj->GetAbsoluteTransform().Rotation;
+ //
+ //		// order of operations matters, considered like a matrix
+ //		forward = glm::normalize(rot * forward);
+ //		right = glm::normalize(rot * right);
+ //		up = glm::normalize(rot * up);
+ //
+ //		const glm::vec3 start = usedObj->GetAbsoluteTransform().Translation;
+ //
+ //		DrawDebugHelpers::DrawDebugLine(start, start + forward * 4.f, glm::vec3(0.f, 0.f, 1.f));
+ //		DrawDebugHelpers::DrawDebugLine(start, start + right * 4.f, glm::vec3(1.f, 0.f, 0.f));
+ //		DrawDebugHelpers::DrawDebugLine(start, start + up * 4.f, glm::vec3(0.f, 1.f, 0.f));
+	//}
 
 
 

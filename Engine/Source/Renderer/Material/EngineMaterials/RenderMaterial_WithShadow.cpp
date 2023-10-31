@@ -4,6 +4,8 @@
 #include "Renderer/Material/MaterialHelpers.h"
 #include "Renderer/RHI/RHI.h"
 
+#include "Math/SphericalHarmonics.h"
+
 RenderMaterial_WithShadow::RenderMaterial_WithShadow() = default;
 RenderMaterial_WithShadow::~RenderMaterial_WithShadow() = default;
 
@@ -23,11 +25,20 @@ void RenderMaterial_WithShadow::SetRequiredUniforms()
 // 	UBuffers.push_back({ defaultUniforms, ConstantBufferBinding::Pixel });
 // 
 // 
+
+	eastl::vector<UniformWithFlag> GIUniforms = {
+	{"LightCoeffs", SH_COEFFICIENT_COUNT},
+	};
+
+	UBuffers.push_back({ GIUniforms, EShaderType::Sh_Vertex });
+
 	eastl::vector<UniformWithFlag> LightingUniforms = {
 		{"bHasNormalMap"},
 		{"bOverrideColor"},
 		{"OverrideColor"},
 	};
+
+
 
 	UBuffers.push_back({ LightingUniforms, EShaderType::Sh_Fragment });
 

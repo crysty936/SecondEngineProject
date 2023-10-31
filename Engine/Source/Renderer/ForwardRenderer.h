@@ -40,6 +40,7 @@ public:
 	void Present() override;
 
 	void AddCommand(const RenderCommand& inCommand) override;
+	void AddDecalCommand(const RenderCommand& inCommand) override;
 	void AddCommands(eastl::vector<RenderCommand> inCommands) override;
 	//void AddRenderLoadCommand(const RenderingLoadCommand& inCommand) override;
 
@@ -56,6 +57,9 @@ protected:
 	void InitInternal() override;
 
 private:
+	bool TriangleTrace(const PathTracingRay& inRay, PathTracePayload& outPayload, glm::vec3& outColor);
+	void InitGI();
+	void DisplaySettings();
 	void SetDrawMode(const EDrawMode::Type inDrawMode);
 	void SetLightingConstants();
 	void DrawSkybox();

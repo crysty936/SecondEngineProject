@@ -238,6 +238,7 @@ struct SelfRegisteringUniform
 	SelfRegisteringUniform(const glm::vec3& inValue);
 	SelfRegisteringUniform(const glm::vec4& inValue);
 	SelfRegisteringUniform(const eastl::vector<float>& inValue);
+	SelfRegisteringUniform(const eastl::vector<glm::vec4>& inValue);
 	SelfRegisteringUniform(const eastl::vector<glm::mat4>& inValue);
 	SelfRegisteringUniform(const eastl::vector<SPointLight>& inValue);
 	SelfRegisteringUniform(const eastl::shared_ptr<RHITexture2D>& inValue);

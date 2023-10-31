@@ -27,7 +27,7 @@ void RenderMaterial_EditorSphere::SetUniformsValue(eastl::unordered_map<eastl::s
 	static float EditorSphereMetallic = 0.f;
 	ImGui::DragFloat("Editor Sphere Metallic", &EditorSphereMetallic, 0.01f, 0.f, 1.f);
 
-	static float EditorSphereRoughess = 0.5f;
+	static float EditorSphereRoughess = 0.0f;
 	ImGui::DragFloat("Editor Sphere Roughness", &EditorSphereRoughess, 0.01f, 0.f, 1.f);
 
 	inUniformsCache["EditorSphereMetallic"] = EditorSphereMetallic;

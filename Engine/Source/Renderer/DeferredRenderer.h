@@ -46,6 +46,7 @@ protected:
 
 private:
 	bool TriangleTrace(const PathTracingRay& inRay, PathTracePayload& outPayload, glm::vec3& outColor);
+	void InitGI();
 	void SetDrawMode(const EDrawMode::Type inDrawMode);
 	void SetLightingConstants();
 	void UpdateUniforms();

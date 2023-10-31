@@ -34,9 +34,12 @@ struct RenderCommand
 
 	// FOR PATHTRACER, TO MOVE
 
+	eastl::shared_ptr<class RHITextureBuffer> CoeffsBuffer;
 	eastl::vector<PathTraceTriangle> Triangles;
 	eastl::vector<Vertex> Vertices;
+	eastl::vector<glm::vec3> TransferCoeffs;
 	BVH AccStructure;
 	glm::vec3 OverrideColor = glm::vec3(0.f, 0.f, 0.f);
+
 };
 

@@ -34,6 +34,8 @@
 #include "Math/AABB.h"
 #include "imgui.h"
 #include "ShaderTypes.h"
+#include "Math/SphericalHarmonics.h"
+#include "Math/MathUtils.h"
 
 const uint32_t SHADOW_WIDTH = 1024;
 const uint32_t SHADOW_HEIGHT = 1024;
@@ -114,19 +116,19 @@ void ForwardRenderer::InitInternal()
 	ScreenQuad = SceneHelper::CreateVisualEntity<FullScreenQuad>("Global Renderer Screen Quad");
 	ScreenQuad->CreateCommand();
 
-	TonemappingQuad = SceneHelper::CreateEntity<ToneMapQuad>("Global Renderer Tonemapping Quad");
-	TonemappingQuad->CreateCommand();
-	TonemappingQuad->GetCommand().Material->OwnedTextures.push_back(GlobalRenderTexture);
+	//TonemappingQuad = SceneHelper::CreateEntity<ToneMapQuad>("Global Renderer Tonemapping Quad");
+	//TonemappingQuad->CreateCommand();
+	//TonemappingQuad->GetCommand().Material->OwnedTextures.push_back(GlobalRenderTexture);
 
-	ExtractBrightAreasUtilQuad = SceneHelper::CreateEntity<ExtractBrightAreasQuad>("Extract Bright Areas Quad");
-	ExtractBrightAreasUtilQuad->CreateCommand();
-	ExtractBrightAreasUtilQuad->GetCommand().Material->OwnedTextures.push_back(GlobalRenderTexture);
+	//ExtractBrightAreasUtilQuad = SceneHelper::CreateEntity<ExtractBrightAreasQuad>("Extract Bright Areas Quad");
+	//ExtractBrightAreasUtilQuad->CreateCommand();
+	//ExtractBrightAreasUtilQuad->GetCommand().Material->OwnedTextures.push_back(GlobalRenderTexture);
 
-	GaussianBlurUtilQuad = SceneHelper::CreateEntity<GaussianBlurQuad>("Gaussian Blur Quad");
-	GaussianBlurUtilQuad->CreateCommand();
+	//GaussianBlurUtilQuad = SceneHelper::CreateEntity<GaussianBlurQuad>("Gaussian Blur Quad");
+	//GaussianBlurUtilQuad->CreateCommand();
 
-	BloomMergeUtilQuad = SceneHelper::CreateEntity<BloomMergeQuad>("Bloom Merge Quad");
-	BloomMergeUtilQuad->CreateCommand();
+	//BloomMergeUtilQuad = SceneHelper::CreateEntity<BloomMergeQuad>("Bloom Merge Quad");
+	//BloomMergeUtilQuad->CreateCommand();
 
 	// HDR Texture
 	ColorBackupTexture = RHI::Get()->CreateRenderTexture(props.Width, props.Height, ERHITexturePrecision::Float16, ERHITextureFilter::Linear);
@@ -134,11 +136,187 @@ void ForwardRenderer::InitInternal()
 	DepthFrameBuffer = RHI::Get()->CreateEmptyFrameBuffer();
 	DirectionalLightCascadedShadowTexture = RHI::Get()->CreateArrayDepthMap(SHADOW_WIDTH, SHADOW_HEIGHT, MAX_CASCADES_COUNT);
 	RHI::Get()->AttachTextureToFramebufferDepth(*DepthFrameBuffer, DirectionalLightCascadedShadowTexture);
+
+
+	PostInitCallback& postInitMulticast = GEngine->GetPostInitMulticast();
+	postInitMulticast.BindRaw(this, &ForwardRenderer::InitGI);
+}
+
+
+bool ForwardRenderer::TriangleTrace(const PathTracingRay& inRay, PathTracePayload& outPayload, glm::vec3& outColor)
+{
+	bool bHit = false;
+	for (const RenderCommand& command : MainCommands)
+	{
+		if (command.Triangles.size() == 0)
+		{
+			continue;
+		}
+
+		PathTracePayload currMeshPayload;
+		if (command.AccStructure.Trace(inRay, currMeshPayload))
+		{
+			bHit = true;
+			if (currMeshPayload.Distance < outPayload.Distance)
+			{
+				outPayload = currMeshPayload;
+				outColor = command.OverrideColor;
+			}
+		}
+	}
+
+	return bHit;
+}
+
+void ForwardRenderer::InitGI()
+{
+	SHSample* samples = new SHSample[SH_TOTAL_SAMPLE_COUNT];
+	SphericalHarmonics::InitSamples(samples);
+
+	int sceneCoeffCount = 0;
+	for (RenderCommand& command : MainCommands)
+	{
+
+		// Precache transforms
+		if (command.Triangles.size() == 0)
+		{
+			continue;
+		}
+
+		const eastl::shared_ptr<const DrawableObject> parent = command.Parent.lock();
+		glm::mat4 model = parent->GetModelMatrix();
+
+		if (!command.AccStructure.IsValid())
+		{
+			eastl::vector<PathTraceTriangle> transformedTriangles = command.Triangles;
+			for (PathTraceTriangle& triangle : transformedTriangles)
+			{
+				triangle.Transform(model);
+			}
+			command.AccStructure.Build(transformedTriangles);
+		}
+
+		// Each vertex has its own SH Probe and SH_COEFFICIENT_COUNT coefficients
+		command.TransferCoeffs.resize(command.Vertices.size() * SH_COEFFICIENT_COUNT);
+	}
+
+	for (RenderCommand& command : MainCommands)
+	{
+		PathTracingRay traceRay;
+		PathTracePayload payload;
+		glm::vec3 color;
+
+		command.CoeffsBuffer = RHI::Get()->CreateTextureBuffer(command.Vertices.size() * SH_COEFFICIENT_COUNT * sizeof(glm::vec3));
+
+		for (int32_t v = 0; v < command.Vertices.size(); ++v)
+		{
+			const Vertex& vert = command.Vertices[v];
+			// For each vertex, evaluate all samples of its SH Sphere
+
+
+			for (int s = 0; s < SH_TOTAL_SAMPLE_COUNT; s++)
+			{
+				float dot = glm::dot(vert.Normal, samples[s].Direction);
+				// Proceed only with samples within the hemisphere defined by the Vertex Normal
+				// all other samples will be 0
+				if (dot >= 0.0f)
+				{
+					traceRay.Origin = vert.Position + vert.Normal * 0.001f;
+					traceRay.Direction = samples[s].Direction;
+
+					bool hit = TriangleTrace(traceRay, payload, color);
+
+					// If the Ray was not occluded
+					if (!hit)
+					{
+						// For diffuse materials, compose the transfer vector.
+						// This vector includes the BDRF, incorporating the albedo colour, a lambertian diffuse factor (dot) and a SH sample
+						for (int i = 0; i < SH_COEFFICIENT_COUNT; i++)
+						{
+							// Add the contribution of this sample
+							//transfer_coeffs[v * SH_COEFFICIENT_COUNT + i] += material.albedo * dot * samples[s].coeffs[i];
+							command.TransferCoeffs[v * SH_COEFFICIENT_COUNT + i] += color * dot * samples[s].Coeffs[i];
+						}
+					}
+				}
+			}
+
+			// Probability to sample any point on the surface of the unit sphere is the same for all samples,
+			// meaning that the weighting function is 1/surface area of unit sphere which is 4*PI => probability function p(x) is 1/(4*PI).
+			// => The constant weighting function which we need to multiply our Coeffs by is 1 / p(x) = 4 * PI
+
+			// Monte Carlo sampling means that we need to normalize all coefficients by N
+			// => normalization factor of (4 * PI) / N multiplied with the Sum of samples.
+
+			const float normalization_factor = 4.0f * PI / SH_TOTAL_SAMPLE_COUNT;
+
+			// Normalize coefficients
+			for (int i = 0; i < SH_COEFFICIENT_COUNT; i++) {
+				command.TransferCoeffs[v * SH_COEFFICIENT_COUNT + i] *= normalization_factor;
+			}
+
+			ASSERT(command.TransferCoeffs.size() == command.Vertices.size() * SH_COEFFICIENT_COUNT);
+
+			const size_t finalSize = command.TransferCoeffs.size() * sizeof(glm::vec3);
+			RHI::Get()->UploadDataToBuffer(*command.CoeffsBuffer, &command.TransferCoeffs[0], finalSize);
+		}
+
+	}
+
+
+	eastl::vector<glm::vec4> lightCoeffs;
+	lightCoeffs.resize(SH_COEFFICIENT_COUNT);
+
+	// Light Coefficients
+	// For each sample
+	for (int s = 0; s < SH_TOTAL_SAMPLE_COUNT; s++)
+	{
+		const float theta = samples[s].Theta;
+		const float phi = samples[s].Phi;
+
+		// For each SH coefficient
+		for (int n = 0; n < SH_COEFFICIENT_COUNT; n++) 
+		{
+			const glm::vec3 sampleValue = theta < PI / 6.f ? glm::vec3(1.f, 1.f, 1.f) : glm::vec3(0.f, 0.f, 0.f);
+			//const glm::vec3 sampleValue = glm::vec3(1.f, 1.f, 1.f);
+			const glm::vec3 res = sampleValue * samples[s].Coeffs[n];
+			lightCoeffs[n] += glm::vec4(res.x, res.y, res.z, 1.f);
+		}
+	}
+
+	// Weighed by the area of a 3D unit sphere
+	const float weight = 4.0f * PI;
+	// Divide the result by weight and number of samples
+	const float factor = weight / SH_TOTAL_SAMPLE_COUNT;
+	for (int i = 0; i < SH_COEFFICIENT_COUNT; i++) {
+		lightCoeffs[i] *= factor;
+	}
+
+
+	UniformsCache["LightCoeffs"] = lightCoeffs;
+
+
+
+
+
+}
+
+static bool bBVHDebugDraw = false;
+void ForwardRenderer::DisplaySettings()
+{
+	ImGui::Checkbox("BVH Debug Draw", &bBVHDebugDraw);
+
+	static bool bOverrideColor = true;
+	ImGui::Checkbox("Override Color", &bOverrideColor);
+
+	UniformsCache["bOverrideColor"] = bOverrideColor;
 }
 
 void ForwardRenderer::Draw()
 {
 	ImGui::Begin("Renderer settings");
+
+	DisplaySettings();
 
 	SetBaseUniforms();
 	UpdateUniforms();
@@ -150,11 +328,11 @@ void ForwardRenderer::Draw()
 	// Clear default framebuffer buffers
 	RHI::Get()->ClearBuffers();
 
-	RHI::Instance->BindFrameBuffer(*GlobalFrameBuffer);
-	RHI::Instance->ClearTexture(*GlobalRenderTexture, glm::vec4(0.f, 0.f, 0.f, 1.f));
+	//RHI::Instance->BindFrameBuffer(*GlobalFrameBuffer);
+	//RHI::Instance->ClearTexture(*GlobalRenderTexture, glm::vec4(0.f, 0.f, 0.f, 1.f));
 
 	// To output right to default buffer
-	//RHI::Instance->BindDefaultFrameBuffer();
+	RHI::Instance->BindDefaultFrameBuffer();
 
 	// Clear additional framebuffer buffers
 	RHI::Instance->ClearBuffers();
@@ -164,7 +342,7 @@ void ForwardRenderer::Draw()
 	// Draw debug primitives
 	DrawDebugManager::Draw();
 
-	RHI::Instance->CopyRenderTexture(*GlobalRenderTexture, *ColorBackupTexture);
+	//RHI::Instance->CopyRenderTexture(*GlobalRenderTexture, *ColorBackupTexture);
 
 	SetDrawMode(EDrawMode::Default);
 
@@ -178,52 +356,52 @@ void ForwardRenderer::Draw()
 
 	// Bloom
 
- 	RHI::Instance->BindFrameBuffer(*AuxiliaryFrameBuffer);
- 	RHI::Instance->ClearBuffers();
+ 	//RHI::Instance->BindFrameBuffer(*AuxiliaryFrameBuffer);
+ 	//RHI::Instance->ClearBuffers();
 
+ 	////RHI::Instance->BindDefaultFrameBuffer();
+
+  // 	DrawCommand(ExtractBrightAreasUtilQuad->GetCommand());
+
+  //	RHI::Instance->BindDefaultFrameBuffer();
+ 
+  //	static int blurPassesCount = 10;
+ 	//ImGui::DragInt("Bloom Blur Passes Count", &blurPassesCount, 2, 0, 100);
+
+  //	for (int32_t i = 0; i < blurPassesCount; ++i)
+  //	{
+  //		// Use Global render buffer for horizontal and Auxiliary for vertical
+  //		const bool horizontal = i % 2 == 0;
+ 	//	UniformsCache["BlurHorizontal"] = int32_t(horizontal);
+ 
+ 	//	GaussianBlurUtilQuad->GetCommand().Material->ExternalTextures.clear();
+ 
+ 	//	if (horizontal)
+  //		{
+  //			RHI::Instance->BindFrameBuffer(*GlobalFrameBuffer);
+ 	//		RHI::Instance->ClearBuffers();
+ 	//		GaussianBlurUtilQuad->GetCommand().Material->ExternalTextures.push_back(AuxiliaryRenderTexture);
+  //		}
+  //		else
+  //		{
+  //			RHI::Instance->BindFrameBuffer(*AuxiliaryFrameBuffer);
+ 	//		RHI::Instance->ClearBuffers();
+ 	//		GaussianBlurUtilQuad->GetCommand().Material->ExternalTextures.push_back(GlobalRenderTexture);
+  //		}
+  //
+  //		DrawCommand(GaussianBlurUtilQuad->GetCommand());
+  //	}
+ 
  	//RHI::Instance->BindDefaultFrameBuffer();
-
-   	DrawCommand(ExtractBrightAreasUtilQuad->GetCommand());
-
-  	RHI::Instance->BindDefaultFrameBuffer();
- 
-  	static int blurPassesCount = 10;
- 	ImGui::DragInt("Bloom Blur Passes Count", &blurPassesCount, 2, 0, 100);
-
-  	for (int32_t i = 0; i < blurPassesCount; ++i)
-  	{
-  		// Use Global render buffer for horizontal and Auxiliary for vertical
-  		const bool horizontal = i % 2 == 0;
- 		UniformsCache["BlurHorizontal"] = int32_t(horizontal);
- 
- 		GaussianBlurUtilQuad->GetCommand().Material->ExternalTextures.clear();
- 
- 		if (horizontal)
-  		{
-  			RHI::Instance->BindFrameBuffer(*GlobalFrameBuffer);
- 			RHI::Instance->ClearBuffers();
- 			GaussianBlurUtilQuad->GetCommand().Material->ExternalTextures.push_back(AuxiliaryRenderTexture);
-  		}
-  		else
-  		{
-  			RHI::Instance->BindFrameBuffer(*AuxiliaryFrameBuffer);
- 			RHI::Instance->ClearBuffers();
- 			GaussianBlurUtilQuad->GetCommand().Material->ExternalTextures.push_back(GlobalRenderTexture);
-  		}
-  
-  		DrawCommand(GaussianBlurUtilQuad->GetCommand());
-  	}
- 
- 	RHI::Instance->BindDefaultFrameBuffer();
 
 	//ScreenQuad->GetCommand().Material->ExternalTextures.clear();
 	//ScreenQuad->GetCommand().Material->ExternalTextures.push_back(GlobalRenderTexture);
 	//DrawCommand(ScreenQuad->GetCommand());
 
-  	BloomMergeUtilQuad->GetCommand().Material->ExternalTextures.clear();
-  	BloomMergeUtilQuad->GetCommand().Material->ExternalTextures.push_back(ColorBackupTexture);
-  	BloomMergeUtilQuad->GetCommand().Material->ExternalTextures.push_back(GlobalRenderTexture);
-  	DrawCommand(BloomMergeUtilQuad->GetCommand());
+  	//BloomMergeUtilQuad->GetCommand().Material->ExternalTextures.clear();
+  	//BloomMergeUtilQuad->GetCommand().Material->ExternalTextures.push_back(ColorBackupTexture);
+  	//BloomMergeUtilQuad->GetCommand().Material->ExternalTextures.push_back(GlobalRenderTexture);
+  	//DrawCommand(BloomMergeUtilQuad->GetCommand());
 
 	ImGui::End();
 }
@@ -442,6 +620,7 @@ void ForwardRenderer::DrawShadowMap()
 	ImGui::Checkbox("Use Shadows", &bUseShadows);
 	UniformsCache["bUseShadows"] = bUseShadows;
 
+
 	// Cull front face to solve Peter Panning
 	//RHI::Instance->SetFaceCullMode(EFaceCullMode::Front);
 
@@ -607,28 +786,77 @@ void ForwardRenderer::DrawCommand(const RenderCommand& inCommand)
 
 	UniformsCache["model"] = parent->GetModelMatrix();
 	UniformsCache["ObjPos"] = parent->GetAbsoluteTransform().Translation;
+	UniformsCache["OverrideColor"] = inCommand.OverrideColor;
 
+
+	// Path Tracing Debug
+
+if (bBVHDebugDraw && inCommand.Triangles.size() != 0)
+{
+	RenderCommand& nonConstCommand = const_cast<RenderCommand&>(inCommand);
+	if (!nonConstCommand.AccStructure.IsValid())
 	{
-		int texNr = 0;
-		for (const eastl::shared_ptr<RHITexture2D>& tex : material->OwnedTextures)
-		{
-			RHI::Get()->BindTexture2D(*tex, texNr);
-			++texNr;
-		}
+		//eastl::vector<PathTraceTriangle> transformedTriangles = nonConstCommand.Triangles;
+		//for (PathTraceTriangle& triangle : transformedTriangles)
+		//{
+		//	triangle.Transform(model);
+		//}
 
-		for (const eastl::weak_ptr<RHITexture2D>& tex : material->ExternalTextures)
-		{
-			if (tex.expired())
-			{
-				continue;
-			}
-
-			eastl::shared_ptr<RHITexture2D>& sharedTex = tex.lock();
-
-			RHI::Get()->BindTexture2D(*sharedTex, texNr);
-			++texNr;
-		}
+		nonConstCommand.AccStructure.Build(nonConstCommand.Triangles);
 	}
+
+	//// TEST
+	//// draw centers of all triangles and center of all combined
+	//const float InvTriangleCount = inCommand.Triangles.size();
+	//glm::vec3 center = glm::vec3(0.f, 0.f, 0.f);
+	//for (const PathTraceTriangle& triangle : inCommand.Triangles)
+	//{
+	//	glm::vec3 triangleCenter = (triangle.V[0] + triangle.V[1] + triangle.V[2]) * 0.3333333333333333333333f;
+	//	
+	//	DrawDebugHelpers::DrawDebugPoint(triangleCenter, 0.03f, glm::vec3(1.f, 0.f, 0.f));
+
+	//	center += triangleCenter * InvTriangleCount;
+
+
+
+	//}
+	//
+	//DrawDebugHelpers::DrawDebugPoint(center, 0.1f);
+
+
+	nonConstCommand.AccStructure.Root->DebugDraw();
+}
+
+// Path Tracing Debug
+
+
+// Pathtrace
+
+RHI::Get()->BindTextureBuffer(*inCommand.CoeffsBuffer, 0);
+
+// Pathtrace
+
+	//{
+	//	int texNr = 0;
+	//	for (const eastl::shared_ptr<RHITexture2D>& tex : material->OwnedTextures)
+	//	{
+	//		RHI::Get()->BindTexture2D(*tex, texNr);
+	//		++texNr;
+	//	}
+
+	//	for (const eastl::weak_ptr<RHITexture2D>& tex : material->ExternalTextures)
+	//	{
+	//		if (tex.expired())
+	//		{
+	//			continue;
+	//		}
+
+	//		eastl::shared_ptr<RHITexture2D>& sharedTex = tex.lock();
+
+	//		RHI::Get()->BindTexture2D(*sharedTex, texNr);
+	//		++texNr;
+	//	}
+	//}
 
 	const uint32_t indicesCount = dataContainer->VBuffer->GetIndicesCount();
 
@@ -665,26 +893,32 @@ void ForwardRenderer::DrawCommand(const RenderCommand& inCommand)
 
 	RHI::Get()->UnbindVertexBuffer(*(dataContainer->VBuffer));
 
-	{
-		int texNr = 0;
-		for (const eastl::shared_ptr<RHITexture2D>& tex : material->OwnedTextures)
-		{
-			RHI::Get()->UnbindTexture2D(*tex, texNr);
-			++texNr;
-		}
+	// Pathtrace
 
-		for (const eastl::weak_ptr<RHITexture2D>& tex : material->ExternalTextures)
-		{
-			if (tex.expired())
-			{
-				continue;
-			}
+	RHI::Get()->UnbindTextureBuffer(*inCommand.CoeffsBuffer, 0);
 
-			eastl::shared_ptr<RHITexture2D>& sharedTex = tex.lock();
-			RHI::Get()->BindTexture2D(*sharedTex, texNr);
-			++texNr;
-		}
-	}
+	// Pathtrace
+
+	//{
+	//	int texNr = 0;
+	//	for (const eastl::shared_ptr<RHITexture2D>& tex : material->OwnedTextures)
+	//	{
+	//		RHI::Get()->UnbindTexture2D(*tex, texNr);
+	//		++texNr;
+	//	}
+
+	//	for (const eastl::weak_ptr<RHITexture2D>& tex : material->ExternalTextures)
+	//	{
+	//		if (tex.expired())
+	//		{
+	//			continue;
+	//		}
+
+	//		eastl::shared_ptr<RHITexture2D>& sharedTex = tex.lock();
+	//		RHI::Get()->BindTexture2D(*sharedTex, texNr);
+	//		++texNr;
+	//	}
+	//}
 
 	material->UnbindBuffers();
 	RHI::Get()->UnbindShader(*(material->Shader));
@@ -855,6 +1089,9 @@ void ForwardRenderer::AddCommand(const RenderCommand & inCommand)
 	std::lock_guard<std::mutex> lock(RenderCommandsMutex);
 	MainCommands.push_back(inCommand);
 }
+
+void ForwardRenderer::AddDecalCommand(const RenderCommand& inCommand)
+{}
 
 void ForwardRenderer::AddCommands(eastl::vector<RenderCommand> inCommands)
 {

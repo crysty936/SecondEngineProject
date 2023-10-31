@@ -128,7 +128,7 @@ struct Sphere
 	bool bIsEmissive = false;
 };
 
-struct Payload
+struct PathTraceSpherePayload
 {
 	int32_t SphereIndex = -1;
 	glm::vec3 Location = glm::vec3(0.f, 0.f, 0.f);
@@ -141,7 +141,7 @@ static eastl::vector<Sphere> spheres = {
 	{glm::vec3(0.f, -50.f, 0.f), 45.f, glm::vec3(0.f, 1.f, 0.f), false}
 };
 
-Payload Trace(const PathTracingRay& inRay)
+PathTraceSpherePayload TraceSphere(const PathTracingRay& inRay)
 {
 	int32_t closestSphere = -1;
 	float closestDistance = std::numeric_limits<float>::max();
@@ -190,7 +190,7 @@ Payload Trace(const PathTracingRay& inRay)
 		worldPosition = inRay.Origin + (inRay.Direction * closestDistance);
 	}
 
-	const Payload result = {closestSphere, worldPosition, closestDistance};
+	const PathTraceSpherePayload result = {closestSphere, worldPosition, closestDistance};
 
 	return result;
 }
@@ -344,7 +344,7 @@ glm::vec4 PathTracingRenderer::PerPixel(const uint32_t x, const uint32_t y, cons
 	const int32_t nrSamples = 5;
 	for (int32_t i = 0; i < nrSamples; ++i)
 	{
-		Payload result = Trace(traceRay);
+		Payload result = TraceSphere(traceRay);
 
 		if (result.SphereIndex== -1)
 		{
