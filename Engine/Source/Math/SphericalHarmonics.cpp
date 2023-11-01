@@ -68,9 +68,12 @@ float P(int l, int m, float x) {
 	// Apply rule 2; P m m
 	float pmm = 1.0f;
 	if (m > 0) {
-		float somx2 = sqrt((1.0f - x) * (1.0f + x));
+		float somx2 = sqrt((1.0f - x) * (1.0f + x));  //(1 - x^2) = (1 - x)(1 + x)
 		float fact = 1.0f;
 
+		// Raise to the power of M
+		// (2m - 1)!! has exactly m members in the product
+		// which means that with associativity, it can be grouped as this
 		for (int i = 1; i <= m; i++) {
 			pmm *= (-fact) * somx2;
 			fact += 2.0f;

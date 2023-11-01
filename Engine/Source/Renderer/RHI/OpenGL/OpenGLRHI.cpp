@@ -368,7 +368,6 @@ eastl::shared_ptr<class RHITextureBuffer> OpenGLRHI::CreateTextureBuffer(size_t 
 {
 	uint32_t bufferHandle = 0;
 
-	// Bind the transfer coefficients to a Texture Buffer Object (TBO)
 	glGenBuffers(1, &bufferHandle);
 	glBindBuffer(GL_TEXTURE_BUFFER, bufferHandle);
 	glBufferData(GL_TEXTURE_BUFFER, inSize, NULL, GL_STATIC_DRAW);

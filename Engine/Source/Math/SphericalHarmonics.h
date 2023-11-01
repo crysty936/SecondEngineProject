@@ -6,7 +6,7 @@
 #include "glm/ext/vector_float3.hpp"
 
 // Number of Spherical Harmonic bands, commonly referred to with the letter l
-#define SH_NUM_BANDS 5
+#define SH_NUM_BANDS 1
 #define SH_COEFFICIENT_COUNT (SH_NUM_BANDS * SH_NUM_BANDS)
 
 // Amount of samples used for Monte Carlo integration

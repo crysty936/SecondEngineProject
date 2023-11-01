@@ -345,11 +345,11 @@ void main()
 	//}
 
 	//color = normalize(ps_in.VertexNormal * 0.5 + 0.5);
-	vec3 color = ps_in.VertexColor.xyz;
+	vec3 color = ps_in.VertexColor.rgb;
 
-	const float gamma = 2.2;
 	// gamma correction 
-	color = pow(color, vec3(0.0000001));
+	//const float gamma = 2.2;
+	//color = pow(color, vec3(gamma));
 
 	FragColor = vec4(color.xyz, 1.0);
 }

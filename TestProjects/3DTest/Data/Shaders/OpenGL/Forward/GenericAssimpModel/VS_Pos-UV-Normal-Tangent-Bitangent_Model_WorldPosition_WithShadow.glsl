@@ -23,7 +23,7 @@ layout(std140, binding = 0) uniform GeometryDataBuffer
 	mat4 model;
 };
 
-#define SH_NUM_BANDS 5
+#define SH_NUM_BANDS 1
 #define SH_COEFFICIENT_COUNT (SH_NUM_BANDS * SH_NUM_BANDS)
 
 layout(std140, binding = 1) uniform GIBuffer
@@ -53,9 +53,10 @@ void main()
 	{
 		resColor += LightingBuffer.LightCoeffs[i].xyz * texelFetch(tbo_texture, gl_VertexID * SH_COEFFICIENT_COUNT + i).rgb;
 	}
+	vs_out.VertexColor = resColor;
 
-	//vs_out.VertexColor = resColor;
-	vs_out.VertexColor = LightingUniformsBuffer.OverrideColor;
+	//vs_out.VertexColor = texelFetch(tbo_texture, gl_VertexID * SH_COEFFICIENT_COUNT).rgb;
+	//vs_out.VertexColor = LightingUniformsBuffer.OverrideColor;
 
 
 	//vs_out.VertexColor = LightingUniformsBuffer.OverrideColor;

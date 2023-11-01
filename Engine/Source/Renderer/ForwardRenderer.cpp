@@ -189,15 +189,19 @@ void ForwardRenderer::InitGI()
 		if (!command.AccStructure.IsValid())
 		{
 			eastl::vector<PathTraceTriangle> transformedTriangles = command.Triangles;
-			for (PathTraceTriangle& triangle : transformedTriangles)
-			{
-				triangle.Transform(model);
-			}
+			//for (PathTraceTriangle& triangle : transformedTriangles)
+			//{
+			//	triangle.Transform(model);
+			//}
 			command.AccStructure.Build(transformedTriangles);
 		}
 
 		// Each vertex has its own SH Probe and SH_COEFFICIENT_COUNT coefficients
 		command.TransferCoeffs.resize(command.Vertices.size() * SH_COEFFICIENT_COUNT);
+		for (glm::vec3& coeff : command.TransferCoeffs)
+		{
+			coeff = glm::vec3(0.f, 0.f, 0.f);
+		}
 	}
 
 	for (RenderCommand& command : MainCommands)
@@ -213,7 +217,7 @@ void ForwardRenderer::InitGI()
 			const Vertex& vert = command.Vertices[v];
 			// For each vertex, evaluate all samples of its SH Sphere
 
-
+			//int32_t nrTraces = 0;
 			for (int s = 0; s < SH_TOTAL_SAMPLE_COUNT; s++)
 			{
 				float dot = glm::dot(vert.Normal, samples[s].Direction);
@@ -221,10 +225,12 @@ void ForwardRenderer::InitGI()
 				// all other samples will be 0
 				if (dot >= 0.0f)
 				{
-					traceRay.Origin = vert.Position + vert.Normal * 0.001f;
+					//++nrTraces;
+
+					traceRay.Origin = vert.Position + (vert.Normal * 0.001f);
 					traceRay.Direction = samples[s].Direction;
 
-					bool hit = TriangleTrace(traceRay, payload, color);
+					const bool hit = TriangleTrace(traceRay, payload, color);
 
 					// If the Ray was not occluded
 					if (!hit)
@@ -234,12 +240,18 @@ void ForwardRenderer::InitGI()
 						for (int i = 0; i < SH_COEFFICIENT_COUNT; i++)
 						{
 							// Add the contribution of this sample
-							//transfer_coeffs[v * SH_COEFFICIENT_COUNT + i] += material.albedo * dot * samples[s].coeffs[i];
-							command.TransferCoeffs[v * SH_COEFFICIENT_COUNT + i] += color * dot * samples[s].Coeffs[i];
+							command.TransferCoeffs[v * SH_COEFFICIENT_COUNT + i] += command.OverrideColor * dot * samples[s].Coeffs[i];
 						}
+						//command.TransferCoeffs[v * SH_COEFFICIENT_COUNT] += glm::vec3(1.f, 1.f, 1.f);
+					}
+					else
+					{
+						//__debugbreak();
 					}
 				}
 			}
+			//command.TransferCoeffs[v * SH_COEFFICIENT_COUNT] /= float(nrTraces * 10);
+
 
 			// Probability to sample any point on the surface of the unit sphere is the same for all samples,
 			// meaning that the weighting function is 1/surface area of unit sphere which is 4*PI => probability function p(x) is 1/(4*PI).
@@ -250,53 +262,50 @@ void ForwardRenderer::InitGI()
 
 			const float normalization_factor = 4.0f * PI / SH_TOTAL_SAMPLE_COUNT;
 
-			// Normalize coefficients
-			for (int i = 0; i < SH_COEFFICIENT_COUNT; i++) {
+			//Normalize coefficients
+			for (int i = 0; i < SH_COEFFICIENT_COUNT; i++)
+			{
 				command.TransferCoeffs[v * SH_COEFFICIENT_COUNT + i] *= normalization_factor;
 			}
-
-			ASSERT(command.TransferCoeffs.size() == command.Vertices.size() * SH_COEFFICIENT_COUNT);
-
-			const size_t finalSize = command.TransferCoeffs.size() * sizeof(glm::vec3);
-			RHI::Get()->UploadDataToBuffer(*command.CoeffsBuffer, &command.TransferCoeffs[0], finalSize);
 		}
 
+		ASSERT(command.TransferCoeffs.size() == command.Vertices.size() * SH_COEFFICIENT_COUNT);
+		const size_t finalSize = command.TransferCoeffs.size() * sizeof(glm::vec3);
+		RHI::Get()->UploadDataToBuffer(*command.CoeffsBuffer, &command.TransferCoeffs[0], finalSize);
 	}
 
-
-	eastl::vector<glm::vec4> lightCoeffs;
-	lightCoeffs.resize(SH_COEFFICIENT_COUNT);
 
 	// Light Coefficients
-	// For each sample
-	for (int s = 0; s < SH_TOTAL_SAMPLE_COUNT; s++)
 	{
-		const float theta = samples[s].Theta;
-		const float phi = samples[s].Phi;
-
-		// For each SH coefficient
-		for (int n = 0; n < SH_COEFFICIENT_COUNT; n++) 
+		static eastl::vector<glm::vec4> lightCoeffs;
+		lightCoeffs.resize(SH_COEFFICIENT_COUNT);
+		// For each sample
+		for (int s = 0; s < SH_TOTAL_SAMPLE_COUNT; s++)
 		{
-			const glm::vec3 sampleValue = theta < PI / 6.f ? glm::vec3(1.f, 1.f, 1.f) : glm::vec3(0.f, 0.f, 0.f);
-			//const glm::vec3 sampleValue = glm::vec3(1.f, 1.f, 1.f);
-			const glm::vec3 res = sampleValue * samples[s].Coeffs[n];
-			lightCoeffs[n] += glm::vec4(res.x, res.y, res.z, 1.f);
+			const float theta = samples[s].Theta;
+			const float phi = samples[s].Phi;
+
+			// For each SH coefficient
+			for (int n = 0; n < SH_COEFFICIENT_COUNT; n++)
+			{
+				const glm::vec3 sampleValue = theta < PI / 6.f ? glm::vec3(1.f, 1.f, 1.f) : glm::vec3(0.f, 0.f, 0.f);
+				//const glm::vec3 sampleValue = glm::vec3(1.f, 1.f, 1.f);
+				const glm::vec3 res = sampleValue * samples[s].Coeffs[n];
+				lightCoeffs[n] += glm::vec4(res.x, res.y, res.z, 1.f);
+			}
 		}
+
+		// Weighed by the area of a 3D unit sphere
+		const float weight = 4.0f * PI;
+		// Divide the result by weight and number of samples
+		const float factor = weight / SH_TOTAL_SAMPLE_COUNT;
+
+		for (int i = 0; i < SH_COEFFICIENT_COUNT; i++)
+		{
+			lightCoeffs[i] *= factor;
+		}
+		UniformsCache["LightCoeffs"] = lightCoeffs;
 	}
-
-	// Weighed by the area of a 3D unit sphere
-	const float weight = 4.0f * PI;
-	// Divide the result by weight and number of samples
-	const float factor = weight / SH_TOTAL_SAMPLE_COUNT;
-	for (int i = 0; i < SH_COEFFICIENT_COUNT; i++) {
-		lightCoeffs[i] *= factor;
-	}
-
-
-	UniformsCache["LightCoeffs"] = lightCoeffs;
-
-
-
 
 
 }
