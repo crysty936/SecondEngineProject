@@ -1,14 +1,14 @@
-#include "Renderer/Material/EngineMaterials/RenderMaterial_EditorSphere.h"
+#include "Renderer/Material/EngineMaterials/RenderMaterial_PBRSphere.h"
 #include "Renderer/SelfRegisteringUniform/SelfRegisteringUniform.h"
 #include "Core/EngineUtils.h"
 #include "Renderer/Material/MaterialHelpers.h"
 #include "Renderer/RHI/RHI.h"
 #include "imgui.h"
 
-RenderMaterial_EditorSphere::RenderMaterial_EditorSphere() = default;
-RenderMaterial_EditorSphere::~RenderMaterial_EditorSphere() = default;
+RenderMaterial_PBRSphere::RenderMaterial_PBRSphere() = default;
+RenderMaterial_PBRSphere::~RenderMaterial_PBRSphere() = default;
 
-void RenderMaterial_EditorSphere::SetRequiredUniforms()
+void RenderMaterial_PBRSphere::SetRequiredUniforms()
 {
 	__super::SetRequiredUniforms();
 
@@ -20,7 +20,7 @@ void RenderMaterial_EditorSphere::SetRequiredUniforms()
 	UBuffers.push_back({ additionalUniforms, EShaderType::Sh_Fragment });
 }
 
-void RenderMaterial_EditorSphere::SetUniformsValue(eastl::unordered_map<eastl::string, struct SelfRegisteringUniform>& inUniformsCache, const EShaderType inShaderTypes)
+void RenderMaterial_PBRSphere::SetUniformsValue(eastl::unordered_map<eastl::string, struct SelfRegisteringUniform>& inUniformsCache, const EShaderType inShaderTypes)
 {
 	ImGui::Begin("Editor Sphere settings");
 

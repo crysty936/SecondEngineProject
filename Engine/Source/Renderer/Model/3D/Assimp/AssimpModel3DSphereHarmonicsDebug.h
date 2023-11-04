@@ -6,11 +6,11 @@
 #include "Renderer/RenderCommand.h"
 #include "AssimpModel3D.h"
 
-class AssimpModel3DEditorSphere : public AssimpModel3D
+class AssimpModel3DSphereHarmonicsDebug : public AssimpModel3D
 {
 public:
-	AssimpModel3DEditorSphere(const eastl::string& inPath, const eastl::string& inName);
-	virtual ~AssimpModel3DEditorSphere();
+	AssimpModel3DSphereHarmonicsDebug(const eastl::string& inPath, const eastl::string& inName);
+	virtual ~AssimpModel3DSphereHarmonicsDebug();
 
 protected:
 	eastl::shared_ptr<RHIShader> CreateShaders(const class VertexInputLayout& inLayout) const override;

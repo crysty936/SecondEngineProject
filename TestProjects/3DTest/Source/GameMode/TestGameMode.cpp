@@ -18,8 +18,9 @@
 #include "Renderer/Material/EngineMaterials/RenderMaterial_Parallax.h"
 #include "Renderer/Material/EngineMaterials/RenderMaterial_Billboard.h"
 #include "Renderer/DrawDebugHelpers.h"
-#include "Renderer/Model/3D/Assimp/AssimpModel3DEditorSphere.h"
+#include "Renderer/Model/3D/Assimp/AssimpModel3DPBRSphere.h"
 #include "imgui.h"
+#include "Renderer/Model/3D/Assimp/AssimpModel3DSphereHarmonicsDebug.h"
 
 TestGameMode GGameMode = {};
 
@@ -400,7 +401,7 @@ void TestGameMode::Init()
 // 	}
 
 
-//   	AssimpModel = eastl::shared_ptr<AssimpModel3D>(SceneHelper::CreateVisualEntity<AssimpModel3D>("../Data/Models/Shiba/scene.gltf", "Shiba"));
+   	//AssimpModel = SceneHelper::CreateVisualEntity<AssimpModel3D>("../Data/Models/Shiba/scene.gltf", "Shiba");
 //   	AssimpModel->SetScale(glm::vec3(10.f, 10.f, 10.f));
 //   	AssimpModel->Move(glm::vec3(0.f, 10.f, 0.f));
 
@@ -413,7 +414,10 @@ void TestGameMode::Init()
 	//FloorModel->SetScale(glm::vec3(10.f, 10.f, 10.f));
 
 	
-	//SphereModel = SceneHelper::CreateVisualEntity<AssimpModel3DEditorSphere>("../Data/Models/Sphere/scene.gltf", "EditorSphere");
+	//SphereModel = SceneHelper::CreateVisualEntity<AssimpModel3DPBRSphere>("../Data/Models/Sphere/scene.gltf", "EditorSphere");
+	SphereModel = SceneHelper::CreateVisualEntity<AssimpModel3DSphereHarmonicsDebug>("../Data/Models/Sphere/scene.gltf", "EditorSphere");
+	//SphereModel = SceneHelper::CreateVisualEntity<AssimpModel3DSphereHarmonicsDebug>("../Data/Models/Sphere/Perfect360.fbx", "EditorSphere");
+	//SphereModel = SceneHelper::CreateVisualEntity<AssimpModel3DSphereHarmonicsDebug>("../Data/Models/Sphere/sphere.obj", "EditorSphere");
 	//SphereModel->Move(glm::vec3(0.f, -2.f, 0.f));
 
 
@@ -443,8 +447,9 @@ void TestGameMode::Init()
 
 
 		MainModel = SceneHelper::CreateVisualEntity<AssimpModel3D>("../Data/Models/low_poly_suzanne/Monkey.obj", "Monke", glm::vec3(1.f, 1.f, 1.f));
-		eastl::shared_ptr<AssimpModel3D> weirdCube = SceneHelper::CreateVisualEntity<AssimpModel3D>("../Data/Models/WeirdCube/Cube.obj", "Cube", glm::vec3(0.f, 1.f, 1.f));
-		eastl::shared_ptr<AssimpModel3D> plane = SceneHelper::CreateVisualEntity<AssimpModel3D>("../Data/Models/HighPolyPlane/Plane.obj", "Plane", glm::vec3(0.f, 1.f, 0.f));
+
+		//eastl::shared_ptr<AssimpModel3D> weirdCube = SceneHelper::CreateVisualEntity<AssimpModel3D>("../Data/Models/WeirdCube/Cube.obj", "Cube", glm::vec3(0.f, 1.f, 1.f));
+		//eastl::shared_ptr<AssimpModel3D> plane = SceneHelper::CreateVisualEntity<AssimpModel3D>("../Data/Models/HighPolyPlane/Plane.obj", "Plane", glm::vec3(0.f, 1.f, 0.f));
 
 }
 
@@ -472,6 +477,8 @@ void TestGameMode::Tick(float inDeltaT)
 	glm::vec3 forward = glm::vec3(0.f, 0.f, 1.f);
 	glm::vec3 right = glm::vec3(1.f, 0.f, 0.f);
 	glm::vec3 up = glm::vec3(0.f, 1.f, 0.f);
+
+	//DrawDebugHelpers::DrawDebugPoint(SphereModel->GetAbsoluteTransform().Translation, 1.f, glm::vec3(1.f, 1.f, 0.f), true);
 
 	//const eastl::shared_ptr<TransformObject>& usedObj = DirLight;
 

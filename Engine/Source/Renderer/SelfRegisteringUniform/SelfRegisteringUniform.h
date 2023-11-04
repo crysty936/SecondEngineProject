@@ -195,7 +195,7 @@ public:
 };
 
 // shared_ptr specialization
-// These are supposed to be just data holders to be used in specific forms, not self-registering
+// These are supposed to be just data holders to be used as utilities in materials, not self-registering
 template<typename T>
 class SelfRegisteringUniformData<eastl::shared_ptr<T>> : public IUniformData
 {

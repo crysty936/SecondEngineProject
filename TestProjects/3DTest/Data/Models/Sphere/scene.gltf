@@ -3,64 +3,64 @@
     {
       "bufferView": 1,
       "componentType": 5126,
-      "count": 32514,
+      "count": 1984,
       "max": [
-        10.0,
-        10.0,
-        20.0
+        1.0,
+        1.0,
+        1.0
       ],
       "min": [
-        -10.0,
-        -10.0,
-        0.0
+        -1.0,
+        -1.0,
+        -1.0
       ],
       "type": "VEC3"
     },
     {
       "bufferView": 1,
-      "byteOffset": 390168,
+      "byteOffset": 23808,
       "componentType": 5126,
-      "count": 32514,
+      "count": 1984,
       "max": [
-        1.0,
-        0.9999416470527649,
-        0.9999415874481201
+        0.9904375672340393,
+        0.9904472231864929,
+        0.9951420426368713
       ],
       "min": [
-        -1.0,
-        -0.9999416470527649,
-        -0.9999415874481201
+        -0.9904375672340393,
+        -0.9904375672340393,
+        -0.9951420426368713
       ],
       "type": "VEC3"
     },
     {
       "bufferView": 0,
       "componentType": 5125,
-      "count": 195072,
+      "count": 2880,
       "type": "SCALAR"
     }
   ],
   "asset": {
     "extras": {
-      "author": "3DVarious (https://sketchfab.com/3DVarious)",
+      "author": "matejv (https://sketchfab.com/matejv)",
       "license": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)",
-      "source": "https://sketchfab.com/3d-models/sphere-b31b12ffa93a40f48c9d991b6f168f4d",
+      "source": "https://sketchfab.com/3d-models/sphere-cb3372617eed4014b4b1dc68e35b23bf",
       "title": "Sphere"
     },
-    "generator": "Sketchfab-12.66.0",
+    "generator": "Sketchfab-12.67.0",
     "version": "2.0"
   },
   "bufferViews": [
     {
       "buffer": 0,
-      "byteLength": 780288,
+      "byteLength": 11520,
       "name": "floatBufferViews",
       "target": 34963
     },
     {
       "buffer": 0,
-      "byteLength": 780336,
-      "byteOffset": 780288,
+      "byteLength": 47616,
+      "byteOffset": 11520,
       "byteStride": 12,
       "name": "floatBufferViews",
       "target": 34962
@@ -68,14 +68,14 @@
   ],
   "buffers": [
     {
-      "byteLength": 1560624,
+      "byteLength": 59136,
       "uri": "scene.bin"
     }
   ],
   "materials": [
     {
       "doubleSided": true,
-      "name": "Scene_-_Root",
+      "name": "None",
       "pbrMetallicRoughness": {
         "metallicFactor": 0.0,
         "roughnessFactor": 0.6
@@ -127,7 +127,7 @@
       "children": [
         2
       ],
-      "name": "spheree.stl.cleaner.materialmerger.gles"
+      "name": "04c7c26ae10b443caf8d28ce59cc75a7.obj.cleaner.materialmerger.gles"
     },
     {
       "mesh": 0,

@@ -171,6 +171,7 @@ bool ForwardRenderer::TriangleTrace(const PathTracingRay& inRay, PathTracePayloa
 void ForwardRenderer::InitGI()
 {
 	SHSample* samples = new SHSample[SH_TOTAL_SAMPLE_COUNT];
+
 	SphericalHarmonics::InitSamples(samples);
 
 	int sceneCoeffCount = 0;
@@ -230,24 +231,25 @@ void ForwardRenderer::InitGI()
 					traceRay.Origin = vert.Position + (vert.Normal * 0.001f);
 					traceRay.Direction = samples[s].Direction;
 
-					const bool hit = TriangleTrace(traceRay, payload, color);
+					//const bool hit = TriangleTrace(traceRay, payload, color);
 
 					// If the Ray was not occluded
-					if (!hit)
+					//if (!hit)
 					{
 						// For diffuse materials, compose the transfer vector.
 						// This vector includes the BDRF, incorporating the albedo colour, a lambertian diffuse factor (dot) and a SH sample
 						for (int i = 0; i < SH_COEFFICIENT_COUNT; i++)
 						{
 							// Add the contribution of this sample
-							command.TransferCoeffs[v * SH_COEFFICIENT_COUNT + i] += command.OverrideColor * dot * samples[s].Coeffs[i];
+							//command.TransferCoeffs[v * SH_COEFFICIENT_COUNT + i] += command.OverrideColor * dot * samples[s].Coeffs[i];
+							command.TransferCoeffs[v * SH_COEFFICIENT_COUNT + i] += glm::vec3(1.f, 1.f, 1.f) * samples[s].Coeffs[i];
 						}
 						//command.TransferCoeffs[v * SH_COEFFICIENT_COUNT] += glm::vec3(1.f, 1.f, 1.f);
 					}
-					else
-					{
-						//__debugbreak();
-					}
+					//else
+					//{
+					//	__debugbreak();
+					//}
 				}
 			}
 			//command.TransferCoeffs[v * SH_COEFFICIENT_COUNT] /= float(nrTraces * 10);
@@ -288,9 +290,13 @@ void ForwardRenderer::InitGI()
 			// For each SH coefficient
 			for (int n = 0; n < SH_COEFFICIENT_COUNT; n++)
 			{
+				// The reason this works is kind of a happy mistake. Normally, theta would be the angle, starting from the top but because the formulas
+				// to get cartesian from spherical here is based on a coordinate base that has Z as up, theta here is based on Z which points towards the screen
+				// thus illuminating like a light coming from Z to -Z(because that's how SH are added)
+				// Also, theta and phi are inversed compared to the usual mathematical notation
 				const glm::vec3 sampleValue = theta < PI / 6.f ? glm::vec3(1.f, 1.f, 1.f) : glm::vec3(0.f, 0.f, 0.f);
-				//const glm::vec3 sampleValue = glm::vec3(1.f, 1.f, 1.f);
 				const glm::vec3 res = sampleValue * samples[s].Coeffs[n];
+
 				lightCoeffs[n] += glm::vec4(res.x, res.y, res.z, 1.f);
 			}
 		}
@@ -345,6 +351,8 @@ void ForwardRenderer::Draw()
 
 	// Clear additional framebuffer buffers
 	RHI::Instance->ClearBuffers();
+
+
 
     DrawCommands(MainCommands);
 
