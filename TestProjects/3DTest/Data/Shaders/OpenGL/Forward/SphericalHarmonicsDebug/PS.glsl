@@ -30,23 +30,36 @@ void main()
 {
 	const vec3 relPos = normalize(ps_in.worldPos - Constants.ObjPos);
 
-	const float ro = length(relPos); // This is 1 for sphere or circle of unit radius
+	const float ro = length(relPos); // = 1 for sphere or circle of unit radius
+	// Z is length of Adjacent and Ro is length of Hypotenuse
+	// cos is Adjacent / Hypotenuse, so this is basically acos(cos)
+	// Because it's unit length, z is basically the cos value so arc cos of it just returns the current angle, which is what Theta is
 	//const float thetaPi = acos(relPos.z / ro);
-	const float thetaPi = acos(relPos.z); // Because it's unit length, z is basically its own cos so arc cos of it just returns the current angle, which is what Theta is
-	//const float phiPi = atan(relPos.y / relPos.x);
+	const float thetaPi = acos(relPos.z); 
+	// Again, tan is Opposite / Adjacent and in the right triangle formed by connecting Y and X, Y is Opposite and X is Adjacent so this is basically atan(tan) to get the angle
+	const float phiPi = atan(relPos.y, relPos.x);
 
 	const float theta = thetaPi / PI;
-	//const float phi = phiPi / PI;
+	float phi = phiPi / PI;
+	phi += 1;
+
+	// Convert Phi to 0..1
+	//phi = (phi * 0.5) + 0.5;
+
+
+
 
 	//const float normalizedY = relPos.y / ro;
 	//FragColor = vec4(normalizedY, normalizedY, normalizedY, 1.0);
 	//FragColor = vec4(ps_in.worldPos.x, ps_in.worldPos.y, ps_in.worldPos.z, 1.0);
 	//FragColor = vec4(ps_in.modelPos.x, ps_in.modelPos.y, ps_in.modelPos.z, 1.0);
 	//FragColor = vec4(Constants.ObjPos, 1.0);
+	//FragColor = vec4(phi, phi, phi, 1.0);
 
 
-
-	if ((theta - (Constants.Theta)) < 0.00001/* && (phi - Constants.Phi) < 0.1*/)
+	const float thetaDelta = theta - Constants.Theta;
+	const float phiDelta = phi - Constants.Phi;
+	if ((thetaDelta < 0.03 && thetaDelta > 0.001) && (phiDelta < 0.03 && phiDelta > 0.001))
 	{
 		vec3 color = vec3(1.0, 0.0, 0.0);
 		FragColor = vec4(color.xyz, 1.0);

@@ -447,6 +447,7 @@ void TestGameMode::Init()
 
 
 		MainModel = SceneHelper::CreateVisualEntity<AssimpModel3D>("../Data/Models/low_poly_suzanne/Monkey.obj", "Monke", glm::vec3(1.f, 1.f, 1.f));
+		MainModel->Move(glm::vec3(3.f, 0.f, 0.f));
 
 		//eastl::shared_ptr<AssimpModel3D> weirdCube = SceneHelper::CreateVisualEntity<AssimpModel3D>("../Data/Models/WeirdCube/Cube.obj", "Cube", glm::vec3(0.f, 1.f, 1.f));
 		//eastl::shared_ptr<AssimpModel3D> plane = SceneHelper::CreateVisualEntity<AssimpModel3D>("../Data/Models/HighPolyPlane/Plane.obj", "Plane", glm::vec3(0.f, 1.f, 0.f));
