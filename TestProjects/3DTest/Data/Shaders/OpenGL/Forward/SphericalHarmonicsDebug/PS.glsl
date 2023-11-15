@@ -37,17 +37,12 @@ void main()
 	//const float thetaPi = acos(relPos.z / ro);
 	const float thetaPi = acos(relPos.z); 
 	// Again, tan is Opposite / Adjacent and in the right triangle formed by connecting Y and X, Y is Opposite and X is Adjacent so this is basically atan(tan) to get the angle
+	//const float phiPi = atan(relPos.y / relPos.x);
 	const float phiPi = atan(relPos.y, relPos.x);
 
 	const float theta = thetaPi / PI;
 	float phi = phiPi / PI;
-	phi += 1;
-
-	// Convert Phi to 0..1
-	//phi = (phi * 0.5) + 0.5;
-
-
-
+	phi += 1; // -1..1 to 0..2
 
 	//const float normalizedY = relPos.y / ro;
 	//FragColor = vec4(normalizedY, normalizedY, normalizedY, 1.0);

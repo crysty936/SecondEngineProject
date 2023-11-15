@@ -64,17 +64,20 @@ void init_K() {
 }
 
 // Evaluates the Associated Legendre Polynomial P(l,m,x) at x
-float P(int l, int m, float x) {
+float P(int l, int m, float x) 
+{
 	// Apply rule 2; P m m
 	float pmm = 1.0f;
-	if (m > 0) {
+	if (m > 0) 
+	{
 		float somx2 = sqrt((1.0f - x) * (1.0f + x));  //(1 - x^2) = (1 - x)(1 + x)
 		float fact = 1.0f;
 
 		// Raise to the power of M
 		// (2m - 1)!! has exactly m members in the product
 		// which means that with associativity, it can be grouped as this
-		for (int i = 1; i <= m; i++) {
+		for (int i = 1; i <= m; i++) 
+		{
 			pmm *= (-fact) * somx2;
 			fact += 2.0f;
 		}
@@ -89,7 +92,8 @@ float P(int l, int m, float x) {
 
 	// Iterate rule 1 until the right answer is found
 	float pll = 0.0f;
-	for (int ll = m + 2; ll <= l; ll++) {
+	for (int ll = m + 2; ll <= l; ll++) 
+	{
 		pll = ((2.0f * ll - 1.0f) * x * pmmp1 - (ll + m - 1.0f) * pmm) / (ll - m);
 		pmm = pmmp1;
 		pmmp1 = pll;
@@ -99,14 +103,18 @@ float P(int l, int m, float x) {
 }
 
 
-float evaluate(int l, int m, float theta, float phi) {
-	if (m == 0) {
+float evaluate(int l, int m, float theta, float phi) 
+{
+	if (m == 0) 
+	{
 		return K[l * (l + 1)] * P(l, m, cos(theta));
 	}
-	else if (m > 0) {
+	else if (m > 0) 
+	{
 		return sqrt(2.0f) * K[l * (l + 1) + m] * cos(m * phi) * P(l, m, cos(theta));
 	}
-	else {
+	else 
+	{
 		return sqrt(2.0f) * K[l * (l + 1) - m] * sin(-m * phi) * P(l, -m, cos(theta));
 	}
 }

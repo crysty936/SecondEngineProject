@@ -36,6 +36,7 @@
 #include "ShaderTypes.h"
 #include "Math/SphericalHarmonics.h"
 #include "Math/MathUtils.h"
+#include "Math/SphericalHarmonicsRotation.h"
 
 const uint32_t SHADOW_WIDTH = 1024;
 const uint32_t SHADOW_HEIGHT = 1024;
@@ -168,6 +169,7 @@ bool ForwardRenderer::TriangleTrace(const PathTracingRay& inRay, PathTracePayloa
 	return bHit;
 }
 
+static eastl::vector<glm::vec4> lightCoeffs;
 void ForwardRenderer::InitGI()
 {
 	SHSample* samples = new SHSample[SH_TOTAL_SAMPLE_COUNT];
@@ -279,7 +281,6 @@ void ForwardRenderer::InitGI()
 
 	// Light Coefficients
 	{
-		static eastl::vector<glm::vec4> lightCoeffs;
 		lightCoeffs.resize(SH_COEFFICIENT_COUNT);
 		// For each sample
 		for (int s = 0; s < SH_TOTAL_SAMPLE_COUNT; s++)
@@ -310,7 +311,6 @@ void ForwardRenderer::InitGI()
 		{
 			lightCoeffs[i] *= factor;
 		}
-		UniformsCache["LightCoeffs"] = lightCoeffs;
 	}
 
 
@@ -523,6 +523,18 @@ void ForwardRenderer::SetLightingConstants()
 
 	UniformsCache["NumPointLights"] =  static_cast<int32_t>(shaderPointLightData.size());
 	UniformsCache["PointLights"] = shaderPointLightData;
+
+
+
+	//
+
+	static float xRotation = 0.f;
+	ImGui::DragFloat("X Rotation", &xRotation, 0.01f, 0.f, 6.f);
+
+	const glm::quat rotation = glm::angleAxis(xRotation, glm::vec3(1.f, 0.f, 0.f));
+	eastl::vector<glm::vec4> rotatedLightCoeffs;
+	SphericalHarmonicsRotation::Rotate(rotation, lightCoeffs, rotatedLightCoeffs);
+	UniformsCache["LightCoeffs"] = rotatedLightCoeffs;
 }
 
 void ForwardRenderer::DrawSkybox()
