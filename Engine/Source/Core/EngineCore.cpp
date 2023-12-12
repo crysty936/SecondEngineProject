@@ -71,16 +71,16 @@ void EngineCore::Init()
 	RHI::Get()->ImGuiInit();
 
 	 //Hide Cursor for input
-	InputSystem::Get().SetCursorMode(ECursorMode::Disabled, GEngine->MainWindow->GetHandle());
+	//InputSystem::Get().SetCursorMode(ECursorMode::Disabled, GEngine->MainWindow->GetHandle());
 
-	Renderer::Init();
+	//Renderer::Init();
 
 	TimersManager::Init();
 
 	SceneManager::Get().LoadScene();
 
 	 //TODO [Editor-Game Separation]: Only if compiled with editor
-	Editor::Init();
+	//Editor::Init();
 
 	 //After initializing all engine subsystems, Game Mode init is called 
 	 //TODO [Editor-Game Separation]: This should be initialized like this only when editor is missing otherwise by the editor
@@ -95,10 +95,10 @@ void EngineCore::Terminate()
 {
 
 	// TODO [Editor-Game Separation]: Only if compiled with editor
-	Editor::Terminate();
+	//Editor::Terminate();
 
 	TimersManager::Terminate();
-	Renderer::Terminate();
+	//Renderer::Terminate();
 
 
 	for (PluginAndName& container : GetInternalPluginsList())
@@ -156,40 +156,40 @@ void EngineCore::Run()
 		TimersManager::Get().TickTimers(CurrentDeltaT);
 
 		RHI::Get()->ImGuiBeginFrame();
- 		ImGui_ImplWin32_NewFrame();
- 		ImGui::NewFrame();
+ 		//ImGui_ImplWin32_NewFrame();
+ 		//ImGui::NewFrame();
  
  		//ImGui::ShowDemoWindow();
 
- 		SceneManager::Get().GetCurrentScene().TickObjects(CurrentDeltaT);
- 		SceneManager::Get().GetCurrentScene().DisplayObjects();
+ 		//SceneManager::Get().GetCurrentScene().TickObjects(CurrentDeltaT);
+ 		//SceneManager::Get().GetCurrentScene().DisplayObjects();
 
 		 //TODO [Editor-Game Separation]: If editor is not present
- 		CurrentGameMode->Tick(CurrentDeltaT); 
+ 		//CurrentGameMode->Tick(CurrentDeltaT); 
 
-		GEditor->Tick(CurrentDeltaT);
+		//GEditor->Tick(CurrentDeltaT);
 
-		Renderer::Get().Draw();
+		//Renderer::Get().Draw();
 
- 		for (PluginAndName& container : GetInternalPluginsList())
- 		{
- 			container.Plugin->Tick(static_cast<float>(deltaTime));
- 		}
+ 		//for (PluginAndName& container : GetInternalPluginsList())
+ 		//{
+ 		//	container.Plugin->Tick(static_cast<float>(deltaTime));
+ 		//}
 
 		 //Draw ImGui
-		ImGui::EndFrame();
-		ImGui::Render();
+		//ImGui::EndFrame();
+		//ImGui::Render();
 		RHI::Get()->ImGuiRenderDrawData();
 
 		 //Update and Render additional Platform windows
- 		if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
- 		{
- 			ImGui::UpdatePlatformWindows();
- 			ImGui::RenderPlatformWindowsDefault();
- 		}
+ 		//if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+ 		//{
+ 		//	ImGui::UpdatePlatformWindows();
+ 		//	ImGui::RenderPlatformWindowsDefault();
+ 		//}
 
-		Renderer::Get().Present();
-		//RHI::Get()->Test();
+		//Renderer::Get().Present();
+		RHI::Get()->Test();
 
 		CheckShouldCloseWindow();
 

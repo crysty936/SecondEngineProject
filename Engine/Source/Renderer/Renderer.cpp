@@ -7,7 +7,7 @@
 #include "Window/WindowsWindow.h"
 #include "Core/EngineCore.h"
 
-#define CHOSEN_RENDERER 1
+#define CHOSEN_RENDERER 2
 #define RENDERER_FORWARD 1
 #define RENDERER_DEFERRED 2
 #define RENDERER_PATHTRACING 3

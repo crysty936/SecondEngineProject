@@ -34,8 +34,8 @@ eastl::string GetTimeString()
 
 void RenderDocPlugin::Init()
 {
-	PostInitCallback& postInitMulticast = GEngine->GetPostInitMulticast();
-	postInitMulticast.BindRaw(this, &RenderDocPlugin::OnEngineInitDone);
+	//PostInitCallback& postInitMulticast = GEngine->GetPostInitMulticast();
+	//postInitMulticast.BindRaw(this, &RenderDocPlugin::OnEngineInitDone);
 
 	eastl::wstring renderDocPath;
 

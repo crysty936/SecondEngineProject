@@ -40,6 +40,5 @@ struct RenderCommand
 	eastl::vector<glm::vec3> TransferCoeffs;
 	BVH AccStructure;
 	glm::vec3 OverrideColor = glm::vec3(0.f, 0.f, 0.f);
-
 };
 

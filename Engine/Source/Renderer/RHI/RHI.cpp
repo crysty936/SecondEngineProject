@@ -1,6 +1,6 @@
 #include "RHI.h"
 
-#define CHOSEN_API 1
+#define CHOSEN_API 3
 
 #define API_GL CHOSEN_API == 1
 #define API_D3D11 CHOSEN_API == 2

@@ -139,8 +139,8 @@ void ForwardRenderer::InitInternal()
 	RHI::Get()->AttachTextureToFramebufferDepth(*DepthFrameBuffer, DirectionalLightCascadedShadowTexture);
 
 
-	PostInitCallback& postInitMulticast = GEngine->GetPostInitMulticast();
-	postInitMulticast.BindRaw(this, &ForwardRenderer::InitGI);
+	//PostInitCallback& postInitMulticast = GEngine->GetPostInitMulticast();
+	//postInitMulticast.BindRaw(this, &ForwardRenderer::InitGI);
 }
 
 
@@ -861,7 +861,7 @@ if (bBVHDebugDraw && inCommand.Triangles.size() != 0)
 
 // Pathtrace
 
-RHI::Get()->BindTextureBuffer(*inCommand.CoeffsBuffer, 0);
+	RHI::Get()->BindTextureBuffer(*inCommand.CoeffsBuffer, 0);
 
 // Pathtrace
 

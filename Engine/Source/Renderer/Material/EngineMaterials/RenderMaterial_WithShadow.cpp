@@ -15,6 +15,8 @@ void RenderMaterial_WithShadow::SetRequiredUniforms()
 {
 	__super::SetRequiredUniforms();
 
+	// Forward Renderer
+
 // 	eastl::vector<UniformWithFlag> defaultUniforms = {
 // 	{"lsMatrices", 3},
 // 	{"ShadowCameraViewMatrix"},
@@ -25,20 +27,25 @@ void RenderMaterial_WithShadow::SetRequiredUniforms()
 // 	UBuffers.push_back({ defaultUniforms, ConstantBufferBinding::Pixel });
 // 
 // 
+	// SH Lighting 
 
-	eastl::vector<UniformWithFlag> GIUniforms = {
-	{"LightCoeffs", SH_COEFFICIENT_COUNT},
-	};
+	//eastl::vector<UniformWithFlag> GIUniforms = {
+	//{"LightCoeffs", SH_COEFFICIENT_COUNT},
+	//};
 
-	UBuffers.push_back({ GIUniforms, EShaderType::Sh_Vertex });
+	//UBuffers.push_back({ GIUniforms, EShaderType::Sh_Vertex });
+
+
+	// ~SH Lighting
+
+
+	// ~Forward Renderer
 
 	eastl::vector<UniformWithFlag> LightingUniforms = {
 		{"bHasNormalMap"},
 		{"bOverrideColor"},
 		{"OverrideColor"},
 	};
-
-
 
 	UBuffers.push_back({ LightingUniforms, EShaderType::Sh_Fragment });
 

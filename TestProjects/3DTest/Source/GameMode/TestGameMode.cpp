@@ -371,10 +371,10 @@ void TestGameMode::Init()
  	}
 
 	{
-	 	DirLight = SceneHelper::CreateVisualEntity<LightSource>("Directional Light");
-	 	DirLight->LData.Type = ELightType::Directional;
-	 	DirLight->SetRelativeLocation({ -2.0f, 20.0f, -1.0f });
-	 	DirLight->SetRotationDegrees(glm::vec3(80.f, 0.f, 0.f));
+	 	//DirLight = SceneHelper::CreateVisualEntity<LightSource>("Directional Light");
+	 	//DirLight->LData.Type = ELightType::Directional;
+	 	//DirLight->SetRelativeLocation({ -2.0f, 20.0f, -1.0f });
+	 	//DirLight->SetRotationDegrees(glm::vec3(80.f, 0.f, 0.f));
 	}
 
 	constexpr float linear = 0.0014f;
@@ -415,9 +415,7 @@ void TestGameMode::Init()
 
 	
 	//SphereModel = SceneHelper::CreateVisualEntity<AssimpModel3DPBRSphere>("../Data/Models/Sphere/scene.gltf", "EditorSphere");
-	SphereModel = SceneHelper::CreateVisualEntity<AssimpModel3DSphereHarmonicsDebug>("../Data/Models/Sphere/scene.gltf", "EditorSphere");
-	//SphereModel = SceneHelper::CreateVisualEntity<AssimpModel3DSphereHarmonicsDebug>("../Data/Models/Sphere/Perfect360.fbx", "EditorSphere");
-	//SphereModel = SceneHelper::CreateVisualEntity<AssimpModel3DSphereHarmonicsDebug>("../Data/Models/Sphere/sphere.obj", "EditorSphere");
+	//SphereModel = SceneHelper::CreateVisualEntity<AssimpModel3DSphereHarmonicsDebug>("../Data/Models/Sphere/scene.gltf", "EditorSphere");
 	//SphereModel->Move(glm::vec3(0.f, -2.f, 0.f));
 
 
@@ -431,6 +429,7 @@ void TestGameMode::Init()
 // 		PointLight->SetRelativeLocation({ 0.5f, 1.0f, -52.f });
 // 	}
 
+	//SphereModel = SceneHelper::CreateVisualEntity<AssimpModel3D>("../Data/Models/Backpack/scene.gltf", "Backpack", glm::vec3(1.f, 0.f, 0.f));
 
 		//MainModel = SceneHelper::CreateVisualEntity<AssimpModel3D>("../Data/Models/high_poly_blender_monkey_suzanne/scene.gltf", "Monke");
 	//MainModel->Move(glm::vec3(0.f, -2.f, 0.f));
@@ -446,8 +445,8 @@ void TestGameMode::Init()
 
 
 
-		MainModel = SceneHelper::CreateVisualEntity<AssimpModel3D>("../Data/Models/low_poly_suzanne/Monkey.obj", "Monke", glm::vec3(1.f, 1.f, 1.f));
-		MainModel->Move(glm::vec3(3.f, 0.f, 0.f));
+		//MainModel = SceneHelper::CreateVisualEntity<AssimpModel3D>("../Data/Models/low_poly_suzanne/Monkey.obj", "Monke", glm::vec3(1.f, 1.f, 1.f));
+		//MainModel->Move(glm::vec3(3.f, 0.f, 0.f));
 
 		//eastl::shared_ptr<AssimpModel3D> weirdCube = SceneHelper::CreateVisualEntity<AssimpModel3D>("../Data/Models/WeirdCube/Cube.obj", "Cube", glm::vec3(0.f, 1.f, 1.f));
 		//eastl::shared_ptr<AssimpModel3D> plane = SceneHelper::CreateVisualEntity<AssimpModel3D>("../Data/Models/HighPolyPlane/Plane.obj", "Plane", glm::vec3(0.f, 1.f, 0.f));
