@@ -71,20 +71,20 @@ void EngineCore::Init()
 	RHI::Get()->ImGuiInit();
 
 	 //Hide Cursor for input
-	//InputSystem::Get().SetCursorMode(ECursorMode::Disabled, GEngine->MainWindow->GetHandle());
+	//InputSystem::Get().SetCursorMode(ECursorMode::Disabled, GEngine->MainWindow->GetHandle());// RHIWorkDisabled
 
-	//Renderer::Init();
+	//Renderer::Init();// RHIWorkDisabled
 
 	TimersManager::Init();
 
 	SceneManager::Get().LoadScene();
 
 	 //TODO [Editor-Game Separation]: Only if compiled with editor
-	//Editor::Init();
+	Editor::Init();
 
 	 //After initializing all engine subsystems, Game Mode init is called 
 	 //TODO [Editor-Game Separation]: This should be initialized like this only when editor is missing otherwise by the editor
-	//GEngine->CurrentGameMode->Init();
+	//GEngine->CurrentGameMode->Init(); // RHIWorkDisabled
 	SceneManager::Get().GetCurrentScene().InitObjects();
 
 	GEngine->InitDoneMulticast.Invoke();
@@ -95,10 +95,10 @@ void EngineCore::Terminate()
 {
 
 	// TODO [Editor-Game Separation]: Only if compiled with editor
-	//Editor::Terminate();
+	Editor::Terminate();
 
 	TimersManager::Terminate();
-	//Renderer::Terminate();
+	//Renderer::Terminate();// RHIWorkDisabled
 
 
 	for (PluginAndName& container : GetInternalPluginsList())
@@ -156,39 +156,39 @@ void EngineCore::Run()
 		TimersManager::Get().TickTimers(CurrentDeltaT);
 
 		RHI::Get()->ImGuiBeginFrame();
- 		//ImGui_ImplWin32_NewFrame();
- 		//ImGui::NewFrame();
+ 		//ImGui_ImplWin32_NewFrame();// RHIWorkDisabled
+ 		//ImGui::NewFrame();// RHIWorkDisabled
  
  		//ImGui::ShowDemoWindow();
 
- 		//SceneManager::Get().GetCurrentScene().TickObjects(CurrentDeltaT);
- 		//SceneManager::Get().GetCurrentScene().DisplayObjects();
+ 		//SceneManager::Get().GetCurrentScene().TickObjects(CurrentDeltaT);// RHIWorkDisabled
+ 		//SceneManager::Get().GetCurrentScene().DisplayObjects();// RHIWorkDisabled
 
 		 //TODO [Editor-Game Separation]: If editor is not present
  		//CurrentGameMode->Tick(CurrentDeltaT); 
 
-		//GEditor->Tick(CurrentDeltaT);
+		GEditor->Tick(CurrentDeltaT);
 
-		//Renderer::Get().Draw();
+		//Renderer::Get().Draw();// RHIWorkDisabled
 
- 		//for (PluginAndName& container : GetInternalPluginsList())
- 		//{
- 		//	container.Plugin->Tick(static_cast<float>(deltaTime));
- 		//}
+ 		for (PluginAndName& container : GetInternalPluginsList())
+ 		{
+ 			container.Plugin->Tick(static_cast<float>(deltaTime));
+ 		}
 
 		 //Draw ImGui
-		//ImGui::EndFrame();
-		//ImGui::Render();
+		//ImGui::EndFrame();// RHIWorkDisabled
+		//ImGui::Render();// RHIWorkDisabled
 		RHI::Get()->ImGuiRenderDrawData();
 
 		 //Update and Render additional Platform windows
- 		//if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+ 		//if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)// RHIWorkDisabled
  		//{
  		//	ImGui::UpdatePlatformWindows();
  		//	ImGui::RenderPlatformWindowsDefault();
  		//}
 
-		//Renderer::Get().Present();
+		//Renderer::Get().Present();// RHIWorkDisabled
 		RHI::Get()->Test();
 
 		CheckShouldCloseWindow();

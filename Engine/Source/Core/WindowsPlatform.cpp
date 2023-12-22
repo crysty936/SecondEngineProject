@@ -332,14 +332,14 @@ namespace WindowsPlatform
 
 	void SetCursorMode(void* inWindowHandle, const ECursorMode inMode)
 	{
-		ImGuiIO& io = ImGui::GetIO();
+		//ImGuiIO& io = ImGui::GetIO();// RHIWorkDisabled
 
 		switch (inMode)
         {
         case ECursorMode::Enabled:
         {
 			EnableCursor(static_cast<HWND>(inWindowHandle));
-            io.EnableCursor();
+            //io.EnableCursor();// RHIWorkDisabled
 
             break;
         }
@@ -353,7 +353,7 @@ namespace WindowsPlatform
 			if (IsWindowFocused(static_cast<HWND>(inWindowHandle)))
 			{
 				DisableCursor(static_cast<HWND>(inWindowHandle));
-                io.DisableCursor();
+                //io.DisableCursor();// RHIWorkDisabled
 			}
             break;
         }

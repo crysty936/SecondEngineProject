@@ -34,8 +34,8 @@ eastl::string GetTimeString()
 
 void RenderDocPlugin::Init()
 {
-	//PostInitCallback& postInitMulticast = GEngine->GetPostInitMulticast();
-	//postInitMulticast.BindRaw(this, &RenderDocPlugin::OnEngineInitDone);
+	PostInitCallback& postInitMulticast = GEngine->GetPostInitMulticast();
+	postInitMulticast.BindRaw(this, &RenderDocPlugin::OnEngineInitDone);
 
 	eastl::wstring renderDocPath;
 
@@ -75,7 +75,6 @@ void RenderDocPlugin::Init()
 
 	eastl::string directoryOutputPath = ExePath();
 	directoryOutputPath += "\\RenderDocCaptures" ;
-	//capturesOutputPath += "\\RenderDocCaptures\\" + eastl::string("Test");
 	eastl::string::const_iterator newEnd = eastl::remove_if(directoryOutputPath.begin(), directoryOutputPath.end(), isspace);
 
 	// RenderDoc requires a path different than what Windows accepts(/ instead of \\)
@@ -126,14 +125,14 @@ HWND GetWindowHandle()
 
 void RenderDocPlugin::Tick(const float inDeltaTime)
 {
-	ImGui::Begin("RenderDoc");
+	//ImGui::Begin("RenderDoc"); // RHIWorkDisabled
 
-	if (ImGui::Button("Do RenderDoc Capture"))
-	{
-		DoCapture();
-	}
+	//if (ImGui::Button("Do RenderDoc Capture")) // RHIWorkDisabled
+	//{
+	//	DoCapture();
+	//}
 
-	ImGui::End();
+	//ImGui::End();
 
 
 	if (bCaptureInProgress)

@@ -124,27 +124,26 @@ UINT m_rtvDescriptorSize;
 // App resources.
 ComPtr<ID3D12Resource> m_vertexBuffer;
 D3D12_VERTEX_BUFFER_VIEW m_vertexBufferView;
+
 // Constant Buffer
-
-ComPtr<ID3D12DescriptorHeap> m_cbvHeap;
-
 struct SceneConstantBuffer
 {
 	DirectX::XMFLOAT4 offset;
 	float padding[60]; // Padding so the constant buffer is 256-byte aligned.
 };
 static_assert((sizeof(SceneConstantBuffer) % 256) == 0, "Constant Buffer size must be 256-byte aligned");
+
+ComPtr<ID3D12DescriptorHeap> m_cbvHeap;
 ComPtr<ID3D12Resource> m_constantBuffer;
 SceneConstantBuffer m_constantBufferData;
 UINT8* m_pCbvDataBegin;
 
-
 // Synchronization objects.
-UINT m_frameIndex;
+UINT m_frameIndex = 0;
 HANDLE m_fenceEvent;
 ComPtr<ID3D12Fence> m_fence;
 
-#define FRAME_BUFFERING 1
+#define FRAME_BUFFERING 0
 
 #if FRAME_BUFFERING
 UINT64 m_fenceValues[FrameCount];
@@ -158,7 +157,7 @@ void InitPipeline()
 {
 	UINT dxgiFactoryFlags = 0;
 
-#if defined(_DEBUG)
+//#if defined(_DEBUG)
 	// Enable the debug layer (requires the Graphics Tools "optional feature").
 	// NOTE: Enabling the debug layer after device creation will invalidate the active device.
 	{
@@ -171,7 +170,7 @@ void InitPipeline()
 			dxgiFactoryFlags |= DXGI_CREATE_FACTORY_DEBUG;
 		}
 	}
-#endif
+//#endif
 
 
 	ComPtr<IDXGIFactory4> factory;
@@ -193,7 +192,6 @@ void InitPipeline()
 	queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
 
 	DXAssert(m_device->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&m_commandQueue)));
-
 
 	const WindowsWindow& mainWindow = GEngine->GetMainWindow();
 	const WindowProperties& props = mainWindow.GetProperties();
@@ -695,11 +693,11 @@ D3D12RHI::D3D12RHI()
 
 	// Create synchronization objects and wait until assets have been uploaded to the GPU.
 	{
+#if FRAME_BUFFERING
 		m_fenceValues[0] = m_fenceValues[1] = 1;
 
-#if FRAME_BUFFERING
-		DXAssert(m_device->CreateFence(m_fenceValues[m_frameIndex], D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_fence)));
-		m_fenceValues[m_frameIndex]++;
+		DXAssert(m_device->CreateFence(m_fenceValues[0], D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_fence)));
+		m_fenceValues[0]++;
 #else
 		DXAssert(m_device->CreateFence(m_fenceValue, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_fence)));
 		m_fenceValue++;
@@ -794,6 +792,8 @@ void D3D12RHI::MoveToNextFrame()
 	m_frameIndex = m_swapChain->GetCurrentBackBufferIndex();
 
 	const UINT64 presentFenceValue = m_fence->GetCompletedValue();
+
+	// Happens if Graphics device is removed while running
 	if (presentFenceValue == UINT64_MAX)
 	{
 		__debugbreak();
