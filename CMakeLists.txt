@@ -37,6 +37,10 @@ list(APPEND EXTRA_INCLUDES "${CMAKE_CURRENT_LIST_DIR}/Plugins/glm/")
 add_subdirectory(Plugins/imgui)
 list(APPEND extra_libs imgui)
 
+# Add DirectXTex
+add_subdirectory(Plugins/DirectXTex)
+list(APPEND extra_libs DirectXTex)
+
 # Rendering API's libs
 list(APPEND extra_libs opengl32.lib)
 list(APPEND extra_libs d3d11.lib)
@@ -47,9 +51,6 @@ file(GLOB_RECURSE source_files CONFIGURE_DEPENDS "${CMAKE_CURRENT_LIST_DIR}/Engi
 
 # used to create filters for all files one to one with their folder structure
 source_group(TREE ${CMAKE_CURRENT_LIST_DIR} FILES ${source_files})
-
-# OBJECT to make sure that all the project's files and statics are used and linked as if they were from the executable's project, that is, no matter if they are used or not.( Eg. for internal 
-# plugins which are not referenced anywhere but self-register.
 
 add_library(SecondEngineProject STATIC ${source_files})
 
@@ -109,7 +110,7 @@ option(BUILD_GMOCK OFF)
 # gtest_discover_tests(EngineTests)
 
 # Group Plugins in a separate folder
-set_target_properties(	glad assimp imgui EASTL EAStdC EAAssert EAThread 
+set_target_properties(	glad assimp imgui EASTL EAStdC EAAssert EAThread DirectXTex
 						PROPERTIES
 						FOLDER "Plugins")		  
 						
