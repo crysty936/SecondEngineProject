@@ -9,6 +9,7 @@ public:
 	~D3D12RHI();
 
 
+	void CreateTextureStuff(struct ID3D12Resource* inUploadHeap);
 	void WaitForPreviousFrame();
 	void MoveToNextFrame();
 	void Test() override;

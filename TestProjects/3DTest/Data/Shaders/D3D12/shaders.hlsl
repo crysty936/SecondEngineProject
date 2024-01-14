@@ -9,29 +9,36 @@
 //
 //*********************************************************
 
-cbuffer SceneConstantBuffer : register(b0)
-{
-    float4 offset;
-    float4 padding[15];
-};
+// cbuffer SceneConstantBuffer : register(b0)
+// {
+//     float4 offset;
+//     float4 padding[15];
+// };
+
+Texture2D g_texture : register(t0);
+SamplerState g_sampler : register(s0);
 
 struct PSInput
 {
     float4 position : SV_POSITION;
-    float4 color : COLOR;
+    float2 uv : TEXCOORD;
+    //float4 color : COLOR;
 };
 
-PSInput VSMain(float4 position : POSITION, float4 color : COLOR)
+//PSInput VSMain(float4 position : POSITION, float4 color : COLOR)
+PSInput VSMain(float4 position : POSITION, float2 uv : TEXCOORD)
 {
     PSInput result;
 
-    result.position = position + offset;
-    result.color = color;
+    result.position = position;
+    result.uv = uv;
+    //result.position = position + offset;
+    //result.color = color;
 
     return result;
 }
 
 float4 PSMain(PSInput input) : SV_TARGET
 {
-    return input.color;
+    return g_texture.Sample(g_sampler, input.uv);
 }

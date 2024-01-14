@@ -108,8 +108,12 @@ static const UINT FrameCount = 2;
 struct TestVertex
 {
 	DirectX::XMFLOAT3 position;
-	DirectX::XMFLOAT4 color;
+	DirectX::XMFLOAT2 UV;
 };
+
+static const UINT TextureWidth = 256;
+static const UINT TextureHeight = 256;
+static const UINT TexturePixelSize = 4;
 
 // Pipeline objects.
 D3D12_VIEWPORT m_viewport;
@@ -121,6 +125,7 @@ ComPtr<ID3D12CommandAllocator> m_commandAllocators[FrameCount];
 ComPtr<ID3D12CommandQueue> m_commandQueue;
 ComPtr<ID3D12RootSignature> m_rootSignature;
 ComPtr<ID3D12DescriptorHeap> m_rtvHeap;
+ComPtr<ID3D12DescriptorHeap> m_srvHeap;
 ComPtr<ID3D12PipelineState> m_pipelineState;
 ComPtr<ID3D12GraphicsCommandList> m_commandList;
 UINT m_rtvDescriptorSize;
@@ -128,6 +133,8 @@ UINT m_rtvDescriptorSize;
 // App resources.
 ComPtr<ID3D12Resource> m_vertexBuffer;
 D3D12_VERTEX_BUFFER_VIEW m_vertexBufferView;
+ComPtr<ID3D12Resource> m_texture;
+
 
 // Constant Buffer
 struct SceneConstantBuffer
@@ -137,10 +144,10 @@ struct SceneConstantBuffer
 };
 static_assert((sizeof(SceneConstantBuffer) % 256) == 0, "Constant Buffer size must be 256-byte aligned");
 
-ComPtr<ID3D12DescriptorHeap> m_cbvHeap;
-ComPtr<ID3D12Resource> m_constantBuffer;
-SceneConstantBuffer m_constantBufferData;
-UINT8* m_pCbvDataBegin;
+//ComPtr<ID3D12DescriptorHeap> m_cbvHeap;
+//ComPtr<ID3D12Resource> m_constantBuffer;
+//SceneConstantBuffer m_constantBufferData;
+//UINT8* m_pCbvDataBegin;
 
 // Synchronization objects.
 UINT m_frameIndex = 0;
@@ -245,11 +252,20 @@ void InitPipeline()
 		// Describe and create a constant buffer view (CBV) descriptor heap.
 		// Flags indicate that this descriptor heap can be bound to the pipeline 
 		// and that descriptors contained in it can be referenced by a root table.
-		D3D12_DESCRIPTOR_HEAP_DESC cbvHeapDesc = {};
-		cbvHeapDesc.NumDescriptors = 1;
-		cbvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-		cbvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-		DXAssert(m_device->CreateDescriptorHeap(&cbvHeapDesc, IID_PPV_ARGS(&m_cbvHeap)));
+// 		D3D12_DESCRIPTOR_HEAP_DESC cbvHeapDesc = {};
+// 		cbvHeapDesc.NumDescriptors = 1;
+// 		cbvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+// 		cbvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+// 		DXAssert(m_device->CreateDescriptorHeap(&cbvHeapDesc, IID_PPV_ARGS(&m_cbvHeap)));
+
+
+
+		// Describe and create a shader resource view (SRV) heap for the texture.
+		D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
+		srvHeapDesc.NumDescriptors = 1;
+		srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+		srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+		DXAssert(m_device->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&m_srvHeap)));
 	}
 
 
@@ -268,6 +284,156 @@ void InitPipeline()
 		}
 	}
 
+}
+
+
+// Generate a simple black and white checkerboard texture.
+std::vector<UINT8> GenerateTextureData()
+{
+	const UINT rowPitch = TextureWidth * TexturePixelSize;
+	const UINT cellPitch = rowPitch >> 3;        // The width of a cell in the checkboard texture.
+	const UINT cellHeight = TextureWidth >> 3;    // The height of a cell in the checkerboard texture.
+	const UINT textureSize = rowPitch * TextureHeight;
+
+	std::vector<UINT8> data(textureSize);
+	UINT8* pData = &data[0];
+
+	for (UINT n = 0; n < textureSize; n += TexturePixelSize)
+	{
+		UINT x = n % rowPitch;
+		UINT y = n / rowPitch;
+		UINT i = x / cellPitch;
+		UINT j = y / cellHeight;
+
+		if (i % 2 == j % 2)
+		{
+			pData[n] = 0x00;        // R
+			pData[n + 1] = 0x00;    // G
+			pData[n + 2] = 0x00;    // B
+			pData[n + 3] = 0xff;    // A
+		}
+		else
+		{
+			pData[n] = 0xff;        // R
+			pData[n + 1] = 0xff;    // G
+			pData[n + 2] = 0xff;    // B
+			pData[n + 3] = 0xff;    // A
+		}
+	}
+
+	return data;
+}
+
+// Returns required size of a buffer to be used for data upload
+inline UINT64 GetRequiredIntermediateSize(
+	ID3D12Resource* pDestinationResource,
+	UINT FirstSubresource,
+	UINT NumSubresources) noexcept
+{
+	const D3D12_RESOURCE_DESC Desc = pDestinationResource->GetDesc();
+	UINT64 RequiredSize = 0;
+
+	ID3D12Device* device = nullptr;
+	pDestinationResource->GetDevice(_uuidof(ID3D12Device), reinterpret_cast<void**>(&device));
+	device->GetCopyableFootprints(&Desc, FirstSubresource, NumSubresources, 0, nullptr, nullptr, nullptr, &RequiredSize);
+	device->Release();
+
+	return RequiredSize;
+}
+
+
+void DoTheUploadBlocking(ID3D12Resource* inDestResource, ID3D12Resource* inUploadResource, const D3D12_SUBRESOURCE_DATA* inSrcData, uint32_t NumSubresources, ID3D12GraphicsCommandList* inCmdList)
+{
+	D3D12_PLACED_SUBRESOURCE_FOOTPRINT* layouts = static_cast<D3D12_PLACED_SUBRESOURCE_FOOTPRINT*>(_alloca(sizeof(D3D12_PLACED_SUBRESOURCE_FOOTPRINT) * NumSubresources));
+	ASSERT(layouts != nullptr);
+
+	uint64_t* rowSize = static_cast<uint64_t*>(_alloca(sizeof(uint64_t) * NumSubresources));
+	ASSERT(rowSize != nullptr);
+
+	uint32_t* numRows = static_cast<uint32_t*>(_alloca(sizeof(uint32_t) * NumSubresources));
+	ASSERT(numRows != nullptr);
+
+	uint64_t requiredSize = 0;
+
+	const D3D12_RESOURCE_DESC DestDesc = inDestResource->GetDesc();
+	ID3D12Device* device = nullptr;
+	inDestResource->GetDevice(_uuidof(ID3D12Device), reinterpret_cast<void**>(&device));
+
+	constexpr uint32_t firstSubresource = 0;
+	device->GetCopyableFootprints(&DestDesc, 0, NumSubresources, 0, layouts, numRows, rowSize, &requiredSize);
+	device->Release();
+
+	const D3D12_RESOURCE_DESC uploadBufferDesc = inUploadResource->GetDesc();
+
+	const bool isCopyValid = uploadBufferDesc.Dimension == D3D12_RESOURCE_DIMENSION_BUFFER &&
+		uploadBufferDesc.Width >= requiredSize + layouts[0].Offset && requiredSize <= size_t(-1) &&
+		(DestDesc.Dimension != D3D12_RESOURCE_DIMENSION_BUFFER || (NumSubresources == 1));
+
+	ASSERT(isCopyValid);
+
+	char* data = nullptr;
+	
+	HRESULT hr = inUploadResource->Map(0, nullptr, reinterpret_cast<void**>(&data));
+
+	if (!ASSERT(SUCCEEDED(hr)))
+	{
+		return;
+	}
+
+	// Copy to the staging upload heap
+	for (uint32_t i = 0; i < NumSubresources; ++i)
+	{
+		if (rowSize[i] > size_t(-1))
+		{
+			ASSERT(0);
+			return;
+		}
+
+		D3D12_MEMCPY_DEST destData{};
+		destData.pData = data + layouts[i].Offset;
+		destData.RowPitch = layouts[i].Footprint.RowPitch;
+		destData.SlicePitch = size_t(layouts[i].Footprint.RowPitch) * size_t(numRows[i]);
+
+		
+		for (uint32_t z = 0; z < layouts[i].Footprint.Depth; ++z)
+		{
+			char* destSlice = static_cast<char*>(destData.pData) + destData.SlicePitch * z;
+			const char* srcSlice = static_cast<const char*>(inSrcData[i].pData) + inSrcData[i].SlicePitch * int64_t(z);
+
+			for (uint32_t y = 0; y < numRows[i]; ++y)
+			{
+				memcpy(destSlice + destData.RowPitch * y, srcSlice + inSrcData[i].RowPitch * int64_t(y), static_cast<SIZE_T>(rowSize[i]));
+			}
+		}
+
+	}
+
+	inUploadResource->Unmap(0, nullptr);
+
+
+	if (DestDesc.Dimension == D3D12_RESOURCE_DIMENSION_BUFFER)
+	{
+		inCmdList->CopyBufferRegion(inDestResource, 0, inUploadResource, layouts[0].Offset, layouts[0].Footprint.Width);
+	}
+	else
+	{
+		for (uint32_t i = 0; i < NumSubresources; ++i)
+		{
+			D3D12_TEXTURE_COPY_LOCATION dest = {};
+			dest.pResource = inDestResource;
+			dest.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
+			dest.PlacedFootprint = {};
+			dest.SubresourceIndex = i + firstSubresource;
+
+
+			D3D12_TEXTURE_COPY_LOCATION src = {};
+			src.pResource = inUploadResource;
+			src.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
+			src.PlacedFootprint = layouts[i];
+
+			inCmdList->CopyTextureRegion(&dest, 0, 0, 0, &src, nullptr);
+		}
+	}
 }
 
 D3D12RHI::D3D12RHI()
@@ -289,41 +455,66 @@ D3D12RHI::D3D12RHI()
 			featureData.HighestVersion = D3D_ROOT_SIGNATURE_VERSION_1_0;
 		}
 
+// 		D3D12_DESCRIPTOR_RANGE1 ranges[1];
+// 
+// 		ranges[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;
+// 		ranges[0].NumDescriptors = 1;
+// 		ranges[0].BaseShaderRegister = 0;
+// 		ranges[0].RegisterSpace = 0;
+// 		ranges[0].Flags = D3D12_DESCRIPTOR_RANGE_FLAG_DATA_STATIC;
+// 		ranges[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
 		D3D12_DESCRIPTOR_RANGE1 ranges[1];
 
-		ranges[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;
+		ranges[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 		ranges[0].NumDescriptors = 1;
 		ranges[0].BaseShaderRegister = 0;
 		ranges[0].RegisterSpace = 0;
 		ranges[0].Flags = D3D12_DESCRIPTOR_RANGE_FLAG_DATA_STATIC;
 		ranges[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
+
 		D3D12_ROOT_PARAMETER1 rootParameters[1];
 		rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-		rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+		//rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+		rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 		rootParameters[0].DescriptorTable.NumDescriptorRanges = 1;
 		rootParameters[0].DescriptorTable.pDescriptorRanges = &ranges[0];
 
 		// Allow input layout and deny uneccessary access to certain pipeline stages.
 		D3D12_ROOT_SIGNATURE_FLAGS rootSignatureFlags =
-			D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT |
-			D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS |
-			D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS |
-			D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS |
-			D3D12_ROOT_SIGNATURE_FLAG_DENY_PIXEL_SHADER_ROOT_ACCESS;
+			D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT
+			| D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS
+			| D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS
+			| D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS;
+			//| D3D12_ROOT_SIGNATURE_FLAG_DENY_PIXEL_SHADER_ROOT_ACCESS;
 
+
+		D3D12_STATIC_SAMPLER_DESC sampler = {};
+		sampler.Filter = D3D12_FILTER_MIN_MAG_MIP_POINT;
+		sampler.AddressU = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
+		sampler.AddressV = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
+		sampler.AddressW = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
+		sampler.MipLODBias = 0;
+		sampler.MaxAnisotropy = 0;
+		sampler.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
+		sampler.BorderColor = D3D12_STATIC_BORDER_COLOR_TRANSPARENT_BLACK;
+		sampler.MinLOD = 0.0f;
+		sampler.MaxLOD = D3D12_FLOAT32_MAX;
+		sampler.ShaderRegister = 0;
+		sampler.RegisterSpace = 0;
+		sampler.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 
 		D3D12_VERSIONED_ROOT_SIGNATURE_DESC rootSignatureDesc;
 		rootSignatureDesc.Version = D3D_ROOT_SIGNATURE_VERSION_1_1;
 		rootSignatureDesc.Desc_1_1.NumParameters = _countof(rootParameters);
 		rootSignatureDesc.Desc_1_1.pParameters = &rootParameters[0];
-		rootSignatureDesc.Desc_1_1.NumStaticSamplers = 0;
-		rootSignatureDesc.Desc_1_1.pStaticSamplers = nullptr;
+		rootSignatureDesc.Desc_1_1.NumStaticSamplers = 1;
+		rootSignatureDesc.Desc_1_1.pStaticSamplers = &sampler;
 		rootSignatureDesc.Desc_1_1.Flags = rootSignatureFlags;
 
 		ComPtr<ID3DBlob> signature;
 		ComPtr<ID3DBlob> error;
-		//DXAssert(D3DX12SerializeVersionedRootSignature(&rootSignatureDesc, featureData.HighestVersion, &signature, &error));
 		DXAssert(D3D12SerializeVersionedRootSignature(&rootSignatureDesc, &signature, &error));
 
 		DXAssert(m_device->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&m_rootSignature)));
@@ -375,10 +566,11 @@ D3D12RHI::D3D12RHI()
 
 
 	// Define the vertex input layout.
+		// Define the vertex input layout.
 	D3D12_INPUT_ELEMENT_DESC inputElementDescs[] =
 	{
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-		{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
+		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
 	};
 
 	// shader bytecodes
@@ -443,12 +635,6 @@ D3D12RHI::D3D12RHI()
 	// Create the command list.
 	DXAssert(m_device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_commandAllocators[m_frameIndex].Get(), m_pipelineState.Get(), IID_PPV_ARGS(&m_commandList)));
 
-	// Command lists are created in the recording state, but there is nothing
-	// to record yet. The main loop expects it to be closed, so close it now.
-	DXAssert(m_commandList->Close());
-
-
-
 	const WindowsWindow& mainWindow = GEngine->GetMainWindow();
 	const WindowProperties& props = mainWindow.GetProperties();
 
@@ -459,9 +645,9 @@ D3D12RHI::D3D12RHI()
 		// Define the geometry for a triangle.
 		TestVertex triangleVertices[] =
 		{
-			{ { 0.0f, 0.25f * aspectRatio, 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f } },
-			{ { 0.25f, -0.25f * aspectRatio, 0.0f }, { 0.0f, 1.0f, 0.0f, 1.0f } },
-			{ { -0.25f, -0.25f * aspectRatio, 0.0f }, { 0.0f, 0.0f, 1.0f, 1.0f } }
+			{ { 0.0f, 0.25f * aspectRatio, 0.0f }, { 0.5f, 0.0f } },
+			{ { 0.25f, -0.25f * aspectRatio, 0.0f }, { 1.0f, 1.0f } },
+			{ { -0.25f, -0.25f * aspectRatio, 0.0f }, { 0.0f, 1.0f } }
 		};
 
 		const UINT vertexBufferSize = sizeof(triangleVertices);
@@ -515,54 +701,64 @@ D3D12RHI::D3D12RHI()
 	}
 
 
-	// Create the constant buffer.
-	{
-		const UINT constantBufferSize = sizeof(SceneConstantBuffer);    // CB size is required to be 256-byte aligned.
+	//// Create the constant buffer.
+	//{
+	//	const UINT constantBufferSize = sizeof(SceneConstantBuffer);    // CB size is required to be 256-byte aligned.
 
-		D3D12_HEAP_PROPERTIES heapProps;
-		heapProps.Type = D3D12_HEAP_TYPE_UPLOAD;
-		heapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-		heapProps.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-		heapProps.CreationNodeMask = 1;
-		heapProps.VisibleNodeMask = 1;
+	//	D3D12_HEAP_PROPERTIES heapProps;
+	//	heapProps.Type = D3D12_HEAP_TYPE_UPLOAD;
+	//	heapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+	//	heapProps.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+	//	heapProps.CreationNodeMask = 1;
+	//	heapProps.VisibleNodeMask = 1;
 
 
-		D3D12_RESOURCE_DESC constantBufferDesc;
-		constantBufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-		constantBufferDesc.Alignment = 0;
-		constantBufferDesc.Width = constantBufferSize;
-		constantBufferDesc.Height = 1;
-		constantBufferDesc.DepthOrArraySize = 1;
-		constantBufferDesc.MipLevels = 1;
-		constantBufferDesc.Format = DXGI_FORMAT_UNKNOWN;
-		constantBufferDesc.SampleDesc.Count = 1;
-		constantBufferDesc.SampleDesc.Quality = 0;
-		constantBufferDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-		constantBufferDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+	//	D3D12_RESOURCE_DESC constantBufferDesc;
+	//	constantBufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+	//	constantBufferDesc.Alignment = 0;
+	//	constantBufferDesc.Width = constantBufferSize;
+	//	constantBufferDesc.Height = 1;
+	//	constantBufferDesc.DepthOrArraySize = 1;
+	//	constantBufferDesc.MipLevels = 1;
+	//	constantBufferDesc.Format = DXGI_FORMAT_UNKNOWN;
+	//	constantBufferDesc.SampleDesc.Count = 1;
+	//	constantBufferDesc.SampleDesc.Quality = 0;
+	//	constantBufferDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+	//	constantBufferDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
 
-		DXAssert(m_device->CreateCommittedResource(
-			&heapProps,
-			D3D12_HEAP_FLAG_NONE,
-			&constantBufferDesc,
-			D3D12_RESOURCE_STATE_GENERIC_READ,
-			nullptr,
-			IID_PPV_ARGS(&m_constantBuffer)));
+	//	DXAssert(m_device->CreateCommittedResource(
+	//		&heapProps,
+	//		D3D12_HEAP_FLAG_NONE,
+	//		&constantBufferDesc,
+	//		D3D12_RESOURCE_STATE_GENERIC_READ,
+	//		nullptr,
+	//		IID_PPV_ARGS(&m_constantBuffer)));
 
-		// Describe and create a constant buffer view.
-		D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
-		cbvDesc.BufferLocation = m_constantBuffer->GetGPUVirtualAddress();
-		cbvDesc.SizeInBytes = constantBufferSize;
-		m_device->CreateConstantBufferView(&cbvDesc, m_cbvHeap->GetCPUDescriptorHandleForHeapStart());
+	//	// Describe and create a constant buffer view.
+	//	D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
+	//	cbvDesc.BufferLocation = m_constantBuffer->GetGPUVirtualAddress();
+	//	cbvDesc.SizeInBytes = constantBufferSize;
+	//	m_device->CreateConstantBufferView(&cbvDesc, m_cbvHeap->GetCPUDescriptorHandleForHeapStart());
 
-		// Map and initialize the constant buffer. We don't unmap this until the
-		// app closes. Keeping things mapped for the lifetime of the resource is okay.
-		D3D12_RANGE readRange;
-		readRange.Begin = 0;
-		readRange.End = 0;      // We do not intend to read from this resource on the CPU.
-		DXAssert(m_constantBuffer->Map(0, &readRange, reinterpret_cast<void**>(&m_pCbvDataBegin)));
-		memcpy(m_pCbvDataBegin, &m_constantBufferData, sizeof(m_constantBufferData));
-	}
+	//	// Map and initialize the constant buffer. We don't unmap this until the
+	//	// app closes. Keeping things mapped for the lifetime of the resource is okay.
+	//	D3D12_RANGE readRange;
+	//	readRange.Begin = 0;
+	//	readRange.End = 0;      // We do not intend to read from this resource on the CPU.
+	//	DXAssert(m_constantBuffer->Map(0, &readRange, reinterpret_cast<void**>(&m_pCbvDataBegin)));
+	//	memcpy(m_pCbvDataBegin, &m_constantBufferData, sizeof(m_constantBufferData));
+	//}
 
+
+
+
+	// Note: ComPtr's are CPU objects but this resource needs to stay in scope until
+	// the command list that references it has finished executing on the GPU.
+	// We will flush the GPU at the end of this method to ensure the resource is not
+	// prematurely destroyed.
+	ComPtr<ID3D12Resource> textureUploadHeap;
+
+	CreateTextureStuff(textureUploadHeap.Get());
 
 	// Create synchronization objects and wait until assets have been uploaded to the GPU.
 	{
@@ -588,14 +784,118 @@ D3D12RHI::D3D12RHI()
 		// complete before continuing.
 		WaitForPreviousFrame();
 	}
-
-
-
-
-
-
-
 }
+
+void D3D12RHI::CreateTextureStuff(ID3D12Resource* inUploadHeap)
+{
+	// Create the texture.
+	{
+		D3D12_HEAP_PROPERTIES DefaultHeapProps;
+		DefaultHeapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
+		DefaultHeapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+		DefaultHeapProps.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+		DefaultHeapProps.CreationNodeMask = 1;
+		DefaultHeapProps.VisibleNodeMask = 1;
+
+		D3D12_HEAP_PROPERTIES UploadHeapProps;
+		UploadHeapProps.Type = D3D12_HEAP_TYPE_UPLOAD;
+		UploadHeapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+		UploadHeapProps.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+		UploadHeapProps.CreationNodeMask = 1;
+		UploadHeapProps.VisibleNodeMask = 1;
+
+		// Describe and create a Texture2D on GPU(Default Heap)
+		D3D12_RESOURCE_DESC textureDesc = {};
+		textureDesc.MipLevels = 1;
+		textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		textureDesc.Width = TextureWidth;
+		textureDesc.Height = TextureHeight;
+		textureDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+		textureDesc.DepthOrArraySize = 1;
+		textureDesc.SampleDesc.Count = 1;
+		textureDesc.SampleDesc.Quality = 0;
+		textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+
+		DXAssert(m_device->CreateCommittedResource(
+			&DefaultHeapProps,
+			D3D12_HEAP_FLAG_NONE,
+			&textureDesc,
+			D3D12_RESOURCE_STATE_COPY_DEST,
+			nullptr,
+			IID_PPV_ARGS(&m_texture)));
+
+
+		// Get required size by device
+		UINT64 uploadBufferSize = 0;
+		m_device->GetCopyableFootprints(&textureDesc, 0, 1, 0, nullptr, nullptr, nullptr, &uploadBufferSize);
+
+		// Same thing
+		//const UINT64 uploadBufferSize = GetRequiredIntermediateSize(m_texture.Get(), 0, 1);
+
+
+		D3D12_RESOURCE_DESC UploadBufferDesc;
+		UploadBufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+		UploadBufferDesc.Alignment = 0;
+		UploadBufferDesc.Width = uploadBufferSize;
+		UploadBufferDesc.Height = 1;
+		UploadBufferDesc.DepthOrArraySize = 1;
+		UploadBufferDesc.MipLevels = 1;
+		UploadBufferDesc.Format = DXGI_FORMAT_UNKNOWN;
+		UploadBufferDesc.SampleDesc.Count = 1;
+		UploadBufferDesc.SampleDesc.Quality = 0;
+		UploadBufferDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+		UploadBufferDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+		// Create the CPU -> GPU Upload Buffer
+		DXAssert(m_device->CreateCommittedResource(
+			&UploadHeapProps,
+			D3D12_HEAP_FLAG_NONE,
+			&UploadBufferDesc,
+			D3D12_RESOURCE_STATE_GENERIC_READ,
+			nullptr,
+			IID_PPV_ARGS(&inUploadHeap)));
+
+
+		// Copy data to the intermediate upload heap and then schedule a copy 
+		// from the upload heap to the Texture2D.
+		std::vector<UINT8> texture = GenerateTextureData();
+
+		D3D12_SUBRESOURCE_DATA textureData = {};
+		textureData.pData = &texture[0];
+		textureData.RowPitch = TextureWidth * TexturePixelSize;
+		textureData.SlicePitch = textureData.RowPitch * TextureHeight;
+
+
+		// Blocking call
+		DoTheUploadBlocking(m_texture.Get(), inUploadHeap, &textureData, 1, m_commandList.Get());
+		//UpdateSubresources(m_commandList.Get(), m_texture.Get(), textureUploadHeap.Get(), 0, 0, 1, &textureData);
+
+
+		D3D12_RESOURCE_BARRIER barrier;
+		barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+		barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+		barrier.Transition.pResource = m_texture.Get();
+		barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+		barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+		barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+
+		m_commandList->ResourceBarrier(1, &barrier);
+
+		// Describe and create a SRV for the texture.
+		D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+		srvDesc.Format = textureDesc.Format;
+		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+		srvDesc.Texture2D.MipLevels = 1;
+		m_device->CreateShaderResourceView(m_texture.Get(), &srvDesc, m_srvHeap->GetCPUDescriptorHandleForHeapStart());
+	}
+
+
+	DXAssert(m_commandList->Close());
+	ID3D12CommandList* ppCommandLists[] = { m_commandList.Get() };
+	m_commandQueue->ExecuteCommandLists(_countof(ppCommandLists), ppCommandLists);
+}
+
 
 D3D12RHI::~D3D12RHI()
 {
@@ -684,19 +984,17 @@ void D3D12RHI::MoveToNextFrame()
 }
 #endif
 
-
-
 void D3D12RHI::Test()
 {
-	const float translationSpeed = 0.005f;
-	const float offsetBounds = 1.25f;
+	//const float translationSpeed = 0.005f;
+	//const float offsetBounds = 1.25f;
 
-	m_constantBufferData.offset.x += translationSpeed;
-	if (m_constantBufferData.offset.x > offsetBounds)
-	{
-		m_constantBufferData.offset.x = -offsetBounds;
-	}
-	memcpy(m_pCbvDataBegin, &m_constantBufferData, sizeof(m_constantBufferData));
+	//m_constantBufferData.offset.x += translationSpeed;
+	//if (m_constantBufferData.offset.x > offsetBounds)
+	//{
+	//	m_constantBufferData.offset.x = -offsetBounds;
+	//}
+	//memcpy(m_pCbvDataBegin, &m_constantBufferData, sizeof(m_constantBufferData));
 
 
 	// Populate Command List
@@ -717,9 +1015,13 @@ void D3D12RHI::Test()
 
 
 	// Constant buffer
-	ID3D12DescriptorHeap* ppHeaps[] = { m_cbvHeap.Get() };
+	//ID3D12DescriptorHeap* ppHeaps[] = { m_cbvHeap.Get() };
+	//m_commandList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
+	//m_commandList->SetGraphicsRootDescriptorTable(0, m_cbvHeap->GetGPUDescriptorHandleForHeapStart());
+
+	ID3D12DescriptorHeap* ppHeaps[] = { m_srvHeap.Get() };
 	m_commandList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
-	m_commandList->SetGraphicsRootDescriptorTable(0, m_cbvHeap->GetGPUDescriptorHandleForHeapStart());
+	m_commandList->SetGraphicsRootDescriptorTable(0, m_srvHeap->GetGPUDescriptorHandleForHeapStart());
 
 
 	D3D12_RESOURCE_BARRIER transitionPresentToRt;
