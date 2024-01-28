@@ -921,13 +921,10 @@ void D3D12RHI::CreateTextureStuff(ID3D12Resource* inUploadHeap)
 		srvDesc.Texture2D.MipLevels = 1;
 
 
-		uint32_t DescriptorSize = m_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-		
 		D3D12_CPU_DESCRIPTOR_HANDLE descHeapStartHandle = m_srvHeap->GetCPUDescriptorHandleForHeapStart();
-		descHeapStartHandle.ptr += 1 * DescriptorSize;
+		descHeapStartHandle.ptr += 1 * m_srvDescriptorSize;
 		m_device->CreateShaderResourceView(m_texture.Get(), &srvDesc, descHeapStartHandle);
 	}
-
 
 	DXAssert(m_commandList->Close());
 	ID3D12CommandList* ppCommandLists[] = { m_commandList.Get() };
@@ -1056,14 +1053,19 @@ void D3D12RHI::Test()
 // 	m_commandList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
 // 	m_commandList->SetGraphicsRootDescriptorTable(0, m_cbvHeap->GetGPUDescriptorHandleForHeapStart());
 
+	// Desc Heap
 	ID3D12DescriptorHeap* ppHeaps[] = { m_srvHeap.Get() };
 	m_commandList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
+
+
+	// First table
 	m_commandList->SetGraphicsRootDescriptorTable(0, m_srvHeap->GetGPUDescriptorHandleForHeapStart());
 
-
-	D3D12_GPU_DESCRIPTOR_HANDLE secondTableHandle(m_rtvHeap->GetGPUDescriptorHandleForHeapStart());
+	// Second table
+	//D3D12_GPU_DESCRIPTOR_HANDLE secondTableHandle(m_rtvHeap->GetGPUDescriptorHandleForHeapStart());// Also works with this for some reason
+	D3D12_GPU_DESCRIPTOR_HANDLE secondTableHandle(m_srvHeap->GetGPUDescriptorHandleForHeapStart());
 	secondTableHandle.ptr += size_t(m_srvDescriptorSize);
-	m_commandList->SetGraphicsRootDescriptorTable(1, secondTableHandle);
+	m_commandList->SetGraphicsRootDescriptorTable(1, secondTableHandle); // This does the magic of binding a certain descriptor table to a certain heap with a start index for accessing descriptors
 
 
 	D3D12_RESOURCE_BARRIER transitionPresentToRt;
