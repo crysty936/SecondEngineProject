@@ -129,6 +129,7 @@ ComPtr<ID3D12DescriptorHeap> m_srvHeap;
 ComPtr<ID3D12PipelineState> m_pipelineState;
 ComPtr<ID3D12GraphicsCommandList> m_commandList;
 UINT m_rtvDescriptorSize;
+UINT m_srvDescriptorSize;
 
 // App resources.
 ComPtr<ID3D12Resource> m_vertexBuffer;
@@ -262,6 +263,9 @@ void InitPipeline()
 		srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 		srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 		DXAssert(m_device->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&m_srvHeap)));
+
+		m_srvDescriptorSize = m_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
 	}
 
 
@@ -451,40 +455,68 @@ D3D12RHI::D3D12RHI()
 			featureData.HighestVersion = D3D_ROOT_SIGNATURE_VERSION_1_0;
 		}
 
-		D3D12_DESCRIPTOR_RANGE1 ranges[2];
+		//////////////////////////////////////////////////////////////////////////
 
-		// Constant Buffer
-		ranges[1].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;
-		ranges[1].NumDescriptors = 1;
-		ranges[1].BaseShaderRegister = 0;
-		ranges[1].RegisterSpace = 0;
-		ranges[1].Flags = D3D12_DESCRIPTOR_RANGE_FLAG_DATA_STATIC;
-		ranges[1].OffsetInDescriptorsFromTableStart = 0;
+		//D3D12_DESCRIPTOR_RANGE1 ranges[2];
 
-		// Texture
-		ranges[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
-		ranges[0].NumDescriptors = 1;
-		ranges[0].BaseShaderRegister = 0;
-		ranges[0].RegisterSpace = 0;
-		ranges[0].Flags = D3D12_DESCRIPTOR_RANGE_FLAG_DATA_STATIC;
-		ranges[0].OffsetInDescriptorsFromTableStart = 1;
+// 		// Constant Buffer
+// 		ranges[1].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;
+// 		ranges[1].NumDescriptors = 1;
+// 		ranges[1].BaseShaderRegister = 0;
+// 		ranges[1].RegisterSpace = 0;
+// 		ranges[1].Flags = D3D12_DESCRIPTOR_RANGE_FLAG_DATA_STATIC;
+// 		ranges[1].OffsetInDescriptorsFromTableStart = 0;
+// 
+// 		// Texture
+// 		ranges[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+// 		ranges[0].NumDescriptors = 1;
+// 		ranges[0].BaseShaderRegister = 0;
+// 		ranges[0].RegisterSpace = 0;
+// 		ranges[0].Flags = D3D12_DESCRIPTOR_RANGE_FLAG_DATA_STATIC;
+// 		ranges[0].OffsetInDescriptorsFromTableStart = 1;
+// 
+// 
+// 		D3D12_ROOT_PARAMETER1 rootParameters[1];
+// 		rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+// 		//rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+// 		rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+// 		rootParameters[0].DescriptorTable.NumDescriptorRanges = 2;
+// 		rootParameters[0].DescriptorTable.pDescriptorRanges = &ranges[0];
+		
 
+		//////////////////////////////////////////////////////////////////////////
 
-		D3D12_ROOT_PARAMETER1 rootParameters[1];
-		rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-		//rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
-		rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-		rootParameters[0].DescriptorTable.NumDescriptorRanges = 2;
-		rootParameters[0].DescriptorTable.pDescriptorRanges = &ranges[0];
+ 		D3D12_DESCRIPTOR_RANGE1 rangesVS[1];
+ 
+ 		// Constant Buffer
+ 		rangesVS[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;
+ 		rangesVS[0].NumDescriptors = 1;
+ 		rangesVS[0].BaseShaderRegister = 0;
+ 		rangesVS[0].RegisterSpace = 0;
+ 		rangesVS[0].Flags = D3D12_DESCRIPTOR_RANGE_FLAG_DATA_STATIC;
+ 		rangesVS[0].OffsetInDescriptorsFromTableStart = 0;
+ 
+ 		D3D12_DESCRIPTOR_RANGE1 rangesPS[1];
+ 		// Texture
+ 		rangesPS[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+ 		rangesPS[0].NumDescriptors = 1;
+ 		rangesPS[0].BaseShaderRegister = 0;
+ 		rangesPS[0].RegisterSpace = 0;
+ 		rangesPS[0].Flags = D3D12_DESCRIPTOR_RANGE_FLAG_DATA_STATIC;
+ 		rangesPS[0].OffsetInDescriptorsFromTableStart = 0;
+ 
+ 		D3D12_ROOT_PARAMETER1 rootParameters[2];
+ 		rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+ 		rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+ 		rootParameters[0].DescriptorTable.NumDescriptorRanges = 1;
+ 		rootParameters[0].DescriptorTable.pDescriptorRanges = &rangesVS[0];
+ 
+ 		rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+ 		rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+ 		rootParameters[1].DescriptorTable.NumDescriptorRanges = 1;
+ 		rootParameters[1].DescriptorTable.pDescriptorRanges = &rangesPS[0];
 
-		// Allow input layout and deny uneccessary access to certain pipeline stages.
-		D3D12_ROOT_SIGNATURE_FLAGS rootSignatureFlags =
-			D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT
-			| D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS
-			| D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS
-			| D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS;
-			//| D3D12_ROOT_SIGNATURE_FLAG_DENY_PIXEL_SHADER_ROOT_ACCESS;
-
+		//////////////////////////////////////////////////////////////////////////
 
 		D3D12_STATIC_SAMPLER_DESC sampler = {};
 		sampler.Filter = D3D12_FILTER_MIN_MAG_MIP_POINT;
@@ -500,6 +532,14 @@ D3D12RHI::D3D12RHI()
 		sampler.ShaderRegister = 0;
 		sampler.RegisterSpace = 0;
 		sampler.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+
+		// Allow input layout and deny uneccessary access to certain pipeline stages.
+		D3D12_ROOT_SIGNATURE_FLAGS rootSignatureFlags =
+			D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT
+			| D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS
+			| D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS
+			| D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS;
+			//| D3D12_ROOT_SIGNATURE_FLAG_DENY_PIXEL_SHADER_ROOT_ACCESS;
 
 		D3D12_VERSIONED_ROOT_SIGNATURE_DESC rootSignatureDesc;
 		rootSignatureDesc.Version = D3D_ROOT_SIGNATURE_VERSION_1_1;
@@ -1019,6 +1059,11 @@ void D3D12RHI::Test()
 	ID3D12DescriptorHeap* ppHeaps[] = { m_srvHeap.Get() };
 	m_commandList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
 	m_commandList->SetGraphicsRootDescriptorTable(0, m_srvHeap->GetGPUDescriptorHandleForHeapStart());
+
+
+	D3D12_GPU_DESCRIPTOR_HANDLE secondTableHandle(m_rtvHeap->GetGPUDescriptorHandleForHeapStart());
+	secondTableHandle.ptr += size_t(m_srvDescriptorSize);
+	m_commandList->SetGraphicsRootDescriptorTable(1, secondTableHandle);
 
 
 	D3D12_RESOURCE_BARRIER transitionPresentToRt;
