@@ -101,9 +101,12 @@ void GetHardwareAdapter(
 }
 
 
-inline void DXAssert(HRESULT inRez)
+inline bool DXAssert(HRESULT inRez)
 {
-	ASSERT_MSG(SUCCEEDED(inRez), "Direct3D12 Operation failed with code 0x%08X", static_cast<uint32_t>(inRez));
+	const bool success = SUCCEEDED(inRez);
+	ASSERT_MSG(success, "Direct3D12 Operation failed with code 0x%08X", static_cast<uint32_t>(inRez));
+
+	return success;
 }
 
 static const UINT FrameCount = 2;
@@ -415,16 +418,26 @@ D3D12RHI::D3D12RHI()
  		rangesPS[0].Flags = D3D12_DESCRIPTOR_RANGE_FLAG_DATA_STATIC;
  		rangesPS[0].OffsetInDescriptorsFromTableStart = 0;
  
- 		D3D12_ROOT_PARAMETER1 rootParameters[2];
- 		rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
- 		rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
- 		rootParameters[0].DescriptorTable.NumDescriptorRanges = 1;
- 		rootParameters[0].DescriptorTable.pDescriptorRanges = &rangesVS[0];
- 
+ 		D3D12_ROOT_PARAMETER1 rootParameters[3];
+		rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;
+		rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+		rootParameters[0].Constants.Num32BitValues = 4;
+		rootParameters[0].Constants.RegisterSpace = 0;
+		rootParameters[0].Constants.ShaderRegister = 0;
+
  		rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
- 		rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+ 		rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
  		rootParameters[1].DescriptorTable.NumDescriptorRanges = 1;
- 		rootParameters[1].DescriptorTable.pDescriptorRanges = &rangesPS[0];
+ 		rootParameters[1].DescriptorTable.pDescriptorRanges = &rangesVS[0];
+ 
+ 		rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+ 		rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+ 		rootParameters[2].DescriptorTable.NumDescriptorRanges = 1;
+ 		rootParameters[2].DescriptorTable.pDescriptorRanges = &rangesPS[0];
+
+
+
+
 
 		//////////////////////////////////////////////////////////////////////////
 
@@ -461,7 +474,12 @@ D3D12RHI::D3D12RHI()
 
 		ComPtr<ID3DBlob> signature;
 		ComPtr<ID3DBlob> error;
-		DXAssert(D3D12SerializeVersionedRootSignature(&rootSignatureDesc, &signature, &error));
+		if (!DXAssert(D3D12SerializeVersionedRootSignature(&rootSignatureDesc, &signature, &error)))
+		{
+			const char* errText = (char*)error->GetBufferPointer();
+			LOG_ERROR("%s", errText);
+		}
+
 
 		DXAssert(m_device->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&m_rootSignature)));
 	}
@@ -786,7 +804,6 @@ void DoTheUploadBlocking(ID3D12Resource* inDestResource, ID3D12Resource* inUploa
 	{
 		ASSERT(rowSize[i] <= size_t(-1));
 
-
 		const uint64_t mipId = i;
 
 		const D3D12_PLACED_SUBRESOURCE_FOOTPRINT& mipSubresourceLayout = layouts[mipId];
@@ -1066,13 +1083,15 @@ void D3D12RHI::Test()
 	const float translationSpeed = 0.005f;
 	const float offsetBounds = 1.25f;
 
-	m_constantBufferData.offset.x += translationSpeed;
-	if (m_constantBufferData.offset.x > offsetBounds)
+	float offset = m_constantBufferData.offset.x;
+	offset += translationSpeed;
+	if (offset > offsetBounds)
 	{
-		m_constantBufferData.offset.x = -offsetBounds;
+		offset = -offsetBounds;
 	}
-	memcpy(m_pCbvDataBegin, &m_constantBufferData, sizeof(m_constantBufferData));
+	m_constantBufferData.offset.x = offset;
 
+	memcpy(m_pCbvDataBegin, &m_constantBufferData, sizeof(m_constantBufferData));
 
 	// Populate Command List
 
@@ -1101,13 +1120,16 @@ void D3D12RHI::Test()
 
 
 	// First table
-	m_commandList->SetGraphicsRootDescriptorTable(0, m_srvHeap->GetGPUDescriptorHandleForHeapStart());
+	m_commandList->SetGraphicsRoot32BitConstants(0, 4, &offset, 0);
+
+	m_commandList->SetGraphicsRootDescriptorTable(1, m_srvHeap->GetGPUDescriptorHandleForHeapStart());
+
 
 	// Second table
 	//D3D12_GPU_DESCRIPTOR_HANDLE secondTableHandle(m_rtvHeap->GetGPUDescriptorHandleForHeapStart());// Also works with this for some reason
 	D3D12_GPU_DESCRIPTOR_HANDLE secondTableHandle(m_srvHeap->GetGPUDescriptorHandleForHeapStart());
 	secondTableHandle.ptr += size_t(m_srvDescriptorSize);
-	m_commandList->SetGraphicsRootDescriptorTable(1, secondTableHandle); // This does the magic of binding a certain descriptor table to a certain heap with a start index for accessing descriptors
+	m_commandList->SetGraphicsRootDescriptorTable(2, secondTableHandle); // This does the magic of binding a certain descriptor table to a certain heap with a start index for accessing descriptors
 
 
 	D3D12_RESOURCE_BARRIER transitionPresentToRt;
