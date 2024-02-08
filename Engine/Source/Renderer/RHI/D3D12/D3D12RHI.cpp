@@ -404,7 +404,7 @@ D3D12RHI::D3D12RHI()
  		// Constant Buffer
  		rangesVS[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;
  		rangesVS[0].NumDescriptors = 1;
- 		rangesVS[0].BaseShaderRegister = 0;
+ 		rangesVS[0].BaseShaderRegister = 1;
  		rangesVS[0].RegisterSpace = 0;
  		rangesVS[0].Flags = D3D12_DESCRIPTOR_RANGE_FLAG_DATA_STATIC;
  		rangesVS[0].OffsetInDescriptorsFromTableStart = 0;
@@ -420,7 +420,7 @@ D3D12RHI::D3D12RHI()
  
  		D3D12_ROOT_PARAMETER1 rootParameters[3];
 		rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;
-		rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+		rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
 		rootParameters[0].Constants.Num32BitValues = 4;
 		rootParameters[0].Constants.RegisterSpace = 0;
 		rootParameters[0].Constants.ShaderRegister = 0;
@@ -434,9 +434,6 @@ D3D12RHI::D3D12RHI()
  		rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
  		rootParameters[2].DescriptorTable.NumDescriptorRanges = 1;
  		rootParameters[2].DescriptorTable.pDescriptorRanges = &rangesPS[0];
-
-
-
 
 
 		//////////////////////////////////////////////////////////////////////////
@@ -1118,12 +1115,10 @@ void D3D12RHI::Test()
 	ID3D12DescriptorHeap* ppHeaps[] = { m_srvHeap.Get() };
 	m_commandList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
 
-
 	// First table
 	m_commandList->SetGraphicsRoot32BitConstants(0, 4, &offset, 0);
 
 	m_commandList->SetGraphicsRootDescriptorTable(1, m_srvHeap->GetGPUDescriptorHandleForHeapStart());
-
 
 	// Second table
 	//D3D12_GPU_DESCRIPTOR_HANDLE secondTableHandle(m_rtvHeap->GetGPUDescriptorHandleForHeapStart());// Also works with this for some reason

@@ -11,7 +11,7 @@
 
 cbuffer RootConstantBuffer : register(b0)
 {
-    float theTest;
+    float4 theTest;
 }
 
 cbuffer SceneConstantBuffer : register(b1)
@@ -35,7 +35,9 @@ PSInput VSMain(float4 position : POSITION, float2 uv : TEXCOORD)
 
     //result.position = position;
     result.uv = uv;
-    result.position = position + theTest;
+    result.position = position;
+    result.position.x += theTest.x;
+    result.position.x += offset.x;
 
     return result;
 }
