@@ -606,8 +606,6 @@ D3D12RHI::D3D12RHI()
 
 	// Create the vertex buffer.
 	{
-		//const UINT vertexBufferSize = BasicShapesData::GetCubeVerticesCount();
-
 		// Note: using upload heaps to transfer static data like vert buffers is not 
 		// recommended. Every time the GPU needs it, the upload heap will be marshalled 
 		// over. Please read up on Default Heap usage. An upload heap is used here for 
@@ -619,7 +617,7 @@ D3D12RHI::D3D12RHI()
 		heapProps.CreationNodeMask = 1;
 		heapProps.VisibleNodeMask = 1;
 		{
-			const UINT vertexBufferSize = sizeof(float) * BasicShapesData::GetTriangleVerticesCount();
+			const UINT vertexBufferSize = sizeof(float) * BasicShapesData::GetCubeVerticesCount();
 
 			D3D12_RESOURCE_DESC vertexBufferDesc;
 			vertexBufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
@@ -651,7 +649,7 @@ D3D12RHI::D3D12RHI()
 			DXAssert(m_vertexBuffer->Map(0, &readRange, reinterpret_cast<void**>(&pVertexDataBegin)));
 			//memcpy(pVertexDataBegin, triangleVertices, vertexBufferSize);
 
-			memcpy(pVertexDataBegin, BasicShapesData::GetTriangleVertices(), vertexBufferSize);
+			memcpy(pVertexDataBegin, BasicShapesData::GetCubeVertices(), vertexBufferSize);
 			//memcpy(pVertexDataBegin, BasicShapesData::GetCubeVertices(), vertexBufferSize);
 			m_vertexBuffer->Unmap(0, nullptr);
 
@@ -662,7 +660,7 @@ D3D12RHI::D3D12RHI()
 		}
 
 		{
-			const UINT indexBufferSize = sizeof(uint32_t) * BasicShapesData::GetTriangleIndicesCount();
+			const UINT indexBufferSize = sizeof(uint32_t) * BasicShapesData::GetCubeIndicesCount();
 
 			D3D12_RESOURCE_DESC indexBufferDesc;
 			indexBufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
@@ -693,7 +691,7 @@ D3D12RHI::D3D12RHI()
 			indexReadRange.End = 0;
 			DXAssert(m_indexBuffer->Map(0, &indexReadRange, reinterpret_cast<void**>(&pIndexDataBegin)));
 
-			memcpy(pIndexDataBegin, BasicShapesData::GetTriangleIndices(), indexBufferSize);
+			memcpy(pIndexDataBegin, BasicShapesData::GetCubeIndices(), indexBufferSize);
 
 
 			m_indexBuffer->Unmap(0, nullptr);
@@ -1117,7 +1115,20 @@ void D3D12RHI::Test()
 	}
 
 	glm::mat4 modelMatrix(1.f);
-	m_constantBufferData.Model = glm::translate(modelMatrix, glm::vec3(StaticOffset, 0.f, 0.f));
+	//modelMatrix = glm::translate(modelMatrix, glm::vec3(StaticOffset, 0.f, 0.f));
+	modelMatrix = glm::translate(modelMatrix, glm::vec3(StaticOffset, 0.f, 0.2f));
+	modelMatrix = glm::rotate(modelMatrix, StaticOffset * StaticOffset, glm::vec3(0.f, 1.f, 0.f));
+	modelMatrix = glm::scale(modelMatrix, glm::vec3(0.1f, 0.1f, 0.1f));
+
+
+	//const float windowWidth = static_cast<float>(GEngine->GetMainWindow().GetProperties().Width);
+	//const float windowHeight = static_cast<float>(GEngine->GetMainWindow().GetProperties().Height);
+	//glm::mat4 projection = glm::perspectiveRH_ZO(glm::radians(CAMERA_FOV), windowWidth / windowHeight, CAMERA_NEAR, CAMERA_FAR);
+
+
+
+
+	m_constantBufferData.Model = modelMatrix;
 
 	memcpy(m_pCbvDataBegin, &m_constantBufferData, sizeof(m_constantBufferData));
 
@@ -1182,7 +1193,7 @@ void D3D12RHI::Test()
 	m_commandList->IASetVertexBuffers(0, 1, &m_vertexBufferView);
 	m_commandList->IASetIndexBuffer(&m_indexBufferView);
 	//m_commandList->DrawInstanced(3, 1, 0, 0);
-	m_commandList->DrawIndexedInstanced(3, 1, 0, 0, 0);
+	m_commandList->DrawIndexedInstanced(BasicShapesData::GetCubeIndicesCount(), 1, 0, 0, 0);
 
 
 	D3D12_RESOURCE_BARRIER transitionRtToPresent;

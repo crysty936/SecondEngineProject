@@ -25,13 +25,13 @@ PSInput VSMain(float4 position : POSITION, float3 normal : NORMAL, float2 uv : T
 {
     PSInput result;
 
-    //result.position = position;
     result.uv = uv;
+    // Inverse y to simulate opengl like uv space
     result.uv.y = 1 - uv.y;
-    result.position = position;
+
+    result.position = mul(Model, position);
+
     result.position.x += theTest.x;
-    
-    result.position = mul(Model, result.position);
     
     //result.position.x += offset;
 
