@@ -1,23 +1,15 @@
-//*********************************************************
-//
-// Copyright (c) Microsoft. All rights reserved.
-// This code is licensed under the MIT License (MIT).
-// THIS CODE IS PROVIDED *AS IS* WITHOUT WARRANTY OF
-// ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING ANY
-// IMPLIED WARRANTIES OF FITNESS FOR A PARTICULAR
-// PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.
-//
-//*********************************************************
 
+// 16 byte aligned
 cbuffer RootConstantBuffer : register(b0)
 {
     float4 theTest;
 }
 
+// 256 byte aligned
 cbuffer SceneConstantBuffer : register(b1)
 {
-    float offset;
-    float padding[63];
+    float4x4 Model;
+    float padding[48];
 };
 
 Texture2D g_texture : register(t0);
@@ -29,14 +21,18 @@ struct PSInput
     float2 uv : TEXCOORD;
 };
 
-PSInput VSMain(float4 position : POSITION, float2 uv : TEXCOORD)
+PSInput VSMain(float4 position : POSITION, float3 normal : NORMAL, float2 uv : TEXCOORD)
 {
     PSInput result;
 
     //result.position = position;
     result.uv = uv;
+    result.uv.y = 1 - uv.y;
     result.position = position;
-    //result.position.x += theTest.x;
+    result.position.x += theTest.x;
+    
+    result.position = mul(Model, result.position);
+    
     //result.position.x += offset;
 
     return result;
