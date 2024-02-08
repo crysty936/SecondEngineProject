@@ -146,8 +146,8 @@ ComPtr<ID3D12Resource> m_texture;
 // Constant Buffer
 struct SceneConstantBuffer
 {
-	DirectX::XMFLOAT4 offset;
-	float padding[60]; // Padding so the constant buffer is 256-byte aligned.
+	float offset;
+	float padding[63]; // Padding so the constant buffer is 256-byte aligned.
 };
 static_assert((sizeof(SceneConstantBuffer) % 256) == 0, "Constant Buffer size must be 256-byte aligned");
 
@@ -399,7 +399,7 @@ D3D12RHI::D3D12RHI()
 
 		//////////////////////////////////////////////////////////////////////////
 
- 		D3D12_DESCRIPTOR_RANGE1 rangesVS[1];
+ 		D3D12_DESCRIPTOR_RANGE1 rangesVS[2];
  
  		// Constant Buffer
  		rangesVS[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;
@@ -409,16 +409,16 @@ D3D12RHI::D3D12RHI()
  		rangesVS[0].Flags = D3D12_DESCRIPTOR_RANGE_FLAG_DATA_STATIC;
  		rangesVS[0].OffsetInDescriptorsFromTableStart = 0;
  
- 		D3D12_DESCRIPTOR_RANGE1 rangesPS[1];
+ 		//D3D12_DESCRIPTOR_RANGE1 rangesPS[1];
  		// Texture
- 		rangesPS[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
- 		rangesPS[0].NumDescriptors = 1;
- 		rangesPS[0].BaseShaderRegister = 0;
- 		rangesPS[0].RegisterSpace = 0;
- 		rangesPS[0].Flags = D3D12_DESCRIPTOR_RANGE_FLAG_DATA_STATIC;
- 		rangesPS[0].OffsetInDescriptorsFromTableStart = 0;
+ 		rangesVS[1].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+ 		rangesVS[1].NumDescriptors = 1;
+ 		rangesVS[1].BaseShaderRegister = 0;
+ 		rangesVS[1].RegisterSpace = 0;
+ 		rangesVS[1].Flags = D3D12_DESCRIPTOR_RANGE_FLAG_DATA_STATIC;
+ 		rangesVS[1].OffsetInDescriptorsFromTableStart = 1;
  
- 		D3D12_ROOT_PARAMETER1 rootParameters[3];
+ 		D3D12_ROOT_PARAMETER1 rootParameters[2];
 		rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;
 		rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
 		rootParameters[0].Constants.Num32BitValues = 4;
@@ -426,14 +426,14 @@ D3D12RHI::D3D12RHI()
 		rootParameters[0].Constants.ShaderRegister = 0;
 
  		rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
- 		rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
- 		rootParameters[1].DescriptorTable.NumDescriptorRanges = 1;
+ 		rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+ 		rootParameters[1].DescriptorTable.NumDescriptorRanges = 2;
  		rootParameters[1].DescriptorTable.pDescriptorRanges = &rangesVS[0];
  
- 		rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
- 		rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
- 		rootParameters[2].DescriptorTable.NumDescriptorRanges = 1;
- 		rootParameters[2].DescriptorTable.pDescriptorRanges = &rangesPS[0];
+ 		//rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+ 		//rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+ 		//rootParameters[2].DescriptorTable.NumDescriptorRanges = 1;
+ 		//rootParameters[2].DescriptorTable.pDescriptorRanges = &rangesPS[0];
 
 
 		//////////////////////////////////////////////////////////////////////////
@@ -1080,13 +1080,13 @@ void D3D12RHI::Test()
 	const float translationSpeed = 0.005f;
 	const float offsetBounds = 1.25f;
 
-	float offset = m_constantBufferData.offset.x;
+	float offset = m_constantBufferData.offset;
 	offset += translationSpeed;
 	if (offset > offsetBounds)
 	{
 		offset = -offsetBounds;
 	}
-	m_constantBufferData.offset.x = offset;
+	m_constantBufferData.offset = offset;
 
 	memcpy(m_pCbvDataBegin, &m_constantBufferData, sizeof(m_constantBufferData));
 
@@ -1116,15 +1116,16 @@ void D3D12RHI::Test()
 	m_commandList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
 
 	// First table
-	m_commandList->SetGraphicsRoot32BitConstants(0, 4, &offset, 0);
+	glm::vec4 rootConstant(0.f);
+	rootConstant.x = -offset;
+	m_commandList->SetGraphicsRoot32BitConstants(0, 4, &rootConstant, 0);
 
 	m_commandList->SetGraphicsRootDescriptorTable(1, m_srvHeap->GetGPUDescriptorHandleForHeapStart());
 
 	// Second table
-	//D3D12_GPU_DESCRIPTOR_HANDLE secondTableHandle(m_rtvHeap->GetGPUDescriptorHandleForHeapStart());// Also works with this for some reason
-	D3D12_GPU_DESCRIPTOR_HANDLE secondTableHandle(m_srvHeap->GetGPUDescriptorHandleForHeapStart());
-	secondTableHandle.ptr += size_t(m_srvDescriptorSize);
-	m_commandList->SetGraphicsRootDescriptorTable(2, secondTableHandle); // This does the magic of binding a certain descriptor table to a certain heap with a start index for accessing descriptors
+	//D3D12_GPU_DESCRIPTOR_HANDLE secondTableHandle(m_srvHeap->GetGPUDescriptorHandleForHeapStart());
+	//secondTableHandle.ptr += size_t(m_srvDescriptorSize);
+	//m_commandList->SetGraphicsRootDescriptorTable(2, secondTableHandle); // This does the magic of binding a certain descriptor table to a certain heap with a start index for accessing descriptors
 
 
 	D3D12_RESOURCE_BARRIER transitionPresentToRt;

@@ -16,8 +16,8 @@ cbuffer RootConstantBuffer : register(b0)
 
 cbuffer SceneConstantBuffer : register(b1)
 {
-    float4 offset;
-    float4 padding[15];
+    float offset;
+    float padding[63];
 };
 
 Texture2D g_texture : register(t0);
@@ -36,8 +36,8 @@ PSInput VSMain(float4 position : POSITION, float2 uv : TEXCOORD)
     //result.position = position;
     result.uv = uv;
     result.position = position;
-    result.position.x += theTest.x;
-    result.position.x += offset.x;
+    //result.position.x += theTest.x;
+    //result.position.x += offset;
 
     return result;
 }
