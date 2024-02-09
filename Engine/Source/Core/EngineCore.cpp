@@ -100,7 +100,6 @@ void EngineCore::Terminate()
 	TimersManager::Terminate();
 	//Renderer::Terminate();// RHIWorkDisabled
 
-
 	for (PluginAndName& container : GetInternalPluginsList())
 	{
 		container.Plugin->Shutdown();
@@ -156,10 +155,10 @@ void EngineCore::Run()
 		TimersManager::Get().TickTimers(CurrentDeltaT);
 
 		RHI::Get()->ImGuiBeginFrame();
- 		//ImGui_ImplWin32_NewFrame();// RHIWorkDisabled
- 		//ImGui::NewFrame();// RHIWorkDisabled
+ 		ImGui_ImplWin32_NewFrame();// RHIWorkDisabled
+ 		ImGui::NewFrame();// RHIWorkDisabled
  
- 		//ImGui::ShowDemoWindow();
+ 		ImGui::ShowDemoWindow();
 
  		//SceneManager::Get().GetCurrentScene().TickObjects(CurrentDeltaT);// RHIWorkDisabled
  		//SceneManager::Get().GetCurrentScene().DisplayObjects();// RHIWorkDisabled
@@ -170,6 +169,7 @@ void EngineCore::Run()
 		GEditor->Tick(CurrentDeltaT);
 
 		//Renderer::Get().Draw();// RHIWorkDisabled
+		RHI::Get()->Test();
 
  		for (PluginAndName& container : GetInternalPluginsList())
  		{
@@ -177,19 +177,12 @@ void EngineCore::Run()
  		}
 
 		 //Draw ImGui
-		//ImGui::EndFrame();// RHIWorkDisabled
-		//ImGui::Render();// RHIWorkDisabled
+		ImGui::EndFrame();
+		ImGui::Render();
 		RHI::Get()->ImGuiRenderDrawData();
 
-		 //Update and Render additional Platform windows
- 		//if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)// RHIWorkDisabled
- 		//{
- 		//	ImGui::UpdatePlatformWindows();
- 		//	ImGui::RenderPlatformWindowsDefault();
- 		//}
-
 		//Renderer::Get().Present();// RHIWorkDisabled
-		RHI::Get()->Test();
+		RHI::Get()->SwapBuffers();
 
 		CheckShouldCloseWindow();
 

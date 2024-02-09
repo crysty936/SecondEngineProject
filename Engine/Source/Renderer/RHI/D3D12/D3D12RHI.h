@@ -14,4 +14,16 @@ public:
 	void MoveToNextFrame();
 	void Test() override;
 
+
+	void ImGuiInit() override;
+
+
+	void ImGuiBeginFrame() override;
+
+
+	void ImGuiRenderDrawData() override;
+
+
+	void SwapBuffers() override;
+
 };

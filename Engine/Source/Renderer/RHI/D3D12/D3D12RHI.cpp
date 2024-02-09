@@ -6,8 +6,9 @@
 #include "Window/WindowsWindow.h"
 #include "Utils/IOUtils.h"
 
+// Exclude rarely-used stuff from Windows headers.
 #ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers.
+#define WIN32_LEAN_AND_MEAN             
 #endif
 
 #include <windows.h>
@@ -18,6 +19,7 @@
 #include <wrl/client.h>
 #include <DirectXMath.h>
 //#include "glm/ext/vector_common.inl"
+#include "glm/ext/matrix_clip_space.inl"
 #include "glm/glm.hpp"
 #include "glm/ext/matrix_transform.hpp"
 
@@ -25,6 +27,9 @@
 #include "DirectXTex.h"
 #include "Utils/ImageLoading.h"
 #include "Renderer/Drawable/ShapesUtils/BasicShapesData.h"
+#include "imgui.h"
+#include "backends/imgui_impl_win32.h"
+#include "backends/imgui_impl_dx12.h"
 
 
 using Microsoft::WRL::ComPtr;
@@ -111,19 +116,27 @@ inline bool DXAssert(HRESULT inRez)
 	return success;
 }
 
-static const UINT FrameCount = 2;
+static const UINT NumFramesInFlight = 2;
 
 // Pipeline objects.
 D3D12_VIEWPORT m_viewport;
 D3D12_RECT m_scissorRect;
 ComPtr<IDXGISwapChain3> m_swapChain;
 ComPtr<ID3D12Device> m_device;
-ComPtr<ID3D12Resource> m_renderTargets[FrameCount];
-ComPtr<ID3D12CommandAllocator> m_commandAllocators[FrameCount];
+ComPtr<ID3D12Resource> m_renderTargets[NumFramesInFlight];
+ComPtr<ID3D12CommandAllocator> m_commandAllocators[NumFramesInFlight];
 ComPtr<ID3D12CommandQueue> m_commandQueue;
+
+// Root signature
 ComPtr<ID3D12RootSignature> m_rootSignature;
+
+
+// Descriptor Heaps
 ComPtr<ID3D12DescriptorHeap> m_rtvHeap;
 ComPtr<ID3D12DescriptorHeap> m_cbvsrvHeap;
+ComPtr<ID3D12DescriptorHeap> m_imguiCbvSrvHeap;
+
+
 ComPtr<ID3D12PipelineState> m_pipelineState;
 ComPtr<ID3D12GraphicsCommandList> m_commandList;
 UINT m_rtvDescriptorSize;
@@ -141,7 +154,8 @@ ComPtr<ID3D12Resource> m_texture;
 struct SceneConstantBuffer
 {
 	glm::mat4 Model;
-	float padding[48]; // Padding so the constant buffer is 256-byte aligned.
+	glm::mat4 Projection;
+	float padding[32]; // Padding so the constant buffer is 256-byte aligned.
 };
 static_assert((sizeof(SceneConstantBuffer) % 256) == 0, "Constant Buffer size must be 256-byte aligned");
 
@@ -160,7 +174,7 @@ ComPtr<ID3D12Fence> m_fence;
 #define FRAME_BUFFERING 0
 
 #if FRAME_BUFFERING
-UINT64 m_fenceValues[FrameCount];
+UINT64 m_fenceValues[NumFramesInFlight];
 #else
 UINT64 m_fenceValue;
 #endif
@@ -216,7 +230,7 @@ void InitPipeline()
 
 	// Describe and create the swap chain.
 	DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
-	swapChainDesc.BufferCount = FrameCount;
+	swapChainDesc.BufferCount = NumFramesInFlight;
 	swapChainDesc.Width = props.Width;
 	swapChainDesc.Height = props.Height;
 	swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -242,7 +256,7 @@ void InitPipeline()
 	{
 		// Describe and create a render target view (RTV) descriptor heap.
 		D3D12_DESCRIPTOR_HEAP_DESC rtvHeapDesc = {};
-		rtvHeapDesc.NumDescriptors = FrameCount;
+		rtvHeapDesc.NumDescriptors = NumFramesInFlight;
 		rtvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
 		rtvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 		DXAssert(m_device->CreateDescriptorHeap(&rtvHeapDesc, IID_PPV_ARGS(&m_rtvHeap)));
@@ -275,7 +289,7 @@ void InitPipeline()
 		D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle(m_rtvHeap->GetCPUDescriptorHandleForHeapStart());
 
 		// Create a RTV for each frame.
-		for (UINT n = 0; n < FrameCount; n++)
+		for (UINT n = 0; n < NumFramesInFlight; n++)
 		{
 			DXAssert(m_swapChain->GetBuffer(n, IID_PPV_ARGS(&m_renderTargets[n])));
 			m_device->CreateRenderTargetView(m_renderTargets[n].Get(), nullptr, rtvHandle);
@@ -1119,16 +1133,17 @@ void D3D12RHI::Test()
 	modelMatrix = glm::translate(modelMatrix, glm::vec3(StaticOffset, 0.f, 0.2f));
 	modelMatrix = glm::rotate(modelMatrix, StaticOffset * StaticOffset, glm::vec3(0.f, 1.f, 0.f));
 	modelMatrix = glm::scale(modelMatrix, glm::vec3(0.1f, 0.1f, 0.1f));
-
-
-	//const float windowWidth = static_cast<float>(GEngine->GetMainWindow().GetProperties().Width);
-	//const float windowHeight = static_cast<float>(GEngine->GetMainWindow().GetProperties().Height);
-	//glm::mat4 projection = glm::perspectiveRH_ZO(glm::radians(CAMERA_FOV), windowWidth / windowHeight, CAMERA_NEAR, CAMERA_FAR);
-
-
-
-
 	m_constantBufferData.Model = modelMatrix;
+
+
+	const float windowWidth = static_cast<float>(GEngine->GetMainWindow().GetProperties().Width);
+	const float windowHeight = static_cast<float>(GEngine->GetMainWindow().GetProperties().Height);
+	const float CAMERA_FOV = 45.f;
+	const float CAMERA_NEAR = 0.1f;
+	const float CAMERA_FAR = 10000.f;
+	glm::mat4 projection = glm::perspectiveLH_ZO(glm::radians(CAMERA_FOV), windowWidth / windowHeight, CAMERA_NEAR, CAMERA_FAR);
+
+	m_constantBufferData.Projection = projection;
 
 	memcpy(m_pCbvDataBegin, &m_constantBufferData, sizeof(m_constantBufferData));
 
@@ -1192,10 +1207,105 @@ void D3D12RHI::Test()
 	m_commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	m_commandList->IASetVertexBuffers(0, 1, &m_vertexBufferView);
 	m_commandList->IASetIndexBuffer(&m_indexBufferView);
-	//m_commandList->DrawInstanced(3, 1, 0, 0);
+
 	m_commandList->DrawIndexedInstanced(BasicShapesData::GetCubeIndicesCount(), 1, 0, 0, 0);
 
+//	// Set the imgui descriptor heap
+//	ID3D12DescriptorHeap* imguiHeaps[] = { m_imguiCbvSrvHeap.Get() };
+//	m_commandList->SetDescriptorHeaps(1, imguiHeaps);
+//
+//	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), m_commandList.Get());
+//
+//	D3D12_RESOURCE_BARRIER transitionRtToPresent;
+//	transitionRtToPresent.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+//	transitionRtToPresent.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+//	transitionRtToPresent.Transition.pResource = m_renderTargets[m_frameIndex].Get();
+//	transitionRtToPresent.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+//	transitionRtToPresent.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
+//	transitionRtToPresent.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+//
+//	// Indicate that the back buffer will now be used to present.
+//	m_commandList->ResourceBarrier(1, &transitionRtToPresent);
+//
+//	DXAssert(m_commandList->Close());
+//
+//	ID3D12CommandList* commandLists[] = { m_commandList.Get() };
+//	m_commandQueue->ExecuteCommandLists(1, commandLists);
+//
+//	if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+//	{
+//		ImGui::UpdatePlatformWindows();
+//		ImGui::RenderPlatformWindowsDefault(nullptr, (void*)m_commandList.Get());
+//	}
+//
+//	m_swapChain->Present(1, 0);
+//
+//#if FRAME_BUFFERING
+//	MoveToNextFrame();
+//#else
+//	WaitForPreviousFrame();
+//#endif
 
+}
+
+
+void D3D12RHI::ImGuiInit()
+{
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+	ImGui::StyleColorsDark();
+
+	ImGuiStyle& style = ImGui::GetStyle();
+	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+	{
+		style.WindowRounding = 0.0f;
+		style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+	}
+
+	ImGui_ImplWin32_Init(static_cast<HWND>(GEngine->GetMainWindow().GetHandle()));
+
+// 	ID3D12Device* device, int num_frames_in_flight, DXGI_FORMAT rtv_format, ID3D12DescriptorHeap* cbv_srv_heap,
+// 		D3D12_CPU_DESCRIPTOR_HANDLE font_srv_cpu_desc_handle, D3D12_GPU_DESCRIPTOR_HANDLE font_srv_gpu_desc_handle);
+
+	D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
+	srvHeapDesc.NumDescriptors = 1;
+	srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+	srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+	DXAssert(m_device->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&m_imguiCbvSrvHeap)));
+
+	D3D12_CPU_DESCRIPTOR_HANDLE fontSrvCpuHandle = m_imguiCbvSrvHeap->GetCPUDescriptorHandleForHeapStart();
+	D3D12_GPU_DESCRIPTOR_HANDLE fontSrvGpuHandle = m_imguiCbvSrvHeap->GetGPUDescriptorHandleForHeapStart();
+
+	ID3D12Device* device = m_device.Get();
+	DXGI_FORMAT format = DXGI_FORMAT::DXGI_FORMAT_R8G8B8A8_UNORM;
+
+
+	bool success = ImGui_ImplDX12_Init(device, NumFramesInFlight, format, m_imguiCbvSrvHeap.Get(), fontSrvCpuHandle, fontSrvGpuHandle);
+
+	ASSERT(success);
+
+}
+
+void D3D12RHI::ImGuiBeginFrame()
+{
+	ImGui_ImplDX12_NewFrame();
+}
+
+void D3D12RHI::ImGuiRenderDrawData()
+{
+	// Set the imgui descriptor heap
+	ID3D12DescriptorHeap* imguiHeaps[] = { m_imguiCbvSrvHeap.Get() };
+	m_commandList->SetDescriptorHeaps(1, imguiHeaps);
+
+	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), m_commandList.Get());
+}
+
+void D3D12RHI::SwapBuffers()
+{
 	D3D12_RESOURCE_BARRIER transitionRtToPresent;
 	transitionRtToPresent.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 	transitionRtToPresent.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
@@ -1203,7 +1313,6 @@ void D3D12RHI::Test()
 	transitionRtToPresent.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	transitionRtToPresent.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
 	transitionRtToPresent.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-
 
 	// Indicate that the back buffer will now be used to present.
 	m_commandList->ResourceBarrier(1, &transitionRtToPresent);
@@ -1213,7 +1322,14 @@ void D3D12RHI::Test()
 	ID3D12CommandList* commandLists[] = { m_commandList.Get() };
 	m_commandQueue->ExecuteCommandLists(1, commandLists);
 
+	if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+	{
+		ImGui::UpdatePlatformWindows();
+		ImGui::RenderPlatformWindowsDefault(nullptr, (void*)m_commandList.Get());
+	}
+
 	m_swapChain->Present(1, 0);
+
 
 #if FRAME_BUFFERING
 	MoveToNextFrame();
