@@ -10,7 +10,8 @@ cbuffer SceneConstantBuffer : register(b1)
 {
     float4x4 Model;
     float4x4 Projection;
-    float padding[32];
+    float4x4 View;
+    float padding[16];
 };
 
 Texture2D g_texture : register(t0);
@@ -32,7 +33,8 @@ PSInput VSMain(float4 position : POSITION, float3 normal : NORMAL, float2 uv : T
 
     result.position = mul(Model, position);
 
-    result.position = mul(Projection, position);
+    result.position = mul(View, result.position);
+    result.position = mul(Projection, result.position);
     
     //result.position.x += offset;
 

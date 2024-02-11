@@ -19,7 +19,7 @@
 #include <wrl/client.h>
 #include <DirectXMath.h>
 //#include "glm/ext/vector_common.inl"
-#include "glm/ext/matrix_clip_space.inl"
+#include "glm/ext/matrix_clip_space.hpp"
 #include "glm/glm.hpp"
 #include "glm/ext/matrix_transform.hpp"
 
@@ -30,6 +30,11 @@
 #include "imgui.h"
 #include "backends/imgui_impl_win32.h"
 #include "backends/imgui_impl_dx12.h"
+
+#include "Scene/SceneManager.h"
+
+#include "Scene/Scene.h"
+#include "Camera/Camera.h"
 
 
 using Microsoft::WRL::ComPtr;
@@ -155,7 +160,8 @@ struct SceneConstantBuffer
 {
 	glm::mat4 Model;
 	glm::mat4 Projection;
-	float padding[32]; // Padding so the constant buffer is 256-byte aligned.
+	glm::mat4 View;
+	float padding[16]; // Padding so the constant buffer is 256-byte aligned.
 };
 static_assert((sizeof(SceneConstantBuffer) % 256) == 0, "Constant Buffer size must be 256-byte aligned");
 
@@ -561,10 +567,10 @@ D3D12RHI::D3D12RHI()
 	// Rasterizer State
 	D3D12_RASTERIZER_DESC rastState;
 	rastState.FillMode = D3D12_FILL_MODE_SOLID;
-	//rastState.CullMode = D3D12_CULL_MODE_BACK;
-	rastState.CullMode = D3D12_CULL_MODE_FRONT;
-	//rastState.FrontCounterClockwise = FALSE;
+	rastState.CullMode = D3D12_CULL_MODE_BACK;
+	//rastState.CullMode = D3D12_CULL_MODE_FRONT;
 	rastState.FrontCounterClockwise = false;
+	//rastState.FrontCounterClockwise = true;
 	rastState.DepthBias = D3D12_DEFAULT_DEPTH_BIAS;
 	rastState.DepthBiasClamp = D3D12_DEFAULT_DEPTH_BIAS_CLAMP;
 	rastState.SlopeScaledDepthBias = D3D12_DEFAULT_SLOPE_SCALED_DEPTH_BIAS;
@@ -1119,6 +1125,12 @@ void D3D12RHI::MoveToNextFrame()
 
 void D3D12RHI::Test()
 {
+	ImGui::Begin("D3D12 Test Settings");
+	static glm::vec3 translation(0.f, 0.f, 2.f);
+	ImGui::DragFloat3("Obj Translation", &translation.x, 0.1f);
+
+	ImGui::End();
+
 	const float translationSpeed = 0.005f;
 	const float offsetBounds = 1.25f;
 
@@ -1129,21 +1141,25 @@ void D3D12RHI::Test()
 	}
 
 	glm::mat4 modelMatrix(1.f);
-	//modelMatrix = glm::translate(modelMatrix, glm::vec3(StaticOffset, 0.f, 0.f));
-	modelMatrix = glm::translate(modelMatrix, glm::vec3(StaticOffset, 0.f, 0.2f));
+	modelMatrix = glm::translate(modelMatrix, translation);
 	modelMatrix = glm::rotate(modelMatrix, StaticOffset * StaticOffset, glm::vec3(0.f, 1.f, 0.f));
 	modelMatrix = glm::scale(modelMatrix, glm::vec3(0.1f, 0.1f, 0.1f));
 	m_constantBufferData.Model = modelMatrix;
-
 
 	const float windowWidth = static_cast<float>(GEngine->GetMainWindow().GetProperties().Width);
 	const float windowHeight = static_cast<float>(GEngine->GetMainWindow().GetProperties().Height);
 	const float CAMERA_FOV = 45.f;
 	const float CAMERA_NEAR = 0.1f;
 	const float CAMERA_FAR = 10000.f;
+
 	glm::mat4 projection = glm::perspectiveLH_ZO(glm::radians(CAMERA_FOV), windowWidth / windowHeight, CAMERA_NEAR, CAMERA_FAR);
 
 	m_constantBufferData.Projection = projection;
+
+	//glm::lookAt()
+	const glm::mat4 view = SceneManager::Get().GetCurrentScene().GetCurrentCamera()->GetLookAt();
+
+	m_constantBufferData.View = view;
 
 	memcpy(m_pCbvDataBegin, &m_constantBufferData, sizeof(m_constantBufferData));
 
@@ -1209,42 +1225,6 @@ void D3D12RHI::Test()
 	m_commandList->IASetIndexBuffer(&m_indexBufferView);
 
 	m_commandList->DrawIndexedInstanced(BasicShapesData::GetCubeIndicesCount(), 1, 0, 0, 0);
-
-//	// Set the imgui descriptor heap
-//	ID3D12DescriptorHeap* imguiHeaps[] = { m_imguiCbvSrvHeap.Get() };
-//	m_commandList->SetDescriptorHeaps(1, imguiHeaps);
-//
-//	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), m_commandList.Get());
-//
-//	D3D12_RESOURCE_BARRIER transitionRtToPresent;
-//	transitionRtToPresent.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-//	transitionRtToPresent.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-//	transitionRtToPresent.Transition.pResource = m_renderTargets[m_frameIndex].Get();
-//	transitionRtToPresent.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-//	transitionRtToPresent.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
-//	transitionRtToPresent.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-//
-//	// Indicate that the back buffer will now be used to present.
-//	m_commandList->ResourceBarrier(1, &transitionRtToPresent);
-//
-//	DXAssert(m_commandList->Close());
-//
-//	ID3D12CommandList* commandLists[] = { m_commandList.Get() };
-//	m_commandQueue->ExecuteCommandLists(1, commandLists);
-//
-//	if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-//	{
-//		ImGui::UpdatePlatformWindows();
-//		ImGui::RenderPlatformWindowsDefault(nullptr, (void*)m_commandList.Get());
-//	}
-//
-//	m_swapChain->Present(1, 0);
-//
-//#if FRAME_BUFFERING
-//	MoveToNextFrame();
-//#else
-//	WaitForPreviousFrame();
-//#endif
 
 }
 

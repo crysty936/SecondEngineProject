@@ -335,8 +335,9 @@ void TestGameMode::Init()
 	// Push camera back a bit
 	if (TransformObjPtr parentShared = GameCamera->GetParent().lock())
 	{
+		//parentShared->LookAt(glm::vec3()
 		// Move the camera parent
-		parentShared->Move(glm::vec3(0.f, 0.f, 8.f));
+		//parentShared->Move(glm::vec3(0.f, 0.f, 8.f));
 		//parentShared->Move(glm::vec3(8.f, 18.f, -9.f));
 		//parentShared->SetRotationDegrees(glm::vec3(-180.f, -80.f, -180.f));
 		//GameCamera->SetRotationDegrees(glm::vec3(-25.f, 0.f, 0.f));

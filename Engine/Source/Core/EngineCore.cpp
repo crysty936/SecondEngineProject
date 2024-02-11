@@ -155,10 +155,10 @@ void EngineCore::Run()
 		TimersManager::Get().TickTimers(CurrentDeltaT);
 
 		RHI::Get()->ImGuiBeginFrame();
- 		ImGui_ImplWin32_NewFrame();// RHIWorkDisabled
- 		ImGui::NewFrame();// RHIWorkDisabled
+ 		ImGui_ImplWin32_NewFrame();
+ 		ImGui::NewFrame();
  
- 		ImGui::ShowDemoWindow();
+ 		//ImGui::ShowDemoWindow();
 
  		//SceneManager::Get().GetCurrentScene().TickObjects(CurrentDeltaT);// RHIWorkDisabled
  		//SceneManager::Get().GetCurrentScene().DisplayObjects();// RHIWorkDisabled
