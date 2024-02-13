@@ -50,7 +50,6 @@ DeferredRenderer::DeferredRenderer(const WindowProperties& inMainWindowPropertie
 DeferredRenderer::~DeferredRenderer() = default;
 
 static eastl::shared_ptr<RHIFrameBuffer> GBuffer = nullptr;
-static eastl::shared_ptr<RHITexture2D> GlobalRenderTexture = nullptr;
 static eastl::shared_ptr<RHITexture2D> GBufferDepth = nullptr;
 static eastl::shared_ptr<RHITexture2D> GBufferNormal = nullptr;
 static eastl::shared_ptr<RHITexture2D> GBufferAlbedo = nullptr;
@@ -68,8 +67,6 @@ void DeferredRenderer::InitInternal()
 	const WindowProperties& props = currentWindow.GetProperties();
 
 	GBuffer = RHI::Get()->CreateEmptyFrameBuffer();
-	GlobalRenderTexture = RHI::Get()->CreateRenderTexture(props.Width, props.Height, ERHITexturePrecision::Float16, ERHITextureFilter::Nearest);
-	//RHI::Get()->AttachTextureToFramebufferColor(*GBuffer, *GlobalRenderTexture);
 
 	GBufferDepth = RHI::Get()->CreateDepthMap(props.Width, props.Height);
 
@@ -116,209 +113,12 @@ void DeferredRenderer::InitInternal()
 	DefaultPBRShadingModelQuad->GetCommand().Material->ExternalTextures.push_back(GBufferMetallicRoughness);
 	DefaultPBRShadingModelQuad->GetCommand().Material->ExternalTextures.push_back(GBufferDepth);
 	DefaultPBRShadingModelQuad->CreateCommand();
-
-	PostInitCallback& postInitMulticast = GEngine->GetPostInitMulticast();
-	//postInitMulticast.BindRaw(this, &DeferredRenderer::InitGI);
-}
-
-static glm::vec3 NormalizedDirLightDir = glm::vec3(0.f, 1.f, 0.f);
-
-bool DeferredRenderer::TriangleTrace(const PathTracingRay& inRay, PathTracePayload& outPayload, glm::vec3& outColor)
-{
-	bool bHit = false;
-	for (const RenderCommand& command : MainCommands)
-	{
-		if (command.Triangles.size() == 0)
-		{
-			continue;
-		}
-
-		PathTracePayload currMeshPayload;
-		if (command.AccStructure.Trace(inRay, currMeshPayload))
-		{
-			bHit = true;
-			if (currMeshPayload.Distance < outPayload.Distance)
-			{
-				outPayload = currMeshPayload;
-				outColor = command.OverrideColor;
-			}
-		}
-	}
-
-	return bHit;
-}
-
-void DeferredRenderer::InitGI()
-{
-	SHSample* samples = new SHSample[SH_TOTAL_SAMPLE_COUNT];
-	SphericalHarmonics::InitSamples(samples);
-
-	int sceneCoeffCount = 0;
-	for (RenderCommand& command : MainCommands)
-	{
-
-		// Precache transforms
-		if (command.Triangles.size() == 0)
-		{
-			continue;
-		}
-
-		const eastl::shared_ptr<const DrawableObject> parent = command.Parent.lock();
-		glm::mat4 model = parent->GetModelMatrix();
-
-		if (!command.AccStructure.IsValid())
-		{
-			eastl::vector<PathTraceTriangle> transformedTriangles = command.Triangles;
-			for (PathTraceTriangle& triangle : transformedTriangles)
-			{
-				triangle.Transform(model);
-			}
-			command.AccStructure.Build(transformedTriangles);
-		}
-
-		// Each vertex has its own SH Probe and SH_COEFFICIENT_COUNT coefficients
-		command.TransferCoeffs.resize(command.Vertices.size() * SH_COEFFICIENT_COUNT);
-	}
-
-	for (RenderCommand& command : MainCommands)
-	{
-		//Ray ray;
-		//// Iterate over vertices
-		//for (int v = 0; v < vertex_count; v++)
-		//{
-		//	// Initialize SH coefficients to 0
-		//	for (int i = 0; i < transfer_coeff_count; i++)
-		//	{
-		//		transfer_coeffs[v * transfer_coeff_count + i] = glm::vec3(0.0f, 0.0f, 0.0f);
-		//	}
-
-		//	// Iterate over SH samples
-		//	for (int s = 0; s < SAMPLE_COUNT; s++)
-		//	{
-		//		float dot = glm::dot(mesh_data->vertices[v].normal, samples[s].direction);
-
-		//		// Only accept samples within the hemisphere defined by the Vertex normal
-		//		if (dot >= 0.0f)
-		//		{
-		//			ray.origin = mesh_data->vertices[v].position + mesh_data->vertices[v].normal * EPSILON;
-		//			ray.direction = samples[s].direction;
-
-		//			bool hit = scene.intersects(ray);
-		//			hits[v * SAMPLE_COUNT + s] = hit;
-
-		//			// If the Ray was not occluded
-		//			if (!hit)
-		//			{
-		//				switch (material.shader.type)
-		//				{
-		//					// For diffuse materials, compose the transfer vector.
-		//					// This vector includes the BDRF, incorporating the albedo colour, a lambertian diffuse factor (dot) and a SH sample
-		//				case MeshShader::Type::DIFFUSE:
-		//				{
-		//					for (int i = 0; i < SH_COEFFICIENT_COUNT; i++)
-		//					{
-		//						// Add the contribution of this sample
-		//						transfer_coeffs[v * SH_COEFFICIENT_COUNT + i] += material.albedo * dot * samples[s].coeffs[i];
-		//					}
-		//				} break;
-
-		//				//// For glossy materials, compose the transfer matrix.
-		//				//// This matrix does not include the BDRF, incorporating only two SH samples
-		//				//case MeshShader::Type::GLOSSY: {
-		//				//	for (int j = 0; j < SH_COEFFICIENT_COUNT; j++) {
-		//				//		for (int i = 0; i < SH_COEFFICIENT_COUNT; i++) {
-		//				//			// Add the contribution of this sample
-		//				//			transfer_coeffs[(v * SH_COEFFICIENT_COUNT + j) * SH_COEFFICIENT_COUNT + i] += samples[s].coeffs[j] * samples[s].coeffs[i];
-		//				//		}
-		//				//	}
-		//				//} break;
-		//				}
-		//			}
-		//		}
-		//		else
-		//		{
-		//			hits[v * SAMPLE_COUNT + s] = false;
-		//		}
-		//	}
-
-		//	const float normalization_factor = 4.0f * PI / SAMPLE_COUNT;
-
-		//	// Normalize coefficients
-		//	for (int i = 0; i < transfer_coeff_count; i++) {
-		//		transfer_coeffs[v * transfer_coeff_count + i] *= normalization_factor;
-		//	}
-		//}
-
-		PathTracingRay traceRay;
-		PathTracePayload payload;
-		glm::vec3 color;
-
-		for (int32_t v = 0; v < command.Vertices.size(); ++v)
-		{
-			const Vertex& vert = command.Vertices[v];
-			// For each vertex, evaluate all samples of its SH Sphere
-
-
-			for (int s = 0; s < SH_TOTAL_SAMPLE_COUNT; s++)
-			{
-				float dot = glm::dot(vert.Normal, samples[s].Direction);
-				// Proceed only with samples within the hemisphere defined by the Vertex Normal
-				// all other samples will be 0
-				if (dot >= 0.0f)
-				{
-					traceRay.Origin = vert.Position + vert.Normal * 0.001f;
-					traceRay.Direction = samples[s].Direction;
-
-					bool hit = TriangleTrace(traceRay, payload, color);
-
-					// If the Ray was not occluded
-					if (!hit)
-					{
-						// For diffuse materials, compose the transfer vector.
-						// This vector includes the BDRF, incorporating the albedo colour, a lambertian diffuse factor (dot) and a SH sample
-						for (int i = 0; i < SH_COEFFICIENT_COUNT; i++)
-						{
-							// Add the contribution of this sample
-							//transfer_coeffs[v * SH_COEFFICIENT_COUNT + i] += material.albedo * dot * samples[s].coeffs[i];
-							command.TransferCoeffs[v * SH_COEFFICIENT_COUNT + i] += color * dot * samples[s].Coeffs[i];
-						}
-					}
-				}
-			}
-
-			// Probability to sample any point on the surface of the unit sphere is the same for all samples,
-			// meaning that the weighting function is 1/surface area of unit sphere which is 4*PI => probability function p(x) is 1/(4*PI).
-			// => The constant weighting function which we need to multiply our Coeffs by is 1 / p(x) = 4 * PI
-			
-			// Monte Carlo sampling means that we need to normalize all coefficients by N
-			// => normalization factor of (4 * PI) / N multiplied with the Sum of samples.
-
-			const float normalization_factor = 4.0f * PI / SH_TOTAL_SAMPLE_COUNT;
-
-			// Normalize coefficients
-			for (int i = 0; i < SH_COEFFICIENT_COUNT; i++) {
-				command.TransferCoeffs[v * SH_COEFFICIENT_COUNT + i] *= normalization_factor;
-			}
-		}
-
-
-
-
-
-	}
-
-
-
-
-
-
 }
 
 static bool bBVHDebugDraw = false;
 static void DisplaySettings()
 {
 	ImGui::Checkbox("BVH Debug Draw", &bBVHDebugDraw);
-
 }
 
 void DeferredRenderer::Draw()
@@ -468,6 +268,7 @@ void DeferredRenderer::SetLightingConstants()
 		//UniformsCache["ViewDir"] = cameraForward;
 	}
 
+	static glm::vec3 CachedDirLightDir = glm::vec3(0.f, 1.f, 0.f);
 	const bool useDirLight = dirLights.size() > 0;
 	UniformsCache["bUseDirLight"] = (int32_t)useDirLight;
 
@@ -476,7 +277,7 @@ void DeferredRenderer::SetLightingConstants()
 		const eastl::shared_ptr<LightSource>& dirLight = dirLights[0];
 
 		const glm::vec3 dir = dirLight->GetAbsoluteTransform().Rotation * glm::vec3(0.f, 0.f, 1.f);
-		NormalizedDirLightDir = glm::normalize(dir);
+		CachedDirLightDir = glm::normalize(dir);
 
 		UniformsCache["DirectionalLightDirection"] = glm::normalize(dir);
 	}
@@ -808,46 +609,6 @@ void DeferredRenderer::DrawCommand(const RenderCommand& inCommand)
 	UniformsCache["ObjPos"] = parent->GetAbsoluteTransform().Translation;
 
 	UniformsCache["OverrideColor"] = inCommand.OverrideColor;
-
-	// Path Tracing Debug
-
-	//if (bBVHDebugDraw && inCommand.Triangles.size() != 0)
-	//{
-	//	RenderCommand& nonConstCommand = const_cast<RenderCommand&>(inCommand);
-	//	if (!nonConstCommand.AccStructure.IsValid())
-	//	{
-	//		eastl::vector<PathTraceTriangle> transformedTriangles = nonConstCommand.Triangles;
-	//		for (PathTraceTriangle& triangle : transformedTriangles)
-	//		{
-	//			triangle.Transform(model);
-	//		}
-
-	//		nonConstCommand.AccStructure.Build(transformedTriangles);
-	//	}
-
-	//	//// TEST
-	//	//// draw centers of all triangles and center of all combined
-	//	//const float InvTriangleCount = inCommand.Triangles.size();
-	//	//glm::vec3 center = glm::vec3(0.f, 0.f, 0.f);
-	//	//for (const PathTraceTriangle& triangle : inCommand.Triangles)
-	//	//{
-	//	//	glm::vec3 triangleCenter = (triangle.V[0] + triangle.V[1] + triangle.V[2]) * 0.3333333333333333333333f;
-	//	//	
-	//	//	DrawDebugHelpers::DrawDebugPoint(triangleCenter, 0.03f, glm::vec3(1.f, 0.f, 0.f));
-
-	//	//	center += triangleCenter * InvTriangleCount;
-
-
-
-	//	//}
-	//	//
-	//	//DrawDebugHelpers::DrawDebugPoint(center, 0.1f);
-
-
-	//	nonConstCommand.AccStructure.Root->DebugDraw();
-	//}
-
-	// Path Tracing Debug
 
 	{
 		int texNr = 0;

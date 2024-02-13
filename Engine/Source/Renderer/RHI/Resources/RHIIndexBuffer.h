@@ -5,6 +5,7 @@
 class RHIIndexBuffer : public RHIBufferBase
 {
 public:
+	RHIIndexBuffer();
 	RHIIndexBuffer(int32_t inIndicesCount);
 
 public:

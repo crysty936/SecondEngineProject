@@ -1,4 +1,16 @@
 
+struct PSInput
+{
+    float4 position : SV_POSITION;
+    float2 uv : TEXCOORD;
+};
+
+struct PSOutput
+{
+    float4 Color : SV_TARGET0;
+};
+
+
 // 16 byte aligned
 cbuffer RootConstantBuffer : register(b0)
 {
@@ -17,11 +29,6 @@ cbuffer SceneConstantBuffer : register(b1)
 Texture2D g_texture : register(t0);
 SamplerState g_sampler : register(s0);
 
-struct PSInput
-{
-    float4 position : SV_POSITION;
-    float2 uv : TEXCOORD;
-};
 
 PSInput VSMain(float4 position : POSITION, float3 normal : NORMAL, float2 uv : TEXCOORD)
 {
@@ -41,7 +48,10 @@ PSInput VSMain(float4 position : POSITION, float3 normal : NORMAL, float2 uv : T
     return result;
 }
 
-float4 PSMain(PSInput input) : SV_TARGET
+PSOutput PSMain(PSInput input)
 {
-    return g_texture.Sample(g_sampler, input.uv);
+    PSOutput output;
+    output.Color = g_texture.Sample(g_sampler, input.uv);
+
+    return output;
 }

@@ -5,3 +5,9 @@ RHIIndexBuffer::RHIIndexBuffer(int32_t inIndicesCount)
 {
 
 }
+
+RHIIndexBuffer::RHIIndexBuffer()
+	: RHIBufferBase(RHIBufferType::Index)
+{
+
+}

@@ -26,4 +26,9 @@ public:
 
 	void SwapBuffers() override;
 
+
+
+
+	eastl::shared_ptr<class RHIIndexBuffer> CreateIndexBuffer(const uint32_t* inData, uint32_t inCount) override;
+
 };

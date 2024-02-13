@@ -35,6 +35,9 @@
 
 #include "Scene/Scene.h"
 #include "Camera/Camera.h"
+#include "D3D12Utility.h"
+#include "D3D12GraphicsTypes_Internal.h"
+#include "D3D12Resources.h"
 
 
 using Microsoft::WRL::ComPtr;
@@ -113,45 +116,34 @@ void GetHardwareAdapter(
 }
 
 
-inline bool DXAssert(HRESULT inRez)
-{
-	const bool success = SUCCEEDED(inRez);
-	ASSERT_MSG(success, "Direct3D12 Operation failed with code 0x%08X", static_cast<uint32_t>(inRez));
-
-	return success;
-}
-
 static const UINT NumFramesInFlight = 2;
 
 // Pipeline objects.
 D3D12_VIEWPORT m_viewport;
 D3D12_RECT m_scissorRect;
 ComPtr<IDXGISwapChain3> m_swapChain;
-ComPtr<ID3D12Device> m_device;
+
+
 ComPtr<ID3D12Resource> m_renderTargets[NumFramesInFlight];
+ComPtr<ID3D12Resource> m_DeferredRenderTargets[NumFramesInFlight];
+
 ComPtr<ID3D12CommandAllocator> m_commandAllocators[NumFramesInFlight];
 ComPtr<ID3D12CommandQueue> m_commandQueue;
 
 // Root signature
 ComPtr<ID3D12RootSignature> m_rootSignature;
 
-
 // Descriptor Heaps
-ComPtr<ID3D12DescriptorHeap> m_rtvHeap;
-ComPtr<ID3D12DescriptorHeap> m_cbvsrvHeap;
-ComPtr<ID3D12DescriptorHeap> m_imguiCbvSrvHeap;
-
+DescriptorHeap m_rtvHeap;
+DescriptorHeap m_cbvsrvHeap;
 
 ComPtr<ID3D12PipelineState> m_pipelineState;
 ComPtr<ID3D12GraphicsCommandList> m_commandList;
-UINT m_rtvDescriptorSize;
-UINT m_srvDescriptorSize;
 
 // App resources.
 ComPtr<ID3D12Resource> m_vertexBuffer;
 D3D12_VERTEX_BUFFER_VIEW m_vertexBufferView;
-ComPtr<ID3D12Resource> m_indexBuffer;
-D3D12_INDEX_BUFFER_VIEW m_indexBufferView;
+eastl::shared_ptr<D3D12IndexBuffer> m_indexBuffer;
 ComPtr<ID3D12Resource> m_texture;
 
 
@@ -167,7 +159,6 @@ static_assert((sizeof(SceneConstantBuffer) % 256) == 0, "Constant Buffer size mu
 
 float StaticOffset = 0.f;
 
-ComPtr<ID3D12DescriptorHeap> m_cbvHeap;
 ComPtr<ID3D12Resource> m_constantBuffer;
 SceneConstantBuffer m_constantBufferData;
 UINT8* m_pCbvDataBegin;
@@ -205,15 +196,15 @@ void InitPipeline()
 //#endif
 
 	ComPtr<IDXGIFactory4> factory;
-	DXAssert(CreateDXGIFactory2(dxgiFactoryFlags, IID_PPV_ARGS(&factory)));
+	D3D12Utility::DXAssert(CreateDXGIFactory2(dxgiFactoryFlags, IID_PPV_ARGS(&factory)));
 
 	ComPtr<IDXGIAdapter1> hardwareAdapter;
 	GetHardwareAdapter(factory.Get(), &hardwareAdapter, false);
 
-	DXAssert(D3D12CreateDevice(
+	D3D12Utility::DXAssert(D3D12CreateDevice(
 		hardwareAdapter.Get(),
 		D3D_FEATURE_LEVEL_11_0,
-		IID_PPV_ARGS(&m_device)
+		IID_PPV_ARGS(&D3D12Globals::Device)
 	));
 
 
@@ -222,7 +213,7 @@ void InitPipeline()
 	queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
 	queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
 
-	DXAssert(m_device->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&m_commandQueue)));
+	D3D12Utility::DXAssert(D3D12Globals::Device->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&m_commandQueue)));
 
 	const WindowsWindow& mainWindow = GEngine->GetMainWindow();
 	const WindowProperties& props = mainWindow.GetProperties();
@@ -246,7 +237,7 @@ void InitPipeline()
 
 
 	ComPtr<IDXGISwapChain1> swapChain;
-	DXAssert(factory->CreateSwapChainForHwnd(
+	D3D12Utility::DXAssert(factory->CreateSwapChainForHwnd(
 		m_commandQueue.Get(),        // Swap chain needs the queue so that it can force a flush on it.
 		static_cast<HWND>(mainWindow.GetHandle()),
 		&swapChainDesc,
@@ -255,61 +246,40 @@ void InitPipeline()
 		&swapChain
 	));
 
-	DXAssert(swapChain.As(&m_swapChain));
+	D3D12Utility::DXAssert(swapChain.As(&m_swapChain));
 
 
 	// Create descriptor heaps.
 	{
 		// Describe and create a render target view (RTV) descriptor heap.
-		D3D12_DESCRIPTOR_HEAP_DESC rtvHeapDesc = {};
-		rtvHeapDesc.NumDescriptors = NumFramesInFlight;
-		rtvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
-		rtvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-		DXAssert(m_device->CreateDescriptorHeap(&rtvHeapDesc, IID_PPV_ARGS(&m_rtvHeap)));
-
-		m_rtvDescriptorSize = m_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-
-		// Describe and create a constant buffer view (CBV) descriptor heap.
-		// Flags indicate that this descriptor heap can be bound to the pipeline 
-		// and that descriptors contained in it can be referenced by a root table.
-		//D3D12_DESCRIPTOR_HEAP_DESC cbvHeapDesc = {};
-		//cbvHeapDesc.NumDescriptors = 1;
-		//cbvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-		//cbvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-		//DXAssert(m_device->CreateDescriptorHeap(&cbvHeapDesc, IID_PPV_ARGS(&m_cbvHeap)));
+		m_rtvHeap.Init(false, NumFramesInFlight, D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 
 		// Describe and create a shader resource view (SRV) heap for the texture.
-		D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
-		srvHeapDesc.NumDescriptors = 2;
-		srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-		srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-		DXAssert(m_device->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&m_cbvsrvHeap)));
-
-		m_srvDescriptorSize = m_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-
+		m_cbvsrvHeap.Init(true, 2, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	}
-
 
 	// Create frame resources.
 	{
-		D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle(m_rtvHeap->GetCPUDescriptorHandleForHeapStart());
+		D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle(m_rtvHeap.CPUStart);
 
 		// Create a RTV for each frame.
 		for (UINT n = 0; n < NumFramesInFlight; n++)
 		{
-			DXAssert(m_swapChain->GetBuffer(n, IID_PPV_ARGS(&m_renderTargets[n])));
-			m_device->CreateRenderTargetView(m_renderTargets[n].Get(), nullptr, rtvHandle);
+			D3D12Utility::DXAssert(m_swapChain->GetBuffer(n, IID_PPV_ARGS(&m_renderTargets[n])));
 
-			rtvHandle.ptr += size_t(m_rtvDescriptorSize);
-			DXAssert(m_device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&m_commandAllocators[n])));
+			D3D12Globals::Device->CreateRenderTargetView(m_renderTargets[n].Get(), nullptr, rtvHandle);
+
+			D3D12Utility::DXAssert(D3D12Globals::Device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&m_commandAllocators[n])));
+
+			// Advance position in pool for next view
+			rtvHandle.ptr += size_t(m_rtvHeap.DescriptorSize);
 		}
 	}
 
 }
 
-
 // Generate a simple black and white checkerboard texture.
-std::vector<UINT8> GenerateTextureData()
+std::vector<UINT8> GenerateCheckerboardTextureData()
 {
 	static const UINT TextureWidth = 256;
 	static const UINT TextureHeight = 256;
@@ -373,7 +343,6 @@ D3D12RHI::D3D12RHI()
 {
 	InitPipeline();
 
-
 	// Load Assets
 
 	// Create a root signature consisting of a descriptor table with a single CBV.
@@ -383,39 +352,10 @@ D3D12RHI::D3D12RHI()
 		// This is the highest version the sample supports. If CheckFeatureSupport succeeds, the HighestVersion returned will not be greater than this.
 		featureData.HighestVersion = D3D_ROOT_SIGNATURE_VERSION_1_1;
 
-		if (FAILED(m_device->CheckFeatureSupport(D3D12_FEATURE_ROOT_SIGNATURE, &featureData, sizeof(featureData))))
+		if (FAILED(D3D12Globals::Device->CheckFeatureSupport(D3D12_FEATURE_ROOT_SIGNATURE, &featureData, sizeof(featureData))))
 		{
 			featureData.HighestVersion = D3D_ROOT_SIGNATURE_VERSION_1_0;
 		}
-
-		//////////////////////////////////////////////////////////////////////////
-
-		//D3D12_DESCRIPTOR_RANGE1 ranges[2];
-
-// 		// Constant Buffer
-// 		ranges[1].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;
-// 		ranges[1].NumDescriptors = 1;
-// 		ranges[1].BaseShaderRegister = 0;
-// 		ranges[1].RegisterSpace = 0;
-// 		ranges[1].Flags = D3D12_DESCRIPTOR_RANGE_FLAG_DATA_STATIC;
-// 		ranges[1].OffsetInDescriptorsFromTableStart = 0;
-// 
-// 		// Texture
-// 		ranges[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
-// 		ranges[0].NumDescriptors = 1;
-// 		ranges[0].BaseShaderRegister = 0;
-// 		ranges[0].RegisterSpace = 0;
-// 		ranges[0].Flags = D3D12_DESCRIPTOR_RANGE_FLAG_DATA_STATIC;
-// 		ranges[0].OffsetInDescriptorsFromTableStart = 1;
-// 
-// 
-// 		D3D12_ROOT_PARAMETER1 rootParameters[1];
-// 		rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-// 		//rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
-// 		rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-// 		rootParameters[0].DescriptorTable.NumDescriptorRanges = 2;
-// 		rootParameters[0].DescriptorTable.pDescriptorRanges = &ranges[0];
-		
 
 		//////////////////////////////////////////////////////////////////////////
 
@@ -491,14 +431,14 @@ D3D12RHI::D3D12RHI()
 
 		ComPtr<ID3DBlob> signature;
 		ComPtr<ID3DBlob> error;
-		if (!DXAssert(D3D12SerializeVersionedRootSignature(&rootSignatureDesc, &signature, &error)))
+		if (!D3D12Utility::DXAssert(D3D12SerializeVersionedRootSignature(&rootSignatureDesc, &signature, &error)))
 		{
 			const char* errText = (char*)error->GetBufferPointer();
 			LOG_ERROR("%s", errText);
 		}
 
 
-		DXAssert(m_device->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&m_rootSignature)));
+		D3D12Utility::DXAssert(D3D12Globals::Device->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&m_rootSignature)));
 	}
 	
 	eastl::string fullPath = "shaders";
@@ -514,8 +454,6 @@ D3D12RHI::D3D12RHI()
 
 	eastl::string shaderCode;
 	const bool readSuccess = IOUtils::TryFastReadFile(fullPath, shaderCode);
-
-
 
 	ComPtr<ID3DBlob> vertexShader;
 	ID3DBlob* vsErrBlob = nullptr;
@@ -547,7 +485,6 @@ D3D12RHI::D3D12RHI()
 
 
 	// Define the vertex input layout.
-		// Define the vertex input layout.
 	D3D12_INPUT_ELEMENT_DESC inputElementDescs[] =
 	{
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
@@ -614,10 +551,10 @@ D3D12RHI::D3D12RHI()
 	psoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
 	psoDesc.SampleDesc.Count = 1;
 
-	DXAssert(m_device->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&m_pipelineState)));
-
+	D3D12Utility::DXAssert(D3D12Globals::Device->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&m_pipelineState)));
+										 
 	// Create the command list.
-	DXAssert(m_device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_commandAllocators[m_frameIndex].Get(), m_pipelineState.Get(), IID_PPV_ARGS(&m_commandList)));
+	D3D12Utility::DXAssert(D3D12Globals::Device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_commandAllocators[m_frameIndex].Get(), m_pipelineState.Get(), IID_PPV_ARGS(&m_commandList)));
 
 	const WindowsWindow& mainWindow = GEngine->GetMainWindow();
 	const WindowProperties& props = mainWindow.GetProperties();
@@ -653,7 +590,7 @@ D3D12RHI::D3D12RHI()
 			vertexBufferDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
 
 
-			DXAssert(m_device->CreateCommittedResource(
+			D3D12Utility::DXAssert(D3D12Globals::Device->CreateCommittedResource(
 				&heapProps,
 				D3D12_HEAP_FLAG_NONE,
 				&vertexBufferDesc,
@@ -666,7 +603,7 @@ D3D12RHI::D3D12RHI()
 			D3D12_RANGE readRange;
 			readRange.Begin = 0;
 			readRange.End = 0;
-			DXAssert(m_vertexBuffer->Map(0, &readRange, reinterpret_cast<void**>(&pVertexDataBegin)));
+			D3D12Utility::DXAssert(m_vertexBuffer->Map(0, &readRange, reinterpret_cast<void**>(&pVertexDataBegin)));
 			//memcpy(pVertexDataBegin, triangleVertices, vertexBufferSize);
 
 			memcpy(pVertexDataBegin, BasicShapesData::GetCubeVertices(), vertexBufferSize);
@@ -679,48 +616,7 @@ D3D12RHI::D3D12RHI()
 			m_vertexBufferView.SizeInBytes = vertexBufferSize;
 		}
 
-		{
-			const UINT indexBufferSize = sizeof(uint32_t) * BasicShapesData::GetCubeIndicesCount();
-
-			D3D12_RESOURCE_DESC indexBufferDesc;
-			indexBufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-			indexBufferDesc.Alignment = 0;
-			indexBufferDesc.Width = indexBufferSize;
-			indexBufferDesc.Height = 1;
-			indexBufferDesc.DepthOrArraySize = 1;
-			indexBufferDesc.MipLevels = 1;
-			indexBufferDesc.Format = DXGI_FORMAT_UNKNOWN;
-			indexBufferDesc.SampleDesc.Count = 1;
-			indexBufferDesc.SampleDesc.Quality = 0;
-			indexBufferDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-			indexBufferDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
-
-			DXAssert(m_device->CreateCommittedResource(
-				&heapProps,
-				D3D12_HEAP_FLAG_NONE,
-				&indexBufferDesc,
-				D3D12_RESOURCE_STATE_GENERIC_READ,
-				nullptr,
-				IID_PPV_ARGS(&m_indexBuffer)));
-
-
-			// Copy the triangle data to the index buffer.
-			UINT8* pIndexDataBegin;
-			D3D12_RANGE indexReadRange;
-			indexReadRange.Begin = 0;
-			indexReadRange.End = 0;
-			DXAssert(m_indexBuffer->Map(0, &indexReadRange, reinterpret_cast<void**>(&pIndexDataBegin)));
-
-			memcpy(pIndexDataBegin, BasicShapesData::GetCubeIndices(), indexBufferSize);
-
-
-			m_indexBuffer->Unmap(0, nullptr);
-
-			// Initialize the index buffer view.
-			m_indexBufferView.BufferLocation = m_indexBuffer->GetGPUVirtualAddress();
-			m_indexBufferView.SizeInBytes = indexBufferSize;
-			m_indexBufferView.Format = DXGI_FORMAT::DXGI_FORMAT_R32_UINT;
-		}
+		m_indexBuffer = eastl::static_shared_pointer_cast<D3D12IndexBuffer>(CreateIndexBuffer(BasicShapesData::GetCubeIndices(), BasicShapesData::GetCubeIndicesCount()));
 	}
 
 
@@ -749,7 +645,7 @@ D3D12RHI::D3D12RHI()
 		constantBufferDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 		constantBufferDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
 
-		DXAssert(m_device->CreateCommittedResource(
+		D3D12Utility::DXAssert(D3D12Globals::Device->CreateCommittedResource(
 			&heapProps,
 			D3D12_HEAP_FLAG_NONE,
 			&constantBufferDesc,
@@ -761,7 +657,7 @@ D3D12RHI::D3D12RHI()
 		D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
 		cbvDesc.BufferLocation = m_constantBuffer->GetGPUVirtualAddress();
 		cbvDesc.SizeInBytes = constantBufferSize;
-		m_device->CreateConstantBufferView(&cbvDesc, m_cbvsrvHeap->GetCPUDescriptorHandleForHeapStart());
+		D3D12Globals::Device->CreateConstantBufferView(&cbvDesc, m_cbvsrvHeap.CPUStart);
 
 
 		// Map and initialize the constant buffer. We don't unmap this until the
@@ -769,7 +665,7 @@ D3D12RHI::D3D12RHI()
 		D3D12_RANGE readRange;
 		readRange.Begin = 0;
 		readRange.End = 0;      // We do not intend to read from this resource on the CPU.
-		DXAssert(m_constantBuffer->Map(0, &readRange, reinterpret_cast<void**>(&m_pCbvDataBegin)));
+		D3D12Utility::DXAssert(m_constantBuffer->Map(0, &readRange, reinterpret_cast<void**>(&m_pCbvDataBegin)));
 		memcpy(m_pCbvDataBegin, &m_constantBufferData, sizeof(m_constantBufferData));
 	}
 
@@ -787,10 +683,10 @@ D3D12RHI::D3D12RHI()
 #if FRAME_BUFFERING
 		m_fenceValues[0] = m_fenceValues[1] = 1;
 
-		DXAssert(m_device->CreateFence(m_fenceValues[0], D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_fence)));
+		D3D12Utility::DXAssert(D3D12Globals::Device->CreateFence(m_fenceValues[0], D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_fence)));
 		m_fenceValues[0]++;
 #else
-		DXAssert(m_device->CreateFence(m_fenceValue, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_fence)));
+		D3D12Utility::DXAssert(D3D12Globals::Device->CreateFence(m_fenceValue, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_fence)));
 		m_fenceValue++;
 #endif
 
@@ -798,7 +694,7 @@ D3D12RHI::D3D12RHI()
 		m_fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
 		if (m_fenceEvent == nullptr)
 		{
-			DXAssert(HRESULT_FROM_WIN32(GetLastError()));
+			D3D12Utility::DXAssert(HRESULT_FROM_WIN32(GetLastError()));
 		}
 
 		// Wait for the command list to execute; we are reusing the same command 
@@ -855,9 +751,6 @@ void DoTheUploadBlocking(ID3D12Resource* inDestResource, ID3D12Resource* inUploa
 		return;
 	}
 
-	//const uint64_t srcTexelSize = DirectX::BitsPerPixel(metaData.format);
-	//uint64_t mipWidth = metaData.width;
-
 	// Copy to the staging upload heap
 	for (uint32_t i = 0; i < numMips; ++i)
 	{
@@ -869,7 +762,6 @@ void DoTheUploadBlocking(ID3D12Resource* inDestResource, ID3D12Resource* inUploa
 		const uint64_t subResourceHeight = numRows[mipId];
 		const uint64_t subResourcePitch = mipSubresourceLayout.Footprint.RowPitch;
 		const uint64_t subResourceDepth = mipSubresourceLayout.Footprint.Depth;
-		//const uint64_t srcPitch = mipWidth * srcTexelSize;
 
 		uint8_t* dstSubresourceMem = uploadMem + mipSubresourceLayout.Offset;
 
@@ -887,17 +779,10 @@ void DoTheUploadBlocking(ID3D12Resource* inDestResource, ID3D12Resource* inUploa
 				dstSubresourceMem += subResourcePitch;
 				srcSubImageTexels += currentSubImage->rowPitch;
 			}
-
-
-
 		}
-		//mipWidth = glm::max(mipWidth / 2, 1ull);
-
-
 	}
 
 	inUploadResource->Unmap(0, nullptr);
-
 
 	if (DestDesc.Dimension == D3D12_RESOURCE_DIMENSION_BUFFER)
 	{
@@ -964,7 +849,7 @@ void D3D12RHI::CreateTextureStuff(ID3D12Resource* inUploadHeap)
 		textureDesc.SampleDesc.Quality = 0;
 		textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 
-		DXAssert(m_device->CreateCommittedResource(
+		D3D12Utility::DXAssert(D3D12Globals::Device->CreateCommittedResource(
 			&DefaultHeapProps,
 			D3D12_HEAP_FLAG_NONE,
 			&textureDesc,
@@ -974,7 +859,7 @@ void D3D12RHI::CreateTextureStuff(ID3D12Resource* inUploadHeap)
 
 		// Get required size by device
 		UINT64 uploadBufferSize = 0;
-		m_device->GetCopyableFootprints(&textureDesc, 0, (uint32_t)res.GetImageCount(), 0, nullptr, nullptr, nullptr, &uploadBufferSize);
+		D3D12Globals::Device->GetCopyableFootprints(&textureDesc, 0, (uint32_t)res.GetImageCount(), 0, nullptr, nullptr, nullptr, &uploadBufferSize);
 
 		// Same thing
 		//const UINT64 uploadBufferSize = GetRequiredIntermediateSize(m_texture.Get(), 0, 1);
@@ -993,7 +878,7 @@ void D3D12RHI::CreateTextureStuff(ID3D12Resource* inUploadHeap)
 		UploadBufferDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
 
 		// Create the CPU -> GPU Upload Buffer
-		DXAssert(m_device->CreateCommittedResource(
+		D3D12Utility::DXAssert(D3D12Globals::Device->CreateCommittedResource(
 			&UploadHeapProps,
 			D3D12_HEAP_FLAG_NONE,
 			&UploadBufferDesc,
@@ -1021,15 +906,13 @@ void D3D12RHI::CreateTextureStuff(ID3D12Resource* inUploadHeap)
 		srvDesc.Format = textureDesc.Format;
 		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 		srvDesc.Texture2D.MipLevels = (uint32_t)res.GetImageCount();
-		//srvDesc.Texture2D.MipLevels = 1;
 
-
-		D3D12_CPU_DESCRIPTOR_HANDLE descHeapStartHandle = m_cbvsrvHeap->GetCPUDescriptorHandleForHeapStart();
-		descHeapStartHandle.ptr += 1 * m_srvDescriptorSize;
-		m_device->CreateShaderResourceView(m_texture.Get(), &srvDesc, descHeapStartHandle);
+		D3D12_CPU_DESCRIPTOR_HANDLE descHeapStartHandle = m_cbvsrvHeap.CPUStart;
+		descHeapStartHandle.ptr += 1 * m_cbvsrvHeap.DescriptorSize;
+		D3D12Globals::Device->CreateShaderResourceView(m_texture.Get(), &srvDesc, descHeapStartHandle);
 	}
 
-	DXAssert(m_commandList->Close());
+	D3D12Utility::DXAssert(m_commandList->Close());
 	ID3D12CommandList* ppCommandLists[] = { m_commandList.Get() };
 	m_commandQueue->ExecuteCommandLists(_countof(ppCommandLists), ppCommandLists);
 }
@@ -1048,10 +931,10 @@ void D3D12RHI::WaitForPreviousFrame()
 {
 	const UINT64 currentFrameRequiredFenceValue = m_fenceValues[m_frameIndex];
 	// We want that fence to be set to that value from the GPU side
-	DXAssert(m_commandQueue->Signal(m_fence.Get(), m_fenceValues[m_frameIndex]));
+	D3D12Utility::DXAssert(m_commandQueue->Signal(m_fence.Get(), m_fenceValues[m_frameIndex]));
 
 	// Tell m_fence to raise this event once it's equal fence value
-	DXAssert(m_fence->SetEventOnCompletion(m_fenceValues[m_frameIndex], m_fenceEvent));
+	D3D12Utility::DXAssert(m_fence->SetEventOnCompletion(m_fenceValues[m_frameIndex], m_fenceEvent));
 
 	// Wait until that event is raised
 	WaitForSingleObject(m_fenceEvent, INFINITE);
@@ -1073,14 +956,14 @@ void D3D12RHI::WaitForPreviousFrame()
 	// Signal and increment the fence value.
 	const UINT64 fence = m_fenceValue;
 	// We want that fence to be set to that value from the GPU side
-	DXAssert(m_commandQueue->Signal(m_fence.Get(), fence));
+	D3D12Utility::DXAssert(m_commandQueue->Signal(m_fence.Get(), fence));
 	m_fenceValue++;
 
 	const UINT64 fenceValue = m_fence->GetCompletedValue();
 	if (fenceValue < fence)
 	{
 		// Tell m_fence to raise this event once it's equal fence value
-		DXAssert(m_fence->SetEventOnCompletion(fence, m_fenceEvent));
+		D3D12Utility::DXAssert(m_fence->SetEventOnCompletion(fence, m_fenceEvent));
 
 		// Wait until that event is raised
 		WaitForSingleObject(m_fenceEvent, INFINITE);
@@ -1098,7 +981,7 @@ void D3D12RHI::MoveToNextFrame()
 	const UINT64 submittedFrameFenceValue = m_fenceValues[m_frameIndex];
 
 	// Place signal for frame that was just submitted
-	DXAssert(m_commandQueue->Signal(m_fence.Get(), submittedFrameFenceValue));
+	D3D12Utility::DXAssert(m_commandQueue->Signal(m_fence.Get(), submittedFrameFenceValue));
 
 	// Move onto next frame. Backbuffer index was changed as Present was called before this
 	m_frameIndex = m_swapChain->GetCurrentBackBufferIndex();
@@ -1115,7 +998,7 @@ void D3D12RHI::MoveToNextFrame()
 
 	if (presentFenceValue < toStartFrameFenceValue)
 	{
-		DXAssert(m_fence->SetEventOnCompletion(toStartFrameFenceValue, m_fenceEvent));
+		D3D12Utility::DXAssert(m_fence->SetEventOnCompletion(toStartFrameFenceValue, m_fenceEvent));
 		WaitForSingleObjectEx(m_fenceEvent, INFINITE, false);
 	}
 
@@ -1125,7 +1008,7 @@ void D3D12RHI::MoveToNextFrame()
 
 void D3D12RHI::Test()
 {
-	ImGui::Begin("D3D12 Test Settings");
+	ImGui::Begin("D3D12 Settings");
 	static glm::vec3 translation(0.f, 0.f, 2.f);
 	ImGui::DragFloat3("Obj Translation", &translation.x, 0.1f);
 
@@ -1168,24 +1051,19 @@ void D3D12RHI::Test()
 	// Command list allocators can only be reset when the associated 
 	// command lists have finished execution on the GPU; apps should use 
 	// fences to determine GPU execution progress.
-	DXAssert(m_commandAllocators[m_frameIndex]->Reset());
+	D3D12Utility::DXAssert(m_commandAllocators[m_frameIndex]->Reset());
 
 	// However, when ExecuteCommandList() is called on a particular command 
 	// list, that command list can then be reset at any time and must be before 
 	// re-recording.
-	DXAssert(m_commandList->Reset(m_commandAllocators[m_frameIndex].Get(), m_pipelineState.Get()));
+	D3D12Utility::DXAssert(m_commandList->Reset(m_commandAllocators[m_frameIndex].Get(), m_pipelineState.Get()));
 
 	m_commandList->SetGraphicsRootSignature(m_rootSignature.Get());
 	m_commandList->RSSetViewports(1, &m_viewport);
 	m_commandList->RSSetScissorRects(1, &m_scissorRect);
 
-	// Constant buffer
-// 	ID3D12DescriptorHeap* ppHeaps[] = { m_cbvHeap.Get() };
-// 	m_commandList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
-// 	m_commandList->SetGraphicsRootDescriptorTable(0, m_cbvHeap->GetGPUDescriptorHandleForHeapStart());
-
 	// Desc Heap
-	ID3D12DescriptorHeap* ppHeaps[] = { m_cbvsrvHeap.Get() };
+	ID3D12DescriptorHeap* ppHeaps[] = { m_cbvsrvHeap.Heap };
 	m_commandList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
 
 	// First table
@@ -1193,11 +1071,11 @@ void D3D12RHI::Test()
 	rootConstant.x = -StaticOffset;
 	m_commandList->SetGraphicsRoot32BitConstants(0, 4, &rootConstant, 0);
 
-	m_commandList->SetGraphicsRootDescriptorTable(1, m_cbvsrvHeap->GetGPUDescriptorHandleForHeapStart());
+	m_commandList->SetGraphicsRootDescriptorTable(1, m_cbvsrvHeap.GPUStart);
 
 	// Second table
-	D3D12_GPU_DESCRIPTOR_HANDLE secondTableHandle(m_cbvsrvHeap->GetGPUDescriptorHandleForHeapStart());
-	secondTableHandle.ptr += size_t(m_srvDescriptorSize);
+	D3D12_GPU_DESCRIPTOR_HANDLE secondTableHandle(m_cbvsrvHeap.GPUStart);
+	secondTableHandle.ptr += size_t(m_cbvsrvHeap.DescriptorSize);
 	m_commandList->SetGraphicsRootDescriptorTable(2, secondTableHandle); // This does the magic of binding a certain descriptor table to a certain heap with a start index for accessing descriptors
 
 
@@ -1213,7 +1091,7 @@ void D3D12RHI::Test()
 	m_commandList->ResourceBarrier(1, &transitionPresentToRt);
 
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle;
-	rtvHandle.ptr = m_rtvHeap->GetCPUDescriptorHandleForHeapStart().ptr + m_frameIndex * m_rtvDescriptorSize;
+	rtvHandle.ptr = m_rtvHeap.CPUStart.ptr + m_frameIndex * m_rtvHeap.DescriptorSize;
 
 	m_commandList->OMSetRenderTargets(1, &rtvHandle, FALSE, nullptr);
 
@@ -1222,12 +1100,13 @@ void D3D12RHI::Test()
 	m_commandList->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
 	m_commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	m_commandList->IASetVertexBuffers(0, 1, &m_vertexBufferView);
-	m_commandList->IASetIndexBuffer(&m_indexBufferView);
+	m_commandList->IASetIndexBuffer(&m_indexBuffer->IBView());
 
 	m_commandList->DrawIndexedInstanced(BasicShapesData::GetCubeIndicesCount(), 1, 0, 0, 0);
 
 }
 
+ComPtr<ID3D12DescriptorHeap> m_imguiCbvSrvHeap;
 
 void D3D12RHI::ImGuiInit()
 {
@@ -1255,16 +1134,15 @@ void D3D12RHI::ImGuiInit()
 	srvHeapDesc.NumDescriptors = 1;
 	srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 	srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-	DXAssert(m_device->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&m_imguiCbvSrvHeap)));
+	D3D12Utility::DXAssert(D3D12Globals::Device->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&m_imguiCbvSrvHeap)));
 
 	D3D12_CPU_DESCRIPTOR_HANDLE fontSrvCpuHandle = m_imguiCbvSrvHeap->GetCPUDescriptorHandleForHeapStart();
 	D3D12_GPU_DESCRIPTOR_HANDLE fontSrvGpuHandle = m_imguiCbvSrvHeap->GetGPUDescriptorHandleForHeapStart();
 
-	ID3D12Device* device = m_device.Get();
 	DXGI_FORMAT format = DXGI_FORMAT::DXGI_FORMAT_R8G8B8A8_UNORM;
 
 
-	bool success = ImGui_ImplDX12_Init(device, NumFramesInFlight, format, m_imguiCbvSrvHeap.Get(), fontSrvCpuHandle, fontSrvGpuHandle);
+	bool success = ImGui_ImplDX12_Init(D3D12Globals::Device, NumFramesInFlight, format, m_imguiCbvSrvHeap.Get(), fontSrvCpuHandle, fontSrvGpuHandle);
 
 	ASSERT(success);
 
@@ -1297,7 +1175,7 @@ void D3D12RHI::SwapBuffers()
 	// Indicate that the back buffer will now be used to present.
 	m_commandList->ResourceBarrier(1, &transitionRtToPresent);
 
-	DXAssert(m_commandList->Close());
+	D3D12Utility::DXAssert(m_commandList->Close());
 
 	ID3D12CommandList* commandLists[] = { m_commandList.Get() };
 	m_commandQueue->ExecuteCommandLists(1, commandLists);
@@ -1317,4 +1195,64 @@ void D3D12RHI::SwapBuffers()
 	WaitForPreviousFrame();
 #endif
 
+}
+
+eastl::shared_ptr<class RHIIndexBuffer> D3D12RHI::CreateIndexBuffer(const uint32_t* inData, uint32_t inCount)
+{
+	ID3D12Resource* handle;
+	const UINT indexBufferSize = sizeof(uint32_t) * inCount;
+
+	D3D12_RESOURCE_DESC indexBufferDesc;
+	indexBufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+	indexBufferDesc.Alignment = 0;
+	indexBufferDesc.Width = indexBufferSize;
+	indexBufferDesc.Height = 1;
+	indexBufferDesc.DepthOrArraySize = 1;
+	indexBufferDesc.MipLevels = 1;
+	indexBufferDesc.Format = DXGI_FORMAT_UNKNOWN;
+	indexBufferDesc.SampleDesc.Count = 1;
+	indexBufferDesc.SampleDesc.Quality = 0;
+	indexBufferDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+	indexBufferDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+	// TODO:
+	// Note: using upload heaps to transfer static data like vert buffers is not 
+	// recommended. Every time the GPU needs it, the upload heap will be marshalled 
+	// over. Please read up on Default Heap usage. An upload heap is used here for 
+	// code simplicity and because there are very few verts to actually transfer.
+	D3D12_HEAP_PROPERTIES heapProps;
+	heapProps.Type = D3D12_HEAP_TYPE_UPLOAD;
+	heapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+	heapProps.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+	heapProps.CreationNodeMask = 1;
+	heapProps.VisibleNodeMask = 1;
+
+	D3D12Utility::DXAssert(D3D12Globals::Device->CreateCommittedResource(
+		&heapProps,
+		D3D12_HEAP_FLAG_NONE,
+		&indexBufferDesc,
+		D3D12_RESOURCE_STATE_GENERIC_READ,
+		nullptr,
+		IID_PPV_ARGS(&handle)));
+
+
+	// Copy the triangle data to the index buffer.
+	UINT8* pIndexDataBegin;
+	D3D12_RANGE indexReadRange;
+	indexReadRange.Begin = 0;
+	indexReadRange.End = 0;
+	D3D12Utility::DXAssert(handle->Map(0, &indexReadRange, reinterpret_cast<void**>(&pIndexDataBegin)));
+
+	memcpy(pIndexDataBegin, inData, indexBufferSize);
+
+	handle->Unmap(0, nullptr);
+
+	eastl::shared_ptr<D3D12IndexBuffer> newBuffer = eastl::make_shared<D3D12IndexBuffer>();
+	newBuffer->IndexCount = inCount;
+	newBuffer->Handle = handle;
+	newBuffer->IBFormat = DXGI_FORMAT::DXGI_FORMAT_R32_UINT;
+	newBuffer->GPUAddress = handle->GetGPUVirtualAddress();;
+	newBuffer->Size = indexBufferSize;
+
+	return newBuffer;
 }

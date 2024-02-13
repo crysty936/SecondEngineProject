@@ -16,11 +16,11 @@
 #include "Window/WindowProperties.h"
 #include "RenderCommand.h"
 
-class DeferredRenderer : public Renderer
+class TestRenderer : public Renderer
 {
 protected:
-	DeferredRenderer(const WindowProperties& inMainWindowProperties);
-	virtual ~DeferredRenderer();
+	TestRenderer(const WindowProperties& inMainWindowProperties);
+	virtual ~TestRenderer();
 
 public:
 	virtual void Draw() override;
@@ -44,22 +44,15 @@ public:
 protected:
 	void InitInternal() override;
 
-private:
-	void SetDrawMode(const EDrawMode::Type inDrawMode);
-	void SetLightingConstants();
-	void UpdateUniforms();
-	void DrawCommands(const eastl::vector<RenderCommand>& inCommands);
-	void RenderPreStencil(const RenderCommand& inCommand);
-	void DrawDecals(const eastl::vector<RenderCommand>& inCommands);
-	void DrawCommand(const RenderCommand& inCommand);
-	eastl::shared_ptr<RenderMaterial> GetMaterial(const RenderCommand& inCommand) const;
-	void SetViewportSizeToMain();
+//private:
+	//void UpdateUniforms();
+//	void SetViewportSizeToMain();
 
 private:
-	eastl::vector<RenderCommand> MainCommands;
-	eastl::vector<RenderCommand> DecalCommands;
-	EDrawMode::Type CurrentDrawMode = EDrawMode::Default;
-	eastl::unordered_map<eastl::string, eastl::shared_ptr<class MeshDataContainer>> RenderDataContainerMap;
+	//eastl::vector<RenderCommand> MainCommands;
+	//eastl::vector<RenderCommand> DecalCommands;
+	//EDrawMode::Type CurrentDrawMode = EDrawMode::Default;
+	//eastl::unordered_map<eastl::string, eastl::shared_ptr<class MeshDataContainer>> RenderDataContainerMap;
 
 
 	friend Renderer;
