@@ -5,3 +5,7 @@ RHIVertexBuffer::RHIVertexBuffer(eastl::shared_ptr<RHIIndexBuffer>& inIndexBuffe
 {
 
 }
+
+RHIVertexBuffer::RHIVertexBuffer()
+	: RHIBufferBase(RHIBufferType::Vertex)
+{}

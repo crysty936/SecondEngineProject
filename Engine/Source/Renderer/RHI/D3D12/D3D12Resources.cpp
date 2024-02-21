@@ -14,3 +14,19 @@ D3D12_INDEX_BUFFER_VIEW D3D12IndexBuffer::IBView() const
 
 	return ibView;
 }
+
+D3D12VertexBuffer::D3D12VertexBuffer()
+	: RHIVertexBuffer()
+{}
+
+D3D12_VERTEX_BUFFER_VIEW D3D12VertexBuffer::VBView() const
+{
+	D3D12_VERTEX_BUFFER_VIEW outView = {};
+
+	outView.BufferLocation = GPUAddress;
+	outView.StrideInBytes = Layout.GetStride();
+	//outView.StrideInBytes = 3;// 8 floats
+	outView.SizeInBytes = AllocatedSize;
+
+	return outView;
+}

@@ -21,4 +21,17 @@ void DescriptorHeap::Init(bool inShaderVisible, uint32_t inNumPersistent, D3D12_
 	GPUStart = Heap->GetGPUDescriptorHandleForHeapStart();
 }
 
+D3D12DescHeapAllocationDesc DescriptorHeap::AllocatePersistent()
+{
+	D3D12DescHeapAllocationDesc newAllocation;
+
+	newAllocation.Index = Allocated;
+
+	++Allocated;
+
+	newAllocation.CPUHandle = CPUStart;
+	newAllocation.CPUHandle.ptr += newAllocation.Index * DescriptorSize;
+
+	return newAllocation;
+}
 

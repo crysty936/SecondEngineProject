@@ -7,6 +7,7 @@
 class RHIVertexBuffer : public RHIBufferBase
 {
 public:
+	RHIVertexBuffer();
 	RHIVertexBuffer(eastl::shared_ptr<class RHIIndexBuffer>& inIndexBuffer, const class VertexInputLayout& inLayout);
 	inline const VertexInputLayout& GetLayout() const { return Layout; }
 	inline int32_t GetIndicesCount() { return IndexBuffer->IndexCount; }

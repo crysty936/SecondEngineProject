@@ -11,14 +11,8 @@ struct PSOutput
 };
 
 
-// 16 byte aligned
-cbuffer RootConstantBuffer : register(b0)
-{
-    float4 theTest;
-}
-
 // 256 byte aligned
-cbuffer SceneConstantBuffer : register(b1)
+cbuffer SceneConstantBuffer : register(b0)
 {
     float4x4 Model;
     float4x4 Projection;

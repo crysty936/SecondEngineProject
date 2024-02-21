@@ -134,18 +134,26 @@ ComPtr<ID3D12CommandQueue> m_commandQueue;
 ComPtr<ID3D12RootSignature> m_rootSignature;
 
 // Descriptor Heaps
+// TODO: Implement non-shader visible descriptor heaps that will be copied over into main heap when drawing
 DescriptorHeap m_rtvHeap;
-DescriptorHeap m_cbvsrvHeap;
+DescriptorHeap m_CbvSrvHeap;
 
 ComPtr<ID3D12PipelineState> m_pipelineState;
 ComPtr<ID3D12GraphicsCommandList> m_commandList;
 
 // App resources.
-ComPtr<ID3D12Resource> m_vertexBuffer;
-D3D12_VERTEX_BUFFER_VIEW m_vertexBufferView;
+eastl::shared_ptr<D3D12VertexBuffer> m_vertexBuffer;
+//ComPtr<ID3D12Resource> m_vertexBuffer;
+//D3D12_VERTEX_BUFFER_VIEW m_vertexBufferView;
 eastl::shared_ptr<D3D12IndexBuffer> m_indexBuffer;
-ComPtr<ID3D12Resource> m_texture;
+//ComPtr<ID3D12Resource> m_texture;
+eastl::shared_ptr<D3D12Texture2D> m_texture;
 
+// Hack to keep upload buffers referenced by command lists alive on the GPU until they finish execution
+// ComPtr's are CPU objects
+// GPU will be flushed at end of frame before this is cleaned up to ensure that resources are not prematurely destroyed
+// TODO: Replace this hack with a copy queue ring buffer approach
+eastl::vector<ComPtr<ID3D12Resource>> TextureUploadBuffers;
 
 // Constant Buffer
 struct SceneConstantBuffer
@@ -248,14 +256,14 @@ void InitPipeline()
 
 	D3D12Utility::DXAssert(swapChain.As(&m_swapChain));
 
-
 	// Create descriptor heaps.
 	{
 		// Describe and create a render target view (RTV) descriptor heap.
 		m_rtvHeap.Init(false, NumFramesInFlight, D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 
+		constexpr uint32_t numSRVs = 2;
 		// Describe and create a shader resource view (SRV) heap for the texture.
-		m_cbvsrvHeap.Init(true, 2, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		m_CbvSrvHeap.Init(true, numSRVs, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	}
 
 	// Create frame resources.
@@ -359,12 +367,12 @@ D3D12RHI::D3D12RHI()
 
 		//////////////////////////////////////////////////////////////////////////
 
- 		D3D12_DESCRIPTOR_RANGE1 rangesVS[2];
+ 		D3D12_DESCRIPTOR_RANGE1 rangesVS[1];
  
  		// Constant Buffer
  		rangesVS[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;
  		rangesVS[0].NumDescriptors = 1;
- 		rangesVS[0].BaseShaderRegister = 1;
+ 		rangesVS[0].BaseShaderRegister = 0;
  		rangesVS[0].RegisterSpace = 0;
  		rangesVS[0].Flags = D3D12_DESCRIPTOR_RANGE_FLAG_DATA_STATIC;
  		rangesVS[0].OffsetInDescriptorsFromTableStart = 0;
@@ -378,22 +386,17 @@ D3D12RHI::D3D12RHI()
  		rangesPS[0].Flags = D3D12_DESCRIPTOR_RANGE_FLAG_DATA_STATIC;
 		rangesPS[0].OffsetInDescriptorsFromTableStart = 0;
  
- 		D3D12_ROOT_PARAMETER1 rootParameters[3];
-		rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;
-		rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
-		rootParameters[0].Constants.Num32BitValues = 4;
-		rootParameters[0].Constants.RegisterSpace = 0;
-		rootParameters[0].Constants.ShaderRegister = 0;
+ 		D3D12_ROOT_PARAMETER1 rootParameters[2];
 
- 		rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
- 		rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
- 		rootParameters[1].DescriptorTable.NumDescriptorRanges = 1;
- 		rootParameters[1].DescriptorTable.pDescriptorRanges = &rangesVS[0];
+ 		rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+ 		rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+ 		rootParameters[0].DescriptorTable.NumDescriptorRanges = 1;
+ 		rootParameters[0].DescriptorTable.pDescriptorRanges = &rangesVS[0];
  
- 		rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
- 		rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
- 		rootParameters[2].DescriptorTable.NumDescriptorRanges = 1;
- 		rootParameters[2].DescriptorTable.pDescriptorRanges = &rangesPS[0];
+ 		rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+ 		rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+ 		rootParameters[1].DescriptorTable.NumDescriptorRanges = 1;
+ 		rootParameters[1].DescriptorTable.pDescriptorRanges = &rangesPS[0];
 
 
 		//////////////////////////////////////////////////////////////////////////
@@ -561,62 +564,18 @@ D3D12RHI::D3D12RHI()
 
 	const int32_t aspectRatio = props.Width / props.Height;
 
+	m_indexBuffer = eastl::static_shared_pointer_cast<D3D12IndexBuffer>(CreateIndexBuffer(BasicShapesData::GetCubeIndices(), BasicShapesData::GetCubeIndicesCount()));
+
 	// Create the vertex buffer.
 	{
-		// Note: using upload heaps to transfer static data like vert buffers is not 
-		// recommended. Every time the GPU needs it, the upload heap will be marshalled 
-		// over. Please read up on Default Heap usage. An upload heap is used here for 
-		// code simplicity and because there are very few verts to actually transfer.
-		D3D12_HEAP_PROPERTIES heapProps;
-		heapProps.Type = D3D12_HEAP_TYPE_UPLOAD;
-		heapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-		heapProps.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-		heapProps.CreationNodeMask = 1;
-		heapProps.VisibleNodeMask = 1;
-		{
-			const UINT vertexBufferSize = sizeof(float) * BasicShapesData::GetCubeVerticesCount();
+		VertexInputLayout vbLayout;
+		// Vertex points
+		vbLayout.Push<float>(3, VertexInputType::Position);
+		// Vertex Tex Coords
+		vbLayout.Push<float>(3, VertexInputType::Normal);
+		vbLayout.Push<float>(2, VertexInputType::TexCoords);
 
-			D3D12_RESOURCE_DESC vertexBufferDesc;
-			vertexBufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-			vertexBufferDesc.Alignment = 0;
-			vertexBufferDesc.Width = vertexBufferSize;
-			vertexBufferDesc.Height = 1;
-			vertexBufferDesc.DepthOrArraySize = 1;
-			vertexBufferDesc.MipLevels = 1;
-			vertexBufferDesc.Format = DXGI_FORMAT_UNKNOWN;
-			vertexBufferDesc.SampleDesc.Count = 1;
-			vertexBufferDesc.SampleDesc.Quality = 0;
-			vertexBufferDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-			vertexBufferDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
-
-
-			D3D12Utility::DXAssert(D3D12Globals::Device->CreateCommittedResource(
-				&heapProps,
-				D3D12_HEAP_FLAG_NONE,
-				&vertexBufferDesc,
-				D3D12_RESOURCE_STATE_GENERIC_READ,
-				nullptr,
-				IID_PPV_ARGS(&m_vertexBuffer)));
-
-			// Copy the triangle data to the vertex buffer.
-			UINT8* pVertexDataBegin;
-			D3D12_RANGE readRange;
-			readRange.Begin = 0;
-			readRange.End = 0;
-			D3D12Utility::DXAssert(m_vertexBuffer->Map(0, &readRange, reinterpret_cast<void**>(&pVertexDataBegin)));
-			//memcpy(pVertexDataBegin, triangleVertices, vertexBufferSize);
-
-			memcpy(pVertexDataBegin, BasicShapesData::GetCubeVertices(), vertexBufferSize);
-			//memcpy(pVertexDataBegin, BasicShapesData::GetCubeVertices(), vertexBufferSize);
-			m_vertexBuffer->Unmap(0, nullptr);
-
-			// Initialize the vertex buffer view.
-			m_vertexBufferView.BufferLocation = m_vertexBuffer->GetGPUVirtualAddress();
-			m_vertexBufferView.StrideInBytes = 32;// 8 floats
-			m_vertexBufferView.SizeInBytes = vertexBufferSize;
-		}
-
-		m_indexBuffer = eastl::static_shared_pointer_cast<D3D12IndexBuffer>(CreateIndexBuffer(BasicShapesData::GetCubeIndices(), BasicShapesData::GetCubeIndicesCount()));
+		m_vertexBuffer = eastl::static_shared_pointer_cast<D3D12VertexBuffer>(CreateVertexBuffer(vbLayout, BasicShapesData::GetCubeVertices(), BasicShapesData::GetCubeVerticesCount(), m_indexBuffer));
 	}
 
 
@@ -653,12 +612,16 @@ D3D12RHI::D3D12RHI()
 			nullptr,
 			IID_PPV_ARGS(&m_constantBuffer)));
 
+
+		D3D12DescHeapAllocationDesc descAlloc = m_CbvSrvHeap.AllocatePersistent();
+
+
+
 		// Describe and create a constant buffer view.
 		D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
 		cbvDesc.BufferLocation = m_constantBuffer->GetGPUVirtualAddress();
 		cbvDesc.SizeInBytes = constantBufferSize;
-		D3D12Globals::Device->CreateConstantBufferView(&cbvDesc, m_cbvsrvHeap.CPUStart);
-
+		D3D12Globals::Device->CreateConstantBufferView(&cbvDesc, descAlloc.CPUHandle);
 
 		// Map and initialize the constant buffer. We don't unmap this until the
 		// app closes. Keeping things mapped for the lifetime of the resource is okay.
@@ -669,14 +632,12 @@ D3D12RHI::D3D12RHI()
 		memcpy(m_pCbvDataBegin, &m_constantBufferData, sizeof(m_constantBufferData));
 	}
 
+	//CreateTextureStuff();
+	m_texture = eastl::static_shared_pointer_cast<D3D12Texture2D>(CreateAndLoadTexture2D("../Data/Textures/MinecraftGrass.jpg", true));
 
-	// Note: ComPtr's are CPU objects but this resource needs to stay in scope until
-	// the command list that references it has finished executing on the GPU.
-	// We will flush the GPU at the end of this method to ensure the resource is not
-	// prematurely destroyed.
-	ComPtr<ID3D12Resource> textureUploadHeap;
-
-	CreateTextureStuff(textureUploadHeap.Get());
+	D3D12Utility::DXAssert(m_commandList->Close());
+	ID3D12CommandList* ppCommandLists[] = { m_commandList.Get() };
+	m_commandQueue->ExecuteCommandLists(_countof(ppCommandLists), ppCommandLists);
 
 	// Create synchronization objects and wait until assets have been uploaded to the GPU.
 	{
@@ -809,113 +770,113 @@ void DoTheUploadBlocking(ID3D12Resource* inDestResource, ID3D12Resource* inUploa
 	}
 }
 
-void D3D12RHI::CreateTextureStuff(ID3D12Resource* inUploadHeap)
-{
-	// Create the texture.
-	{
-		D3D12_HEAP_PROPERTIES DefaultHeapProps;
-		DefaultHeapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
-		DefaultHeapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-		DefaultHeapProps.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-		DefaultHeapProps.CreationNodeMask = 1;
-		DefaultHeapProps.VisibleNodeMask = 1;
-
-		D3D12_HEAP_PROPERTIES UploadHeapProps;
-		UploadHeapProps.Type = D3D12_HEAP_TYPE_UPLOAD;
-		UploadHeapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-		UploadHeapProps.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-		UploadHeapProps.CreationNodeMask = 1;
-		UploadHeapProps.VisibleNodeMask = 1;
-
-
-		DirectX::ScratchImage dxImageTest = {};
-		DirectX::TexMetadata dxMetadataTest = {};
-
-		HRESULT hresult = DirectX::LoadFromWICFile(L"../Data/Textures/MinecraftGrass.jpg", DirectX::WIC_FLAGS_NONE, &dxMetadataTest, dxImageTest);
-		const bool success = SUCCEEDED(hresult);
-
-		DirectX::ScratchImage res;
-		DirectX::GenerateMipMaps(*dxImageTest.GetImage(0, 0, 0), DirectX::TEX_FILTER_FLAGS::TEX_FILTER_DEFAULT, 0, res, false);
-
-		// Describe and create a Texture2D on GPU(Default Heap)
-		D3D12_RESOURCE_DESC textureDesc = {};
-		textureDesc.MipLevels = (uint16_t)res.GetImageCount();
-		textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-		textureDesc.Width = (uint32_t)dxMetadataTest.width;
-		textureDesc.Height = (uint32_t)dxMetadataTest.height;
-		textureDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
-		textureDesc.DepthOrArraySize = 1;
-		textureDesc.SampleDesc.Count = 1;
-		textureDesc.SampleDesc.Quality = 0;
-		textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-
-		D3D12Utility::DXAssert(D3D12Globals::Device->CreateCommittedResource(
-			&DefaultHeapProps,
-			D3D12_HEAP_FLAG_NONE,
-			&textureDesc,
-			D3D12_RESOURCE_STATE_COPY_DEST,
-			nullptr,
-			IID_PPV_ARGS(&m_texture)));
-
-		// Get required size by device
-		UINT64 uploadBufferSize = 0;
-		D3D12Globals::Device->GetCopyableFootprints(&textureDesc, 0, (uint32_t)res.GetImageCount(), 0, nullptr, nullptr, nullptr, &uploadBufferSize);
-
-		// Same thing
-		//const UINT64 uploadBufferSize = GetRequiredIntermediateSize(m_texture.Get(), 0, 1);
-
-		D3D12_RESOURCE_DESC UploadBufferDesc;
-		UploadBufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-		UploadBufferDesc.Alignment = 0;
-		UploadBufferDesc.Width = uploadBufferSize;
-		UploadBufferDesc.Height = 1;
-		UploadBufferDesc.DepthOrArraySize = 1;
-		UploadBufferDesc.MipLevels = 1;
-		UploadBufferDesc.Format = DXGI_FORMAT_UNKNOWN;
-		UploadBufferDesc.SampleDesc.Count = 1;
-		UploadBufferDesc.SampleDesc.Quality = 0;
-		UploadBufferDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-		UploadBufferDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
-
-		// Create the CPU -> GPU Upload Buffer
-		D3D12Utility::DXAssert(D3D12Globals::Device->CreateCommittedResource(
-			&UploadHeapProps,
-			D3D12_HEAP_FLAG_NONE,
-			&UploadBufferDesc,
-			D3D12_RESOURCE_STATE_GENERIC_READ,
-			nullptr,
-			IID_PPV_ARGS(&inUploadHeap)));
-
-
-		// Blocking call
-		DoTheUploadBlocking(m_texture.Get(), inUploadHeap, 1, m_commandList.Get(), res);
-
-		D3D12_RESOURCE_BARRIER barrier;
-		barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-		barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-		barrier.Transition.pResource = m_texture.Get();
-		barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
-		barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
-		barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-
-		m_commandList->ResourceBarrier(1, &barrier);
-
-		// Describe and create a SRV for the texture.
-		D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-		srvDesc.Format = textureDesc.Format;
-		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-		srvDesc.Texture2D.MipLevels = (uint32_t)res.GetImageCount();
-
-		D3D12_CPU_DESCRIPTOR_HANDLE descHeapStartHandle = m_cbvsrvHeap.CPUStart;
-		descHeapStartHandle.ptr += 1 * m_cbvsrvHeap.DescriptorSize;
-		D3D12Globals::Device->CreateShaderResourceView(m_texture.Get(), &srvDesc, descHeapStartHandle);
-	}
-
-	D3D12Utility::DXAssert(m_commandList->Close());
-	ID3D12CommandList* ppCommandLists[] = { m_commandList.Get() };
-	m_commandQueue->ExecuteCommandLists(_countof(ppCommandLists), ppCommandLists);
-}
+//void D3D12RHI::CreateTextureStuff()
+//{
+//	ComPtr<ID3D12Resource> newTextureUploadHeap;
+//	TextureUploadBuffers.push_back(newTextureUploadHeap);
+//
+//	ID3D12Resource* textureUploadHeap = newTextureUploadHeap.Get();
+//
+//	// Create the texture.
+//	{
+//		D3D12_HEAP_PROPERTIES DefaultHeapProps;
+//		DefaultHeapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
+//		DefaultHeapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+//		DefaultHeapProps.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+//		DefaultHeapProps.CreationNodeMask = 1;
+//		DefaultHeapProps.VisibleNodeMask = 1;
+//
+//		D3D12_HEAP_PROPERTIES UploadHeapProps;
+//		UploadHeapProps.Type = D3D12_HEAP_TYPE_UPLOAD;
+//		UploadHeapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+//		UploadHeapProps.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+//		UploadHeapProps.CreationNodeMask = 1;
+//		UploadHeapProps.VisibleNodeMask = 1;
+//
+//
+//		DirectX::ScratchImage dxImageTest = {};
+//		DirectX::TexMetadata dxMetadataTest = {};
+//
+//		HRESULT hresult = DirectX::LoadFromWICFile(L"../Data/Textures/MinecraftGrass.jpg", DirectX::WIC_FLAGS_NONE, &dxMetadataTest, dxImageTest);
+//		const bool success = SUCCEEDED(hresult);
+//
+//		DirectX::ScratchImage res;
+//		DirectX::GenerateMipMaps(*dxImageTest.GetImage(0, 0, 0), DirectX::TEX_FILTER_FLAGS::TEX_FILTER_DEFAULT, 0, res, false);
+//
+//		// Describe and create a Texture2D on GPU(Default Heap)
+//		D3D12_RESOURCE_DESC textureDesc = {};
+//		textureDesc.MipLevels = (uint16_t)res.GetImageCount();
+//		textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+//		textureDesc.Width = (uint32_t)dxMetadataTest.width;
+//		textureDesc.Height = (uint32_t)dxMetadataTest.height;
+//		textureDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+//		textureDesc.DepthOrArraySize = 1;
+//		textureDesc.SampleDesc.Count = 1;
+//		textureDesc.SampleDesc.Quality = 0;
+//		textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+//
+//		D3D12Utility::DXAssert(D3D12Globals::Device->CreateCommittedResource(
+//			&DefaultHeapProps,
+//			D3D12_HEAP_FLAG_NONE,
+//			&textureDesc,
+//			D3D12_RESOURCE_STATE_COPY_DEST,
+//			nullptr,
+//			IID_PPV_ARGS(&m_texture)));
+//
+//		// Get required size by device
+//		UINT64 uploadBufferSize = 0;
+//		D3D12Globals::Device->GetCopyableFootprints(&textureDesc, 0, (uint32_t)res.GetImageCount(), 0, nullptr, nullptr, nullptr, &uploadBufferSize);
+//
+//		// Same thing
+//		//const UINT64 uploadBufferSize = GetRequiredIntermediateSize(m_texture.Get(), 0, 1);
+//
+//		D3D12_RESOURCE_DESC UploadBufferDesc;
+//		UploadBufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+//		UploadBufferDesc.Alignment = 0;
+//		UploadBufferDesc.Width = uploadBufferSize;
+//		UploadBufferDesc.Height = 1;
+//		UploadBufferDesc.DepthOrArraySize = 1;
+//		UploadBufferDesc.MipLevels = 1;
+//		UploadBufferDesc.Format = DXGI_FORMAT_UNKNOWN;
+//		UploadBufferDesc.SampleDesc.Count = 1;
+//		UploadBufferDesc.SampleDesc.Quality = 0;
+//		UploadBufferDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+//		UploadBufferDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+//
+//		// Create the CPU -> GPU Upload Buffer
+//		D3D12Utility::DXAssert(D3D12Globals::Device->CreateCommittedResource(
+//			&UploadHeapProps,
+//			D3D12_HEAP_FLAG_NONE,
+//			&UploadBufferDesc,
+//			D3D12_RESOURCE_STATE_GENERIC_READ,
+//			nullptr,
+//			IID_PPV_ARGS(&textureUploadHeap)));
+//
+//		// Blocking call
+//		DoTheUploadBlocking(m_texture.Get(), textureUploadHeap, 1, m_commandList.Get(), res);
+//
+//		D3D12_RESOURCE_BARRIER barrier;
+//		barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+//		barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+//		barrier.Transition.pResource = m_texture.Get();
+//		barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+//		barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+//		barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+//
+//		m_commandList->ResourceBarrier(1, &barrier);
+//
+//		// Describe and create a SRV for the texture.
+//		D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+//		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+//		srvDesc.Format = textureDesc.Format;
+//		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+//		srvDesc.Texture2D.MipLevels = (uint32_t)res.GetImageCount();
+//
+//		D3D12_CPU_DESCRIPTOR_HANDLE descHeapStartHandle = m_cbvsrvHeap.CPUStart;
+//		descHeapStartHandle.ptr += 1 * m_cbvsrvHeap.DescriptorSize;
+//		D3D12Globals::Device->CreateShaderResourceView(m_texture.Get(), &srvDesc, descHeapStartHandle);
+//	}
+//}
 
 
 
@@ -970,6 +931,9 @@ void D3D12RHI::WaitForPreviousFrame()
 	}
 
 	m_frameIndex = m_swapChain->GetCurrentBackBufferIndex();
+
+	// Clean all used up upload buffers
+	TextureUploadBuffers.clear();
 }
 #endif
 
@@ -1063,21 +1027,15 @@ void D3D12RHI::Test()
 	m_commandList->RSSetScissorRects(1, &m_scissorRect);
 
 	// Desc Heap
-	ID3D12DescriptorHeap* ppHeaps[] = { m_cbvsrvHeap.Heap };
+	ID3D12DescriptorHeap* ppHeaps[] = { m_CbvSrvHeap.Heap };
 	m_commandList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
 
-	// First table
-	glm::vec4 rootConstant(0.f);
-	rootConstant.x = -StaticOffset;
-	m_commandList->SetGraphicsRoot32BitConstants(0, 4, &rootConstant, 0);
-
-	m_commandList->SetGraphicsRootDescriptorTable(1, m_cbvsrvHeap.GPUStart);
+	m_commandList->SetGraphicsRootDescriptorTable(0, m_CbvSrvHeap.GPUStart);
 
 	// Second table
-	D3D12_GPU_DESCRIPTOR_HANDLE secondTableHandle(m_cbvsrvHeap.GPUStart);
-	secondTableHandle.ptr += size_t(m_cbvsrvHeap.DescriptorSize);
-	m_commandList->SetGraphicsRootDescriptorTable(2, secondTableHandle); // This does the magic of binding a certain descriptor table to a certain heap with a start index for accessing descriptors
-
+	D3D12_GPU_DESCRIPTOR_HANDLE secondTableHandle(m_CbvSrvHeap.GPUStart);
+	secondTableHandle.ptr += size_t(m_CbvSrvHeap.DescriptorSize);
+	m_commandList->SetGraphicsRootDescriptorTable(1, secondTableHandle); // This does the magic of binding a certain descriptor table to a certain heap with a start index for accessing descriptors
 
 	D3D12_RESOURCE_BARRIER transitionPresentToRt;
 	transitionPresentToRt.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
@@ -1099,7 +1057,7 @@ void D3D12RHI::Test()
 	const float clearColor[] = { 0.0f, 0.2f, 0.4f, 1.0f };
 	m_commandList->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
 	m_commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	m_commandList->IASetVertexBuffers(0, 1, &m_vertexBufferView);
+	m_commandList->IASetVertexBuffers(0, 1, &m_vertexBuffer->VBView());
 	m_commandList->IASetIndexBuffer(&m_indexBuffer->IBView());
 
 	m_commandList->DrawIndexedInstanced(BasicShapesData::GetCubeIndicesCount(), 1, 0, 0, 0);
@@ -1126,9 +1084,6 @@ void D3D12RHI::ImGuiInit()
 	}
 
 	ImGui_ImplWin32_Init(static_cast<HWND>(GEngine->GetMainWindow().GetHandle()));
-
-// 	ID3D12Device* device, int num_frames_in_flight, DXGI_FORMAT rtv_format, ID3D12DescriptorHeap* cbv_srv_heap,
-// 		D3D12_CPU_DESCRIPTOR_HANDLE font_srv_cpu_desc_handle, D3D12_GPU_DESCRIPTOR_HANDLE font_srv_gpu_desc_handle);
 
 	D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
 	srvHeapDesc.NumDescriptors = 1;
@@ -1199,7 +1154,7 @@ void D3D12RHI::SwapBuffers()
 
 eastl::shared_ptr<class RHIIndexBuffer> D3D12RHI::CreateIndexBuffer(const uint32_t* inData, uint32_t inCount)
 {
-	ID3D12Resource* handle;
+	ID3D12Resource* resource = nullptr;
 	const UINT indexBufferSize = sizeof(uint32_t) * inCount;
 
 	D3D12_RESOURCE_DESC indexBufferDesc;
@@ -1218,8 +1173,7 @@ eastl::shared_ptr<class RHIIndexBuffer> D3D12RHI::CreateIndexBuffer(const uint32
 	// TODO:
 	// Note: using upload heaps to transfer static data like vert buffers is not 
 	// recommended. Every time the GPU needs it, the upload heap will be marshalled 
-	// over. Please read up on Default Heap usage. An upload heap is used here for 
-	// code simplicity and because there are very few verts to actually transfer.
+	// over. Replace this with default heap.
 	D3D12_HEAP_PROPERTIES heapProps;
 	heapProps.Type = D3D12_HEAP_TYPE_UPLOAD;
 	heapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
@@ -1233,7 +1187,7 @@ eastl::shared_ptr<class RHIIndexBuffer> D3D12RHI::CreateIndexBuffer(const uint32
 		&indexBufferDesc,
 		D3D12_RESOURCE_STATE_GENERIC_READ,
 		nullptr,
-		IID_PPV_ARGS(&handle)));
+		IID_PPV_ARGS(&resource)));
 
 
 	// Copy the triangle data to the index buffer.
@@ -1241,18 +1195,207 @@ eastl::shared_ptr<class RHIIndexBuffer> D3D12RHI::CreateIndexBuffer(const uint32
 	D3D12_RANGE indexReadRange;
 	indexReadRange.Begin = 0;
 	indexReadRange.End = 0;
-	D3D12Utility::DXAssert(handle->Map(0, &indexReadRange, reinterpret_cast<void**>(&pIndexDataBegin)));
+	D3D12Utility::DXAssert(resource->Map(0, &indexReadRange, reinterpret_cast<void**>(&pIndexDataBegin)));
 
 	memcpy(pIndexDataBegin, inData, indexBufferSize);
 
-	handle->Unmap(0, nullptr);
+	resource->Unmap(0, nullptr);
 
 	eastl::shared_ptr<D3D12IndexBuffer> newBuffer = eastl::make_shared<D3D12IndexBuffer>();
 	newBuffer->IndexCount = inCount;
-	newBuffer->Handle = handle;
+	newBuffer->Resource = resource;
 	newBuffer->IBFormat = DXGI_FORMAT::DXGI_FORMAT_R32_UINT;
-	newBuffer->GPUAddress = handle->GetGPUVirtualAddress();;
+	newBuffer->GPUAddress = resource->GetGPUVirtualAddress();;
 	newBuffer->Size = indexBufferSize;
 
 	return newBuffer;
 }
+
+eastl::shared_ptr<class RHIVertexBuffer> D3D12RHI::CreateVertexBuffer(const class VertexInputLayout& inLayout, const float* inVertices, const int32_t inCount, eastl::shared_ptr<class RHIIndexBuffer> inIndexBuffer /*= nullptr*/)
+{
+	ID3D12Resource* resource = nullptr;
+
+	// Note: using upload heaps to transfer static data like vert buffers is not 
+	// recommended. Every time the GPU needs it, the upload heap will be marshalled 
+	// over. Please read up on Default Heap usage. An upload heap is used here for 
+	// code simplicity and because there are very few verts to actually transfer.
+	D3D12_HEAP_PROPERTIES heapProps;
+	heapProps.Type = D3D12_HEAP_TYPE_UPLOAD;
+	heapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+	heapProps.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+	heapProps.CreationNodeMask = 1;
+	heapProps.VisibleNodeMask = 1;
+
+	const UINT vertexBufferSize = sizeof(float) * inCount;
+
+	D3D12_RESOURCE_DESC vertexBufferDesc;
+	vertexBufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+	vertexBufferDesc.Alignment = 0;
+	vertexBufferDesc.Width = vertexBufferSize;
+	vertexBufferDesc.Height = 1;
+	vertexBufferDesc.DepthOrArraySize = 1;
+	vertexBufferDesc.MipLevels = 1;
+	vertexBufferDesc.Format = DXGI_FORMAT_UNKNOWN;
+	vertexBufferDesc.SampleDesc.Count = 1;
+	vertexBufferDesc.SampleDesc.Quality = 0;
+	vertexBufferDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+	vertexBufferDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+	D3D12Utility::DXAssert(D3D12Globals::Device->CreateCommittedResource(
+		&heapProps,
+		D3D12_HEAP_FLAG_NONE,
+		&vertexBufferDesc,
+		D3D12_RESOURCE_STATE_GENERIC_READ,
+		nullptr,
+		IID_PPV_ARGS(&resource)));
+
+	// Copy the vertex data to the vertex buffer.
+	UINT8* pVertexDataBegin;
+	D3D12_RANGE readRange;
+	readRange.Begin = 0;
+	readRange.End = 0;
+	D3D12Utility::DXAssert(resource->Map(0, &readRange, reinterpret_cast<void**>(&pVertexDataBegin)));
+
+	memcpy(pVertexDataBegin, inVertices, vertexBufferSize);
+	resource->Unmap(0, nullptr);
+
+	eastl::shared_ptr<D3D12VertexBuffer> newBuffer = eastl::make_shared<D3D12VertexBuffer>();
+	newBuffer->GPUAddress = resource->GetGPUVirtualAddress();
+	newBuffer->AllocatedSize = vertexBufferSize;
+	newBuffer->Resource = resource;
+	newBuffer->Layout = inLayout;
+	newBuffer->NumElements = inCount;
+
+	return newBuffer;
+}
+
+eastl::shared_ptr<RHITexture2D> D3D12RHI::CreateAndLoadTexture2D(const eastl::string& inDataPath, const bool inSRGB)
+{
+	eastl::shared_ptr<D3D12Texture2D> newTexture = eastl::make_shared<D3D12Texture2D>();
+
+	ComPtr<ID3D12Resource> newTextureUploadHeap;
+	TextureUploadBuffers.push_back(newTextureUploadHeap);
+
+	ID3D12Resource* textureUploadHeap = newTextureUploadHeap.Get();
+	ID3D12Resource* texResource;
+
+	D3D12_HEAP_PROPERTIES DefaultHeapProps;
+	DefaultHeapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
+	DefaultHeapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+	DefaultHeapProps.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+	DefaultHeapProps.CreationNodeMask = 1;
+	DefaultHeapProps.VisibleNodeMask = 1;
+
+	D3D12_HEAP_PROPERTIES UploadHeapProps;
+	UploadHeapProps.Type = D3D12_HEAP_TYPE_UPLOAD;
+	UploadHeapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+	UploadHeapProps.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+	UploadHeapProps.CreationNodeMask = 1;
+	UploadHeapProps.VisibleNodeMask = 1;
+
+
+	DirectX::ScratchImage dxImageTest = {};
+	DirectX::TexMetadata dxMetadataTest = {};
+
+	wchar_t* wideString = new wchar_t[inDataPath.length()];
+	for (int32_t i = 0; i < inDataPath.length(); ++i)
+	{
+		wideString[i] = inDataPath[i];
+	}
+
+	eastl::wstring wide = eastl::wstring(wideString, inDataPath.length());
+	HRESULT hresult = DirectX::LoadFromWICFile(wide.c_str(), DirectX::WIC_FLAGS_NONE, &dxMetadataTest, dxImageTest);
+	const bool success = SUCCEEDED(hresult);
+
+	ENSURE(success);
+
+	DirectX::ScratchImage res;
+	DirectX::GenerateMipMaps(*dxImageTest.GetImage(0, 0, 0), DirectX::TEX_FILTER_FLAGS::TEX_FILTER_DEFAULT, 0, res, false);
+
+	// Describe and create a Texture2D on GPU(Default Heap)
+	D3D12_RESOURCE_DESC textureDesc = {};
+	textureDesc.MipLevels = (uint16_t)res.GetImageCount();
+	textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	textureDesc.Width = (uint32_t)dxMetadataTest.width;
+	textureDesc.Height = (uint32_t)dxMetadataTest.height;
+	textureDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+	textureDesc.DepthOrArraySize = 1;
+	textureDesc.SampleDesc.Count = 1;
+	textureDesc.SampleDesc.Quality = 0;
+	textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+
+	D3D12Utility::DXAssert(D3D12Globals::Device->CreateCommittedResource(
+		&DefaultHeapProps,
+		D3D12_HEAP_FLAG_NONE,
+		&textureDesc,
+		D3D12_RESOURCE_STATE_COPY_DEST,
+		nullptr,
+		IID_PPV_ARGS(&texResource)));
+
+	// Get required size by device
+	UINT64 uploadBufferSize = 0;
+	D3D12Globals::Device->GetCopyableFootprints(&textureDesc, 0, (uint32_t)res.GetImageCount(), 0, nullptr, nullptr, nullptr, &uploadBufferSize);
+
+	// Same thing
+	//const UINT64 uploadBufferSize = GetRequiredIntermediateSize(textureHandle, 0, 1);
+
+	D3D12_RESOURCE_DESC UploadBufferDesc;
+	UploadBufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+	UploadBufferDesc.Alignment = 0;
+	UploadBufferDesc.Width = uploadBufferSize;
+	UploadBufferDesc.Height = 1;
+	UploadBufferDesc.DepthOrArraySize = 1;
+	UploadBufferDesc.MipLevels = 1;
+	UploadBufferDesc.Format = DXGI_FORMAT_UNKNOWN;
+	UploadBufferDesc.SampleDesc.Count = 1;
+	UploadBufferDesc.SampleDesc.Quality = 0;
+	UploadBufferDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+	UploadBufferDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+	// Create the CPU -> GPU Upload Buffer
+	D3D12Utility::DXAssert(D3D12Globals::Device->CreateCommittedResource(
+		&UploadHeapProps,
+		D3D12_HEAP_FLAG_NONE,
+		&UploadBufferDesc,
+		D3D12_RESOURCE_STATE_GENERIC_READ,
+		nullptr,
+		IID_PPV_ARGS(&textureUploadHeap)));
+
+	// Blocking call
+	DoTheUploadBlocking(texResource, textureUploadHeap, 1, m_commandList.Get(), res);
+
+	D3D12_RESOURCE_BARRIER barrier;
+	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	barrier.Transition.pResource = texResource;
+	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+	barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+
+	m_commandList->ResourceBarrier(1, &barrier);
+
+	// Describe and create a SRV for the texture.
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc.Format = textureDesc.Format;
+	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	srvDesc.Texture2D.MipLevels = (uint32_t)res.GetImageCount();
+
+	D3D12DescHeapAllocationDesc descAllocation = m_CbvSrvHeap.AllocatePersistent();
+	newTexture->SRVIndex = descAllocation.Index;
+	D3D12Globals::Device->CreateShaderResourceView(texResource, &srvDesc, descAllocation.CPUHandle);
+
+	newTexture->NumMips = (uint16_t)res.GetImageCount();
+	newTexture->ChannelsType = ERHITextureChannelsType::RGBA;
+	newTexture->NrChannels = 4;
+	newTexture->Height = textureDesc.Height;
+	newTexture->Width = textureDesc.Width;
+	newTexture->Precision = ERHITexturePrecision::UnsignedByte;
+	newTexture->SourcePath = inDataPath;
+	newTexture->TextureType = ETextureType::Single;
+	newTexture->Resource = texResource;
+
+
+	return newTexture;
+}
+
