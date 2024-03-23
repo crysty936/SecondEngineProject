@@ -17,7 +17,7 @@ public:
 	struct ID3D12Resource* Resource = nullptr;
 	DXGI_FORMAT IBFormat = DXGI_FORMAT_UNKNOWN;
 	uint64_t GPUAddress = 0;
-	uint64_t Size = 0;
+	uint32_t Size = 0;
 
 
 };
@@ -37,7 +37,6 @@ public:
 
 
 };
-
 
 class D3D12Texture2D : public RHITexture2D
 {

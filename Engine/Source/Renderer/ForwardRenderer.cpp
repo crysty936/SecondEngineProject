@@ -211,7 +211,6 @@ void ForwardRenderer::InitGI()
 	{
 		PathTracingRay traceRay;
 		PathTracePayload payload;
-		glm::vec3 color;
 
 		command.CoeffsBuffer = RHI::Get()->CreateTextureBuffer(command.Vertices.size() * SH_COEFFICIENT_COUNT * sizeof(glm::vec3));
 

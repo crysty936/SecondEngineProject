@@ -4,15 +4,18 @@
 #include <winerror.h>
 #include "Core/EngineUtils.h"
 #include <d3d12.h>
-
-
+#include "D3D12GraphicsTypes_Internal.h"
 
 namespace D3D12Globals
 {
 	extern ID3D12Device* Device;
+	extern uint64_t CurrentFrameIndex;
+	constexpr uint32_t NumFramesInFlight = 2;
 
-
-
+	// Descriptor Heaps
+	// TODO: Implement non-shader visible descriptor heaps that will be copied over into main heap when drawing
+	extern DescriptorHeap GlobalRTVHeap;
+	extern DescriptorHeap GlobalSRVHeap;
 }
 
 namespace D3D12Utility
@@ -25,6 +28,8 @@ namespace D3D12Utility
 		return success;
 	}
 
+	D3D12_HEAP_PROPERTIES& GetDefaultHeapProps();
 
+	void TransitionResource(ID3D12GraphicsCommandList* inCmdList, ID3D12Resource* inResource, D3D12_RESOURCE_STATES inStateBefore, D3D12_RESOURCE_STATES inStateAfter);
 
 }

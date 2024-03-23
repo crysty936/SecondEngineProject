@@ -8,7 +8,6 @@ public:
 	D3D12RHI();
 	~D3D12RHI();
 
-	void CreateTextureStuff();
 	void WaitForPreviousFrame();
 	void MoveToNextFrame();
 	void Test() override;
@@ -31,6 +30,9 @@ public:
 
 
 	eastl::shared_ptr<class RHITexture2D> CreateAndLoadTexture2D(const eastl::string& inDataPath, const bool inSRGB) override;
+
+
+private:
 
 
 };
