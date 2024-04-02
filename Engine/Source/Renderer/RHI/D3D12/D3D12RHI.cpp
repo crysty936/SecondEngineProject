@@ -1,5 +1,4 @@
 #include "D3D12RHI.h"
-#include <windows.h>
 
 #include "Core/EngineUtils.h"
 #include "Core/EngineCore.h"
@@ -10,6 +9,7 @@
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN             
 #endif
+#include <windows.h>
 
 #include <d3d12.h>
 #include <dxgi1_6.h>
@@ -406,12 +406,11 @@ D3D12RHI::D3D12RHI()
 	UINT compileFlags = 0;
 #endif
 
-	eastl::string shaderCode;
+	static eastl::string shaderCode;
 	const bool readSuccess = IOUtils::TryFastReadFile(fullPath, shaderCode);
 
 	ComPtr<ID3DBlob> vertexShader;
 	ID3DBlob* vsErrBlob = nullptr;
-
 
 	D3DCompile2(shaderCode.data(), shaderCode.size(), "testshadername", nullptr, nullptr, "VSMain", "vs_5_0", compileFlags, 0, 0, nullptr, 0, &vertexShader, &vsErrBlob);
 
@@ -832,12 +831,12 @@ void D3D12RHI::Test()
 	D3D12_CPU_DESCRIPTOR_HANDLE renderTargets[2];
 	//D3D12_CPU_DESCRIPTOR_HANDLE currentRTDescriptor;
 	//currentRTDescriptor.ptr = D3D12Globals::GlobalRTVHeap.CPUStart.ptr + D3D12Globals::CurrentFrameIndex * D3D12Globals::GlobalRTVHeap.DescriptorSize;
+
+	// Backbuffers are the first 2 RTVs in the Global Heap
 	D3D12_CPU_DESCRIPTOR_HANDLE currentRTDescriptor = D3D12Globals::GlobalRTVHeap.GetCPUHandle(D3D12Globals::CurrentFrameIndex);
 
 	renderTargets[0] = currentRTDescriptor;
-	
 	renderTargets[1] = m_GBufferAlbedo.RTV;
-
 
 	m_commandList->OMSetRenderTargets(2, renderTargets, FALSE, nullptr);
 

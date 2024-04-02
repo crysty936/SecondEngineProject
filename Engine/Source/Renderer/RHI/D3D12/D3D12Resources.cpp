@@ -1,6 +1,12 @@
 #include "D3D12Resources.h"
 #include "D3D12Utility.h"
 #include "D3D12RHI.h"
+
+// Exclude rarely-used stuff from Windows headers.
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN             
+#endif
+
 #include <windows.h>
 #include <d3d12.h>
 #include <wrl/client.h>
