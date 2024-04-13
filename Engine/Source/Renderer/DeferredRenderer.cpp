@@ -66,20 +66,20 @@ void DeferredRenderer::InitInternal()
 	const WindowsWindow& currentWindow = GEngine->GetMainWindow();
 	const WindowProperties& props = currentWindow.GetProperties();
 
-	GBuffer = RHI::Get()->CreateEmptyFrameBuffer();
+	//GBuffer = RHI::Get()->CreateEmptyFrameBuffer();
 
 	GBufferDepth = RHI::Get()->CreateDepthMap(props.Width, props.Height);
 
-	RHI::Get()->AttachTextureToFramebufferDepth(*GBuffer, GBufferDepth);
+	//RHI::Get()->AttachTextureToFramebufferDepth(*GBuffer, GBufferDepth);
 
-	GBufferNormal = RHI::Get()->CreateRenderTexture(props.Width, props.Height, ERHITexturePrecision::Float16, ERHITextureFilter::Nearest);
-	RHI::Get()->AttachTextureToFramebufferColor(*GBuffer, GBufferNormal);
+	//GBufferNormal = RHI::Get()->CreateRenderTexture(props.Width, props.Height, ERHITexturePrecision::Float16, ERHITextureFilter::Nearest);
+	//RHI::Get()->AttachTextureToFramebufferColor(*GBuffer, GBufferNormal);
 
-	GBufferAlbedo = RHI::Get()->CreateRenderTexture(props.Width, props.Height, ERHITexturePrecision::UnsignedByte, ERHITextureFilter::Nearest);
-	RHI::Get()->AttachTextureToFramebufferColor(*GBuffer, GBufferAlbedo);
+	//GBufferAlbedo = RHI::Get()->CreateRenderTexture(props.Width, props.Height, ERHITexturePrecision::UnsignedByte, ERHITextureFilter::Nearest);
+	//RHI::Get()->AttachTextureToFramebufferColor(*GBuffer, GBufferAlbedo);
 
-	GBufferMetallicRoughness = RHI::Get()->CreateRenderTexture(props.Width, props.Height, ERHITexturePrecision::UnsignedByte, ERHITextureFilter::Nearest);
-	RHI::Get()->AttachTextureToFramebufferColor(*GBuffer, GBufferMetallicRoughness);
+	//GBufferMetallicRoughness = RHI::Get()->CreateRenderTexture(props.Width, props.Height, ERHITexturePrecision::UnsignedByte, ERHITextureFilter::Nearest);
+	//RHI::Get()->AttachTextureToFramebufferColor(*GBuffer, GBufferMetallicRoughness);
 
 	VisualizeDepthUtil = SceneHelper::CreateObject<VisualizeDepthQuad>("VisualizeDepth");
 	VisualizeDepthUtil->CreateCommand();
@@ -152,7 +152,7 @@ void DeferredRenderer::Draw()
 
 	DrawDecals(DecalCommands);
 
-	RHI::Instance->BindDefaultFrameBuffer();
+	//RHI::Instance->BindDefaultFrameBuffer();
 	RHI::Get()->ClearBuffers();
 
 	RHI::Get()->CopyFrameBufferDepth(GBuffer, nullptr);

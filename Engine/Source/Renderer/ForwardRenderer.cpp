@@ -100,18 +100,18 @@ ForwardRenderer::~ForwardRenderer() = default;
 
 void ForwardRenderer::InitInternal()
 {
-	GlobalFrameBuffer = RHI::Get()->CreateDepthStencilFrameBuffer();
+	//GlobalFrameBuffer = RHI::Get()->CreateDepthStencilFrameBuffer();
 
 	const WindowsWindow& currentWindow = GEngine->GetMainWindow();
 	const WindowProperties& props = currentWindow.GetProperties();
 
 	// HDR Texture
-	GlobalRenderTexture = RHI::Get()->CreateRenderTexture(props.Width, props.Height, ERHITexturePrecision::Float16, ERHITextureFilter::Linear);
-	RHI::Get()->AttachTextureToFramebufferColor(*GlobalFrameBuffer, GlobalRenderTexture);
+	//GlobalRenderTexture = RHI::Get()->CreateRenderTexture(props.Width, props.Height, ERHITexturePrecision::Float16, ERHITextureFilter::Linear);
+	//RHI::Get()->AttachTextureToFramebufferColor(*GlobalFrameBuffer, GlobalRenderTexture);
 
-	AuxiliaryFrameBuffer = RHI::Get()->CreateDepthStencilFrameBuffer();
-	AuxiliaryRenderTexture = RHI::Get()->CreateRenderTexture(props.Width, props.Height, ERHITexturePrecision::Float16, ERHITextureFilter::Linear);
-	RHI::Get()->AttachTextureToFramebufferColor(*AuxiliaryFrameBuffer, AuxiliaryRenderTexture);
+	//AuxiliaryFrameBuffer = RHI::Get()->CreateDepthStencilFrameBuffer();
+	//AuxiliaryRenderTexture = RHI::Get()->CreateRenderTexture(props.Width, props.Height, ERHITexturePrecision::Float16, ERHITextureFilter::Linear);
+	//RHI::Get()->AttachTextureToFramebufferColor(*AuxiliaryFrameBuffer, AuxiliaryRenderTexture);
 
 
 	ScreenQuad = SceneHelper::CreateVisualEntity<FullScreenQuad>("Global Renderer Screen Quad");
@@ -132,11 +132,11 @@ void ForwardRenderer::InitInternal()
 	//BloomMergeUtilQuad->CreateCommand();
 
 	// HDR Texture
-	ColorBackupTexture = RHI::Get()->CreateRenderTexture(props.Width, props.Height, ERHITexturePrecision::Float16, ERHITextureFilter::Linear);
+	//ColorBackupTexture = RHI::Get()->CreateRenderTexture(props.Width, props.Height, ERHITexturePrecision::Float16, ERHITextureFilter::Linear);
 
-	DepthFrameBuffer = RHI::Get()->CreateEmptyFrameBuffer();
+	//DepthFrameBuffer = RHI::Get()->CreateEmptyFrameBuffer();
 	DirectionalLightCascadedShadowTexture = RHI::Get()->CreateArrayDepthMap(SHADOW_WIDTH, SHADOW_HEIGHT, MAX_CASCADES_COUNT);
-	RHI::Get()->AttachTextureToFramebufferDepth(*DepthFrameBuffer, DirectionalLightCascadedShadowTexture);
+	//RHI::Get()->AttachTextureToFramebufferDepth(*DepthFrameBuffer, DirectionalLightCascadedShadowTexture);
 
 
 	//PostInitCallback& postInitMulticast = GEngine->GetPostInitMulticast();
@@ -346,7 +346,7 @@ void ForwardRenderer::Draw()
 	//RHI::Instance->ClearTexture(*GlobalRenderTexture, glm::vec4(0.f, 0.f, 0.f, 1.f));
 
 	// To output right to default buffer
-	RHI::Instance->BindDefaultFrameBuffer();
+	//RHI::Instance->BindDefaultFrameBuffer();
 
 	// Clear additional framebuffer buffers
 	RHI::Instance->ClearBuffers();
@@ -727,7 +727,7 @@ void ForwardRenderer::DrawShadowMap()
  	DrawCommands(MainCommands);
 // 	RenderCommandsMutex.unlock();
 
-	RHI::Get()->UnbindFrameBuffer(*DepthFrameBuffer);
+	//RHI::Get()->UnbindFrameBuffer(*DepthFrameBuffer);
 
  	SetViewportSizeToMain();
  	SetDrawMode(EDrawMode::Default);

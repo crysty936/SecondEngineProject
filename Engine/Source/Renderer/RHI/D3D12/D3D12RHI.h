@@ -8,6 +8,8 @@ public:
 	D3D12RHI();
 	~D3D12RHI();
 
+	void Init_Internal() override;
+
 	void WaitForPreviousFrame();
 	void MoveToNextFrame();
 	void Test() override;
@@ -30,6 +32,11 @@ public:
 
 
 	eastl::shared_ptr<class RHITexture2D> CreateAndLoadTexture2D(const eastl::string& inDataPath, const bool inSRGB) override;
+
+
+
+	eastl::shared_ptr<class RHIRenderTarget2D> CreateRenderTexture(const int32_t inWidth, const int32_t inHeight, const ERHITexturePrecision inPrecision = ERHITexturePrecision::UnsignedByte, const ERHITextureFilter inFilter = ERHITextureFilter::Linear) override;
+
 
 
 private:

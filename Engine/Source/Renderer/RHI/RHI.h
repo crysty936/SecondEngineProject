@@ -157,7 +157,6 @@ public:
 	virtual void BindUniformBuffer(const RHIUniformBuffer& inBuffer) {}
 	virtual void BindTexture2D(const class RHITexture2D& inTex, const int32_t inTexId) {}
 	virtual void BindFrameBuffer(const class RHIFrameBuffer& inFrameBuffer) {};
-	virtual void BindDefaultFrameBuffer() {}
 	virtual void BindTextureBuffer(const RHITextureBuffer& inBuffer, const int32_t inBindingSlot) {}
 
 	virtual void UnbindVertexBuffer(const class RHIVertexBuffer& inBuffer, const bool inUnbindIndexBuffer = true) {}
@@ -165,16 +164,9 @@ public:
 	virtual void UnbindShader(const class RHIShader& inShader) {}
 	virtual void UnbindUniformBuffer(const RHIUniformBuffer& inBuffer) {}
 	virtual void UnbindTexture2D(const class RHITexture2D& inTex, const int32_t inTexId) {}
-	virtual void UnbindFrameBuffer(const class RHIFrameBuffer& inFrameBuffer) {}
 	virtual void UnbindTextureBuffer(const RHITextureBuffer& inBuffer, const int32_t inBindingSlot) {}
 
 	virtual void UniformBufferUpdateData(class RHIUniformBuffer& inBuffer, const void* inData, const size_t inDataSize, const int32_t inBufferNr) {};
-
-	/** Attach a texture to the color ouput of a framebuffer */
-	virtual void AttachTextureToFramebufferColor(class RHIFrameBuffer& inFrameBuffer, eastl::shared_ptr<class RHITexture2D>& inTex) {}
-
-	/** Attach a texture to the depth output of a framebuffer. Preferrably a texture with only depth component */
-	virtual void AttachTextureToFramebufferDepth(class RHIFrameBuffer& inFrameBuffer, eastl::shared_ptr<class RHITexture2D>& inTex) {}
 
 	virtual void ClearTexture(const RHITexture2D& inTexture, const glm::vec4& inColor) {}
 
@@ -186,13 +178,8 @@ public:
 	virtual void UploadDataToBuffer(RHITextureBuffer& inBuffer, const void* inData, const size_t inSize) {}
 	virtual eastl::shared_ptr<class RHITexture2D> CreateAndLoadTexture2D(const eastl::string& inDataPath, const bool inSRGB) { return nullptr; }
 
-	/**  A frame buffer that already has Depth Stencil attachments, can be used with texture color attachment */
-	virtual eastl::shared_ptr<class RHIFrameBuffer> CreateDepthStencilFrameBuffer() { return nullptr; }
-
-	virtual eastl::shared_ptr<class RHIFrameBuffer> CreateEmptyFrameBuffer() { return nullptr; }
-
 	/** Render texture with all channels */
-	virtual eastl::shared_ptr<class RHITexture2D> CreateRenderTexture(const int32_t inWidth, const int32_t inHeight, const ERHITexturePrecision inPrecision = ERHITexturePrecision::UnsignedByte, const ERHITextureFilter inFilter = ERHITextureFilter::Linear) { return nullptr; }
+	virtual eastl::shared_ptr<class RHIRenderTarget2D> CreateRenderTexture(const int32_t inWidth, const int32_t inHeight, const ERHITexturePrecision inPrecision = ERHITexturePrecision::UnsignedByte, const ERHITextureFilter inFilter = ERHITextureFilter::Linear) { return nullptr; }
 
 	virtual void CopyRenderTexture(class RHITexture2D& inSrc, class RHITexture2D& inTrg) {}
 	virtual void CopyRenderTextureRegion(class RHITexture2D& inSrc, class RHITexture2D& inTrg, const int32_t inOffsetX, const int32_t inOffsetY, const int32_t inRegionWidth, const int32_t inRegionHeight) {}
@@ -248,6 +235,9 @@ public:
 	// Test stuff
 	virtual void Test() {}
 	//
+
+private:
+	virtual void Init_Internal() {};
 
 public:
 	inline static class RHI* Instance = nullptr;

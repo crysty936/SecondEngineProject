@@ -2,6 +2,9 @@
 #include "Renderer/RHI/RHI.h"
 #include "EASTL/string.h"
 
+// Deprecated
+#if 0
+
 class OpenGLRHI : public RHI
 {
 public:
@@ -27,7 +30,7 @@ public:
 	virtual void UploadDataToTexture(class RHITexture2D& inTexture, const struct ImageData& inData, const bool inGenerateMips) override;
 	virtual void UploadDataToBuffer(RHITextureBuffer& inBuffer, const void* inData, const size_t inSize) override;
 	virtual eastl::shared_ptr<class RHITexture2D> CreateAndLoadTexture2D(const eastl::string& inDataPath, const bool inSRGB) override;
-	virtual eastl::shared_ptr<class RHITexture2D> CreateRenderTexture(const int32_t inWidth, const int32_t inHeight, const ERHITexturePrecision inPrecision = ERHITexturePrecision::UnsignedByte, const ERHITextureFilter inFilter = ERHITextureFilter::Linear) override;
+	virtual eastl::shared_ptr<class RHIRenderTarget2D> CreateRenderTexture(const int32_t inWidth, const int32_t inHeight, const ERHITexturePrecision inPrecision = ERHITexturePrecision::UnsignedByte, const ERHITextureFilter inFilter = ERHITextureFilter::Linear) override;
 	virtual void CopyRenderTexture(class RHITexture2D& inSrc, class RHITexture2D& inTrg) override;
 	virtual void CopyRenderTextureRegion(class RHITexture2D& inSrc, class RHITexture2D& inTrg, const int32_t inOffsetX, const int32_t inOffsetY, const int32_t inRegionWidth, const int32_t inRegionHeight) override;
 
@@ -127,3 +130,6 @@ private:
 
 	void* GLContext = nullptr;
 };
+
+#endif
+

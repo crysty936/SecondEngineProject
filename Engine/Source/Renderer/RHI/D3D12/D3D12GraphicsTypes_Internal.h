@@ -9,10 +9,10 @@ struct D3D12DescHeapAllocationDesc
 	uint32_t Index = -1;
 };
 
-struct DescriptorHeap
+struct D3D12IDescriptorHeap
 {
 public:
-	~DescriptorHeap();
+	~D3D12IDescriptorHeap();
 
 	void Init(bool inShaderVisible, uint32_t inNumPersistent, D3D12_DESCRIPTOR_HEAP_TYPE inHeapType);
 	D3D12DescHeapAllocationDesc AllocatePersistent();
@@ -60,29 +60,26 @@ public:
 
 };
 
-struct RenderTargetTexture
-{
-public:
-	RenderTargetTexture();
-	~RenderTargetTexture();
-
-	void Init(const uint32_t inWidth, const uint32_t inHeight);
-	void MakeReadable(ID3D12GraphicsCommandList* inCmdList);
-	void MakeWriteable(ID3D12GraphicsCommandList* inCmdList);
-
-public:
-
-	D3D12Texture2D Texture;
-
-	D3D12_CPU_DESCRIPTOR_HANDLE RTV = {};
-
-
-
-
-};
-
-
-
+//struct D3D12IRenderTargetTexture
+//{
+//public:
+//	//D3D12IRenderTargetTexture();
+//	//~D3D12IRenderTargetTexture();
+//
+//	//void Init(const uint32_t inWidth, const uint32_t inHeight);
+//
+//public:
+//	//D3D12Texture2D Texture;
+//
+//	D3D12_CPU_DESCRIPTOR_HANDLE RTV = {};
+//
+//
+//
+//
+//};
+//
+//
+//
 
 
 

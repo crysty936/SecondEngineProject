@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include "Renderer/RHI/RHI.h"
 
+// One dimensional Array
 class RHITextureBuffer : public RHIBufferBase
 {
 public:

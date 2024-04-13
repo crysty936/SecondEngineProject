@@ -14,8 +14,8 @@ namespace D3D12Globals
 
 	// Descriptor Heaps
 	// TODO: Implement non-shader visible descriptor heaps that will be copied over into main heap when drawing
-	extern DescriptorHeap GlobalRTVHeap;
-	extern DescriptorHeap GlobalSRVHeap;
+	extern D3D12IDescriptorHeap GlobalRTVHeap;
+	extern D3D12IDescriptorHeap GlobalSRVHeap;
 }
 
 namespace D3D12Utility
@@ -31,5 +31,9 @@ namespace D3D12Utility
 	D3D12_HEAP_PROPERTIES& GetDefaultHeapProps();
 
 	void TransitionResource(ID3D12GraphicsCommandList* inCmdList, ID3D12Resource* inResource, D3D12_RESOURCE_STATES inStateBefore, D3D12_RESOURCE_STATES inStateAfter);
+
+	void MakeTextureReadable(ID3D12GraphicsCommandList* inCmdList, ID3D12Resource* inResource);
+	void MakeTextureWriteable(ID3D12GraphicsCommandList* inCmdList, ID3D12Resource* inResource);
+
 
 }

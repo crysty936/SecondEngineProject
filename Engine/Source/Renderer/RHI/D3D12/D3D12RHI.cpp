@@ -121,7 +121,7 @@ D3D12_RECT m_scissorRect;
 ComPtr<IDXGISwapChain3> m_swapChain;
 
 ComPtr<ID3D12Resource> m_renderTargets[D3D12Globals::NumFramesInFlight];
-RenderTargetTexture m_GBufferAlbedo;
+eastl::shared_ptr<D3D12RenderTarget2D> m_GBufferAlbedo;
 
 ComPtr<ID3D12CommandAllocator> m_commandAllocators[D3D12Globals::NumFramesInFlight];
 ComPtr<ID3D12CommandQueue> m_commandQueue;
@@ -176,13 +176,14 @@ UINT64 m_fenceValues[D3D12Globals::NumFramesInFlight];
 UINT64 m_fenceValue;
 #endif
 
-void InitPipeline()
+
+void InitPipeline(const WindowsWindow& inWindow)
 {
 	UINT dxgiFactoryFlags = 0;
 
-//#if defined(_DEBUG)
-	// Enable the debug layer (requires the Graphics Tools "optional feature").
-	// NOTE: Enabling the debug layer after device creation will invalidate the active device.
+	//#if defined(_DEBUG)
+		// Enable the debug layer (requires the Graphics Tools "optional feature").
+		// NOTE: Enabling the debug layer after device creation will invalidate the active device.
 	{
 		ComPtr<ID3D12Debug> debugController;
 		if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController))))
@@ -193,7 +194,7 @@ void InitPipeline()
 			dxgiFactoryFlags |= DXGI_CREATE_FACTORY_DEBUG;
 		}
 	}
-//#endif
+	//#endif
 
 	ComPtr<IDXGIFactory4> factory;
 	D3D12Utility::DXAssert(CreateDXGIFactory2(dxgiFactoryFlags, IID_PPV_ARGS(&factory)));
@@ -215,8 +216,7 @@ void InitPipeline()
 
 	D3D12Utility::DXAssert(D3D12Globals::Device->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&m_commandQueue)));
 
-	const WindowsWindow& mainWindow = GEngine->GetMainWindow();
-	const WindowProperties& props = mainWindow.GetProperties();
+	const WindowProperties& props = inWindow.GetProperties();
 	m_viewport.Width = static_cast<float>(props.Width);
 	m_viewport.Height = static_cast<float>(props.Height);
 
@@ -239,7 +239,7 @@ void InitPipeline()
 	ComPtr<IDXGISwapChain1> swapChain;
 	D3D12Utility::DXAssert(factory->CreateSwapChainForHwnd(
 		m_commandQueue.Get(),        // Swap chain needs the queue so that it can force a flush on it.
-		static_cast<HWND>(mainWindow.GetHandle()),
+		static_cast<HWND>(inWindow.GetHandle()),
 		&swapChainDesc,
 		nullptr,
 		nullptr,
@@ -276,40 +276,16 @@ void InitPipeline()
 			D3D12Utility::DXAssert(D3D12Globals::Device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&m_commandAllocators[i])));
 		}
 	}
-
-	m_GBufferAlbedo.Init(props.Width, props.Height);
 }
 
-// Returns required size of a buffer to be used for data upload
-inline UINT64 GetRequiredIntermediateSize(
-	ID3D12Resource* pDestinationResource,
-	UINT FirstSubresource,
-	UINT NumSubresources) noexcept
+void D3D12RHI::Init_Internal()
 {
-	const D3D12_RESOURCE_DESC Desc = pDestinationResource->GetDesc();
-	UINT64 RequiredSize = 0;
+	const WindowsWindow& mainWindow = GEngine->GetMainWindow();
+	InitPipeline(mainWindow);
 
-	ID3D12Device* device = nullptr;
-	pDestinationResource->GetDevice(_uuidof(ID3D12Device), reinterpret_cast<void**>(&device));
-	device->GetCopyableFootprints(&Desc, FirstSubresource, NumSubresources, 0, nullptr, nullptr, nullptr, &RequiredSize);
-	device->Release();
+	const WindowProperties& props = mainWindow.GetProperties();
 
-	return RequiredSize;
-}
-
-void DoTheUploadBlocking(ID3D12Resource* inDestResource, ID3D12Resource* inUploadResource, const D3D12_SUBRESOURCE_DATA* inSrcData, uint32_t NumSubresources, ID3D12GraphicsCommandList* inCmdList, DirectX::ScratchImage& inRes);
-
-// One constant buffer view per signature, in the root
-// One table pointing to the global SRV heap where either 
-// A: all descriptors are stored and just the root for the table is modified per drawcall or
-// B: Just the necessary descriptors are stored and they are copied over before the drawcall from non shader-visible heaps
-
-// Constant Buffer is double buffered to allow modifying it each frame
-// Descriptors should also be double buffered
-
-D3D12RHI::D3D12RHI()
-{
-	InitPipeline();
+	m_GBufferAlbedo = eastl::static_shared_pointer_cast<D3D12RenderTarget2D>(CreateRenderTexture(props.Width, props.Height, ERHITexturePrecision::UnsignedByte, ERHITextureFilter::Nearest));
 
 	// Load Assets
 
@@ -327,27 +303,27 @@ D3D12RHI::D3D12RHI()
 
 		//////////////////////////////////////////////////////////////////////////
 
- 		D3D12_DESCRIPTOR_RANGE1 rangesPS[1];
- 		// Texture
- 		rangesPS[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
- 		rangesPS[0].NumDescriptors = 1;
- 		rangesPS[0].BaseShaderRegister = 0;
- 		rangesPS[0].RegisterSpace = 0;
- 		rangesPS[0].Flags = D3D12_DESCRIPTOR_RANGE_FLAG_DATA_STATIC;
+		D3D12_DESCRIPTOR_RANGE1 rangesPS[1];
+		// Texture
+		rangesPS[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+		rangesPS[0].NumDescriptors = 1;
+		rangesPS[0].BaseShaderRegister = 0;
+		rangesPS[0].RegisterSpace = 0;
+		rangesPS[0].Flags = D3D12_DESCRIPTOR_RANGE_FLAG_DATA_STATIC;
 		rangesPS[0].OffsetInDescriptorsFromTableStart = 0;
- 
- 		D3D12_ROOT_PARAMETER1 rootParameters[2];
 
- 		rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
- 		rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+		D3D12_ROOT_PARAMETER1 rootParameters[2];
+
+		rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+		rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
 		rootParameters[0].Descriptor.Flags = D3D12_ROOT_DESCRIPTOR_FLAG_DATA_STATIC;
 		rootParameters[0].Descriptor.RegisterSpace = 0;
 		rootParameters[0].Descriptor.ShaderRegister = 0;
- 
- 		rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
- 		rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
- 		rootParameters[1].DescriptorTable.NumDescriptorRanges = 1;
- 		rootParameters[1].DescriptorTable.pDescriptorRanges = &rangesPS[0];
+
+		rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+		rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+		rootParameters[1].DescriptorTable.NumDescriptorRanges = 1;
+		rootParameters[1].DescriptorTable.pDescriptorRanges = &rangesPS[0];
 
 
 		//////////////////////////////////////////////////////////////////////////
@@ -373,7 +349,7 @@ D3D12RHI::D3D12RHI()
 			| D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS
 			| D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS
 			| D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS;
-			//| D3D12_ROOT_SIGNATURE_FLAG_DENY_PIXEL_SHADER_ROOT_ACCESS;
+		//| D3D12_ROOT_SIGNATURE_FLAG_DENY_PIXEL_SHADER_ROOT_ACCESS;
 
 		D3D12_VERSIONED_ROOT_SIGNATURE_DESC rootSignatureDesc;
 		rootSignatureDesc.Version = D3D_ROOT_SIGNATURE_VERSION_1_1;
@@ -394,7 +370,7 @@ D3D12RHI::D3D12RHI()
 
 		D3D12Utility::DXAssert(D3D12Globals::Device->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&m_rootSignature)));
 	}
-	
+
 	eastl::string fullPath = "shaders";
 	fullPath.insert(0, "../Data/Shaders/D3D12/");
 	fullPath.append(".hlsl");
@@ -506,12 +482,9 @@ D3D12RHI::D3D12RHI()
 	psoDesc.SampleDesc.Count = 1;
 
 	D3D12Utility::DXAssert(D3D12Globals::Device->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&m_pipelineState)));
-										 
+
 	// Create the command list.
 	D3D12Utility::DXAssert(D3D12Globals::Device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_commandAllocators[D3D12Globals::CurrentFrameIndex].Get(), m_pipelineState.Get(), IID_PPV_ARGS(&m_commandList)));
-
-	const WindowsWindow& mainWindow = GEngine->GetMainWindow();
-	const WindowProperties& props = mainWindow.GetProperties();
 
 	const int32_t aspectRatio = props.Width / props.Height;
 
@@ -567,7 +540,38 @@ D3D12RHI::D3D12RHI()
 	}
 }
 
-void DoTheUploadBlocking(ID3D12Resource* inDestResource, ID3D12Resource* inUploadResource, uint32_t NumSubresources, ID3D12GraphicsCommandList* inCmdList, DirectX::ScratchImage& inRes)
+// Returns required size of a buffer to be used for data upload
+inline UINT64 GetRequiredIntermediateSize(
+	ID3D12Resource* pDestinationResource,
+	UINT FirstSubresource,
+	UINT NumSubresources) noexcept
+{
+	const D3D12_RESOURCE_DESC Desc = pDestinationResource->GetDesc();
+	UINT64 RequiredSize = 0;
+
+	ID3D12Device* device = nullptr;
+	pDestinationResource->GetDevice(_uuidof(ID3D12Device), reinterpret_cast<void**>(&device));
+	device->GetCopyableFootprints(&Desc, FirstSubresource, NumSubresources, 0, nullptr, nullptr, nullptr, &RequiredSize);
+	device->Release();
+
+	return RequiredSize;
+}
+
+void UploadTextureBlocking(ID3D12Resource* inDestResource, ID3D12Resource* inUploadResource, const D3D12_SUBRESOURCE_DATA* inSrcData, uint32_t NumSubresources, ID3D12GraphicsCommandList* inCmdList, DirectX::ScratchImage& inRes);
+
+// One constant buffer view per signature, in the root
+// One table pointing to the global SRV heap where either 
+// A: all descriptors are stored and just the root for the table is modified per drawcall or
+// B: Just the necessary descriptors are stored and they are copied over before the drawcall from non shader-visible heaps
+
+// Constant Buffer is double buffered to allow modifying it each frame
+// Descriptors should also be double buffered
+
+D3D12RHI::D3D12RHI()
+{
+}
+
+void UploadTextureBlocking(ID3D12Resource* inDestResource, ID3D12Resource* inUploadResource, uint32_t NumSubresources, ID3D12GraphicsCommandList* inCmdList, DirectX::ScratchImage& inRes)
 {
 	const uint32_t numMips = (uint32_t)(inRes.GetImageCount());
 	const DirectX::TexMetadata& metaData = inRes.GetMetadata();
@@ -826,23 +830,20 @@ void D3D12RHI::Test()
 	m_commandList->SetGraphicsRootDescriptorTable(1, D3D12Globals::GlobalSRVHeap.GetGPUHandle(m_texture->SRVIndex));
 
 	D3D12Utility::TransitionResource(m_commandList.Get(), m_renderTargets[D3D12Globals::CurrentFrameIndex].Get(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
-
 	
 	D3D12_CPU_DESCRIPTOR_HANDLE renderTargets[2];
-	//D3D12_CPU_DESCRIPTOR_HANDLE currentRTDescriptor;
-	//currentRTDescriptor.ptr = D3D12Globals::GlobalRTVHeap.CPUStart.ptr + D3D12Globals::CurrentFrameIndex * D3D12Globals::GlobalRTVHeap.DescriptorSize;
 
 	// Backbuffers are the first 2 RTVs in the Global Heap
-	D3D12_CPU_DESCRIPTOR_HANDLE currentRTDescriptor = D3D12Globals::GlobalRTVHeap.GetCPUHandle(D3D12Globals::CurrentFrameIndex);
+	D3D12_CPU_DESCRIPTOR_HANDLE currentBackbufferRTDescriptor = D3D12Globals::GlobalRTVHeap.GetCPUHandle(D3D12Globals::CurrentFrameIndex);
 
-	renderTargets[0] = currentRTDescriptor;
-	renderTargets[1] = m_GBufferAlbedo.RTV;
+	renderTargets[0] = currentBackbufferRTDescriptor; // TODO: This has to be removed from the RTs and stuff has to be copied into the backbuffer at the end
+	renderTargets[1] = m_GBufferAlbedo->RTV;
 
 	m_commandList->OMSetRenderTargets(2, renderTargets, FALSE, nullptr);
 
 	// Record commands.
 	const float clearColor[] = { 0.0f, 0.2f, 0.4f, 1.0f };
-	m_commandList->ClearRenderTargetView(currentRTDescriptor, clearColor, 0, nullptr);
+	m_commandList->ClearRenderTargetView(currentBackbufferRTDescriptor, clearColor, 0, nullptr);
 	m_commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	m_commandList->IASetVertexBuffers(0, 1, &m_vertexBuffer->VBView());
 	m_commandList->IASetIndexBuffer(&m_indexBuffer->IBView());
@@ -1019,7 +1020,7 @@ eastl::shared_ptr<RHITexture2D> D3D12RHI::CreateAndLoadTexture2D(const eastl::st
 		IID_PPV_ARGS(&textureUploadHeap)));
 
 	// Blocking call
-	DoTheUploadBlocking(texResource, textureUploadHeap, 1, m_commandList.Get(), res);
+	UploadTextureBlocking(texResource, textureUploadHeap, 1, m_commandList.Get(), res);
 
 	// Transition from copy dest to shader resource
 	D3D12Utility::TransitionResource(m_commandList.Get(), texResource, D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
@@ -1047,4 +1048,87 @@ eastl::shared_ptr<RHITexture2D> D3D12RHI::CreateAndLoadTexture2D(const eastl::st
 
 	return newTexture;
 }
+
+eastl::shared_ptr<class RHIRenderTarget2D> D3D12RHI::CreateRenderTexture(const int32_t inWidth, const int32_t inHeight, const ERHITexturePrecision inPrecision /*= ERHITexturePrecision::UnsignedByte*/, const ERHITextureFilter inFilter /*= ERHITextureFilter::Linear*/)
+{
+	eastl::shared_ptr<D3D12RenderTarget2D> newRT = eastl::make_shared<D3D12RenderTarget2D>();
+	eastl::unique_ptr<D3D12Texture2D> ownedTexture = eastl::make_unique<D3D12Texture2D>();
+
+ 	D3D12_RESOURCE_DESC textureDesc = {};
+ 
+ 	DXGI_FORMAT texFormat;
+ 
+ 	switch (inPrecision)
+ 	{
+ 	case ERHITexturePrecision::UnsignedByte:
+ 	{
+ 		texFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
+ 		break;
+ 	}
+ 	case ERHITexturePrecision::Float16:
+ 	{
+ 		texFormat = DXGI_FORMAT_R16G16B16A16_FLOAT;
+ 		break;
+ 	}
+ 	default:
+ 		break;
+ 
+ 	}
+ 
+ 	textureDesc.Width = inWidth;
+ 	textureDesc.Height = inHeight;
+ 	textureDesc.MipLevels = 1;
+ 	textureDesc.Format = texFormat;
+ 	textureDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
+ 	textureDesc.DepthOrArraySize = 1;
+ 	textureDesc.SampleDesc.Count = 1;
+ 	textureDesc.SampleDesc.Quality = 0;
+ 	textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+ 	textureDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+ 	textureDesc.Alignment = 0;
+ 
+ 	const D3D12_RESOURCE_STATES initState = D3D12_RESOURCE_STATE_RENDER_TARGET;
+ 
+ 	D3D12Utility::DXAssert(D3D12Globals::Device->CreateCommittedResource(
+ 		&D3D12Utility::GetDefaultHeapProps(),
+ 		D3D12_HEAP_FLAG_NONE,
+ 		&textureDesc,
+ 		initState,
+ 		nullptr,
+ 		IID_PPV_ARGS(&ownedTexture->Resource)));
+ 
+ 	static int32_t RenderTargetIndex = 0;
+ 	++RenderTargetIndex;
+ 
+ 	eastl::wstring textureName = L"RenderTarget ";
+ 	const eastl::wstring textureIndex = eastl::to_wstring(RenderTargetIndex);
+ 	textureName += textureIndex;
+ 
+	ownedTexture->Resource->SetName(textureName.c_str());
+ 
+ 	// Create SRV
+ 	{
+ 		D3D12DescHeapAllocationDesc descAllocation = D3D12Globals::GlobalSRVHeap.AllocatePersistent();
+		ownedTexture->SRVIndex = descAllocation.Index;
+ 		D3D12Globals::Device->CreateShaderResourceView(ownedTexture->Resource, nullptr, descAllocation.CPUHandle);
+ 	}
+ 
+ 	// Create RTV
+ 	{
+ 		D3D12DescHeapAllocationDesc descAllocation = D3D12Globals::GlobalRTVHeap.AllocatePersistent();
+ 		newRT->RTV = descAllocation.CPUHandle;
+ 
+ 		D3D12Globals::Device->CreateRenderTargetView(ownedTexture->Resource, nullptr, descAllocation.CPUHandle);
+ 
+ 	}
+ 
+ 	ownedTexture->Width = inWidth;
+	ownedTexture->Height = inHeight;
+
+	newRT->Texture = std::move(ownedTexture);
+
+	return newRT;
+}
+
+
 

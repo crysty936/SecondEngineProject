@@ -2,6 +2,9 @@
 #include "Renderer/RHI/RHI.h"
 #include "EASTL/string.h"
 
+#if 0
+
+
 class D3D11RHI : public RHI
 {
 public:
@@ -65,3 +68,5 @@ private:
 	glm::vec4 CurrentClearColor = glm::vec4(1.f, 1.f, 1.f, 1.f);
 
 };
+
+#endif

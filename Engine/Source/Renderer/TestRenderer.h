@@ -39,21 +39,10 @@ public:
 
 	eastl::string GetMaterialsDirPrefix() override;
 
-
-
 protected:
 	void InitInternal() override;
 
-//private:
-	//void UpdateUniforms();
-//	void SetViewportSizeToMain();
-
 private:
-	//eastl::vector<RenderCommand> MainCommands;
-	//eastl::vector<RenderCommand> DecalCommands;
-	//EDrawMode::Type CurrentDrawMode = EDrawMode::Default;
-	//eastl::unordered_map<eastl::string, eastl::shared_ptr<class MeshDataContainer>> RenderDataContainerMap;
-
 
 	friend Renderer;
 };

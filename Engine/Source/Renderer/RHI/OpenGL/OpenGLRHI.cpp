@@ -22,6 +22,11 @@
 #include "imgui.h"
 #include "backends/imgui_impl_opengl3.h"
 
+// Deprecated
+
+#if 0
+
+
 namespace GLUtils
 {
 
@@ -479,65 +484,67 @@ eastl::shared_ptr<RHITexture2D> OpenGLRHI::CreateAndLoadTexture2D(const eastl::s
 	return newTexture;
 }
 
-eastl::shared_ptr<class RHITexture2D> OpenGLRHI::CreateRenderTexture(const int32_t inWidth, const int32_t inHeight, const ERHITexturePrecision inPrecision, const ERHITextureFilter inFilter)
+eastl::shared_ptr<class RHIRenderTarget2D> OpenGLRHI::CreateRenderTexture(const int32_t inWidth, const int32_t inHeight, const ERHITexturePrecision inPrecision, const ERHITextureFilter inFilter)
 {
-	uint32_t texHandle = 0;
-	glGenTextures(1, &texHandle);
-	eastl::shared_ptr<GLTexture2D> newTexture = eastl::make_shared<GLTexture2D>(texHandle);
+	ASSERT_MSG(false, "Not adapted to new code");
 
- 	glBindTexture(GL_TEXTURE_2D, texHandle);
- 
-	int32_t internalFormat = 0;
-	uint32_t internalType = 0;
-	
-	switch (inPrecision)
-	{
-	case ERHITexturePrecision::UnsignedByte:
-	{
-		internalFormat = GL_RGBA;
-		internalType = GL_UNSIGNED_BYTE;
-		break;
-	}
-	case ERHITexturePrecision::Float16:
-	{
-		internalFormat = GL_RGBA16F;
-		internalType = GL_FLOAT;
-		break;
-	}
-	}
+	//uint32_t texHandle = 0;
+	//glGenTextures(1, &texHandle);
+	//eastl::shared_ptr<GLTexture2D> newTexture = eastl::make_shared<GLTexture2D>(texHandle);
 
- 	glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, inWidth, inHeight, 0, GL_RGBA, internalType, nullptr);
+ //	glBindTexture(GL_TEXTURE_2D, texHandle);
+ //
+	//int32_t internalFormat = 0;
+	//uint32_t internalType = 0;
+	//
+	//switch (inPrecision)
+	//{
+	//case ERHITexturePrecision::UnsignedByte:
+	//{
+	//	internalFormat = GL_RGBA;
+	//	internalType = GL_UNSIGNED_BYTE;
+	//	break;
+	//}
+	//case ERHITexturePrecision::Float16:
+	//{
+	//	internalFormat = GL_RGBA16F;
+	//	internalType = GL_FLOAT;
+	//	break;
+	//}
+	//}
 
-	int32_t filterType = 0;
+ //	glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, inWidth, inHeight, 0, GL_RGBA, internalType, nullptr);
 
-	switch (inFilter)
-	{
-	case ERHITextureFilter::Linear:
-	{
-		filterType = GL_LINEAR;
-		break;
-	}
-	case ERHITextureFilter::Nearest:
-	{
-		filterType = GL_NEAREST;
-		break;
-	}
-	}
- 
- 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filterType);
- 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filterType);
- 
- 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
- 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
- 
- 	glBindTexture(GL_TEXTURE_2D, 0);
+	//int32_t filterType = 0;
 
-	newTexture->Width = inWidth;
-	newTexture->Height = inHeight;
-	newTexture->NrChannels = 3;
-	newTexture->ChannelsType = ERHITextureChannelsType::RGBA;
-	newTexture->Precision = inPrecision;
-	newTexture->Filter = inFilter;
+	//switch (inFilter)
+	//{
+	//case ERHITextureFilter::Linear:
+	//{
+	//	filterType = GL_LINEAR;
+	//	break;
+	//}
+	//case ERHITextureFilter::Nearest:
+	//{
+	//	filterType = GL_NEAREST;
+	//	break;
+	//}
+	//}
+ //
+ //	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filterType);
+ //	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filterType);
+ //
+ //	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+ //	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+ //
+ //	glBindTexture(GL_TEXTURE_2D, 0);
+
+	//newTexture->Width = inWidth;
+	//newTexture->Height = inHeight;
+	//newTexture->NrChannels = 3;
+	//newTexture->ChannelsType = ERHITextureChannelsType::RGBA;
+	//newTexture->Precision = inPrecision;
+	//newTexture->Filter = inFilter;
 
 	return newTexture;
 }
@@ -1689,4 +1696,6 @@ void OpenGLRHI::UpdateVertexBufferData(class RHIVertexBuffer& inBuffer, const vo
 		glNamedBufferData(glBuffer.Handle, inSize, inData, GL_STATIC_DRAW);
 	}
 }
+
+#endif
 

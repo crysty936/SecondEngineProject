@@ -19,6 +19,9 @@
 #include "Utils/ImageLoading.h"
 #include <d3d11_1.h>
 
+#if 0
+
+
 static D3D_DRIVER_TYPE	PresentDriverType = D3D_DRIVER_TYPE_NULL;
 static D3D_FEATURE_LEVEL PresentFeatureLevel = D3D_FEATURE_LEVEL_11_0;
 static ID3D11Device* D3DDevice = nullptr;
@@ -657,3 +660,6 @@ void D3D11RHI::UniformBufferUpdateData(RHIUniformBuffer & inBuffer, const void* 
 	// Unlock the constant buffer.
 	ImmediateContext->Unmap(d3d11Buffer.Handle, 0);
 }
+
+#endif
+

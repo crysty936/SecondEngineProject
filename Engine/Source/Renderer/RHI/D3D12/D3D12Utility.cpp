@@ -2,8 +2,8 @@
 
 ID3D12Device* D3D12Globals::Device;
 uint64_t D3D12Globals::CurrentFrameIndex = 0;
-DescriptorHeap D3D12Globals::GlobalRTVHeap;
-DescriptorHeap D3D12Globals::GlobalSRVHeap;
+D3D12IDescriptorHeap D3D12Globals::GlobalRTVHeap;
+D3D12IDescriptorHeap D3D12Globals::GlobalSRVHeap;
 
 D3D12_HEAP_PROPERTIES& D3D12Utility::GetDefaultHeapProps()
 {
@@ -45,3 +45,14 @@ void D3D12Utility::TransitionResource(ID3D12GraphicsCommandList* inCmdList, ID3D
 
 	inCmdList->ResourceBarrier(1, &barrier);
 }
+
+void D3D12Utility::MakeTextureReadable(ID3D12GraphicsCommandList* inCmdList, ID3D12Resource* inResource)
+{
+	TransitionResource(inCmdList, inResource, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+}
+
+void D3D12Utility::MakeTextureWriteable(ID3D12GraphicsCommandList* inCmdList, ID3D12Resource* inResource)
+{
+	TransitionResource(inCmdList, inResource, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET);
+}
+

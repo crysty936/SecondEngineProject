@@ -2,12 +2,12 @@
 #include "D3D12Utility.h"
 #include <combaseapi.h>
 
-DescriptorHeap::~DescriptorHeap()
+D3D12IDescriptorHeap::~D3D12IDescriptorHeap()
 {
 	Heap->Release();
 }
 
-void DescriptorHeap::Init(bool inShaderVisible, uint32_t inNumPersistent, D3D12_DESCRIPTOR_HEAP_TYPE inHeapType)
+void D3D12IDescriptorHeap::Init(bool inShaderVisible, uint32_t inNumPersistent, D3D12_DESCRIPTOR_HEAP_TYPE inHeapType)
 {
 	D3D12_DESCRIPTOR_HEAP_DESC rtvHeapDesc = {};
 	rtvHeapDesc.NumDescriptors = inNumPersistent;
@@ -22,7 +22,7 @@ void DescriptorHeap::Init(bool inShaderVisible, uint32_t inNumPersistent, D3D12_
 	GPUStart = Heap->GetGPUDescriptorHandleForHeapStart();
 }
 
-D3D12DescHeapAllocationDesc DescriptorHeap::AllocatePersistent()
+D3D12DescHeapAllocationDesc D3D12IDescriptorHeap::AllocatePersistent()
 {
 	ASSERT((Allocated + 1) <= NumPersistentDescriptors);
 
@@ -36,14 +36,14 @@ D3D12DescHeapAllocationDesc DescriptorHeap::AllocatePersistent()
 	return newAllocation;
 }
 
-D3D12_GPU_DESCRIPTOR_HANDLE DescriptorHeap::GetGPUHandle(uint32_t inIndex)
+D3D12_GPU_DESCRIPTOR_HANDLE D3D12IDescriptorHeap::GetGPUHandle(uint32_t inIndex)
 {
 	uint64_t gpuPtr = GPUStart.ptr + (DescriptorSize * inIndex);
 
 	return D3D12_GPU_DESCRIPTOR_HANDLE{ gpuPtr };
 }
 
-D3D12_CPU_DESCRIPTOR_HANDLE DescriptorHeap::GetCPUHandle(uint32_t inIndex)
+D3D12_CPU_DESCRIPTOR_HANDLE D3D12IDescriptorHeap::GetCPUHandle(uint32_t inIndex)
 {
 	uint64_t cpuPtr = CPUStart.ptr + (DescriptorSize * inIndex);
 
@@ -117,87 +117,77 @@ MapResult D3D12IConstantBuffer::Map()
 	return res;
 }
 
-RenderTargetTexture::RenderTargetTexture()
-{
-
-}
-
-RenderTargetTexture::~RenderTargetTexture()
-{
-	if (Texture.Resource)
-	{
-		Texture.Resource->Release();
-	}
-}
-
-void RenderTargetTexture::Init(const uint32_t inWidth, const uint32_t inHeight)
-{
-	D3D12_RESOURCE_DESC textureDesc = {};
-
-	textureDesc.Width = inWidth;
-	textureDesc.Height = inHeight;
-	textureDesc.MipLevels = 1;
-	textureDesc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
-	textureDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
-	textureDesc.DepthOrArraySize = 1;
-	textureDesc.SampleDesc.Count = 1;
-	textureDesc.SampleDesc.Quality = 0;
-	textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-	textureDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-	textureDesc.Alignment = 0;
-
-	const D3D12_RESOURCE_STATES initState = D3D12_RESOURCE_STATE_RENDER_TARGET;
-
-	D3D12Utility::DXAssert(D3D12Globals::Device->CreateCommittedResource(
-		&D3D12Utility::GetDefaultHeapProps(),
-		D3D12_HEAP_FLAG_NONE,
-		&textureDesc,
-		initState,
-		nullptr,
-		IID_PPV_ARGS(&Texture.Resource)));
+//D3D12IRenderTargetTexture::D3D12IRenderTargetTexture()
+//{
+//
+//}
+//
+//D3D12IRenderTargetTexture::~D3D12IRenderTargetTexture()
+//{
+//	if (Texture.Resource)
+//	{
+//		Texture.Resource->Release();
+//	}
+//}
 
 
-	static int32_t RenderTargetIndex = 0;
-	++RenderTargetIndex;
-
-	eastl::wstring textureName = L"RenderTarget ";
-	const eastl::wstring textureIndex = eastl::to_wstring(RenderTargetIndex);
-	textureName += textureIndex;
-
-	Texture.Resource->SetName(textureName.c_str());
-
-	// Create SRV
-	{
-		D3D12DescHeapAllocationDesc descAllocation = D3D12Globals::GlobalSRVHeap.AllocatePersistent();
-		Texture.SRVIndex = descAllocation.Index;
-		D3D12Globals::Device->CreateShaderResourceView(Texture.Resource, nullptr, descAllocation.CPUHandle);
-	}
-
-	// Create RTV
-	{
-		D3D12DescHeapAllocationDesc descAllocation = D3D12Globals::GlobalRTVHeap.AllocatePersistent();
-		RTV = descAllocation.CPUHandle;
-
-		D3D12Globals::Device->CreateRenderTargetView(Texture.Resource, nullptr, descAllocation.CPUHandle);
-
-	}
-
-	Texture.Width = inWidth;
-	Texture.Height = inHeight;
-
-
-
-
-}
-
-void RenderTargetTexture::MakeReadable(ID3D12GraphicsCommandList* inCmdList)
-{
-	D3D12Utility::TransitionResource(inCmdList, Texture.Resource, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
-
-}
-
-void RenderTargetTexture::MakeWriteable(ID3D12GraphicsCommandList* inCmdList)
-{
-	D3D12Utility::TransitionResource(inCmdList, Texture.Resource, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET);
-}
+// 
+// void D3D12IRenderTargetTexture::Init(const uint32_t inWidth, const uint32_t inHeight)
+// {
+// 	D3D12_RESOURCE_DESC textureDesc = {};
+// 
+// 	textureDesc.Width = inWidth;
+// 	textureDesc.Height = inHeight;
+// 	textureDesc.MipLevels = 1;
+// 	textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+// 	textureDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
+// 	textureDesc.DepthOrArraySize = 1;
+// 	textureDesc.SampleDesc.Count = 1;
+// 	textureDesc.SampleDesc.Quality = 0;
+// 	textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+// 	textureDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+// 	textureDesc.Alignment = 0;
+// 
+// 	const D3D12_RESOURCE_STATES initState = D3D12_RESOURCE_STATE_RENDER_TARGET;
+// 
+// 	D3D12Utility::DXAssert(D3D12Globals::Device->CreateCommittedResource(
+// 		&D3D12Utility::GetDefaultHeapProps(),
+// 		D3D12_HEAP_FLAG_NONE,
+// 		&textureDesc,
+// 		initState,
+// 		nullptr,
+// 		IID_PPV_ARGS(&Texture.Resource)));
+// 
+// 	static int32_t RenderTargetIndex = 0;
+// 	++RenderTargetIndex;
+// 
+// 	eastl::wstring textureName = L"RenderTarget ";
+// 	const eastl::wstring textureIndex = eastl::to_wstring(RenderTargetIndex);
+// 	textureName += textureIndex;
+// 
+// 	Texture.Resource->SetName(textureName.c_str());
+// 
+// 	// Create SRV
+// 	{
+// 		D3D12DescHeapAllocationDesc descAllocation = D3D12Globals::GlobalSRVHeap.AllocatePersistent();
+// 		Texture.SRVIndex = descAllocation.Index;
+// 		D3D12Globals::Device->CreateShaderResourceView(Texture.Resource, nullptr, descAllocation.CPUHandle);
+// 	}
+// 
+// 	// Create RTV
+// 	{
+// 		D3D12DescHeapAllocationDesc descAllocation = D3D12Globals::GlobalRTVHeap.AllocatePersistent();
+// 		RTV = descAllocation.CPUHandle;
+// 
+// 		D3D12Globals::Device->CreateRenderTargetView(Texture.Resource, nullptr, descAllocation.CPUHandle);
+// 
+// 	}
+// 
+// 	Texture.Width = inWidth;
+// 	Texture.Height = inHeight;
+// 
+// 
+// 
+// 
+// }
 

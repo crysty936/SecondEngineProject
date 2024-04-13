@@ -540,7 +540,7 @@ void PathTracingRenderer::Draw()
 
 	RHI::Get()->UploadDataToTexture(*RHITexture, data, false);
 
-	RHI::Instance->BindDefaultFrameBuffer();
+	//RHI::Instance->BindDefaultFrameBuffer();
 	RHI::Get()->ClearBuffers();
 
 	DrawCommand(VisualizeQuad->GetCommand());

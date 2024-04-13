@@ -22,7 +22,6 @@ public:
 
 };
 
-
 class D3D12VertexBuffer : public RHIVertexBuffer
 {
 public:
@@ -43,4 +42,13 @@ class D3D12Texture2D : public RHITexture2D
 public:
 	ID3D12Resource* Resource = nullptr;
 	uint32_t SRVIndex = -1;
+};
+
+
+class D3D12RenderTarget2D : public RHIRenderTarget2D
+{
+
+public:
+	D3D12_CPU_DESCRIPTOR_HANDLE RTV = {};
+
 };

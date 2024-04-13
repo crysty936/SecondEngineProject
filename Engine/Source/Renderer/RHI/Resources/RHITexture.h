@@ -1,6 +1,7 @@
 #pragma once
 #include <stdint.h>
 #include "EASTL/string.h"
+#include "EASTL/unique_ptr.h"
 
 enum class ETextureType
 {
@@ -42,4 +43,11 @@ public:
 	ERHITextureChannelsType ChannelsType = ERHITextureChannelsType::RGBA;
 	ERHITexturePrecision Precision = ERHITexturePrecision::UnsignedByte;
 	ERHITextureFilter Filter = ERHITextureFilter::Linear;
+};
+
+
+class RHIRenderTarget2D
+{
+public:
+	eastl::unique_ptr<RHITexture2D> Texture;
 };
