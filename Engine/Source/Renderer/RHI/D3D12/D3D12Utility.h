@@ -14,8 +14,8 @@ namespace D3D12Globals
 
 	// Descriptor Heaps
 	// TODO: Implement non-shader visible descriptor heaps that will be copied over into main heap when drawing
-	extern D3D12IDescriptorHeap GlobalRTVHeap;
-	extern D3D12IDescriptorHeap GlobalSRVHeap;
+	extern D3D12Internal_DescriptorHeap GlobalRTVHeap;
+	extern D3D12Internal_DescriptorHeap GlobalSRVHeap;
 }
 
 namespace D3D12Utility

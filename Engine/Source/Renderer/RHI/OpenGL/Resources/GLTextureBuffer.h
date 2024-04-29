@@ -1,5 +1,5 @@
 #pragma once
-#include "Renderer/RHI/Resources/RHITextureBuffer.h"
+#include "Renderer/RHI/Resources/RHIBuffers.h"
 #include <stdint.h>
 
 class GlTextureBuffer : public RHITextureBuffer

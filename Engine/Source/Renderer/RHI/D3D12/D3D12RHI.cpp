@@ -39,8 +39,11 @@
 #include "D3D12Resources.h"
 
 
-using Microsoft::WRL::ComPtr;
+// D3D12 RHI stuff to do:
+// Fix the default memory allocation to use a ring buffer instead of the hack that is present right now
+// Modify the constant buffers to allow a single buffer to be used for all draws
 
+using Microsoft::WRL::ComPtr;
 
 inline eastl::string HrToString(HRESULT hr)
 {
@@ -159,7 +162,7 @@ static_assert((sizeof(SceneConstantBuffer) % 256) == 0, "Constant Buffer size mu
 float StaticOffset = 0.f;
 
 SceneConstantBuffer m_constantBufferData;
-D3D12IConstantBuffer m_constantBuffer;
+D3D12Internal_ConstantBuffer m_constantBuffer;
 
 //static uint8_t* FrameConstantBufferCPUMem[D3D12Globals::NumFramesInFlight] = {};
 //static uint64_t FrameConstantBufferGPUMem[D3D12Globals::NumFramesInFlight] = {};
@@ -488,7 +491,8 @@ void D3D12RHI::Init_Internal()
 
 	const int32_t aspectRatio = props.Width / props.Height;
 
-	m_indexBuffer = eastl::static_shared_pointer_cast<D3D12IndexBuffer>(CreateIndexBuffer(BasicShapesData::GetCubeIndices(), BasicShapesData::GetCubeIndicesCount()));
+	eastl::shared_ptr<RHIIndexBuffer> newIndexBuffer = CreateIndexBuffer(BasicShapesData::GetCubeIndices(), BasicShapesData::GetCubeIndicesCount());
+	m_indexBuffer = eastl::static_shared_pointer_cast<D3D12IndexBuffer>(newIndexBuffer);
 
 	// Create the vertex buffer.
 	{
@@ -499,7 +503,8 @@ void D3D12RHI::Init_Internal()
 		vbLayout.Push<float>(3, VertexInputType::Normal);
 		vbLayout.Push<float>(2, VertexInputType::TexCoords);
 
-		m_vertexBuffer = eastl::static_shared_pointer_cast<D3D12VertexBuffer>(CreateVertexBuffer(vbLayout, BasicShapesData::GetCubeVertices(), BasicShapesData::GetCubeVerticesCount(), m_indexBuffer));
+		eastl::shared_ptr<RHIVertexBuffer> newVertexBuffer = CreateVertexBuffer(vbLayout, BasicShapesData::GetCubeVertices(), BasicShapesData::GetCubeVerticesCount(), m_indexBuffer);
+		m_vertexBuffer = eastl::static_shared_pointer_cast<D3D12VertexBuffer>(newVertexBuffer);
 	}
 
 	// Create the constant buffer.

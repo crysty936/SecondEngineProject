@@ -4,6 +4,7 @@
 #include "EASTL/shared_ptr.h"
 #include "EASTL/vector.h"
 
+// Used only for OpenGL, deprecated
 class RHIFrameBuffer
 {
 public:

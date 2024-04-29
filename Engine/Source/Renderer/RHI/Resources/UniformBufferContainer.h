@@ -1,8 +1,8 @@
 #pragma once
-#include "RHIBufferBase.h"
+#include "RHIBuffers.h"
 #include "EASTL/vector.h"
 #include "EASTL/shared_ptr.h"
-#include "RHIUniformBuffer.h"
+#include "RHIBuffers.h"
 
 // This can either be subclassed by the other specific uniform buffers or it can contain 
 // the resource, by composition

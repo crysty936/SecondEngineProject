@@ -1,5 +1,5 @@
 #pragma once
-#include "Renderer/RHI/Resources/RHIVertexBuffer.h"
+#include "Renderer/RHI/Resources/RHIBuffers.h"
 
 // Contains data required for drawing.
 // For now just vertex with index buffer

@@ -1,5 +1,5 @@
 #pragma once
-#include "Renderer/RHI/Resources/RHIUniformBuffer.h"
+#include "Renderer/RHI/Resources/RHIBuffers.h"
 
 class D3D11UniformBuffer : public RHIUniformBuffer
 {

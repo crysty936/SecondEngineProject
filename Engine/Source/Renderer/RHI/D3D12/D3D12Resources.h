@@ -1,7 +1,6 @@
 #pragma once
 
-#include "Renderer/RHI/Resources/RHIIndexBuffer.h"
-#include "Renderer/RHI/Resources/RHIVertexBuffer.h"
+#include "Renderer/RHI/Resources/RHIBuffers.h"
 #include <dxgiformat.h>
 #include <d3d12.h>
 #include "Renderer/RHI/Resources/RHITexture.h"

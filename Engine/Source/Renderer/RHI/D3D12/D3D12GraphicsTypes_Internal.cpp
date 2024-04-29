@@ -2,12 +2,12 @@
 #include "D3D12Utility.h"
 #include <combaseapi.h>
 
-D3D12IDescriptorHeap::~D3D12IDescriptorHeap()
+D3D12Internal_DescriptorHeap::~D3D12Internal_DescriptorHeap()
 {
 	Heap->Release();
 }
 
-void D3D12IDescriptorHeap::Init(bool inShaderVisible, uint32_t inNumPersistent, D3D12_DESCRIPTOR_HEAP_TYPE inHeapType)
+void D3D12Internal_DescriptorHeap::Init(bool inShaderVisible, uint32_t inNumPersistent, D3D12_DESCRIPTOR_HEAP_TYPE inHeapType)
 {
 	D3D12_DESCRIPTOR_HEAP_DESC rtvHeapDesc = {};
 	rtvHeapDesc.NumDescriptors = inNumPersistent;
@@ -22,7 +22,7 @@ void D3D12IDescriptorHeap::Init(bool inShaderVisible, uint32_t inNumPersistent, 
 	GPUStart = Heap->GetGPUDescriptorHandleForHeapStart();
 }
 
-D3D12DescHeapAllocationDesc D3D12IDescriptorHeap::AllocatePersistent()
+D3D12DescHeapAllocationDesc D3D12Internal_DescriptorHeap::AllocatePersistent()
 {
 	ASSERT((Allocated + 1) <= NumPersistentDescriptors);
 
@@ -36,26 +36,26 @@ D3D12DescHeapAllocationDesc D3D12IDescriptorHeap::AllocatePersistent()
 	return newAllocation;
 }
 
-D3D12_GPU_DESCRIPTOR_HANDLE D3D12IDescriptorHeap::GetGPUHandle(uint32_t inIndex)
+D3D12_GPU_DESCRIPTOR_HANDLE D3D12Internal_DescriptorHeap::GetGPUHandle(uint32_t inIndex)
 {
 	uint64_t gpuPtr = GPUStart.ptr + (DescriptorSize * inIndex);
 
 	return D3D12_GPU_DESCRIPTOR_HANDLE{ gpuPtr };
 }
 
-D3D12_CPU_DESCRIPTOR_HANDLE D3D12IDescriptorHeap::GetCPUHandle(uint32_t inIndex)
+D3D12_CPU_DESCRIPTOR_HANDLE D3D12Internal_DescriptorHeap::GetCPUHandle(uint32_t inIndex)
 {
 	uint64_t cpuPtr = CPUStart.ptr + (DescriptorSize * inIndex);
 
 	return D3D12_CPU_DESCRIPTOR_HANDLE{ cpuPtr };
 }
 
-D3D12IConstantBuffer::~D3D12IConstantBuffer()
+D3D12Internal_ConstantBuffer::~D3D12Internal_ConstantBuffer()
 {
 	Handle->Release();
 }
 
-void D3D12IConstantBuffer::Init(const uint64_t inSize)
+void D3D12Internal_ConstantBuffer::Init(const uint64_t inSize)
 {
 	//D3D12DescHeapAllocationDesc descAlloc = m_CbvSrvHeap.AllocatePersistent();
 
@@ -106,7 +106,7 @@ void D3D12IConstantBuffer::Init(const uint64_t inSize)
 	D3D12Utility::DXAssert(Handle->Map(0, &readRange, reinterpret_cast<void**>(&CPUAddress)));
 }
 
-MapResult D3D12IConstantBuffer::Map()
+MapResult D3D12Internal_ConstantBuffer::Map()
 {
 	MapResult res = {};
 

@@ -1,5 +1,5 @@
 #pragma once
-#include "Renderer/RHI/Resources/RHIIndexBuffer.h"
+#include "Renderer/RHI/Resources/RHIBuffers.h"
 
 class D3D11IndexBuffer : public RHIIndexBuffer
 {

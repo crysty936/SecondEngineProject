@@ -4,7 +4,7 @@
 #include "EASTL/shared_ptr.h"
 #include "Renderer/RHI/Resources/UniformBufferContainer.h"
 #include "EASTL/unordered_map.h"
-#include "Renderer/RHI/Resources/RHIUniformBuffer.h"
+#include "Renderer/RHI/Resources/RHIBuffers.h"
 
 struct UniformWithFlag
 {
