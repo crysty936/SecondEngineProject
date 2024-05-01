@@ -17,8 +17,6 @@ public:
 	DXGI_FORMAT IBFormat = DXGI_FORMAT_UNKNOWN;
 	uint64_t GPUAddress = 0;
 	uint32_t Size = 0;
-
-
 };
 
 class D3D12VertexBuffer : public RHIVertexBuffer
@@ -43,7 +41,6 @@ public:
 	uint32_t SRVIndex = -1;
 };
 
-
 class D3D12RenderTarget2D : public RHIRenderTarget2D
 {
 
@@ -51,3 +48,4 @@ public:
 	D3D12_CPU_DESCRIPTOR_HANDLE RTV = {};
 
 };
+

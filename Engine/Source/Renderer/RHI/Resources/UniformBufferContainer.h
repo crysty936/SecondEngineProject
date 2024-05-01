@@ -18,7 +18,7 @@ public:
 	void Unbind();
 
 public:
-	eastl::vector<char> UniformsDataCache;
+	eastl::vector<uint8_t> UniformsDataCache;
 	eastl::shared_ptr<RHIUniformBuffer> RHIBuffer;
 	size_t Counter = 0;
 };
